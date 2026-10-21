@@ -1,5 +1,6 @@
 # CI for every push and pull request: build with warnings as errors, formatting, and all tests
-# (including the architecture tests: backend SD1/SD2, app import rules; ADR 0001 and 0019).
+# (including the architecture tests: backend SD1/SD2, app import rules; ADR 0001 and 0019),
+# plus the API v1 contract (ADR 0017): snapshot, backward compatibility, generated Dart client.
 name: ci
 
 on:
@@ -17,7 +18,20 @@ jobs:
       - run: dotnet restore Memorio.slnx
       - run: dotnet build Memorio.slnx --no-restore --configuration Release
       - run: dotnet format Memorio.slnx --verify-no-changes --no-restore
+      # Includes OpenApiContractTests: api/openapi.v1.json must equal what the API serves.
       - run: dotnet test --solution Memorio.slnx --no-build --configuration Release
+
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: API v1 stays backward compatible
+        run: tools/check-api-breaking.sh "$BASE_REF"
+        env:
+          # Pull request: its target branch. Push to version/0.1: the previous commit. Other pushes: version/0.1.
+          BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || (github.ref == 'refs/heads/version/0.1' && 'HEAD^' || 'origin/version/0.1') }}
 
   app:
     runs-on: ubuntu-latest
@@ -31,6 +45,11 @@ jobs:
           flutter-version: 3.47.7
           channel: stable
       - run: flutter pub get
+      - name: Generated API client matches api/openapi.v1.json
+        run: |
+          bash ../tools/generate-api-client.sh
+          git diff --exit-code -- lib/core/api/generated
+          test -z "$(git status --porcelain -- lib/core/api/generated)"
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze
       - run: flutter test

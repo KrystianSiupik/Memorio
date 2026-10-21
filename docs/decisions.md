@@ -331,3 +331,15 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 | D-094 | Reguły importów sprawdzane własnym testem (`test/architecture/import_rules.dart`) z fixturami, zamiast pakietu lint | brak utrzymywanego darmowego pakietu wyrażającego warstwy w funkcjach i pliki publiczne; ~150 linii, każda reguła ma fixture |
 | D-095 | Błędy oczekiwane jako `Result<T, F>` (sealed, Dart 3) w `core/`, z zamkniętym typem błędów per funkcja | wyczerpujący `switch` bez zależności (odpowiednik `Result` w backendzie, D-085) |
 | D-096 | Zależności przypięte dokładnie (flutter_riverpod 3.4.3, go_router 18.1.1, flutter_lints 6.0.0); Flutter 3.47.7 w CI; formatter 120 znaków | powtarzalne buildy, ta sama szerokość linii co backend |
+
+## MEM-E0-PLAT-12 · API v1, OpenAPI, klient Dart, minimalna wersja aplikacji (2026-10-22)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-097 | Klient Dart generowany **swagger_parser** (dio + retrofit + json_serializable) do `app/lib/core/api/generated` | czysty Dart, bez Javy lokalnie i w CI |
+| D-098 | Zgodność kontraktu: **snapshot** `api/openapi.v1.json` (test w backendzie) + **oasdiff** (`breaking --fail-on ERR`) względem `version/0.1` w CI | snapshot łapie każdą zmianę, oasdiff blokuje zmiany łamiące zgodność |
+| D-099 | Wygenerowany kod klienta **commitowany**; CI generuje ponownie i wymaga braku różnic (`tools/generate-api-client.sh`) | zmiany kontraktu widoczne w review, aplikacja buduje się bez generatora |
+| D-100 | Dokument OpenAPI z wbudowanego Microsoft.AspNetCore.OpenApi (OpenAPI 3.1), bez sekcji `servers`; wszystkie ścieżki pod `/v1` (moduły dostają grupę `/v1` w `IModule.MapEndpoints`) | standard .NET 10 bez dodatkowych bibliotek; kontrakt niezależny od hosta |
+| D-101 | Minimalna wersja: nagłówek `X-App-Version`, poniżej `AppVersion:Minimum` odpowiedź **426** z kodem `App.UpdateRequired`; brak nagłówka = obsłużone (web, narzędzia), zły format = 400; `GET /v1/app/version-policy` jako sprawdzenie przy starcie aplikacji | ADR 0017; aplikacja dowiaduje się przy pierwszym żądaniu, bez osobnej logiki porównania w kliencie |
+| D-102 | Format błędów API: **RFC 7807 problem details** z rozszerzeniem `code` („<Obszar>.<Powód>”) | standard ASP.NET Core; kod maszynowy do mapowania na komunikaty w aplikacji |
+| D-103 | Wersja aplikacji z `package_info_plus`, odczytana raz w `main()`; adres backendu z `--dart-define=API_BASE_URL` | jedno źródło wersji (pubspec); adres ustawiany przy buildzie per środowisko |
