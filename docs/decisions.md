@@ -343,3 +343,13 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 | D-101 | Minimalna wersja: nagłówek `X-App-Version`, poniżej `AppVersion:Minimum` odpowiedź **426** z kodem `App.UpdateRequired`; brak nagłówka = obsłużone (web, narzędzia), zły format = 400; `GET /v1/app/version-policy` jako sprawdzenie przy starcie aplikacji | ADR 0017; aplikacja dowiaduje się przy pierwszym żądaniu, bez osobnej logiki porównania w kliencie |
 | D-102 | Format błędów API: **RFC 7807 problem details** z rozszerzeniem `code` („<Obszar>.<Powód>”) | standard ASP.NET Core; kod maszynowy do mapowania na komunikaty w aplikacji |
 | D-103 | Wersja aplikacji z `package_info_plus`, odczytana raz w `main()`; adres backendu z `--dart-define=API_BASE_URL` | jedno źródło wersji (pubspec); adres ustawiany przy buildzie per środowisko |
+
+## MEM-E0-PLAT-19 · nawigacja aplikacji (2026-10-22)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-104 | Typowane trasy jako zamknięta hierarchia klas `AppRoute` (bez generowania kodu); zakładki przez `StatefulShellRoute.indexedStack` (każda zakładka ma własny stos) | go_router_builder 4.5.2 jest niezgodny z build_runner 2.17.1 wymaganym przez generatory klienta API; ręczne typy dają to samo bez cofania wersji |
+| D-105 | Teksty interfejsu na razie po angielsku, w kodzie; lokalizacja (PL/EN) osobnym zadaniem | ekrany to jeszcze zaślepki; l10n warto wprowadzić przed pierwszym prawdziwym ekranem |
+| D-106 | Sesja w funkcji `account`: interfejs `SessionRepository` w domenie, `sessionProvider` w prezentacji, do PLAT-07 implementacja `NoSessionRepository` (nikt nie jest zalogowany) | przekierowanie działa i jest testowane już teraz; PLAT-07 podmienia tylko implementację w `app/composition.dart` |
+| D-107 | Podczas odczytu sesji ekran startowy z `?from=`, po odczycie powrót do żądanego adresu; błąd odczytu = niezalogowany | żadna zakładka nie mignie przed sprawdzeniem sesji; głębokie linki nie giną |
+| D-108 | Baner offline z S02 przenoszę do MEM-E0-PLAT-11 (offline) | wymaga wykrywania łączności, które należy do tamtego ticketu |
