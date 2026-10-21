@@ -318,3 +318,16 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 | D-086 | Testy architektury w **ArchUnitNET** (ADR 0001 dopuszcza NetArchTest/ArchUnitNET); każda reguła ma fixture, który ją łamie, a poprawny fixture wymaga, by każda reguła coś sprawdzała | NetArchTest nie ma dopasowania zależności wyrażeniem regularnym, potrzebnym do wyjątku „tylko Contracts” |
 | D-087 | .NET 10 (SDK przypięty w `global.json`), xUnit v3 na **Microsoft.Testing.Platform**, centralne wersje pakietów, ostrzeżenia jako błędy; CI jako GitHub Actions (plik w repo, bez zdalnego repo na razie) | .NET 10 to aktualne LTS (ADR 0002); `dotnet test` w .NET 10 wymaga MTP |
 | D-088 | Nazwy modułów w kodzie po angielsku: Archive, Album, Access, Provenance, Places, Limits, Plans, AiNarration, Moderation, Account, Succession, Notifications, PlaceProfiles, Publishing | kod po angielsku; mapowanie 1:1 na karty z mapa modułów |
+
+## MEM-E0-PLAT-16 · struktura aplikacji Flutter (2026-10-21)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-089 | **Riverpod** (flutter_riverpod) na stan i wstrzykiwanie zależności | jeden mechanizm, kontrola kompilatora, podmiana zależności w testach przez overrides |
+| D-090 | **go_router** do nawigacji | adresy URL na web, redirect niezalogowanych, zakładki (StatefulShellRoute) w PLAT-19 |
+| D-091 | W tym tickecie tylko część Flutterowa PLAT-16; wzorzec warstw backendu osobno | reguły backendu są już w PLAT-01; przykład warstw backendu powstanie z pierwszym modułem |
+| D-092 | Aplikacja w `app/`, pakiet `memorio`, org `app.memorio` (identyfikator aplikacji do potwierdzenia przed pierwszym wydaniem w sklepie) | jeden folder klienta dla mobile i web; identyfikator łatwo zmienić przed publikacją |
+| D-093 | Funkcje: `lib/features/<f>/{domain,data,presentation}` + plik publiczny `<f>.dart`; `core/` dla kodu 2+ funkcji; `app/` = composition root (overrides providerów) | ADR 0019; prezentacja zależy tylko od interfejsów domeny |
+| D-094 | Reguły importów sprawdzane własnym testem (`test/architecture/import_rules.dart`) z fixturami, zamiast pakietu lint | brak utrzymywanego darmowego pakietu wyrażającego warstwy w funkcjach i pliki publiczne; ~150 linii, każda reguła ma fixture |
+| D-095 | Błędy oczekiwane jako `Result<T, F>` (sealed, Dart 3) w `core/`, z zamkniętym typem błędów per funkcja | wyczerpujący `switch` bez zależności (odpowiednik `Result` w backendzie, D-085) |
+| D-096 | Zależności przypięte dokładnie (flutter_riverpod 3.4.3, go_router 18.1.1, flutter_lints 6.0.0); Flutter 3.47.7 w CI; formatter 120 znaków | powtarzalne buildy, ta sama szerokość linii co backend |
