@@ -374,3 +374,9 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 | D-121 | Port `ITextGenerator` w Application, pierwszy adapter: **Mistral** (chat completions, wynik JSON) przez `HttpClient` + Microsoft.Extensions.Http.Resilience (60 s na próbę); ostateczny dostawca po DPIA i umowie powierzenia (ADR 0009) | D-080 liczył koszty na Mistral (UE); port pozwala zmienić dostawcę bez zmian domeny |
 | D-122 | Konfiguracja AI opcjonalna (`Ai__ApiKey`): bez klucza funkcje AI zwracają `AiNarration.ProviderUnavailable` (E18), reszta aplikacji działa; treść materiałów i odpowiedzi nigdy nie trafia do logów | środowiska bez AI (dev, testy) nie potrzebują klucza |
 | D-123 | Testy modułów w osobnych projektach `tests/Modules/Memorio.Modules.<X>.Tests` z `InternalsVisibleTo` | typy modułu są `internal` (D-083); testy domeny bez bazy i HTTP |
+
+## MEM-E0-PLAT-16 (backend) · szablon warstw modułu (2026-10-22)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-124 | Szablon modułu backendu jako opis w `src/Modules/README.md` z modułem Narracja AI jako wzorcem; testy kierunku zależności już działają od PLAT-01 | szablon generatora (`dotnet new`) nie opłaca się przy kilkunastu modułach tworzonych raz; reguły pilnuje CI |
