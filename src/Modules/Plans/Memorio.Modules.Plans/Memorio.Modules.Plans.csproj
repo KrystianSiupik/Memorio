@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../../BuildingBlocks/Memorio.SharedKernel/Memorio.SharedKernel.csproj" />
+    <ProjectReference Include="../../../BuildingBlocks/Memorio.Modularity/Memorio.Modularity.csproj" />
+    <ProjectReference Include="../Memorio.Modules.Plans.Contracts/Memorio.Modules.Plans.Contracts.csproj" />
+  </ItemGroup>
+</Project>

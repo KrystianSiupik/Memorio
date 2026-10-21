@@ -305,3 +305,16 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 - **Odwracalność:** średnia (dane pochodne do usunięcia i przeliczenia; port wyszukiwania już jest, D-031).
 - **Otwarte:** podstawa prawna i DPIA dla embeddingów opisów; czy potrzebna osobna zgoda (jak C80).
 - **Ticket:** `jira/mvp/propozycje/MEM-PROP-02-embeddingi-wyszukiwanie-semantyczne.md` (backlog z wyzwalaczem).
+
+---
+
+## MEM-E0-PLAT-01 · szkielet modularnego monolitu (2026-10-21)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-083 | **2 projekty na moduł:** `Memorio.Modules.<X>` (warstwy jako foldery, typy `internal`) + `Memorio.Modules.<X>.Contracts` (publiczny) | izolacja między modułami pilnowana przez kompilator, warstwy przez testy architektury; ~30 projektów zamiast ~70 |
+| D-084 | **Wszystkie 14 modułów z mapy** od startu, także Publikacja i Profil miejsca (poza MVP, puste) | literalnie wg ticketu; moduły po MVP czekają na swoje tickety |
+| D-085 | **Własny `Result` / `Error` w SharedKernel** (Validation, NotFound, Conflict, Forbidden, Failure) zamiast biblioteki | mały kod, pełna kontrola, bez zależności |
+| D-086 | Testy architektury w **ArchUnitNET** (ADR 0001 dopuszcza NetArchTest/ArchUnitNET); każda reguła ma fixture, który ją łamie, a poprawny fixture wymaga, by każda reguła coś sprawdzała | NetArchTest nie ma dopasowania zależności wyrażeniem regularnym, potrzebnym do wyjątku „tylko Contracts” |
+| D-087 | .NET 10 (SDK przypięty w `global.json`), xUnit v3 na **Microsoft.Testing.Platform**, centralne wersje pakietów, ostrzeżenia jako błędy; CI jako GitHub Actions (plik w repo, bez zdalnego repo na razie) | .NET 10 to aktualne LTS (ADR 0002); `dotnet test` w .NET 10 wymaga MTP |
+| D-088 | Nazwy modułów w kodzie po angielsku: Archive, Album, Access, Provenance, Places, Limits, Plans, AiNarration, Moderation, Account, Succession, Notifications, PlaceProfiles, Publishing | kod po angielsku; mapowanie 1:1 na karty z mapa modułów |

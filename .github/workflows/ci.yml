@@ -1,0 +1,20 @@
+# CI for every push and pull request: build with warnings as errors, formatting, and all tests
+# (including the architecture tests SD1/SD2, ADR 0001 and 0019).
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet restore Memorio.slnx
+      - run: dotnet build Memorio.slnx --no-restore --configuration Release
+      - run: dotnet format Memorio.slnx --verify-no-changes --no-restore
+      - run: dotnet test --solution Memorio.slnx --no-build --configuration Release
