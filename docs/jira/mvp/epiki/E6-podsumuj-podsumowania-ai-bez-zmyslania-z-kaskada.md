@@ -35,3 +35,10 @@
 | [MEM-E6-POCHODZENIE-07](../MEM-E6-POCHODZENIE-07-polityka-p12-zawsze-gdy-zgoda-na-ai-odwolana-wtedy.md) | Polityka P12: Zawsze gdy zgoda na AI odwołana, wtedy unieważnij artefakty powstałe z treści tej osoby | pochodzenie / aplikacja (handler zdarzenia) | 1–3 | gotowy |
 | [MEM-E6-POCHODZENIE-08](../MEM-E6-POCHODZENIE-08-polityka-p34-zawsze-gdy-archiwum-przyciete-wtedy-u.md) | Polityka P34: Zawsze gdy archiwum przycięte, wtedy unieważnij artefakty cytujące usunięty materiał | pochodzenie / aplikacja (handler zdarzenia) | 1–3 | gotowy |
 | [MEM-E6-PLAT-01](../MEM-E6-PLAT-01-ekran-s17-podsumowanie-okresu-ai.md) | Ekran S17 „Podsumowanie okresu (AI)” | - / UI | 2–4 | gotowy |
+
+## Propozycje (poza planem, do decyzji)
+
+| Kod | Tytuł | Decyzja |
+|---|---|---|
+| [MEM-PROP-01](../propozycje/MEM-PROP-01-ewaluacja-jakosci-podsumowan-ai.md) | Ewaluacja jakości podsumowań AI (czy AI nie zmyśla) | D-081 |
+| [MEM-PROP-02](../propozycje/MEM-PROP-02-embeddingi-wyszukiwanie-semantyczne.md) | Embeddingi: dobór materiałów do podsumowań (RAG) i wyszukiwanie semantyczne | D-082 |

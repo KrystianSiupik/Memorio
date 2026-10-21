@@ -317,3 +317,10 @@ Plan zaktualizowany 2026-10-19 po przeglądzie wszystkich decyzji (D-001…D-079
 - Inteligentne wyszukiwanie (Elasticsearch/OpenSearch): decyzja o §10 albo skargi na trafność (D-075)
 - „Zaznacz tekst i podmień na oznaczenie konta we wszystkich wystąpieniach” (D-079)
 - Multi-tenancy: pierwszy klient instytucjonalny (D-073)
+
+## Propozycje (poza planem MVP, do decyzji)
+
+| Kod | Tytuł | Gdzie | Decyzja |
+|---|---|---|---|
+| [MEM-PROP-01](propozycje/MEM-PROP-01-ewaluacja-jakosci-podsumowan-ai.md) | Ewaluacja jakości podsumowań AI (czy AI nie zmyśla) | E6 | D-081 |
+| [MEM-PROP-02](propozycje/MEM-PROP-02-embeddingi-wyszukiwanie-semantyczne.md) | Embeddingi: wyszukiwanie semantyczne i dobór materiałów do podsumowań | po MVP, z wyzwalaczem | D-082 |

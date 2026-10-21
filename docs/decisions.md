@@ -286,3 +286,22 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 - Przejrzane wszystkie decyzje D-001…D-072 + nowe D-073…D-079. Zmienione w przeglądzie: D-004, D-005 (HS-020/021), HS-022, D-030 (Wolverine), D-036 (osobny worker, Quartz), D-038 (monitoring testowy na tym samym serwerze), D-069 (sukcesja P0), HS-009, D-076, D-077, D-079.
 - Jedyna otwarta blokada: HS-006 (dyżur 1 h) — w projekcie projektowym jako dokumentacja.
 - **Zmiany naniesione 2026-10-19:** model (model procesów: +11 komend, +13 zdarzeń, +7 polityk, R20; HS-009/020/021/022 zamknięte), mapa modułów §10 (Plany → Album, Sukcesja → Powiadomienia), agregaty (AG1, AG7, AG8, AG10), architektura (ADR 0001–0021, w tym 0019 Onion, 0020 księga uprawnień, 0021 bez multi-tenancy; Wolverine, worker, monitoring), ekrany (28, ekran zgód, przejęcie, oznaczenia, rejestracja z zaproszenia), plan (253 tickety, walidacja OK).
+
+---
+
+## Propozycje (2026-10-21) — `propozycja, do decyzji`
+
+### D-081 · Ewaluacja jakości podsumowań AI — `propozycja`
+- **Propozycja:** zestaw wzorcowy na danych syntetycznych + uprząż ewaluacji adaptera AI; miary: wierność źródłom (model-sędzia + sprawdzenia deterministyczne dat, miejsc, liczb), brak treści pominiętych uczestników, odmowa przy braku materiałów, zgodność listy źródeł; bramka blokująca zmianę promptu/modelu poniżej progu.
+- **Dlaczego:** cel G3 „AI nie zmyśla” jest dziś sprawdzany tylko strukturalnie (lista źródeł, znacznik, brak nazw); treść podsumowania nie jest mierzona.
+- **Alternatywy:** ręczny przegląd próbek przy każdej zmianie promptu (tani, nieskalowalny); brak ewaluacji (status quo).
+- **Odwracalność:** łatwa (testy i CI, bez zmian w domenie).
+- **Ticket:** `jira/mvp/propozycje/MEM-PROP-01-ewaluacja-jakosci-podsumowan-ai.md` (E6, poza planem MVP).
+
+### D-082 · Embeddingi: wyszukiwanie semantyczne i dobór materiałów do podsumowań (RAG) — `propozycja`
+- **Propozycja:** po MVP spike `pgvector` (w istniejącym PostgreSQL) vs Elasticsearch/OpenSearch (D-075); model embeddingów preferowany lokalny; filtr Dostępu w tym samym zapytaniu (ADR 0011); embedding usuwany razem z treścią; wersja modelu przy wektorze; wybrane materiały trafiają na listę źródeł (Pochodzenie).
+- **Dlaczego:** jeden mechanizm daje wyszukiwanie po znaczeniu i dobór materiałów do podsumowań dłuższych okresów.
+- **Alternatywy:** tylko pełnotekstowe (D-031/D-075); dobór materiałów regułą (najnowsze, oznaczone).
+- **Odwracalność:** średnia (dane pochodne do usunięcia i przeliczenia; port wyszukiwania już jest, D-031).
+- **Otwarte:** podstawa prawna i DPIA dla embeddingów opisów; czy potrzebna osobna zgoda (jak C80).
+- **Ticket:** `jira/mvp/propozycje/MEM-PROP-02-embeddingi-wyszukiwanie-semantyczne.md` (backlog z wyzwalaczem).
