@@ -1,0 +1,50 @@
+# MEM-E7-ARCHIWUM-05: Polityka P44: Zawsze gdy plan znowu aktywny w ciągu 30 dni od przycięcia, wtedy przywróć przycięty materiał z kosza
+
+| Pole | Wartość |
+|---|---|
+| Jira | jeszcze nie założony (plan lokalny, D-068) |
+| Epik | [E7](epiki/E7-plany-limity-i-retencja-24-miesiace.md) Plany, limity i retencja 24 miesiące |
+| Wersja | MVP |
+| Typ | Task |
+| Etykiety | Backend, archiwum, MEM-E7-ARCHIWUM-05 |
+| Moduł | archiwum |
+| Warstwa | aplikacja (handler zdarzenia) |
+| Rodzaj | zwykły |
+| Klasa problemu | Integracja |
+| Priorytet | P0 |
+| Estymacja | 1–3 h |
+| Pewność | wysoka |
+| Status | gotowy |
+| Zależy od | [MEM-E0-ARCHIWUM-01](MEM-E0-ARCHIWUM-01-szkielet-modulu-archiwum-struktura-publiczny-kontr.md); [MEM-E7-ARCHIWUM-02](MEM-E7-ARCHIWUM-02-przywroc-przyciety-material-z-kosza-c168.md); [MEM-E7-PLANY-20](MEM-E7-PLANY-20-zdarzenie-integracyjne-plan-aktywny-e94-w-kontrakc.md) |
+| Blokuje | - |
+| Kod roboczy | MEM-E7-ARCHIWUM-05 |
+| Źródło | ES:P44 — przegląd decyzji 2026-10-19 (HS-022) |
+
+## Cel
+
+Polityka P44: Zawsze gdy plan znowu aktywny w ciągu 30 dni od przycięcia, wtedy przywróć przycięty materiał z kosza — część epiku E7 „Plany, limity i retencja 24 miesiące”.
+
+## Kontekst
+
+- Moduł **archiwum** — kluczowe pytanie: Co ta osoba zapisała, gdzie i kiedy?
+- Czego moduł nie wie (nie wolno tego wymagać): kto poza autorem widzi treść; w których albumach jest wspomnienie; plany i pieniądze; czy treść poszła do AI
+- Projekt modułu: model procesów modułu archiwum
+- Reguły: ADR 0001 (modularny monolit), 0019 (Onion + lekki CQRS), 0006 (outbox, Wolverine), 0011 (autoryzacja przez Dostęp)
+
+## Zakres
+
+- Polityka P44: Zawsze gdy plan znowu aktywny w ciągu 30 dni od przycięcia, wtedy przywróć przycięty materiał z kosza (źródło: ES:P44 — przegląd decyzji 2026-10-19 (HS-022))
+
+## Poza zakresem
+
+- ekrany i połączenia z innymi modułami — osobne tickety (zob. epik)
+
+## Kryteria akceptacji
+
+- [ ] Given zdarzenie E94, when handler je przetwarza, then wywołana jest komenda C168. *Sprawdzenie: test integracyjny handlera*
+- [ ] Podwójne dostarczenie zdarzenia nie daje drugiego skutku (inbox, ADR 0006). *Sprawdzenie: test idempotentności*
+- [ ] Zdarzenie starsze niż ostatnio zastosowane dla tej samej pary (zasób, osoba) jest pomijane (D-013). *Sprawdzenie: test jednostkowy*
+
+## Ryzyka i pytania
+
+- brak otwartych hot spotów dla tego elementu

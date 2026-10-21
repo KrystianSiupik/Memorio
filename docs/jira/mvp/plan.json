@@ -1,0 +1,6030 @@
+{
+  "architecture": {
+    "source": "mapa modułów (+ §8, §9)",
+    "modules": [
+      {
+        "name": "archiwum",
+        "uses": [
+          "miejsca",
+          "limity",
+          "konto",
+          "plany"
+        ]
+      },
+      {
+        "name": "album",
+        "uses": [
+          "archiwum",
+          "limity",
+          "plany",
+          "konto",
+          "powiadomienia"
+        ]
+      },
+      {
+        "name": "dostep",
+        "uses": [
+          "album",
+          "sukcesja",
+          "moderacja"
+        ]
+      },
+      {
+        "name": "pochodzenie",
+        "uses": [
+          "archiwum",
+          "album",
+          "dostep",
+          "narracja-ai"
+        ]
+      },
+      {
+        "name": "miejsca",
+        "uses": []
+      },
+      {
+        "name": "limity",
+        "uses": [
+          "plany"
+        ]
+      },
+      {
+        "name": "plany",
+        "uses": [
+          "powiadomienia",
+          "album"
+        ]
+      },
+      {
+        "name": "narracja-ai",
+        "uses": [
+          "dostep",
+          "pochodzenie",
+          "limity"
+        ]
+      },
+      {
+        "name": "moderacja",
+        "uses": [
+          "dostep"
+        ]
+      },
+      {
+        "name": "konto",
+        "uses": [
+          "archiwum",
+          "album"
+        ]
+      },
+      {
+        "name": "sukcesja",
+        "uses": [
+          "album"
+        ]
+      },
+      {
+        "name": "powiadomienia",
+        "uses": [
+          "album",
+          "plany",
+          "miejsca",
+          "sukcesja"
+        ]
+      }
+    ]
+  },
+  "epics": [
+    {
+      "id": "E0",
+      "title": "Szkielet end-to-end i platforma (etap 1)",
+      "priority": "P0",
+      "dependsOn": [],
+      "jiraKey": null
+    },
+    {
+      "id": "E11",
+      "title": "Zgodność przed startem (DPIA, umowy, procedury)",
+      "priority": "P0",
+      "dependsOn": [],
+      "jiraKey": null
+    },
+    {
+      "id": "E1",
+      "title": "Konto: rejestracja 16+, usunięcie z oknem 30 dni",
+      "priority": "P0",
+      "dependsOn": [
+        "E0"
+      ],
+      "jiraKey": null
+    },
+    {
+      "id": "E2",
+      "title": "Wspomnienia na prywatnej mapie: tworzenie, kosz, usuwanie",
+      "priority": "P0",
+      "dependsOn": [
+        "E0",
+        "E7"
+      ],
+      "jiraKey": null
+    },
+    {
+      "id": "E3",
+      "title": "Album współdzielony: skład, wkłady, zgody",
+      "priority": "P0",
+      "dependsOn": [
+        "E2",
+        "E7"
+      ],
+      "jiraKey": null
+    },
+    {
+      "id": "E4",
+      "title": "Udostępnianie linkiem i odbieranie dostępu",
+      "priority": "P0",
+      "dependsOn": [
+        "E3"
+      ],
+      "jiraKey": null
+    },
+    {
+      "id": "E5",
+      "title": "Prześledź: odtwarzanie okresu na mapie",
+      "priority": "P0",
+      "dependsOn": [
+        "E2"
+      ],
+      "jiraKey": null
+    },
+    {
+      "id": "E6",
+      "title": "Podsumuj: podsumowania AI bez zmyślania, z kaskadą",
+      "priority": "P0",
+      "dependsOn": [
+        "E3",
+        "E4"
+      ],
+      "jiraKey": null
+    },
+    {
+      "id": "E7",
+      "title": "Plany, limity i retencja 24 miesiące",
+      "priority": "P0",
+      "dependsOn": [
+        "E0"
+      ],
+      "jiraKey": null
+    },
+    {
+      "id": "E8",
+      "title": "Zgłoszenia, moderacja i nakazy organów",
+      "priority": "P0",
+      "dependsOn": [
+        "E0"
+      ],
+      "jiraKey": null
+    },
+    {
+      "id": "E9",
+      "title": "Sukcesja i przejęcie albumu (następca albo inny uczestnik)",
+      "priority": "P0",
+      "dependsOn": [
+        "E3"
+      ],
+      "jiraKey": null
+    },
+    {
+      "id": "E10",
+      "title": "Import zdjęć z telefonu (po MVP)",
+      "priority": "P2",
+      "dependsOn": [
+        "E2"
+      ],
+      "jiraKey": null
+    }
+  ],
+  "tickets": [
+    {
+      "id": "MEM-E0-PLAT-01",
+      "epic": "E0",
+      "title": "Szkielet modularnego monolitu .NET: 14 modułów, kontrakty, testy architektury w CI",
+      "module": "-",
+      "layer": "szkielet",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-02",
+      "epic": "E0",
+      "title": "Outbox/Inbox w Wolverine (PostgreSQL, bez brokera) w osobnym workerze + metryka wieku kolejki",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-03",
+      "epic": "E0",
+      "title": "PostgreSQL + PostGIS, schemat i rola bazy na moduł, import tabeli OSM",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-04",
+      "epic": "E0",
+      "title": "Magazyn obiektów w UE: bucket prywatny, podpisy 5 min partiami, strefa tymczasowa uploadu",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-05",
+      "epic": "E0",
+      "title": "Spike mapy: MapLibre + PMTiles w Flutterze (globus, 10 tys. punktów, web)",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-06",
+      "epic": "E0",
+      "title": "Adapter AI: pseudonimizacja, znacznik AI, wersja promptu, test ładunku",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-07",
+      "epic": "E0",
+      "title": "Moduł Konto: ASP.NET Core Identity, Apple/Google, deklaracja 16+, strona www usuwania konta",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-08",
+      "epic": "E0",
+      "title": "Worker: Quartz.NET z magazynem w PostgreSQL; zadania idempotentne, gotowe na tryb klastra",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-09",
+      "epic": "E0",
+      "title": "Etap 1: VPS, Compose, nginx, WAL-G, comiesięczny test odtworzenia",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-10",
+      "epic": "E0",
+      "title": "Obserwowalność: OpenTelemetry, Prometheus/Loki/Grafana, monitor zewnętrzny, alert",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-11",
+      "epic": "E0",
+      "title": "Offline: kolejka Drift z UUID klienta",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-12",
+      "epic": "E0",
+      "title": "API v1: OpenAPI → klient Dart, kontrola zgodności w CI, minimalna wersja aplikacji",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-13",
+      "epic": "E0",
+      "title": "Pipeline wdrożenia jedną komendą + lint migracji expand/contract",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-14",
+      "epic": "E0",
+      "title": "Testy macierzy dostępu (użytkownik × zasób) i wyszukiwania po odebraniu dostępu",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-15",
+      "epic": "E0",
+      "title": "Księga uprawnień w Planach: pierwszy adapter (sklepy albo serwis subskrypcji), cykl planu czyta tylko księgę",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-16",
+      "epic": "E0",
+      "title": "Szablon warstw Onion w module backendu i funkcji Fluttera + testy architektury kierunku zależności",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-17",
+      "epic": "E0",
+      "title": "Konfiguracja z ENV z walidacją przy starcie, health i readiness endpoint, kontener (RD1, RD2, RD4)",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 3
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-18",
+      "epic": "E0",
+      "title": "Sekrety etapu 1: .env poza repo + sops/age do odtworzenia (RD10)",
+      "module": "-",
+      "layer": "infrastruktura",
+      "kind": "regular",
+      "component": "Platforma",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-09"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-ARCHIWUM-01",
+      "epic": "E0",
+      "title": "Szkielet modułu archiwum: struktura, publiczny kontrakt, testy architektury",
+      "module": "archiwum",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-ALBUM-01",
+      "epic": "E0",
+      "title": "Szkielet modułu album: struktura, publiczny kontrakt, testy architektury",
+      "module": "album",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-DOSTEP-01",
+      "epic": "E0",
+      "title": "Szkielet modułu dostep: struktura, publiczny kontrakt, testy architektury",
+      "module": "dostep",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-POCHODZENIE-01",
+      "epic": "E0",
+      "title": "Szkielet modułu pochodzenie: struktura, publiczny kontrakt, testy architektury",
+      "module": "pochodzenie",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-MIEJSCA-01",
+      "epic": "E0",
+      "title": "Szkielet modułu miejsca: struktura, publiczny kontrakt, testy architektury",
+      "module": "miejsca",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-LIMITY-01",
+      "epic": "E0",
+      "title": "Szkielet modułu limity: struktura, publiczny kontrakt, testy architektury",
+      "module": "limity",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLANY-01",
+      "epic": "E0",
+      "title": "Szkielet modułu plany: struktura, publiczny kontrakt, testy architektury",
+      "module": "plany",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-NARRACJA-AI-01",
+      "epic": "E0",
+      "title": "Szkielet modułu narracja-ai: struktura, publiczny kontrakt, testy architektury",
+      "module": "narracja-ai",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-MODERACJA-01",
+      "epic": "E0",
+      "title": "Szkielet modułu moderacja: struktura, publiczny kontrakt, testy architektury",
+      "module": "moderacja",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-KONTO-01",
+      "epic": "E0",
+      "title": "Szkielet modułu konto: struktura, publiczny kontrakt, testy architektury",
+      "module": "konto",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-SUKCESJA-01",
+      "epic": "E0",
+      "title": "Szkielet modułu sukcesja: struktura, publiczny kontrakt, testy architektury",
+      "module": "sukcesja",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-POWIADOMIENIA-01",
+      "epic": "E0",
+      "title": "Szkielet modułu powiadomienia: struktura, publiczny kontrakt, testy architektury",
+      "module": "powiadomienia",
+      "layer": "szkielet modułu",
+      "kind": "module-skeleton",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-01",
+        "MEM-E0-PLAT-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-KONTO-01",
+      "epic": "E1",
+      "title": "Zarejestruj konto (C1)",
+      "module": "konto",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-KONTO-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-KONTO-02",
+      "epic": "E1",
+      "title": "Zaakceptuj regulamin (C2)",
+      "module": "konto",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-KONTO-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-KONTO-03",
+      "epic": "E1",
+      "title": "Zleć usunięcie konta (C3)",
+      "module": "konto",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-KONTO-01",
+        "MEM-E1-KONTO-06",
+        "MEM-E1-ARCHIWUM-02",
+        "MEM-E1-ALBUM-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-KONTO-04",
+      "epic": "E1",
+      "title": "Usuń konto definitywnie (C4)",
+      "module": "konto",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-KONTO-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-KONTO-05",
+      "epic": "E1",
+      "title": "Cofnij usunięcie konta (C5)",
+      "module": "konto",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-KONTO-01",
+        "MEM-E1-KONTO-04"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-MIEJSCA-01",
+      "epic": "E2",
+      "title": "Wybierz miejsce z podpowiedzi (C10)",
+      "module": "miejsca",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MIEJSCA-01",
+        "MEM-E2-MIEJSCA-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-MIEJSCA-02",
+      "epic": "E2",
+      "title": "Dodaj miejsce własne (C11)",
+      "module": "miejsca",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MIEJSCA-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-01",
+      "epic": "E2",
+      "title": "Utwórz wspomnienie (C12)",
+      "module": "archiwum",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E2-MIEJSCA-04"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-02",
+      "epic": "E2",
+      "title": "Dodaj zdjęcia do wspomnienia (C13)",
+      "module": "archiwum",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E2-LIMITY-02"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-NARRACJA-AI-01",
+      "epic": "E2",
+      "title": "Poproś AI o szkic opisu (C15)",
+      "module": "narracja-ai",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-NARRACJA-AI-01",
+        "MEM-E2-LIMITY-03"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-03",
+      "epic": "E2",
+      "title": "Zatwierdź opis (C16)",
+      "module": "archiwum",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-04",
+      "epic": "E2",
+      "title": "Usuń swoją treść (C17)",
+      "module": "archiwum",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E2-ARCHIWUM-09"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-05",
+      "epic": "E2",
+      "title": "Usuń treść definitywnie (C18)",
+      "module": "archiwum",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-06",
+      "epic": "E2",
+      "title": "Przywróć treść z kosza (C19)",
+      "module": "archiwum",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E2-ARCHIWUM-05",
+        "MEM-E2-ARCHIWUM-10"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-07",
+      "epic": "E2",
+      "title": "Złóż żądanie usunięcia danych (C20)",
+      "module": "archiwum",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E10-ARCHIWUM-01",
+      "epic": "E10",
+      "title": "Zaimportuj zdjęcia z telefonu (C21)",
+      "module": "archiwum",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P2",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E10-ARCHIWUM-02",
+      "epic": "E10",
+      "title": "Przypisz miejsce grupie zdjęć (C22)",
+      "module": "archiwum",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P2",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E10-ARCHIWUM-04"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E10-ARCHIWUM-03",
+      "epic": "E10",
+      "title": "Usuń zdjęcie z poczekalni (C23)",
+      "module": "archiwum",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P2",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E10-ARCHIWUM-04"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-01",
+      "epic": "E3",
+      "title": "Utwórz album (C40)",
+      "module": "album",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-SUKCESJA-01",
+      "epic": "E3",
+      "title": "Wskaż następcę albumu (C41)",
+      "module": "sukcesja",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-02",
+      "epic": "E3",
+      "title": "Zaproś osobę do albumu (C42)",
+      "module": "album",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-16",
+        "MEM-E3-PLANY-01",
+        "MEM-E3-POWIADOMIENIA-06"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-POWIADOMIENIA-01",
+      "epic": "E3",
+      "title": "Wyślij przypomnienie o zaproszeniu (C43)",
+      "module": "powiadomienia",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-03",
+      "epic": "E3",
+      "title": "Przyjmij zaproszenie (C44)",
+      "module": "album",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-02",
+        "MEM-E3-ALBUM-18"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-04",
+      "epic": "E3",
+      "title": "Odrzuć zaproszenie (C45)",
+      "module": "album",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-02",
+        "MEM-E3-ALBUM-18"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-POWIADOMIENIA-02",
+      "epic": "E3",
+      "title": "Zablokuj zaproszenia z GEO na swój adres (C46)",
+      "module": "powiadomienia",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-05",
+      "epic": "E3",
+      "title": "Dodaj wspomnienie do albumu (C47)",
+      "module": "album",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-LIMITY-02"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-POWIADOMIENIA-03",
+      "epic": "E3",
+      "title": "Powiadom właściciela o pełnej puli (C48)",
+      "module": "powiadomienia",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-06",
+      "epic": "E3",
+      "title": "Powierz treści kuratorowi (C49)",
+      "module": "album",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-07",
+      "epic": "E3",
+      "title": "Odwołaj powierzenie (C50)",
+      "module": "album",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-08",
+      "epic": "E3",
+      "title": "Uporządkuj powierzone treści (C51)",
+      "module": "album",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-09",
+      "epic": "E3",
+      "title": "Opuść album (C52)",
+      "module": "album",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-02",
+        "MEM-E3-ALBUM-17"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-10",
+      "epic": "E3",
+      "title": "Usuń uczestnika z albumu (C53)",
+      "module": "album",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-02"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-POWIADOMIENIA-04",
+      "epic": "E3",
+      "title": "Poproś o wybór zostaw/zabierz (C54)",
+      "module": "powiadomienia",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-11",
+      "epic": "E3",
+      "title": "Odwołaj zgodę na pozostawienie wkładów (C55)",
+      "module": "album",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-17"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-12",
+      "epic": "E3",
+      "title": "Wycofaj wkłady osoby z albumów (C30)",
+      "module": "album",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-DOSTEP-01",
+      "epic": "E4",
+      "title": "Udostępnij album linkiem (C60)",
+      "module": "dostep",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-DOSTEP-02",
+      "epic": "E4",
+      "title": "Wejdź do albumu przez link (C61)",
+      "module": "dostep",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-DOSTEP-03",
+      "epic": "E4",
+      "title": "Unieważnij link (C62)",
+      "module": "dostep",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01",
+        "MEM-E4-DOSTEP-02",
+        "MEM-E4-DOSTEP-07"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-DOSTEP-04",
+      "epic": "E4",
+      "title": "Odbierz dostęp osobie (C63)",
+      "module": "dostep",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01",
+        "MEM-E4-DOSTEP-07"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-DOSTEP-05",
+      "epic": "E4",
+      "title": "Zablokuj użytkownika (C64)",
+      "module": "dostep",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01",
+        "MEM-E4-DOSTEP-02"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E5-ALBUM-01",
+      "epic": "E5",
+      "title": "Utwórz album z odtworzonego okresu (C71)",
+      "module": "album",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E5-ARCHIWUM-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-NARRACJA-AI-01",
+      "epic": "E6",
+      "title": "Udziel zgody na AI dla albumu (C80)",
+      "module": "narracja-ai",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-NARRACJA-AI-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-NARRACJA-AI-02",
+      "epic": "E6",
+      "title": "Odwołaj zgodę na AI (C81)",
+      "module": "narracja-ai",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-NARRACJA-AI-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-NARRACJA-AI-03",
+      "epic": "E6",
+      "title": "Zamów podsumowanie okresu (C82)",
+      "module": "narracja-ai",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-NARRACJA-AI-01",
+        "MEM-E6-NARRACJA-AI-06",
+        "MEM-E6-DOSTEP-01",
+        "MEM-E2-LIMITY-03"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-NARRACJA-AI-04",
+      "epic": "E6",
+      "title": "Zatwierdź i zapisz podsumowanie (C83)",
+      "module": "narracja-ai",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-NARRACJA-AI-01",
+        "MEM-E6-POCHODZENIE-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-NARRACJA-AI-05",
+      "epic": "E6",
+      "title": "Dodaj podsumowanie do albumu (C84)",
+      "module": "narracja-ai",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-NARRACJA-AI-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-POCHODZENIE-01",
+      "epic": "E6",
+      "title": "Unieważnij artefakty pochodne (C31)",
+      "module": "pochodzenie",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POCHODZENIE-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-01",
+      "epic": "E7",
+      "title": "Nadaj uprawnienia planu (C90)",
+      "module": "plany",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-02",
+      "epic": "E7",
+      "title": "Przełącz w tryb tylko do odczytu (C91)",
+      "module": "plany",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-03",
+      "epic": "E7",
+      "title": "Odśwież stan subskrypcji u pośrednika (C96)",
+      "module": "plany",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-12"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-POWIADOMIENIA-01",
+      "epic": "E7",
+      "title": "Wyślij ostrzeżenie przed przycięciem (C92)",
+      "module": "powiadomienia",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-04",
+      "epic": "E7",
+      "title": "Wstrzymaj przycięcie archiwum (C93)",
+      "module": "plany",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-05",
+      "epic": "E7",
+      "title": "Wskaż materiał do zachowania (C94)",
+      "module": "plany",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-01",
+        "MEM-E7-PLANY-12"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-06",
+      "epic": "E7",
+      "title": "Zleć przycięcie archiwum do darmowego limitu (C95)",
+      "module": "plany",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-07",
+      "epic": "E7",
+      "title": "Zaproś do planu rodzinnego (C97)",
+      "module": "plany",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P2",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": "HS-012: plan rodzinny w sklepie czy własny? (PO)",
+      "dependsOn": [
+        "MEM-E0-PLANY-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-08",
+      "epic": "E7",
+      "title": "Dołącz do planu rodzinnego (C98)",
+      "module": "plany",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P2",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": "HS-012: plan rodzinny w sklepie czy własny? (PO)",
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-07"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-09",
+      "epic": "E7",
+      "title": "Usuń osobę z planu rodzinnego (C99)",
+      "module": "plany",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P2",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-07"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-10",
+      "epic": "E7",
+      "title": "Przełącz konto w tryb ponad limitem (C100)",
+      "module": "plany",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-MODERACJA-01",
+      "epic": "E8",
+      "title": "Zgłoś treść (C110)",
+      "module": "moderacja",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MODERACJA-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-MODERACJA-02",
+      "epic": "E8",
+      "title": "Rozstrzygnij zgłoszenie (C111)",
+      "module": "moderacja",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MODERACJA-01",
+        "MEM-E8-MODERACJA-07"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-MODERACJA-03",
+      "epic": "E8",
+      "title": "Odwołaj się od decyzji (C112)",
+      "module": "moderacja",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MODERACJA-01",
+        "MEM-E8-MODERACJA-08"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-MODERACJA-04",
+      "epic": "E8",
+      "title": "Ukryj treść natychmiast (C113)",
+      "module": "moderacja",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MODERACJA-01",
+        "MEM-E8-DOSTEP-02"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-MODERACJA-05",
+      "epic": "E8",
+      "title": "Zabezpiecz dane konta (C114)",
+      "module": "moderacja",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MODERACJA-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-MODERACJA-06",
+      "epic": "E8",
+      "title": "Wydaj dane organowi (C115)",
+      "module": "moderacja",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MODERACJA-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-01",
+      "epic": "E9",
+      "title": "Wskaż kontakt spadkowy (C124)",
+      "module": "sukcesja",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-02",
+      "epic": "E9",
+      "title": "Zgłoś zgon właściciela (C120)",
+      "module": "sukcesja",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-03",
+      "epic": "E9",
+      "title": "Zweryfikuj akt zgonu (C121)",
+      "module": "sukcesja",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-04",
+      "epic": "E9",
+      "title": "Przekaż album następcy (C122)",
+      "module": "sukcesja",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01",
+        "MEM-E9-SUKCESJA-03",
+        "MEM-E9-SUKCESJA-08",
+        "MEM-E9-ALBUM-06"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-05",
+      "epic": "E9",
+      "title": "Odmów przejęcia albumu (C123)",
+      "module": "sukcesja",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01",
+        "MEM-E9-SUKCESJA-03",
+        "MEM-E9-SUKCESJA-08",
+        "MEM-E9-ALBUM-06"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-06",
+      "epic": "E9",
+      "title": "Udostępnij prywatny album kontaktowi spadkowemu (C125)",
+      "module": "sukcesja",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-LIMITY-01",
+      "epic": "E3",
+      "title": "Zarezerwuj jednostki z puli (C150)",
+      "module": "limity",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-LIMITY-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-LIMITY-01",
+      "epic": "E2",
+      "title": "Zwróć jednostki do puli (C151)",
+      "module": "limity",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-LIMITY-01",
+        "MEM-E3-LIMITY-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-LIMITY-01",
+      "epic": "E7",
+      "title": "Ustaw limit puli (C152)",
+      "module": "limity",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-LIMITY-01",
+        "MEM-E3-LIMITY-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-DOSTEP-06",
+      "epic": "E4",
+      "title": "Przyznaj odczyt zakresu (C65)",
+      "module": "dostep",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-DOSTEP-01",
+      "epic": "E8",
+      "title": "Ukryj zakres (C67)",
+      "module": "dostep",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-ARCHIWUM-01",
+      "epic": "E7",
+      "title": "Przytnij archiwum do limitu (nadmiar do kosza na 30 dni) (C24)",
+      "module": "archiwum",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-ARCHIWUM-01",
+      "epic": "E1",
+      "title": "Usuń treści konta (C25)",
+      "module": "archiwum",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-13",
+      "epic": "E3",
+      "title": "Dodaj zdjęcia do wspomnienia w albumie (C56)",
+      "module": "album",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-LIMITY-02",
+        "MEM-E3-LIMITY-03",
+        "MEM-E3-ARCHIWUM-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-ALBUM-01",
+      "epic": "E9",
+      "title": "Zwolnij rolę właściciela albumu (C153)",
+      "module": "album",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-02"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-POCHODZENIE-02",
+      "epic": "E6",
+      "title": "Zarejestruj artefakt (C154)",
+      "module": "pochodzenie",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POCHODZENIE-01",
+        "MEM-E6-POCHODZENIE-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-07",
+      "epic": "E9",
+      "title": "Uznaj brak odpowiedzi następcy (C126)",
+      "module": "sukcesja",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01",
+        "MEM-E9-SUKCESJA-03"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-ALBUM-02",
+      "epic": "E9",
+      "title": "Zarezerwuj przejęcie albumu bez właściciela (C155)",
+      "module": "album",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-02",
+        "MEM-E9-ALBUM-05"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-ALBUM-03",
+      "epic": "E9",
+      "title": "Przejmij album bez właściciela (C156)",
+      "module": "album",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-02"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-ALBUM-04",
+      "epic": "E9",
+      "title": "Wygaś rezerwację przejęcia (C157)",
+      "module": "album",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-02"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-11",
+      "epic": "E7",
+      "title": "Aktywuj plan albumu po przejęciu (C165)",
+      "module": "plany",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-01"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-POWIADOMIENIA-01",
+      "epic": "E9",
+      "title": "Powiadom uczestników o nowym właścicielu (C166)",
+      "module": "powiadomienia",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-POWIADOMIENIA-02",
+      "epic": "E9",
+      "title": "Przypomnij następcy o decyzji (7. i 21. dzień) (C167)",
+      "module": "powiadomienia",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-ARCHIWUM-02",
+      "epic": "E7",
+      "title": "Przywróć przycięty materiał z kosza (C168)",
+      "module": "archiwum",
+      "layer": "domena + aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 3,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E2-ARCHIWUM-05"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-14",
+      "epic": "E3",
+      "title": "Oznacz uczestnika albumu we wspomnieniu (C169)",
+      "module": "album",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-17"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-15",
+      "epic": "E3",
+      "title": "Usuń swoje oznaczenie (C170)",
+      "module": "album",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-POWIADOMIENIA-05",
+      "epic": "E3",
+      "title": "Powiadom oznaczonego (C171)",
+      "module": "powiadomienia",
+      "layer": "aplikacja",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-KONTO-06",
+      "epic": "E1",
+      "title": "Zapytanie: Skutki usunięcia konta (ile zdjęć, z ilu albumów, czyich) (R2)",
+      "module": "konto",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-KONTO-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-MIEJSCA-03",
+      "epic": "E2",
+      "title": "Zapytanie: Podpowiedzi miejsc (OpenStreetMap + miejsca własne) (R3)",
+      "module": "miejsca",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MIEJSCA-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E10-ARCHIWUM-04",
+      "epic": "E10",
+      "title": "Zapytanie: Poczekalnia „do przypisania” (R4)",
+      "module": "archiwum",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P2",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-16",
+      "epic": "E3",
+      "title": "Zapytanie: Miejsca w planie: zajęte / zaproszone / wolne (R5)",
+      "module": "album",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-LIMITY-02",
+      "epic": "E3",
+      "title": "Read port: Stan puli albumu (R6)",
+      "module": "limity",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-LIMITY-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E5-ARCHIWUM-01",
+      "epic": "E5",
+      "title": "Read port: Wspomnienia okresu (przecinające okres, w kolejności użytkownika) (R7)",
+      "module": "archiwum",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-NARRACJA-AI-06",
+      "epic": "E6",
+      "title": "Zapytanie: Materiały dozwolone do podsumowania (zgody, uprawnienia) (R8)",
+      "module": "narracja-ai",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-NARRACJA-AI-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-MODERACJA-07",
+      "epic": "E8",
+      "title": "Zapytanie: Kolejka zgłoszeń (R9)",
+      "module": "moderacja",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MODERACJA-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-DOSTEP-07",
+      "epic": "E4",
+      "title": "Zapytanie: Imienna lista oglądających albumu (R10)",
+      "module": "dostep",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-08",
+      "epic": "E2",
+      "title": "Zapytanie: Mapa wspomnień (punkty: własne + z albumów, do których mam dostęp; filtry dat, osób, albumów) (R11)",
+      "module": "archiwum",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-09",
+      "epic": "E2",
+      "title": "Zapytanie: Szczegóły wspomnienia (miejsce, data z precyzją, treści per autor, osoby: tekst autora albo oznaczeni uczestnicy albumu) (R12)",
+      "module": "archiwum",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-17",
+      "epic": "E3",
+      "title": "Zapytanie: Album: wspomnienia, skład i moje wkłady (R13)",
+      "module": "album",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-DOSTEP-01",
+      "epic": "E3",
+      "title": "Zapytanie: Udostępnione mi (albumy z odczytem) (R14)",
+      "module": "dostep",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-10",
+      "epic": "E2",
+      "title": "Zapytanie: Kosz (moje treści usunięte w ostatnich 30 dniach) (R15)",
+      "module": "archiwum",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-12",
+      "epic": "E7",
+      "title": "Zapytanie: Stan planu (tryb, terminy, zużycie, wybór do zachowania) (R16)",
+      "module": "plany",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-08",
+      "epic": "E9",
+      "title": "Zapytanie: Sprawa przejęcia albumu (album, termin, losy treści fundatora) (R17)",
+      "module": "sukcesja",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-MODERACJA-08",
+      "epic": "E8",
+      "title": "Zapytanie: Moje zgłoszenia i decyzje moderacji (z uzasadnieniem) (R18)",
+      "module": "moderacja",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MODERACJA-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-18",
+      "epic": "E3",
+      "title": "Zapytanie: Zaproszenie (kto zaprasza, nazwa albumu — bez treści) (R19)",
+      "module": "album",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-ALBUM-05",
+      "epic": "E9",
+      "title": "Zapytanie: Album bez właściciela: stan przejęcia (czy można przejąć, trwająca rezerwacja i do kiedy) (R20)",
+      "module": "album",
+      "layer": "infrastruktura (query handler)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-MIEJSCA-04",
+      "epic": "E2",
+      "title": "Read port miejsca → dla archiwum: odwołanie do miejsca (wpis OSM albo miejsce własne) i jego istnienie",
+      "module": "miejsca",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MIEJSCA-01",
+        "MEM-E2-MIEJSCA-01",
+        "MEM-E2-MIEJSCA-02"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-LIMITY-02",
+      "epic": "E2",
+      "title": "Write port limity → dla archiwum: zarezerwuj / zwróć przestrzeń w puli konta",
+      "module": "limity",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-LIMITY-01",
+        "MEM-E3-LIMITY-01",
+        "MEM-E2-LIMITY-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-LIMITY-03",
+      "epic": "E3",
+      "title": "Write port limity → dla album: zarezerwuj przestrzeń w puli albumu",
+      "module": "limity",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-LIMITY-01",
+        "MEM-E3-LIMITY-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ARCHIWUM-01",
+      "epic": "E3",
+      "title": "Write port archiwum → dla album: zapisz treść z numerem puli albumu",
+      "module": "archiwum",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E2-ARCHIWUM-02"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-PLANY-01",
+      "epic": "E3",
+      "title": "Read port plany → dla album: limit miejsc dla albumu",
+      "module": "plany",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-POWIADOMIENIA-06",
+      "epic": "E3",
+      "title": "Read port powiadomienia → dla album: czy adres zablokował zaproszenia",
+      "module": "powiadomienia",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01",
+        "MEM-E3-POWIADOMIENIA-02"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-DOSTEP-01",
+      "epic": "E6",
+      "title": "Read port dostep → dla narracja-ai: które treści osoba może czytać teraz",
+      "module": "dostep",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01",
+        "MEM-E4-DOSTEP-06"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-LIMITY-03",
+      "epic": "E2",
+      "title": "Write port limity → dla narracja-ai: zużyj limit AI",
+      "module": "limity",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-LIMITY-01",
+        "MEM-E3-LIMITY-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-POCHODZENIE-03",
+      "epic": "E6",
+      "title": "Write port pochodzenie → dla narracja-ai: zarejestruj artefakt z listą źródeł (C154)",
+      "module": "pochodzenie",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POCHODZENIE-01",
+        "MEM-E6-POCHODZENIE-02"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-DOSTEP-02",
+      "epic": "E8",
+      "title": "Write port dostep → dla moderacja: ukryj zakres natychmiast i potwierdź (nakaz 1 h)",
+      "module": "dostep",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01",
+        "MEM-E8-DOSTEP-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-ARCHIWUM-02",
+      "epic": "E1",
+      "title": "Read port archiwum → dla konto: ile treści wypadnie przy usunięciu konta",
+      "module": "archiwum",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-ALBUM-01",
+      "epic": "E1",
+      "title": "Read port album → dla konto: z ilu albumów, czy właściciel bez następcy",
+      "module": "album",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-ALBUM-06",
+      "epic": "E9",
+      "title": "Write port album → dla sukcesja: zmień właściciela / zwolnij rolę właściciela (C153)",
+      "module": "album",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E9-ALBUM-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-KONTO-07",
+      "epic": "E1",
+      "title": "Polityka P1: Zawsze gdy okno usunięcia konta minie, wtedy usuń konto definitywnie",
+      "module": "konto",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-KONTO-01",
+        "MEM-E1-KONTO-04"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-KONTO-08",
+      "epic": "E1",
+      "title": "Zdarzenie integracyjne „Konto usunięte” (E7) w kontrakcie modułu konto",
+      "module": "konto",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-KONTO-01",
+        "MEM-E1-KONTO-04"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-19",
+      "epic": "E3",
+      "title": "Polityka P2: Zawsze gdy konto usunięte, wtedy wycofaj wkłady tej osoby z cudzych albumów",
+      "module": "album",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-12",
+        "MEM-E1-KONTO-08"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-11",
+      "epic": "E2",
+      "title": "Polityka P3: Zawsze gdy okno kosza minie, wtedy usuń treść definitywnie",
+      "module": "archiwum",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E2-ARCHIWUM-05"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-12",
+      "epic": "E2",
+      "title": "Zdarzenie integracyjne „Treść usunięta definitywnie” (E22) w kontrakcie modułu archiwum",
+      "module": "archiwum",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E2-ARCHIWUM-05"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-POCHODZENIE-04",
+      "epic": "E6",
+      "title": "Polityka P4: Zawsze gdy treść usunięta definitywnie, wtedy unieważnij artefakty pochodne, które ją cytują",
+      "module": "pochodzenie",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POCHODZENIE-01",
+        "MEM-E6-POCHODZENIE-01",
+        "MEM-E2-ARCHIWUM-12"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-ARCHIWUM-13",
+      "epic": "E2",
+      "title": "Polityka P5: Zawsze gdy zdjęcia mają przypisane miejsce, wtedy utwórz z nich wspomnienie",
+      "module": "archiwum",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P2",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E2-ARCHIWUM-01",
+        "MEM-E10-ARCHIWUM-02"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-20",
+      "epic": "E3",
+      "title": "Zdarzenie integracyjne „Minęło 7 dni od zaproszenia” (E45) w kontrakcie modułu album",
+      "module": "album",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-POWIADOMIENIA-07",
+      "epic": "E3",
+      "title": "Polityka P6: Zawsze gdy minie 7 dni od nieprzyjętego zaproszenia, wtedy wyślij jedno przypomnienie",
+      "module": "powiadomienia",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01",
+        "MEM-E3-POWIADOMIENIA-01",
+        "MEM-E3-ALBUM-20"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-21",
+      "epic": "E3",
+      "title": "Zdarzenie integracyjne „Pula albumu wyczerpana” (E51) w kontrakcie modułu album",
+      "module": "album",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-05"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-POWIADOMIENIA-08",
+      "epic": "E3",
+      "title": "Polityka P7: Zawsze gdy pula albumu wyczerpana, wtedy powiadom właściciela z prośbą o większy plan",
+      "module": "powiadomienia",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01",
+        "MEM-E3-POWIADOMIENIA-03",
+        "MEM-E3-ALBUM-21"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-22",
+      "epic": "E3",
+      "title": "Zdarzenie integracyjne „Uczestnik usunięty z albumu” (E59) w kontrakcie modułu album",
+      "module": "album",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-10"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-POWIADOMIENIA-09",
+      "epic": "E3",
+      "title": "Polityka P8: Zawsze gdy uczestnik usunięty z albumu, wtedy poproś go o wybór zostaw/zabierz z terminem",
+      "module": "powiadomienia",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01",
+        "MEM-E3-POWIADOMIENIA-04",
+        "MEM-E3-ALBUM-22"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-23",
+      "epic": "E3",
+      "title": "Zdarzenie integracyjne „Wkłady wycofane z albumu” (E58) w kontrakcie modułu album",
+      "module": "album",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-09"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-POCHODZENIE-05",
+      "epic": "E6",
+      "title": "Polityka P9: Zawsze gdy wkłady wycofane z albumu, wtedy unieważnij artefakty pochodne, które je cytują",
+      "module": "pochodzenie",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POCHODZENIE-01",
+        "MEM-E6-POCHODZENIE-01",
+        "MEM-E3-ALBUM-23"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-DOSTEP-08",
+      "epic": "E4",
+      "title": "Zdarzenie integracyjne „Dostęp odebrany” (E66) w kontrakcie modułu dostep",
+      "module": "dostep",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01",
+        "MEM-E4-DOSTEP-04"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-POCHODZENIE-06",
+      "epic": "E6",
+      "title": "Polityka P10: Zawsze gdy dostęp odebrany, wtedy unieważnij artefakty pochodne powstałe z tego albumu u tej osoby",
+      "module": "pochodzenie",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POCHODZENIE-01",
+        "MEM-E6-POCHODZENIE-01",
+        "MEM-E4-DOSTEP-08"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-NARRACJA-AI-07",
+      "epic": "E6",
+      "title": "Zdarzenie integracyjne „Zgoda na AI odwołana” (E81) w kontrakcie modułu narracja-ai",
+      "module": "narracja-ai",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-NARRACJA-AI-01",
+        "MEM-E6-NARRACJA-AI-02"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-POCHODZENIE-07",
+      "epic": "E6",
+      "title": "Polityka P12: Zawsze gdy zgoda na AI odwołana, wtedy unieważnij artefakty powstałe z treści tej osoby",
+      "module": "pochodzenie",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POCHODZENIE-01",
+        "MEM-E6-POCHODZENIE-01",
+        "MEM-E6-NARRACJA-AI-07"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-13",
+      "epic": "E7",
+      "title": "Polityka P13: Zawsze gdy subskrypcja aktywowana, wtedy nadaj uprawnienia planu",
+      "module": "plany",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-14",
+      "epic": "E7",
+      "title": "Polityka P14: Zawsze gdy subskrypcja wygasła, wtedy przełącz album lub konto w tryb tylko do odczytu",
+      "module": "plany",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-02"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-15",
+      "epic": "E7",
+      "title": "Zdarzenie integracyjne „Nadszedł termin ostrzeżenia (90/30/7/1 dni przed przycięciem)” (E97) w kontrakcie modułu plany",
+      "module": "plany",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-POWIADOMIENIA-02",
+      "epic": "E7",
+      "title": "Polityka P15: Zawsze gdy nadejdzie termin ostrzeżenia, wtedy ostrzeż właściciela i uczestników",
+      "module": "powiadomienia",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01",
+        "MEM-E7-POWIADOMIENIA-01",
+        "MEM-E7-PLANY-15"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-POWIADOMIENIA-03",
+      "epic": "E7",
+      "title": "Zdarzenie integracyjne „Ostrzeżenie niedoręczone” (E99) w kontrakcie modułu powiadomienia",
+      "module": "powiadomienia",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01",
+        "MEM-E7-POWIADOMIENIA-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-16",
+      "epic": "E7",
+      "title": "Polityka P16: Zawsze gdy ostrzeżenie niedoręczone, wtedy wstrzymaj przycięcie",
+      "module": "plany",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-04",
+        "MEM-E7-POWIADOMIENIA-03"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-17",
+      "epic": "E7",
+      "title": "Zdarzenie integracyjne „Przycięcie wstrzymane” (E100) w kontrakcie modułu plany",
+      "module": "plany",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-04"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-POWIADOMIENIA-04",
+      "epic": "E7",
+      "title": "Polityka P26: Zawsze gdy przycięcie wstrzymane, wtedy ponawiaj ostrzeżenie co miesiąc aż do skutecznego doręczenia",
+      "module": "powiadomienia",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01",
+        "MEM-E7-POWIADOMIENIA-01",
+        "MEM-E7-PLANY-17"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-18",
+      "epic": "E7",
+      "title": "Polityka P17: Zawsze gdy miną 24 miesiące tylko do odczytu, wtedy przytnij archiwum do darmowego limitu",
+      "module": "plany",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-06"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-19",
+      "epic": "E7",
+      "title": "Polityka P18: Zawsze gdy osoba wypadnie z planu rodzinnego, wtedy przełącz jej konto w tryb „nic nowego ponad limit”",
+      "module": "plany",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P2",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-10",
+        "MEM-E7-PLANY-09"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-MODERACJA-09",
+      "epic": "E8",
+      "title": "Polityka P19: Zawsze gdy przyjdzie nakaz usunięcia, wtedy natychmiast ukryj treść",
+      "module": "moderacja",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MODERACJA-01",
+        "MEM-E8-MODERACJA-04"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-MODERACJA-10",
+      "epic": "E8",
+      "title": "Polityka P20: Zawsze gdy przyjdzie nakaz wydania lub zabezpieczenia danych, wtedy zabezpiecz dane konta",
+      "module": "moderacja",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MODERACJA-01",
+        "MEM-E8-MODERACJA-05"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-09",
+      "epic": "E9",
+      "title": "Polityka P21: Zawsze gdy zgon potwierdzony, wtedy przekaż albumy współdzielone następcom",
+      "module": "sukcesja",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01",
+        "MEM-E9-SUKCESJA-04",
+        "MEM-E9-SUKCESJA-03"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-10",
+      "epic": "E9",
+      "title": "Polityka P23: Zawsze gdy zgon potwierdzony, wtedy udostępnij albumy prywatne kontaktowi spadkowemu (tylko odczyt)",
+      "module": "sukcesja",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01",
+        "MEM-E9-SUKCESJA-06",
+        "MEM-E9-SUKCESJA-03"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-20",
+      "epic": "E7",
+      "title": "Zdarzenie integracyjne „Plan aktywny” (E94) w kontrakcie modułu plany",
+      "module": "plany",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-21",
+      "epic": "E7",
+      "title": "Zdarzenie integracyjne „Album lub konto w trybie tylko do odczytu” (E95) w kontrakcie modułu plany",
+      "module": "plany",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-02"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-LIMITY-02",
+      "epic": "E7",
+      "title": "Polityka P27: Zawsze gdy plan aktywny albo przełączony w tryb tylko do odczytu, wtedy ustaw limit puli",
+      "module": "limity",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-LIMITY-01",
+        "MEM-E7-LIMITY-01",
+        "MEM-E7-PLANY-20",
+        "MEM-E7-PLANY-21"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-24",
+      "epic": "E3",
+      "title": "Zdarzenie integracyjne „Zaproszenie przyjęte” (E47) w kontrakcie modułu album",
+      "module": "album",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-03"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-DOSTEP-09",
+      "epic": "E4",
+      "title": "Polityka P29: Zawsze gdy zaproszenie przyjęte, wtedy przyznaj odczyt albumu",
+      "module": "dostep",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01",
+        "MEM-E4-DOSTEP-06",
+        "MEM-E3-ALBUM-24"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-25",
+      "epic": "E3",
+      "title": "Zdarzenie integracyjne „Uczestnik opuścił album (miejsce zwolnione)” (E56) w kontrakcie modułu album",
+      "module": "album",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-09"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-DOSTEP-10",
+      "epic": "E4",
+      "title": "Polityka P30: Zawsze gdy uczestnik opuścił album albo został usunięty, wtedy odbierz mu odczyt",
+      "module": "dostep",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01",
+        "MEM-E4-DOSTEP-04",
+        "MEM-E3-ALBUM-25",
+        "MEM-E3-ALBUM-22"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-11",
+      "epic": "E9",
+      "title": "Zdarzenie integracyjne „Album prywatny udostępniony kontaktowi spadkowemu” (E126) w kontrakcie modułu sukcesja",
+      "module": "sukcesja",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01",
+        "MEM-E9-SUKCESJA-06"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-DOSTEP-11",
+      "epic": "E4",
+      "title": "Polityka P31: Zawsze gdy album prywatny udostępniony kontaktowi spadkowemu, wtedy przyznaj mu odczyt",
+      "module": "dostep",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01",
+        "MEM-E4-DOSTEP-06",
+        "MEM-E9-SUKCESJA-11"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-MODERACJA-11",
+      "epic": "E8",
+      "title": "Zdarzenie integracyjne „Treść ukryta” (E113) w kontrakcie modułu moderacja",
+      "module": "moderacja",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-MODERACJA-01",
+        "MEM-E8-MODERACJA-02"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-DOSTEP-03",
+      "epic": "E8",
+      "title": "Polityka P32: Zawsze gdy treść ukryta decyzją moderacji, wtedy ukryj zakres w Dostępie",
+      "module": "dostep",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-DOSTEP-01",
+        "MEM-E8-DOSTEP-01",
+        "MEM-E8-MODERACJA-11"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-22",
+      "epic": "E7",
+      "title": "Zdarzenie integracyjne „Przycięcie archiwum zlecone” (E103) w kontrakcie modułu plany",
+      "module": "plany",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-06"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-ARCHIWUM-03",
+      "epic": "E7",
+      "title": "Polityka P33: Zawsze gdy przycięcie zlecone, wtedy przytnij archiwum według wyboru właściciela albo od najstarszego",
+      "module": "archiwum",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E7-ARCHIWUM-01",
+        "MEM-E7-PLANY-22"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-ARCHIWUM-04",
+      "epic": "E7",
+      "title": "Zdarzenie integracyjne „Archiwum przycięte (nadmiar w koszu 30 dni)” (E25) w kontrakcie modułu archiwum",
+      "module": "archiwum",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E7-ARCHIWUM-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-POCHODZENIE-08",
+      "epic": "E6",
+      "title": "Polityka P34: Zawsze gdy archiwum przycięte, wtedy unieważnij artefakty cytujące usunięty materiał",
+      "module": "pochodzenie",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POCHODZENIE-01",
+        "MEM-E6-POCHODZENIE-01",
+        "MEM-E7-ARCHIWUM-04"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-ARCHIWUM-03",
+      "epic": "E1",
+      "title": "Polityka P35: Zawsze gdy konto usunięte, wtedy usuń treści tej osoby",
+      "module": "archiwum",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E1-ARCHIWUM-01",
+        "MEM-E1-KONTO-08"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-ALBUM-07",
+      "epic": "E9",
+      "title": "Zdarzenie integracyjne „Album bez właściciela” (E162) w kontrakcie modułu album",
+      "module": "album",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E9-ALBUM-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-23",
+      "epic": "E7",
+      "title": "Polityka P36: Zawsze gdy album bez właściciela, wtedy przełącz plan albumu w tryb tylko do odczytu po końcu opłaconego okresu",
+      "module": "plany",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-02",
+        "MEM-E9-ALBUM-07"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-ALBUM-08",
+      "epic": "E9",
+      "title": "Polityka P37: Zawsze gdy konto właściciela bez następcy usunięte (ze zgodą na wygaśnięcie albumu), wtedy zwolnij rolę właściciela",
+      "module": "album",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E9-ALBUM-01",
+        "MEM-E1-KONTO-08"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-12",
+      "epic": "E9",
+      "title": "Polityka P38: Zawsze gdy termin przejęcia minął, wtedy uznaj brak odpowiedzi następcy",
+      "module": "sukcesja",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01",
+        "MEM-E9-SUKCESJA-07"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-ALBUM-09",
+      "epic": "E9",
+      "title": "Polityka P39: Zawsze gdy minie 30 minut rezerwacji, wtedy wygaś rezerwację przejęcia",
+      "module": "album",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E9-ALBUM-04"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-24",
+      "epic": "E7",
+      "title": "Zdarzenie integracyjne „Plan albumu bez właściciela opłacony przez uczestnika” (E171) w kontrakcie modułu plany",
+      "module": "plany",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-01"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-ALBUM-10",
+      "epic": "E9",
+      "title": "Polityka P40: Zawsze gdy plan albumu bez właściciela opłacony przez uczestnika, wtedy przejmij album (jeśli to jego aktywna rezerwacja)",
+      "module": "album",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E9-ALBUM-03",
+        "MEM-E7-PLANY-24"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-ALBUM-11",
+      "epic": "E9",
+      "title": "Zdarzenie integracyjne „Album przejęty przez uczestnika” (E167) w kontrakcie modułu album",
+      "module": "album",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E9-ALBUM-03"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLANY-25",
+      "epic": "E7",
+      "title": "Polityka P41: Zawsze gdy album przejęty przez uczestnika, wtedy aktywuj plan albumu",
+      "module": "plany",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLANY-01",
+        "MEM-E7-PLANY-11",
+        "MEM-E9-ALBUM-11"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-POWIADOMIENIA-03",
+      "epic": "E9",
+      "title": "Polityka P42: Zawsze gdy album przejęty przez uczestnika, wtedy powiadom pozostałych (mogą wyjść z wyborem zostaw/zabierz)",
+      "module": "powiadomienia",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01",
+        "MEM-E9-POWIADOMIENIA-01",
+        "MEM-E9-ALBUM-11"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-SUKCESJA-13",
+      "epic": "E9",
+      "title": "Zdarzenie integracyjne „Zgon potwierdzony” (E121) w kontrakcie modułu sukcesja",
+      "module": "sukcesja",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-SUKCESJA-01",
+        "MEM-E9-SUKCESJA-03"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-POWIADOMIENIA-04",
+      "epic": "E9",
+      "title": "Polityka P43: Zawsze gdy zgon potwierdzony, wtedy zaplanuj przypomnienia dla następcy (7. i 21. dzień)",
+      "module": "powiadomienia",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01",
+        "MEM-E9-POWIADOMIENIA-02",
+        "MEM-E9-SUKCESJA-13"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-ARCHIWUM-05",
+      "epic": "E7",
+      "title": "Polityka P44: Zawsze gdy plan znowu aktywny w ciągu 30 dni od przycięcia, wtedy przywróć przycięty materiał z kosza",
+      "module": "archiwum",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ARCHIWUM-01",
+        "MEM-E7-ARCHIWUM-02",
+        "MEM-E7-PLANY-20"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-ALBUM-26",
+      "epic": "E3",
+      "title": "Zdarzenie integracyjne „Uczestnik oznaczony we wspomnieniu” (E175) w kontrakcie modułu album",
+      "module": "album",
+      "layer": "kontrakt",
+      "kind": "contract",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-ALBUM-01",
+        "MEM-E3-ALBUM-14"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-POWIADOMIENIA-10",
+      "epic": "E3",
+      "title": "Polityka P45: Zawsze gdy uczestnik oznaczony, wtedy powiadom go (może usunąć oznaczenie)",
+      "module": "powiadomienia",
+      "layer": "aplikacja (handler zdarzenia)",
+      "kind": "regular",
+      "component": "Backend",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-POWIADOMIENIA-01",
+        "MEM-E3-POWIADOMIENIA-05",
+        "MEM-E3-ALBUM-26"
+      ],
+      "problemClass": "integration",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E0-PLAT-19",
+      "epic": "E0",
+      "title": "Nawigacja aplikacji: zakładki Mapa · Albumy · Udostępnione mi · Konto, typy tras, przekierowanie niezalogowanych (S02)",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 3
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-12"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-PLAT-01",
+      "epic": "E1",
+      "title": "Ekran S01 „Rejestracja”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E1-KONTO-01",
+        "MEM-E1-KONTO-02"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-PLAT-01",
+      "epic": "E2",
+      "title": "Ekran S03 „Mapa i globus”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E2-ARCHIWUM-08"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-PLAT-02",
+      "epic": "E2",
+      "title": "Ekran S04 „Nowe wspomnienie (kreator: miejsce → treść)”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 4,
+        "max": 6
+      },
+      "confidence": "niska",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E2-MIEJSCA-01",
+        "MEM-E2-MIEJSCA-02",
+        "MEM-E2-ARCHIWUM-01",
+        "MEM-E2-ARCHIWUM-02",
+        "MEM-E2-NARRACJA-AI-01",
+        "MEM-E2-ARCHIWUM-03",
+        "MEM-E2-MIEJSCA-03"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-PLAT-03",
+      "epic": "E2",
+      "title": "Ekran S05 „Szczegóły wspomnienia”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E2-ARCHIWUM-04",
+        "MEM-E2-ARCHIWUM-07",
+        "MEM-E3-ALBUM-15",
+        "MEM-E2-ARCHIWUM-09"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E2-PLAT-04",
+      "epic": "E2",
+      "title": "Ekran S06 „Kosz”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E2-ARCHIWUM-06",
+        "MEM-E2-ARCHIWUM-10"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E10-PLAT-01",
+      "epic": "E10",
+      "title": "Ekran S07 „Import zdjęć i poczekalnia”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P2",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E10-ARCHIWUM-01",
+        "MEM-E10-ARCHIWUM-02",
+        "MEM-E10-ARCHIWUM-03",
+        "MEM-E10-ARCHIWUM-04"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E5-PLAT-01",
+      "epic": "E5",
+      "title": "Ekran S08 „Prześledź okres”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E5-ALBUM-01",
+        "MEM-E5-ARCHIWUM-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-PLAT-01",
+      "epic": "E3",
+      "title": "Ekran S09 „Albumy (lista) i nowy album”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E3-ALBUM-01",
+        "MEM-E3-DOSTEP-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-PLAT-02",
+      "epic": "E3",
+      "title": "Ekran S10 „Album”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 4,
+        "max": 6
+      },
+      "confidence": "niska",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E3-ALBUM-05",
+        "MEM-E3-ALBUM-13",
+        "MEM-E3-ALBUM-09",
+        "MEM-E4-DOSTEP-05",
+        "MEM-E3-ALBUM-14",
+        "MEM-E9-ALBUM-02",
+        "MEM-E3-ALBUM-17",
+        "MEM-E3-LIMITY-02",
+        "MEM-E9-ALBUM-05"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-PLAT-03",
+      "epic": "E3",
+      "title": "Ekran S11 „Zarządzanie albumem (właściciel)”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 4,
+        "max": 6
+      },
+      "confidence": "niska",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E3-SUKCESJA-01",
+        "MEM-E3-ALBUM-02",
+        "MEM-E3-ALBUM-10",
+        "MEM-E4-DOSTEP-01",
+        "MEM-E4-DOSTEP-03",
+        "MEM-E4-DOSTEP-04",
+        "MEM-E3-ALBUM-16",
+        "MEM-E4-DOSTEP-07"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-PLAT-04",
+      "epic": "E3",
+      "title": "Ekran S12 „Moje zgody i powierzenia w albumie”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E6-NARRACJA-AI-01",
+        "MEM-E6-NARRACJA-AI-02",
+        "MEM-E3-ALBUM-11",
+        "MEM-E3-ALBUM-06",
+        "MEM-E3-ALBUM-07",
+        "MEM-E3-ALBUM-17"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-PLAT-05",
+      "epic": "E3",
+      "title": "Ekran S13 „Powierzone treści (kurator)”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E3-ALBUM-08",
+        "MEM-E3-ALBUM-17"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E3-PLAT-06",
+      "epic": "E3",
+      "title": "Ekran S14 „Zaproszenie do albumu”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E3-ALBUM-03",
+        "MEM-E3-ALBUM-04",
+        "MEM-E3-POWIADOMIENIA-02",
+        "MEM-E3-ALBUM-18"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-PLAT-01",
+      "epic": "E4",
+      "title": "Ekran S15 „Wejście do albumu przez link”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E4-DOSTEP-02"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E4-PLAT-02",
+      "epic": "E4",
+      "title": "Ekran S16 „Udostępnione mi”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E3-DOSTEP-01"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E6-PLAT-01",
+      "epic": "E6",
+      "title": "Ekran S17 „Podsumowanie okresu (AI)”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E6-NARRACJA-AI-03",
+        "MEM-E6-NARRACJA-AI-04",
+        "MEM-E6-NARRACJA-AI-05",
+        "MEM-E6-NARRACJA-AI-06"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLAT-01",
+      "epic": "E7",
+      "title": "Ekran S18 „Plan i subskrypcja”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E7-PLANY-03",
+        "MEM-E7-PLANY-12"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLAT-02",
+      "epic": "E7",
+      "title": "Ekran S18 „Plan i subskrypcja”: akcje „Dołącz do planu rodzinnego”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P2",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "średnia",
+      "blocked": "HS-012: plan rodzinny w sklepie czy własny? (PO)",
+      "dependsOn": [
+        "MEM-E7-PLAT-01",
+        "MEM-E7-PLANY-08"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLAT-03",
+      "epic": "E7",
+      "title": "Ekran S19 „Wybierz, co zostanie po przycięciu”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E7-PLANY-05",
+        "MEM-E7-PLANY-12"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E7-PLAT-04",
+      "epic": "E7",
+      "title": "Ekran S20 „Plan rodzinny”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P2",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E7-PLANY-07",
+        "MEM-E7-PLANY-09"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-PLAT-01",
+      "epic": "E8",
+      "title": "Ekran S21 „Zgłoś treść”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E8-MODERACJA-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-PLAT-02",
+      "epic": "E8",
+      "title": "Ekran S22 „Moje zgłoszenia i decyzje”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E8-MODERACJA-03",
+        "MEM-E8-MODERACJA-08"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-PLAT-01",
+      "epic": "E9",
+      "title": "Ekran S23 „Przejęcie albumu (następca)”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E9-SUKCESJA-04",
+        "MEM-E9-SUKCESJA-05",
+        "MEM-E9-SUKCESJA-08"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E1-PLAT-02",
+      "epic": "E1",
+      "title": "Ekran S24 „Konto i prywatność”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E1-KONTO-03",
+        "MEM-E1-KONTO-05",
+        "MEM-E9-SUKCESJA-01",
+        "MEM-E1-KONTO-06"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E9-PLAT-02",
+      "epic": "E9",
+      "title": "Ekran S25 „Zgłoś zgon właściciela”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E9-SUKCESJA-02"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-PLAT-03",
+      "epic": "E8",
+      "title": "Ekran S26 „Panel obsługi: zgłoszenia, nakazy, sukcesja”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Panel obsługi (web)",
+      "priority": "P0",
+      "estimate": {
+        "min": 4,
+        "max": 6
+      },
+      "confidence": "niska",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E8-MODERACJA-02",
+        "MEM-E8-MODERACJA-04",
+        "MEM-E8-MODERACJA-05",
+        "MEM-E8-MODERACJA-06",
+        "MEM-E9-SUKCESJA-03",
+        "MEM-E8-MODERACJA-07"
+      ],
+      "problemClass": "rc",
+      "concurrencyCriterion": true,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E8-PLAT-04",
+      "epic": "E8",
+      "title": "Ekran S27 „Zgłoś treść (z aplikacji)”",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19",
+        "MEM-E8-MODERACJA-01"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E11-PLAT-01",
+      "epic": "E11",
+      "title": "DPIA przed pierwszym użytkownikiem (Z8)",
+      "module": "-",
+      "layer": "proces / dokument",
+      "kind": "regular",
+      "component": "Zgodność",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "niska",
+      "blocked": null,
+      "dependsOn": [],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E11-PLAT-02",
+      "epic": "E11",
+      "title": "Umowy powierzenia z dostawcami + rejestr czynności + lista podwykonawców (D-046)",
+      "module": "-",
+      "layer": "proces / dokument",
+      "kind": "regular",
+      "component": "Zgodność",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "niska",
+      "blocked": null,
+      "dependsOn": [],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E11-PLAT-03",
+      "epic": "E11",
+      "title": "Procedura Z6: nakazy organów (TERREG 1 h, e-dowody 10 dni, zabezpieczenie 60+30 dni) i zgłaszanie podejrzeń przestępstw (DSA art. 18)",
+      "module": "-",
+      "layer": "proces / dokument",
+      "kind": "regular",
+      "component": "Zgodność",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "niska",
+      "blocked": null,
+      "dependsOn": [],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E11-PLAT-04",
+      "epic": "E11",
+      "title": "Dyżur 1 h pod alertem punktu kontaktowego",
+      "module": "-",
+      "layer": "proces / dokument",
+      "kind": "regular",
+      "component": "Zgodność",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "niska",
+      "blocked": "HS-006: kto ma dyżur w 3-osobowym zespole (PO)",
+      "dependsOn": [],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E11-PLAT-05",
+      "epic": "E11",
+      "title": "Polityka zgłaszania podatności CRA: security.txt, kontakt, runbook 24 h/72 h (D-052)",
+      "module": "-",
+      "layer": "proces / dokument",
+      "kind": "regular",
+      "component": "Zgodność",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "niska",
+      "blocked": null,
+      "dependsOn": [],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E11-PLAT-06",
+      "epic": "E11",
+      "title": "Retencja aktów zgonu: osobny prefiks magazynu, czas do zamknięcia sprawy + 12 mies., dostęp tylko obsługa (D-055)",
+      "module": "-",
+      "layer": "proces / dokument",
+      "kind": "regular",
+      "component": "Zgodność",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 4
+      },
+      "confidence": "niska",
+      "blocked": null,
+      "dependsOn": [],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E11-PLAT-07",
+      "epic": "E11",
+      "title": "Ekran zgody przy pierwszym uruchomieniu: analityka i powiadomienia spoza „dotyczących danych” (D-050)",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 2,
+        "max": 3
+      },
+      "confidence": "średnia",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19"
+      ],
+      "problemClass": "crud",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    },
+    {
+      "id": "MEM-E11-PLAT-08",
+      "epic": "E11",
+      "title": "Sekcja „Podwykonawcy” w ekranie Konto i prywatność (S24)",
+      "module": "-",
+      "layer": "UI",
+      "kind": "regular",
+      "component": "Mobile",
+      "priority": "P0",
+      "estimate": {
+        "min": 1,
+        "max": 2
+      },
+      "confidence": "wysoka",
+      "blocked": null,
+      "dependsOn": [
+        "MEM-E0-PLAT-19"
+      ],
+      "problemClass": "tp",
+      "concurrencyCriterion": false,
+      "jiraKey": null
+    }
+  ]
+}

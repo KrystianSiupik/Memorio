@@ -1,0 +1,415 @@
+# GEO — geograficzny pamiętnik życia
+## Dokument koncepcyjny produktu
+
+### 1. Wizja produktu
+
+GEO to aplikacja łącząca interaktywny globus, osobisty pamiętnik, albumy fotograficzne, wspólne wspomnienia oraz sztuczną inteligencję. Jej głównym celem jest umożliwienie użytkownikom zapisywania, przeglądania, przeżywania na nowo i odkrywania wspomnień powiązanych z konkretnymi miejscami na świecie.
+
+Podstawową ideą systemu jest założenie, że **każde miejsce może być częścią czyjejś historii**.
+
+Może to być szczyt górski, restauracja, rodzinny dom, szkoła, koncert, pierwsza randka, wakacje z przyjaciółmi lub miejsce ważnego wydarzenia. Użytkownik może przypisać do takiej lokalizacji wspomnienie, datę, opis, zdjęcia, filmy, osoby i dodatkowe informacje.
+
+W przeciwieństwie do typowych aplikacji podróżniczych GEO nie ogranicza się do wyjazdów. Ma służyć jako osobista i rodzinna mapa życia, która z czasem staje się cyfrowym archiwum wspomnień.
+
+Aplikacja łączy sześć głównych obszarów:
+
+- **Mapa świata** — wizualna reprezentacja miejsc i wspomnień.
+- **Pamiętnik** — zapisywanie wydarzeń, zdjęć, filmów i opisów.
+- **Albumy współdzielone** — wspólne archiwa dla rodzin, par i grup znajomych.
+- **Prześledź i Podsumuj** — odtwarzanie historii oraz generowanie podsumowań za pomocą AI.
+- **Odkrywaj** — spersonalizowane rekomendacje miejsc i pomysły na wycieczki.
+- **Profile miejsc** — publiczne historie związane z restauracjami, atrakcjami, hotelami i innymi lokalizacjami.
+
+### 2. Główna zasada działania
+
+Każde wspomnienie jest powiązane z miejscem i może zawierać określony zestaw informacji:
+
+- lokalizację geograficzną,
+- datę lub przedział czasu,
+- tytuł i opis,
+- zdjęcia oraz filmy,
+- autora i uczestników,
+- tagi, kategorie i kolekcje,
+- opcjonalne informacje o trasie, wydarzeniu lub aktywności,
+- ustawienia prywatności.
+
+Po zapisaniu wspomnienia odpowiedni punkt pojawia się na mapie użytkownika. Kliknięcie punktu otwiera jego szczegóły.
+
+Jedna lokalizacja może zawierać wiele wspomnień z różnych dni i lat. Na przykład restauracja może być powiązana z pierwszą randką, późniejszymi urodzinami i spotkaniami rodzinnymi.
+
+Wspomnienia mogą pozostać prywatne, należeć do albumu współdzielonego albo zostać opublikowane dla innych użytkowników.
+
+### 3. Mapa i globus
+
+Mapa jest centralnym elementem aplikacji i podstawowym sposobem poruszania się po zapisanych wspomnieniach.
+
+Użytkownik rozpoczyna na widoku interaktywnego globusa, który może obracać, przybliżać i oddalać. Wraz ze zmianą skali globus przechodzi w widok kontynentów, państw, regionów i szczegółowych lokalizacji.
+
+Mapa pokazuje:
+
+- zapisane miejsca,
+- skupiska wspomnień,
+- odwiedzone państwa i regiony,
+- miejsca związane z wybranym albumem,
+- lokalizacje wybranego okresu,
+- publiczne miejsca i treści, które użytkownik może odkrywać.
+
+Punkty na mapie mogą mieć różne oznaczenia zależnie od kategorii, np. podróż, góry, restauracja, wydarzenie, rodzina lub ważne wspomnienie.
+
+Po wybraniu punktu użytkownik widzi nazwę miejsca, datę, krótki opis, zdjęcia oraz odnośniki do powiązanych wpisów i albumów.
+
+Mapa powinna pozostać użyteczna także wtedy, gdy użytkownik zgromadzi tysiące wspomnień. Dlatego należy uwzględnić grupowanie bliskich punktów, filtry dat, kategorii, osób i albumów oraz wyszukiwanie lokalizacji.
+
+### 4. Osobista mapa i pamiętnik
+
+Każdy użytkownik posiada własne konto, mapę i przestrzeń na wspomnienia.
+
+Może samodzielnie dodawać miejsca lub wyszukiwać je w bazie lokalizacji. Po wskazaniu miejsca tworzy nowy wpis, dodając datę, opis, materiały multimedialne i inne informacje.
+
+Przykładowe wspomnienie:
+
+**Ślęża — 14 maja 2026 r.**
+
+„Wyruszyliśmy rano ze znajomymi na szlak. Na szczycie zrobiliśmy zdjęcia, a po zejściu zjedliśmy obiad w Sobótce”.
+
+Zdjęcia: 17  
+Uczestnicy: 4 osoby  
+Kategorie: góry, znajomi, Korona Gór Polski
+
+Wpis zostaje zapisany na mapie pod lokalizacją Ślęży.
+
+Użytkownik powinien móc dodawać wspomnienia również bez korzystania z globusa, np. z poziomu formularza, galerii zdjęć, wyszukiwarki miejsc lub albumu.
+
+### 5. Albumy — podstawowy mechanizm współdzielenia
+
+Album jest odrębną przestrzenią, która gromadzi wspomnienia dotyczące określonego tematu, okresu lub grupy osób.
+
+Przykładowe albumy:
+
+- Nasza rodzina — 1990–2026.
+- Wakacje w Chorwacji 2026.
+- Nasza historia.
+- Wyjazdy ze znajomymi.
+- Korona Gór Polski.
+- Moje życie na studiach.
+- Rocznik szkolny.
+
+Album może zawierać wiele miejsc, wpisów, zdjęć i uczestników. Jego zawartość można przeglądać na mapie, w galerii oraz chronologicznej osi czasu.
+
+#### Album prywatny
+
+Dostęp ma wyłącznie właściciel.
+
+#### Album współdzielony
+
+Właściciel zaprasza wybrane osoby, które otrzymują uprawnienia do przeglądania lub dodawania treści. Można przewidzieć różne poziomy dostępu, np. właściciel, współtwórca i osoba z dostępem tylko do odczytu.
+
+#### Album dostępny przez link
+
+Właściciel może zezwolić na przeglądanie albumu osobom posiadającym specjalny link. Powinien mieć możliwość cofnięcia dostępu.
+
+#### Album publiczny
+
+Album jest widoczny dla innych użytkowników zgodnie z ustawieniami publikacji i zasadami prywatności.
+
+### 6. Współdzielenie Premium
+
+Jednym z elementów modelu biznesowego jest możliwość opłacenia funkcji Premium dla wspólnego albumu zamiast wymagania oddzielnej subskrypcji od każdej zaproszonej osoby.
+
+Przykładowo jedna osoba tworzy album rodzinny, wykupuje odpowiedni plan i zaprasza pięciu członków rodziny. Każdy z nich może korzystać ze wspólnych funkcji albumu bez konieczności kupowania własnego Premium.
+
+Właściciel albumu zarządza zaproszeniami, dostępem i planem. Zaproszone osoby zachowują własne konta i swoje osobiste wspomnienia.
+
+Należy wyraźnie rozróżnić:
+- uprawnienia Premium dostępne w konkretnym albumie,
+- funkcje Premium dostępne w całym osobistym koncie,
+- prywatne wspomnienia uczestnika, które nie zostały udostępnione albumowi.
+
+Subskrypcja albumu nie powinna automatycznie dawać jego właścicielowi dostępu do pozostałych danych zaproszonych osób.
+
+### 7. Wspomnienia publiczne i społeczność
+
+Użytkownicy mogą udostępniać wybrane wspomnienia oraz albumy innym osobom.
+
+Publiczna zawartość może zawierać opis, zdjęcia, lokalizacje, daty, trasy oraz wskazówki dotyczące odwiedzonych miejsc. Użytkownik powinien mieć kontrolę nad tym, które elementy zostaną opublikowane.
+
+W przyszłości aplikacja może umożliwiać obserwowanie profili, odkrywanie albumów, zapisywanie interesujących miejsc i inspirowanie się podróżami innych osób.
+
+Społeczność GEO powinna być skoncentrowana na prawdziwych doświadczeniach i wspomnieniach, a nie tylko na ocenach, polubieniach i krótkich postach.
+
+### 8. Funkcja „Prześledź”
+
+„Prześledź” jest trybem interaktywnego odtwarzania wspomnień w kolejności chronologicznej. Jego zadaniem jest umożliwienie użytkownikowi ponownego przeżycia wybranego okresu na mapie.
+
+Użytkownik wybiera rok, zakres dat, album, osobę lub inną kolekcję wspomnień.
+
+System wybiera pasujące wpisy i porządkuje je według daty. Następnie odtwarza je kolejno, wykorzystując animacje mapy, zdjęcia, opisy i opcjonalną narrację AI.
+
+Przykład: „Prześledź 2026”.
+
+**Etap 1 — Sylwester w Warszawie**
+
+Globus przybliża się do Warszawy. Pojawia się punkt oraz panel:
+
+„Sylwester 2025/2026. Tego dnia spotkałeś się ze znajomymi, aby wspólnie świętować początek roku”.
+
+Panel wyświetla zdjęcia, datę i uczestników.
+
+**Etap 2 — Weekend we Wrocławiu**
+
+Mapa płynnie przemieszcza się do kolejnej lokalizacji. Wyświetlane jest następne wspomnienie.
+
+**Etap 3 — Wycieczka na Ślężę**
+
+Mapa przybliża się do szczytu. Pojawiają się zdjęcia, opis wycieczki i informacje o zdobytej kolekcji.
+
+Użytkownik może przejść do następnego lub poprzedniego wpisu, zatrzymać odtwarzanie, wrócić do mapy albo zmienić tempo.
+
+Tryb powinien obsługiwać brak dokładnej daty, kilka wspomnień z jednego dnia, wydarzenia trwające kilka dni oraz wiele wspomnień w tej samej lokalizacji.
+
+Po zakończeniu system może pokazać statystyki okresu oraz zaproponować utworzenie podsumowania lub albumu.
+
+### 9. Funkcja „Podsumuj”
+
+„Podsumuj” różni się od „Prześledź”.
+
+„Prześledź” pokazuje istniejące wspomnienia chronologicznie. „Podsumuj” wykorzystuje AI do utworzenia opowieści o wybranym okresie lub zbiorze wydarzeń.
+
+Użytkownik może wybrać:
+- miesiąc,
+- porę roku,
+- cały rok,
+- dowolny zakres dat,
+- konkretną podróż,
+- album rodzinny,
+- wspomnienia z określoną osobą,
+- wybraną kolekcję miejsc.
+
+AI analizuje dostępne i dozwolone do wykorzystania materiały: opisy, daty, lokalizacje, tagi i zdjęcia. Następnie tworzy narracyjne podsumowanie, które może zawierać najważniejsze wydarzenia, najczęściej odwiedzane regiony, nowe miejsca oraz wybrane fotografie.
+
+Przykład:
+
+**„Wasza rodzina w 2026 roku”**
+
+„Rok rozpoczęliście od spotkania sylwestrowego. Wiosną wybraliście się w góry, a latem spędziliście wspólnie wakacje w Chorwacji. W ciągu roku zapisaliście 37 miejsc i dodaliście 240 zdjęć do rodzinnego albumu”.
+
+Podsumowanie powinno odróżniać fakty zapisane w systemie od treści interpretowanych przez AI. System nie może wymyślać wydarzeń, relacji, dat ani emocji, których nie da się uzasadnić dostępnymi materiałami.
+
+Gotowe podsumowanie może być zapisane jako pamiątka, udostępnione rodzinie lub wyeksportowane jako prezentacja albo film.
+
+### 10. Sztuczna inteligencja — asystent wspomnień i odkrywania
+
+AI jest zintegrowaną warstwą produktu, która ułatwia tworzenie wspomnień, porządkowanie treści, analizowanie historii oraz odkrywanie nowych miejsc.
+
+#### Pomoc przy tworzeniu wpisów
+
+Użytkownik może wybrać lokalizację, dodać zdjęcia i poprosić AI o przygotowanie szkicu opisu. System może zaproponować tytuł, kategorię lub tagi.
+
+AI nie powinno automatycznie przedstawiać domysłów jako faktów. Użytkownik zatwierdza treść przed zapisaniem.
+
+#### Inteligentne wyszukiwanie
+
+Użytkownik może zapytać:
+
+- „Gdzie byliśmy na wakacjach w 2024 roku?”
+- „Pokaż wszystkie wycieczki w góry”.
+- „Znajdź zdjęcia z restauracji, w której świętowaliśmy urodziny”.
+- „Które miejsca odwiedziliśmy wspólnie z Anią?”
+
+System przeszukuje wyłącznie treści, do których pytający ma odpowiednie uprawnienia.
+
+#### Rekomendacje nowych miejsc
+
+AI analizuje wybrane wspomnienia i albumy, aby proponować miejsca zgodne z zainteresowaniami użytkownika.
+
+Jeżeli ktoś często zapisuje wycieczki górskie, aplikacja może zaproponować kolejne szczyty, trasy w pobliskim regionie lub interesujące miejsca w sąsiednich krajach.
+
+Każda rekomendacja może wyjaśniać, dlaczego została zaproponowana, np. na podstawie kategorii odwiedzanych miejsc, odległości i charakteru poprzednich wycieczek.
+
+#### Planowanie podróży na podstawie albumów
+
+Użytkownik może otworzyć publiczny album innej osoby i wybrać opcję „Zaplanuj podobną podróż”.
+
+AI analizuje publicznie dostępne informacje, takie jak odwiedzone miejsca, kolejność przystanków, opisy i rodzaj aktywności. Na tej podstawie przygotowuje propozycję wycieczki dopasowaną do kryteriów użytkownika.
+
+AI powinno wykorzystywać wyłącznie treści, do których użytkownik ma uprawniony dostęp. Prywatne dane autora albumu nie mogą być ujawniane w rekomendacjach dla innych osób.
+
+### 11. Prywatność i bezpieczne publikowanie
+
+Prywatność jest jednym z fundamentalnych elementów GEO, ponieważ aplikacja może przechowywać zdjęcia, precyzyjne lokalizacje, dane o relacjach i informacje dotyczące życia prywatnego.
+
+Każde wspomnienie i album muszą mieć jasno określone zasady dostępu. Użytkownik powinien wiedzieć, kto może zobaczyć daną treść, a także móc zmienić ustawienia i cofnąć udostępnienie.
+
+#### Funkcja „Sprawdź prywatność”
+
+Przed publikacją prywatnego albumu użytkownik może poprosić AI o sprawdzenie materiałów.
+
+System szuka potencjalnie wrażliwych elementów, takich jak:
+- imiona i nazwiska,
+- numery telefonów i adresy,
+- dane identyfikacyjne i dokumenty,
+- informacje medyczne,
+- widoczne dane na zrzutach ekranu,
+- twarze osób, które mogą nie chcieć publikacji,
+- metadane zdjęć zawierające lokalizację lub inne informacje prywatne.
+
+System przedstawia wykryte elementy i proponuje ich usunięcie, zamazanie lub zastąpienie neutralnym tekstem.
+
+#### Publiczna kopia albumu
+
+Bezpieczniejszym rozwiązaniem jest utworzenie oddzielnej kopii do publikacji, zamiast modyfikowania oryginalnego albumu.
+
+Proces wygląda następująco:
+
+**Prywatny album → kontrola prywatności → proponowane zmiany → podgląd publicznej kopii → zatwierdzenie przez użytkownika → publikacja.**
+
+Oryginał pozostaje niezmieniony.
+
+Automatyczne wykrywanie nie gwarantuje wykrycia wszystkich danych wrażliwych. Dlatego użytkownik powinien móc sprawdzić wersję publiczną przed jej udostępnieniem.
+
+System powinien też przestrzegać uprawnień do zdjęć i wspomnień współtworzonych przez inne osoby. Właściciel albumu nie powinien automatycznie uzyskiwać prawa do publicznego opublikowania każdej treści dodanej przez zaproszonych uczestników.
+
+### 12. Profile miejsc i współpraca z biznesami
+
+GEO może umożliwiać restauracjom, barom, hotelom, schroniskom, atrakcjom turystycznym i innym firmom zarządzanie oficjalnymi profilami swoich lokalizacji.
+
+Przykładowy profil restauracji zawiera:
+- nazwę i lokalizację,
+- opis i zdjęcia,
+- dane kontaktowe i odnośniki,
+- informacje o wydarzeniach,
+- publiczne wspomnienia użytkowników związane z miejscem.
+
+Firma może zgłosić istniejący profil i potwierdzić, że jest jego właścicielem.
+
+#### Wspomnienia związane z miejscem
+
+Na profilu lokalu można przeglądać publiczne wspomnienia dodane przez użytkowników, np. relacje z urodzin, spotkań rodzinnych i randek.
+
+W ten sposób profil miejsca pokazuje nie tylko dane praktyczne, ale również jego rolę w historiach ludzi.
+
+#### Panel dla właściciela
+
+Właściciel może zarządzać oficjalnym profilem, publikować informacje, tworzyć wydarzenia i analizować zagregowane statystyki dotyczące publicznych wspomnień związanych z lokalizacją.
+
+AI może tworzyć podsumowania, np. jakie rodzaje okazji są często kojarzone z danym miejscem. Takie statystyki powinny opierać się na odpowiednio dużej liczbie danych i nie powinny umożliwiać identyfikowania konkretnych użytkowników.
+
+Firma nie otrzymuje automatycznie dostępu do prywatnych wspomnień klientów.
+
+#### QR i zapisywanie miejsc
+
+Lokal może umieścić kod QR, który otwiera swój profil w aplikacji i pozwala użytkownikowi szybko zapisać miejsce na mapie albo dodać wspomnienie. Nie powinno to wymagać wystawienia publicznej opinii.
+
+#### Model biznesowy dla firm
+
+W przyszłości można wprowadzić płatne plany obejmujące rozbudowany profil, statystyki, narzędzia AI, zarządzanie wydarzeniami i funkcje promocyjne. Podstawowe istnienie miejsca na mapie nie musi wymagać płatności od właściciela.
+
+### 13. Model biznesowy
+
+GEO może korzystać z modelu freemium, w którym podstawowe prowadzenie pamiętnika jest bezpłatne, a bardziej zaawansowane funkcje są dostępne w płatnych planach.
+
+**Plan bezpłatny**
+- osobista mapa,
+- tworzenie podstawowych wspomnień,
+- ograniczona przestrzeń na zdjęcia lub inne zasoby,
+- podstawowe albumy i udostępnianie.
+
+**Premium osobiste**
+- większa przestrzeń na multimedia,
+- rozbudowane filtry i kolekcje,
+- zaawansowane funkcje „Prześledź” i „Podsumuj”,
+- funkcje AI,
+- eksport wspomnień.
+
+**Premium dla albumu**
+- rozszerzone możliwości wspólnego archiwum,
+- dodatkowa przestrzeń,
+- funkcje AI obejmujące dozwoloną zawartość albumu,
+- większa liczba uczestników lub rozszerzone uprawnienia.
+
+**Plany biznesowe**
+- oficjalne profile,
+- statystyki publicznej aktywności,
+- narzędzia AI,
+- promocja miejsc i wydarzeń.
+
+Wysokość limitów, ceny i dostępność poszczególnych funkcji należy ustalić po zbadaniu kosztów przechowywania zdjęć, filmów i przetwarzania AI oraz po testach z użytkownikami.
+
+Dodatkowym źródłem przychodu może być generowanie fizycznych fotoksiążek, rodzinnych albumów i rocznych podsumowań.
+
+### 14. Główne ekrany aplikacji
+
+Główna nawigacja powinna obejmować następujące sekcje:
+
+**Mapa**
+Interaktywny globus, osobiste punkty, filtry, albumy i wyszukiwanie miejsc.
+
+**Wspomnienia**
+Lista oraz galeria wpisów, z możliwością filtrowania według dat, osób, kategorii i lokalizacji.
+
+**Albumy**
+Prywatne i współdzielone albumy, zaproszenia, role i ustawienia dostępu.
+
+**Prześledź**
+Chronologiczne odtwarzanie wybranego okresu lub zestawu wspomnień na mapie.
+
+**Odkrywaj**
+Rekomendowane miejsca, publiczne albumy i pomysły na nowe podróże.
+
+**Profil**
+Konto użytkownika, preferencje, plan Premium, prywatność i zarządzanie danymi.
+
+Funkcje „Podsumuj”, ustawienia prywatności oraz profile biznesowe można udostępniać w odpowiednich kontekstach, np. wewnątrz albumu lub strony lokalizacji.
+
+### 15. Zakres pierwszej wersji — MVP
+
+Pierwsza wersja produktu powinna sprawdzić, czy użytkownicy chcą regularnie gromadzić i przeglądać wspomnienia na mapie.
+
+Na początku nie trzeba budować pełnej platformy społecznościowej ani rozbudowanego systemu biznesowego.
+
+Najważniejsze funkcje MVP:
+
+1. Rejestracja i konto użytkownika.
+2. Interaktywna mapa z możliwością wyszukiwania i oznaczania lokalizacji.
+3. Tworzenie wspomnień ze zdjęciami, datą i opisem.
+4. Prywatna mapa użytkownika.
+5. Albumy ze wspólnym dostępem i podstawowymi rolami.
+6. Udostępnianie albumu oraz kontrola uprawnień.
+7. Prosty tryb „Prześledź” dla wybranego zakresu dat.
+8. Pierwsza wersja „Podsumuj” generująca opis na podstawie zapisanych danych.
+9. Podstawowe ustawienia prywatności i możliwość usunięcia wspomnień.
+
+W pierwszym etapie można zastosować ograniczone rekomendacje AI, a dopiero po sprawdzeniu sposobu korzystania z aplikacji rozwijać bardziej zaawansowane planowanie podróży, publiczne albumy i analizę miejsc.
+
+### 16. Kierunki dalszego rozwoju
+
+Po zweryfikowaniu MVP system można rozszerzyć o:
+
+- publiczną społeczność albumów,
+- AI rekomendujące nowe miejsca,
+- planowanie podróży z publicznych albumów,
+- konta rodzinne i rozbudowane plany współdzielenia Premium,
+- profile biznesowe i wydarzenia,
+- generowanie filmów ze wspomnień,
+- automatyczny import zdjęć z telefonu za zgodą użytkownika,
+- kolekcje geograficzne, np. Korona Gór Polski,
+- fizyczne albumy i fotoksiążki,
+- długoterminowe archiwa rodzinne.
+
+### 17. Najważniejsze zasady projektowe
+
+1. **Miejsce jest głównym punktem odniesienia.** Wspomnienia nie są wyłącznie wpisami na osi czasu — są powiązane z geografią.
+2. **Użytkownik zachowuje kontrolę.** Może decydować o udostępnianiu, dostępie i publikacji swoich treści.
+3. **Album jest przestrzenią współpracy.** Wiele osób może budować wspólną historię, bez utraty kontroli nad prywatnymi danymi.
+4. **AI wspiera, ale nie zastępuje użytkownika.** Proponuje opisy, odkrycia i interpretacje, lecz nie powinno zmyślać faktów ani samodzielnie publikować wrażliwych treści.
+5. **Prywatność jest częścią architektury.** System uwzględnia uprawnienia na poziomie wspomnień, albumów, multimediów i publikacji.
+6. **Produkt powinien mieć wartość również dla jednej osoby.** Użytkownik może korzystać z pamiętnika i mapy, nawet jeśli nie zaprasza znajomych i nie udostępnia albumów publicznie.
+7. **Aplikacja ma pomagać wracać do wspomnień.** Funkcje „Prześledź” i „Podsumuj” mają przekształcać zgromadzone dane w angażujące, osobiste historie.
+
+### 18. Docelowa definicja produktu
+
+GEO to osobisty i współdzielony geograficzny pamiętnik, który łączy miejsca, wspomnienia, zdjęcia, ludzi i wydarzenia na jednej interaktywnej mapie.
+
+Pozwala użytkownikom tworzyć prywatne archiwa życia, budować wspólną historię rodziny i znajomych, odkrywać publiczne albumy innych osób oraz korzystać z AI do odnajdywania wspomnień, podsumowywania okresów i planowania nowych podróży.
+
+**GEO — Twoje życie ma swoje miejsca.**
