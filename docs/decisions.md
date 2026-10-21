@@ -364,3 +364,13 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 | D-116 | build_runner cofnięty do 2.16.2 (pozostałe generatory bez zmian wersji), bo drift_dev 2.35.1 wymaga `build` < 5; skrypt `tools/generate-app-code.sh` generuje cały kod (klient API, Drift, JSON) i formatuje `lib`, CI wymaga braku różnic w `lib` | jeden sposób generowania; klient API generuje się identycznie |
 | D-117 | Baner offline S02 (D-108) zrobiony tutaj: na każdej zakładce, gdy brak łączności | wykrywanie łączności powstało w tym tickecie |
 | D-118 | Idempotencja po stronie backendu (ten sam id = jeden skutek, test API z powtórzonym kluczem) powstaje z pierwszym endpointem tworzącym (C12 w E2) | dziś nie ma endpointu, który by ją przyjmował |
+
+## MEM-E0-PLAT-06 · adapter AI (2026-10-22)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-119 | Pseudonimizacja w domenie Narracji AI: nazwy osób i miejsc → `[PERSON_n]`/`[PLACE_n]` (numerowane wg pierwszego wystąpienia), dopasowanie bez wielkości liter i polskich znaków po rdzeniu (słowo bez 2 ostatnich liter, min. 3; min. 2 dla nazw wielowyrazowych), odpowiedź z nieznanym tokenem odrzucana | QS8: polskie nazwy się odmieniają („w Krakowie”), dokładne dopasowanie przepuszczałoby odmiany; nadmiarowe ukrycie słowa jest bezpieczną stroną. Znane ograniczenie: odmiany jednowyrazowych nazw krótszych niż 4 litery |
+| D-120 | `AiGeneratedText` nie istnieje bez znacznika AI, modelu i wersji promptu (`id@wersja`); prompty wersjonowane w kodzie (`Infrastructure/Prompts`), zmiana treści = wyższa wersja | SD9, AI Act art. 50 ust. 2 (K9) |
+| D-121 | Port `ITextGenerator` w Application, pierwszy adapter: **Mistral** (chat completions, wynik JSON) przez `HttpClient` + Microsoft.Extensions.Http.Resilience (60 s na próbę); ostateczny dostawca po DPIA i umowie powierzenia (ADR 0009) | D-080 liczył koszty na Mistral (UE); port pozwala zmienić dostawcę bez zmian domeny |
+| D-122 | Konfiguracja AI opcjonalna (`Ai__ApiKey`): bez klucza funkcje AI zwracają `AiNarration.ProviderUnavailable` (E18), reszta aplikacji działa; treść materiałów i odpowiedzi nigdy nie trafia do logów | środowiska bez AI (dev, testy) nie potrzebują klucza |
+| D-123 | Testy modułów w osobnych projektach `tests/Modules/Memorio.Modules.<X>.Tests` z `InternalsVisibleTo` | typy modułu są `internal` (D-083); testy domeny bez bazy i HTTP |
