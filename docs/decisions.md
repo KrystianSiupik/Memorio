@@ -353,3 +353,14 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 | D-106 | Sesja w funkcji `account`: interfejs `SessionRepository` w domenie, `sessionProvider` w prezentacji, do PLAT-07 implementacja `NoSessionRepository` (nikt nie jest zalogowany) | przekierowanie działa i jest testowane już teraz; PLAT-07 podmienia tylko implementację w `app/composition.dart` |
 | D-107 | Podczas odczytu sesji ekran startowy z `?from=`, po odczycie powrót do żądanego adresu; błąd odczytu = niezalogowany | żadna zakładka nie mignie przed sprawdzeniem sesji; głębokie linki nie giną |
 | D-108 | Baner offline z S02 przenoszę do MEM-E0-PLAT-11 (offline) | wymaga wykrywania łączności, które należy do tamtego ticketu |
+
+## MEM-E0-PLAT-11 · kolejka offline (2026-10-22)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-113 | Kolejka offline w `core/offline`: tabela Drift `pending_operations`, id = **UUID v7 nadany w aplikacji** = klucz idempotencji dla backendu; wysyłka w kolejności utworzenia, pierwsza operacja do ponowienia zatrzymuje wysyłkę (zdjęcia nigdy przed wspomnieniem); ponowienia 5 s → ×2 → maks. 15 min; odrzucone biznesowo (np. pula pełna) zostają z kodem do pokazania użytkownikowi | ADR 0016, D-015, D-039; UUID v7 rośnie w czasie, więc dobrze się indeksuje po stronie serwera |
+| D-114 | Rodzaje operacji i ich wysyłające (`OperationSender`) rejestrują funkcje w `app/composition.dart` (`operationSendersProvider`); wysyłka startuje po powrocie łączności (connectivity_plus) | kolejka nie zna funkcji; nowa operacja offline = jeden sender w funkcji |
+| D-115 | Baza lokalna na iOS/Android przez drift_flutter; **web bez bazy lokalnej** do pierwszej funkcji, która kolejkuje na web (potrzebne `sqlite3.wasm` i `drift_worker.js` w `web/`) | offline dotyczy telefonu („szczyt górski”); nie dokładam zasobów web bez użycia |
+| D-116 | build_runner cofnięty do 2.16.2 (pozostałe generatory bez zmian wersji), bo drift_dev 2.35.1 wymaga `build` < 5; skrypt `tools/generate-app-code.sh` generuje cały kod (klient API, Drift, JSON) i formatuje `lib`, CI wymaga braku różnic w `lib` | jeden sposób generowania; klient API generuje się identycznie |
+| D-117 | Baner offline S02 (D-108) zrobiony tutaj: na każdej zakładce, gdy brak łączności | wykrywanie łączności powstało w tym tickecie |
+| D-118 | Idempotencja po stronie backendu (ten sam id = jeden skutek, test API z powtórzonym kluczem) powstaje z pierwszym endpointem tworzącym (C12 w E2) | dziś nie ma endpointu, który by ją przyjmował |
