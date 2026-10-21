@@ -23,7 +23,7 @@ generated from it. After an API change:
 
 ```bash
 UPDATE_OPENAPI_SNAPSHOT=1 dotnet test --solution Memorio.slnx   # rewrite api/openapi.v1.json, review the diff
-tools/generate-api-client.sh                                   # regenerate the Dart client (needs dart on PATH)
+tools/generate-app-code.sh                                   # regenerate the Dart client and other generated code (needs dart on PATH)
 tools/check-api-breaking.sh version/0.1                        # breaking changes vs version/0.1 (oasdiff, Docker)
 ```
 

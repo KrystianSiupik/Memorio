@@ -32,3 +32,7 @@ Tests override the same provider with a fake. Expected failures are returned as
 `Result<T, Failure>` (`core/result.dart`) with a sealed failure type per feature.
 
 The rules are checked by `test/architecture/import_rules_test.dart`.
+
+Offline (ADR 0016): an operation that must work without network (creating a memory, adding photos)
+is enqueued with `offlineQueueProvider` (`core/offline`); its id is the idempotency key the sender
+passes to the API. The feature registers an `OperationSender` for its kind in `app/composition.dart`.

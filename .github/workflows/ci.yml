@@ -45,11 +45,11 @@ jobs:
           flutter-version: 3.47.7
           channel: stable
       - run: flutter pub get
-      - name: Generated API client matches api/openapi.v1.json
+      - name: Generated code (API client, Drift, JSON) is up to date
         run: |
-          bash ../tools/generate-api-client.sh
-          git diff --exit-code -- lib/core/api/generated
-          test -z "$(git status --porcelain -- lib/core/api/generated)"
+          bash ../tools/generate-app-code.sh
+          git diff --exit-code -- lib
+          test -z "$(git status --porcelain -- lib)"
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze
       - run: flutter test
