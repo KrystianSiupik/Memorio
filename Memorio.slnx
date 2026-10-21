@@ -1,0 +1,72 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/Memorio.Modularity/Memorio.Modularity.csproj" />
+    <Project Path="src/BuildingBlocks/Memorio.SharedKernel/Memorio.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/src/Host/">
+    <Project Path="src/Host/Memorio.Api/Memorio.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Access/">
+    <Project Path="src/Modules/Access/Memorio.Modules.Access.Contracts/Memorio.Modules.Access.Contracts.csproj" />
+    <Project Path="src/Modules/Access/Memorio.Modules.Access/Memorio.Modules.Access.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Account/">
+    <Project Path="src/Modules/Account/Memorio.Modules.Account.Contracts/Memorio.Modules.Account.Contracts.csproj" />
+    <Project Path="src/Modules/Account/Memorio.Modules.Account/Memorio.Modules.Account.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/AiNarration/">
+    <Project Path="src/Modules/AiNarration/Memorio.Modules.AiNarration.Contracts/Memorio.Modules.AiNarration.Contracts.csproj" />
+    <Project Path="src/Modules/AiNarration/Memorio.Modules.AiNarration/Memorio.Modules.AiNarration.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Album/">
+    <Project Path="src/Modules/Album/Memorio.Modules.Album.Contracts/Memorio.Modules.Album.Contracts.csproj" />
+    <Project Path="src/Modules/Album/Memorio.Modules.Album/Memorio.Modules.Album.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Archive/">
+    <Project Path="src/Modules/Archive/Memorio.Modules.Archive.Contracts/Memorio.Modules.Archive.Contracts.csproj" />
+    <Project Path="src/Modules/Archive/Memorio.Modules.Archive/Memorio.Modules.Archive.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Limits/">
+    <Project Path="src/Modules/Limits/Memorio.Modules.Limits.Contracts/Memorio.Modules.Limits.Contracts.csproj" />
+    <Project Path="src/Modules/Limits/Memorio.Modules.Limits/Memorio.Modules.Limits.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Moderation/">
+    <Project Path="src/Modules/Moderation/Memorio.Modules.Moderation.Contracts/Memorio.Modules.Moderation.Contracts.csproj" />
+    <Project Path="src/Modules/Moderation/Memorio.Modules.Moderation/Memorio.Modules.Moderation.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Notifications/">
+    <Project Path="src/Modules/Notifications/Memorio.Modules.Notifications.Contracts/Memorio.Modules.Notifications.Contracts.csproj" />
+    <Project Path="src/Modules/Notifications/Memorio.Modules.Notifications/Memorio.Modules.Notifications.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/PlaceProfiles/">
+    <Project Path="src/Modules/PlaceProfiles/Memorio.Modules.PlaceProfiles.Contracts/Memorio.Modules.PlaceProfiles.Contracts.csproj" />
+    <Project Path="src/Modules/PlaceProfiles/Memorio.Modules.PlaceProfiles/Memorio.Modules.PlaceProfiles.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Places/">
+    <Project Path="src/Modules/Places/Memorio.Modules.Places.Contracts/Memorio.Modules.Places.Contracts.csproj" />
+    <Project Path="src/Modules/Places/Memorio.Modules.Places/Memorio.Modules.Places.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Plans/">
+    <Project Path="src/Modules/Plans/Memorio.Modules.Plans.Contracts/Memorio.Modules.Plans.Contracts.csproj" />
+    <Project Path="src/Modules/Plans/Memorio.Modules.Plans/Memorio.Modules.Plans.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Provenance/">
+    <Project Path="src/Modules/Provenance/Memorio.Modules.Provenance.Contracts/Memorio.Modules.Provenance.Contracts.csproj" />
+    <Project Path="src/Modules/Provenance/Memorio.Modules.Provenance/Memorio.Modules.Provenance.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Publishing/">
+    <Project Path="src/Modules/Publishing/Memorio.Modules.Publishing.Contracts/Memorio.Modules.Publishing.Contracts.csproj" />
+    <Project Path="src/Modules/Publishing/Memorio.Modules.Publishing/Memorio.Modules.Publishing.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Succession/">
+    <Project Path="src/Modules/Succession/Memorio.Modules.Succession.Contracts/Memorio.Modules.Succession.Contracts.csproj" />
+    <Project Path="src/Modules/Succession/Memorio.Modules.Succession/Memorio.Modules.Succession.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Memorio.Api.Tests/Memorio.Api.Tests.csproj" />
+    <Project Path="tests/Memorio.ArchitectureTests/Memorio.ArchitectureTests.csproj" />
+    <Project Path="tests/Memorio.SharedKernel.Tests/Memorio.SharedKernel.Tests.csproj" />
+  </Folder>
+</Solution>
