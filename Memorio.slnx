@@ -69,4 +69,7 @@
     <Project Path="tests/Memorio.ArchitectureTests/Memorio.ArchitectureTests.csproj" />
     <Project Path="tests/Memorio.SharedKernel.Tests/Memorio.SharedKernel.Tests.csproj" />
   </Folder>
+  <Folder Name="/tests/Modules/">
+    <Project Path="tests/Modules/Memorio.Modules.AiNarration.Tests/Memorio.Modules.AiNarration.Tests.csproj" />
+  </Folder>
 </Solution>
