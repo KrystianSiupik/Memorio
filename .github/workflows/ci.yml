@@ -1,5 +1,5 @@
 # CI for every push and pull request: build with warnings as errors, formatting, and all tests
-# (including the architecture tests SD1/SD2, ADR 0001 and 0019).
+# (including the architecture tests: backend SD1/SD2, app import rules; ADR 0001 and 0019).
 name: ci
 
 on:
@@ -18,3 +18,19 @@ jobs:
       - run: dotnet build Memorio.slnx --no-restore --configuration Release
       - run: dotnet format Memorio.slnx --verify-no-changes --no-restore
       - run: dotnet test --solution Memorio.slnx --no-build --configuration Release
+
+  app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.7
+          channel: stable
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze
+      - run: flutter test
