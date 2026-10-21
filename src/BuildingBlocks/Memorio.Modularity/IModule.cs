@@ -15,5 +15,6 @@ public interface IModule
 
     void AddServices(IServiceCollection services, IConfiguration configuration);
 
+    /// <summary>Maps the module's endpoints; <paramref name="endpoints"/> is the /v1 route group.</summary>
     void MapEndpoints(IEndpointRouteBuilder endpoints);
 }

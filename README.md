@@ -15,13 +15,28 @@ dotnet run --project src/Host/Memorio.Api          # API host
 
 Requires the .NET SDK pinned in `global.json`. Tests run on Microsoft.Testing.Platform (xUnit v3).
 
+## API contract (v1)
+
+Every public endpoint is under `/v1` and changes only in backward-compatible ways (ADR 0017).
+The contract is committed as `api/openapi.v1.json`; the Dart client in `app/lib/core/api/generated` is
+generated from it. After an API change:
+
+```bash
+UPDATE_OPENAPI_SNAPSHOT=1 dotnet test --solution Memorio.slnx   # rewrite api/openapi.v1.json, review the diff
+tools/generate-api-client.sh                                   # regenerate the Dart client (needs dart on PATH)
+tools/check-api-breaking.sh version/0.1                        # breaking changes vs version/0.1 (oasdiff, Docker)
+```
+
+The app sends `X-App-Version`; below `AppVersion:Minimum` the API answers 426 (`App.UpdateRequired`,
+RFC 7807 problem details) and the app shows the update screen.
+
 ## Layout
 
 ```
 src/
   BuildingBlocks/
     Memorio.SharedKernel/   Result + Error, Entity, AggregateRoot, IDomainEvent; no business logic
-    Memorio.Modularity/     IModule: how the host registers a module
+    Memorio.Modularity/     IModule: how the host registers a module (endpoints under /v1)
   Host/Memorio.Api/         ASP.NET Core host; ModuleCatalog is the only place that knows every module
   Modules/<Module>/
     Memorio.Modules.<Module>/            the module's inside: Domain, Application, Infrastructure, Api

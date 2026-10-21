@@ -1,0 +1,13 @@
+# Dart client of API v1, generated from the committed contract (MEM-E0-PLAT-12).
+# Regenerate after a contract change:
+#   dart run swagger_parser && dart run build_runner build --delete-conflicting-outputs
+swagger_parser:
+  schema_path: ../api/openapi.v1.json
+  output_directory: lib/core/api/generated
+  name: memorio_api
+  language: dart
+  json_serializer: json_serializable
+  root_client: true
+  root_client_name: MemorioApiClient
+  put_clients_in_folder: true
+  include_toJson_in_enums: true
