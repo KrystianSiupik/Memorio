@@ -353,3 +353,12 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 | D-106 | Sesja w funkcji `account`: interfejs `SessionRepository` w domenie, `sessionProvider` w prezentacji, do PLAT-07 implementacja `NoSessionRepository` (nikt nie jest zalogowany) | przekierowanie działa i jest testowane już teraz; PLAT-07 podmienia tylko implementację w `app/composition.dart` |
 | D-107 | Podczas odczytu sesji ekran startowy z `?from=`, po odczycie powrót do żądanego adresu; błąd odczytu = niezalogowany | żadna zakładka nie mignie przed sprawdzeniem sesji; głębokie linki nie giną |
 | D-108 | Baner offline z S02 przenoszę do MEM-E0-PLAT-11 (offline) | wymaga wykrywania łączności, które należy do tamtego ticketu |
+
+## MEM-E0-PLAT-17 · konfiguracja z ENV, health, kontener (2026-10-22)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-109 | Konfiguracja środowiska tylko ze zmiennych `Sekcja__Klucz`; opcje z `ValidateOnStart`, komunikaty budowane z nazwy zmiennej (`ConfigurationErrors.Variable`), nigdy z wartości; przy błędzie log krytyczny i brak startu. `appsettings.json` trzyma tylko ustawienia niezależne od środowiska (poziomy logów) | RD1 (12-factor); wartości mogą być sekretami |
+| D-110 | `/health` = proces żyje (bez zależności), `/ready` = kontrole z tagiem `ready` (baza, magazyn dochodzą w swoich ticketach), poza `/v1` i poza kontraktem | RD4; awaria bazy nie powinna restartować kontenera, tylko zdejmować go z ruchu |
+| D-111 | Jeden obraz `Dockerfile` w katalogu głównym: sdk 10.0.302 → aspnet 10.0.10, użytkownik bez roota (`APP_UID`), port 8080; brak `HEALTHCHECK` w obrazie (obraz aspnet nie ma curl), sprawdzanie zdrowia w Compose (PLAT-09) | RD2: ten sam obraz w każdym środowisku |
+| D-112 | Testy hosta przez `MemorioApiFactory` z wymaganymi ustawieniami środowiska testowego | jedno miejsce z konfiguracją testów; każdy nowy wymagany klucz dopisuje się tylko tam |

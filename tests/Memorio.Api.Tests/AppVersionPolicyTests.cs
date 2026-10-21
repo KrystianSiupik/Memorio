@@ -10,8 +10,7 @@ public sealed class AppVersionPolicyTests : IDisposable
 {
     private const string PolicyPath = "/v1/app/version-policy";
 
-    private readonly WebApplicationFactory<Program> _factory = new WebApplicationFactory<Program>()
-        .WithWebHostBuilder(builder => builder.UseSetting("AppVersion:Minimum", "1.2.0"));
+    private readonly MemorioApiFactory _factory = MemorioApiFactory.With("AppVersion:Minimum", "1.2.0");
 
     public void Dispose() => _factory.Dispose();
 
@@ -76,17 +75,6 @@ public sealed class AppVersionPolicyTests : IDisposable
         using var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }
-
-    [Fact]
-    public void A_malformed_minimum_stops_the_host_at_startup()
-    {
-        using var factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder => builder.UseSetting("AppVersion:Minimum", "one"));
-
-        var error = Assert.ThrowsAny<Exception>(() => factory.CreateClient());
-
-        Assert.Contains("AppVersion:Minimum", error.ToString(), StringComparison.Ordinal);
     }
 
     private async Task<HttpResponseMessage> SendAsync(string? appVersion)

@@ -16,7 +16,7 @@ public sealed class OpenApiContractTests
     [Fact]
     public async Task The_committed_contract_matches_the_api()
     {
-        await using var factory = new WebApplicationFactory<Program>();
+        await using var factory = new MemorioApiFactory();
         using var client = factory.CreateClient();
         var served = await client.GetStringAsync(new Uri("/openapi/v1.json", UriKind.Relative), TestContext.Current.CancellationToken);
         var actual = JsonNode.Parse(served)!.ToJsonString(Indented).ReplaceLineEndings("\n") + "\n";

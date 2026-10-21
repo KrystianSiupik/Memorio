@@ -15,6 +15,23 @@ dotnet run --project src/Host/Memorio.Api          # API host
 
 Requires the .NET SDK pinned in `global.json`. Tests run on Microsoft.Testing.Platform (xUnit v3).
 
+## Configuration, health, container
+
+Configuration comes only from environment variables (`Section__Key`), validated at startup; an invalid
+or missing variable stops the API and the log names the variable, never its value. Required:
+
+| Variable | Meaning |
+|---|---|
+| `AppVersion__Minimum` | oldest app version the API serves (`major.minor.patch`) |
+
+`dotnet run` takes development values from `Properties/launchSettings.json`. `GET /health` answers while
+the process lives; `GET /ready` also checks dependencies (503 when one fails).
+
+```bash
+docker build -t memorio-api .                                     # one image for every environment
+docker run -p 8080:8080 -e AppVersion__Minimum=0.1.0 memorio-api
+```
+
 ## API contract (v1)
 
 Every public endpoint is under `/v1` and changes only in backward-compatible ways (ADR 0017).

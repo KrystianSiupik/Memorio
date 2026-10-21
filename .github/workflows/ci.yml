@@ -21,6 +21,21 @@ jobs:
       # Includes OpenApiContractTests: api/openapi.v1.json must equal what the API serves.
       - run: dotnet test --solution Memorio.slnx --no-build --configuration Release
 
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # RD2: the same image goes to every environment.
+      - run: docker build -t memorio-api:${{ github.sha }} .
+      - name: Starts with the required configuration and answers /health
+        run: |
+          docker run -d --name api -p 8080:8080 -e AppVersion__Minimum=0.1.0 memorio-api:${{ github.sha }}
+          for i in $(seq 1 30); do curl -fs http://localhost:8080/health && exit 0; sleep 1; done
+          docker logs api; exit 1
+      - name: Refuses to start without it
+        run: |
+          if docker run --rm memorio-api:${{ github.sha }}; then echo "started without AppVersion__Minimum"; exit 1; fi
+
   contract:
     runs-on: ubuntu-latest
     steps:
