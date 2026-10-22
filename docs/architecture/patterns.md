@@ -22,8 +22,8 @@ use the listed pattern in the listed way. A pattern outside this catalog needs a
 |---|---|---|---|
 | One use case = one change | **Command + Handler** | `Application/Commands/<Feature>/`: command, handler, input validation together; handler returns `Result` | `src/Modules/README.md` |
 | One business transaction | **Unit of Work** | One database transaction per command handler, explicit save; events stored in the same transaction (outbox) | ADR 0006 |
-| Reads that must stay fast and simple | **CQRS (light)** | Query definition in `Application/Queries`, handler in `Infrastructure` as a read-only projection to a DTO, no business logic, never an aggregate | ADR 0019 |
-| Loading and saving aggregates | **Repository** | Interface per aggregate in `Domain/<Aggregate>/`, implementation in `Infrastructure`; works on aggregate roots only. No generic repository over EF Core | ADR 0019 |
+| Reads that must stay fast and simple | **CQRS (light)** | Query definition in `Application/Queries`, handler in `Infrastructure` as a read-only projection to a DTO, no business logic, never an aggregate. Write side: EF Core; read side: **Dapper** with parameterized SQL on the module's own schema (D-126) | ADR 0019 |
+| Loading and saving aggregates | **Repository** | Interface per aggregate in `Domain/<Aggregate>/`, implementation in `Infrastructure` with EF Core; works on aggregate roots only. No generic repository over EF Core | ADR 0019 |
 | External services (AI, storage, stores, clock) | **Ports & Adapters** | Interface in `Application/Ports`, implementation in `Infrastructure/<Provider>`; the domain never knows the provider | `ITextGenerator` → `MistralTextGenerator` |
 | Time in rules and tests | **Clock abstraction** | Inject `TimeProvider` (backend) / `DateTime Function() now` (app); never `DateTime.Now` in domain or handlers | `AiTextService`, `OfflineQueue` |
 | A module needs another module's answer now | **Read port / write port** | Interface in the owning module's `Contracts`, implemented inside it; carries only the effect, never the caller's reasons | ADR 0001, map §10 |
@@ -56,6 +56,8 @@ use the listed pattern in the listed way. A pattern outside this catalog needs a
 - **Generic repository** over EF Core (`IRepository<T>`): hides the aggregate boundaries; write one repository per aggregate.
 - **Anemic domain + service layer**: rules in handlers or services instead of aggregates.
 - **Mediator for everything**: in-process calls inside a module are plain method calls; messages are for commands from the edge and for events between modules.
+- **Dapper on the write side** or **EF Core change tracking in queries**: commands load and save aggregates with EF Core; queries read with Dapper (D-126).
+- **SQL built by string concatenation**: values always go as Dapper parameters.
 - **Shared database tables between modules**: each module owns its schema (ADR 0004); others go through `Contracts`.
 - **Static singletons and service locators**: dependencies come through constructors or providers.
 - **Exceptions for business outcomes**: use `Result`.

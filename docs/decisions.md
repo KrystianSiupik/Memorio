@@ -386,3 +386,9 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 | D | Decyzja | Dlaczego |
 |---|---|---|
 | D-125 | Katalog wzorców w `docs/architecture/patterns.md`: problem → wzorzec → jak w Memorio → przykład w kodzie, plus lista antywzorców; nowy wzorzec spoza katalogu wymaga wpisu w `decisions.md` | te same rozwiązania tych samych problemów w każdym tickecie; wzorce tylko tam, gdzie rozwiązują konkretny problem |
+
+## Dapper po stronie odczytu (2026-10-22)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-126 | **Zapis: EF Core** (repozytoria agregatów, migracje, jednostka pracy). **Odczyt: Dapper** w handlerach zapytań (`Infrastructure`), SQL tylko z parametrami, tylko na schemacie własnego modułu (rola bazy modułu, ADR 0004), wynik mapowany wprost do DTO; zapytania o cudze treści z filtrem Dostępu w tym samym SQL (ADR 0011). Pakiet `Dapper` (wersja przypięta dokładnie, dziś 2.1.89) dochodzi z pierwszym handlerem zapytania; PostGIS przez to samo `NpgsqlDataSource` z NetTopologySuite | lżejsze i szybsze odczyty (mapa, listy, wyszukiwanie), pełna kontrola nad SQL i PostGIS; zapis zostaje przy EF Core dla agregatów i migracji |

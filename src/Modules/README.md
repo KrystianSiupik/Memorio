@@ -12,7 +12,7 @@ Modules/<Module>/
       Commands/<Feature>/                command + handler + input validation, one unit of work
       Queries/<Query>/                   query definition only (handler in Infrastructure)
       Ports/                             interfaces for external services (AI, storage, clock...)
-    Infrastructure/                      EF Core, Wolverine, adapters, query handlers (projections)
+    Infrastructure/                      EF Core (repositories), Dapper (query handlers), Wolverine, adapters
     Api/                                 Minimal API endpoints: input → command/query → DTO
   Memorio.Modules.<Module>.Contracts/    public: read ports, DTOs, integration events
 ```
@@ -28,6 +28,7 @@ Rules (checked by `tests/Memorio.ArchitectureTests`, ADR 0001 and 0019):
 - Aggregates: private constructor + static factory returning `Result`, strongly typed id, state
   changes only through methods that check invariants, domain events raised inside.
 - Queries are read-only projections to DTOs with no business logic; they never return aggregates.
+  Commands use EF Core, query handlers use Dapper with parameterized SQL on the module's own schema.
 - Every query about someone else's content goes through the Access module (ADR 0011).
 
 Which pattern solves which problem: `docs/architecture/patterns.md`.
