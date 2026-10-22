@@ -30,6 +30,8 @@ Rules (checked by `tests/Memorio.ArchitectureTests`, ADR 0001 and 0019):
 - Queries are read-only projections to DTOs with no business logic; they never return aggregates.
 - Every query about someone else's content goes through the Access module (ADR 0011).
 
+Which pattern solves which problem: `docs/architecture/patterns.md`.
+
 Reference implementation: `AiNarration` (Domain: `Pseudonymizer`, `AiGeneratedText`; Application:
 `ITextGenerator` port, `AiTextService`; Infrastructure: Mistral adapter, prompts).
 

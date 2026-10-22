@@ -2,7 +2,8 @@
 
 Map-based app for shared memories and albums. Backend: .NET modular monolith with Domain-Driven
 Design and Clean (Onion) Architecture; app: Flutter (iOS, Android, web) in `app/`, see `app/README.md`.
-Product, architecture decisions and tickets live in `docs/`.
+Product, architecture decisions and tickets live in `docs/`; the patterns we use are in
+`docs/architecture/patterns.md`.
 
 ## Commands
 

@@ -380,3 +380,9 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 | D | Decyzja | Dlaczego |
 |---|---|---|
 | D-124 | Szablon modułu backendu jako opis w `src/Modules/README.md` z modułem Narracja AI jako wzorcem; testy kierunku zależności już działają od PLAT-01 | szablon generatora (`dotnet new`) nie opłaca się przy kilkunastu modułach tworzonych raz; reguły pilnuje CI |
+
+## Katalog wzorców (2026-10-22)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-125 | Katalog wzorców w `docs/architecture/patterns.md`: problem → wzorzec → jak w Memorio → przykład w kodzie, plus lista antywzorców; nowy wzorzec spoza katalogu wymaga wpisu w `decisions.md` | te same rozwiązania tych samych problemów w każdym tickecie; wzorce tylko tam, gdzie rozwiązują konkretny problem |
