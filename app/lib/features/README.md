@@ -36,3 +36,5 @@ The rules are checked by `test/architecture/import_rules_test.dart`.
 Offline (ADR 0016): an operation that must work without network (creating a memory, adding photos)
 is enqueued with `offlineQueueProvider` (`core/offline`); its id is the idempotency key the sender
 passes to the API. The feature registers an `OperationSender` for its kind in `app/composition.dart`.
+
+Patterns used in the app (providers as DI, interceptors, strategy, idempotency keys): `docs/architecture/patterns.md`.
