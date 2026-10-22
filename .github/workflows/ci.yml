@@ -28,7 +28,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: API v1 stays backward compatible
-        run: tools/check-api-breaking.sh "$BASE_REF"
+        run: bash tools/check-api-breaking.sh "$BASE_REF"
         env:
           # Pull request: its target branch. Push to version/0.1: the previous commit. Other pushes: version/0.1.
           BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || (github.ref == 'refs/heads/version/0.1' && 'HEAD^' || 'origin/version/0.1') }}
