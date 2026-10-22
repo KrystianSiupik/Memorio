@@ -21,7 +21,7 @@ public sealed class ModuleCatalogTests
     [Fact]
     public async Task The_host_starts_with_every_module_registered()
     {
-        await using var factory = new WebApplicationFactory<Program>();
+        await using var factory = new MemorioApiFactory();
         using var client = factory.CreateClient();
 
         // No endpoints yet (health comes with MEM-E0-PLAT-17); starting and answering proves the

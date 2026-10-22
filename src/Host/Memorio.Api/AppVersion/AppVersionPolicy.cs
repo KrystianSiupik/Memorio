@@ -1,3 +1,4 @@
+using Memorio.Api.Configuration;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -21,7 +22,8 @@ internal static class AppVersionPolicy
             .Bind(configuration.GetSection(AppVersionOptions.Section))
             .Validate(
                 options => AppVersionNumber.TryParse(options.Minimum, out _),
-                $"{AppVersionOptions.Section}:{nameof(AppVersionOptions.Minimum)} must be a version major.minor.patch.")
+                $"{ConfigurationErrors.Variable($"{AppVersionOptions.Section}:{nameof(AppVersionOptions.Minimum)}")} " +
+                "is required and must be a version major.minor.patch.")
             .ValidateOnStart();
         return services;
     }

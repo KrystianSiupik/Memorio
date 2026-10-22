@@ -392,3 +392,12 @@ Nowe elementy do planu ticketów: ekran zgody (D-050), sekcja „Podwykonawcy”
 | D | Decyzja | Dlaczego |
 |---|---|---|
 | D-126 | **Zapis: EF Core** (repozytoria agregatów, migracje, jednostka pracy). **Odczyt: Dapper** w handlerach zapytań (`Infrastructure`), SQL tylko z parametrami, tylko na schemacie własnego modułu (rola bazy modułu, ADR 0004), wynik mapowany wprost do DTO; zapytania o cudze treści z filtrem Dostępu w tym samym SQL (ADR 0011). Pakiet `Dapper` (wersja przypięta dokładnie, dziś 2.1.89) dochodzi z pierwszym handlerem zapytania; PostGIS przez to samo `NpgsqlDataSource` z NetTopologySuite | lżejsze i szybsze odczyty (mapa, listy, wyszukiwanie), pełna kontrola nad SQL i PostGIS; zapis zostaje przy EF Core dla agregatów i migracji |
+## MEM-E0-PLAT-17 · konfiguracja z ENV, health, kontener (2026-10-22)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-109 | Konfiguracja środowiska tylko ze zmiennych `Sekcja__Klucz`; opcje z `ValidateOnStart`, komunikaty budowane z nazwy zmiennej (`ConfigurationErrors.Variable`), nigdy z wartości; przy błędzie log krytyczny i brak startu. `appsettings.json` trzyma tylko ustawienia niezależne od środowiska (poziomy logów) | RD1 (12-factor); wartości mogą być sekretami |
+| D-110 | `/health` = proces żyje (bez zależności), `/ready` = kontrole z tagiem `ready` (baza, magazyn dochodzą w swoich ticketach), poza `/v1` i poza kontraktem | RD4; awaria bazy nie powinna restartować kontenera, tylko zdejmować go z ruchu |
+| D-111 | Jeden obraz `Dockerfile` w katalogu głównym: sdk 10.0.302 → aspnet 10.0.10, użytkownik bez roota (`APP_UID`), port 8080; brak `HEALTHCHECK` w obrazie (obraz aspnet nie ma curl), sprawdzanie zdrowia w Compose (PLAT-09) | RD2: ten sam obraz w każdym środowisku |
+| D-112 | Testy hosta przez `MemorioApiFactory` z wymaganymi ustawieniami środowiska testowego | jedno miejsce z konfiguracją testów; każdy nowy wymagany klucz dopisuje się tylko tam |
+| D-127 | Przy złej konfiguracji host loguje błąd (critical, bez wartości) i rzuca wyjątek dalej, więc proces kończy się kodem ≠ 0 (w kontenerze 139), a nie czystym `exit 1` | sprawdzone w Dockerze 2026-10-22; `WebApplicationFactory` w .NET 10 uruchamia `Program` i potrzebuje wyjątku, a `return 1` psuje testy konfiguracji; orkiestrator patrzy tylko na kod ≠ 0 |

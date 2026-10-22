@@ -5,6 +5,6 @@ internal sealed class AppVersionOptions
 {
     public const string Section = "AppVersion";
 
-    /// <summary>Oldest app version the API still serves, "major.minor.patch".</summary>
-    public string Minimum { get; set; } = "0.0.0";
+    /// <summary>Oldest app version the API still serves, "major.minor.patch". Required.</summary>
+    public string? Minimum { get; set; }
 }
