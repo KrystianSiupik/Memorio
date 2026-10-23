@@ -1,0 +1,1 @@
+- targets: [http://api:8080/ready, http://worker:8080/ready]

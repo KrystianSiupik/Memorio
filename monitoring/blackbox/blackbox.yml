@@ -1,0 +1,16 @@
+# External monitor (D-038): the monitoring server probes the application's public addresses.
+modules:
+  http_2xx:
+    prober: http
+    timeout: 5s
+    http:
+      valid_status_codes: [200]
+      preferred_ip_protocol: ip4
+
+  # SD5 (ADR 0005), continuously: an anonymous read or listing of the media bucket must be refused.
+  http_refused:
+    prober: http
+    timeout: 5s
+    http:
+      valid_status_codes: [401, 403]
+      preferred_ip_protocol: ip4

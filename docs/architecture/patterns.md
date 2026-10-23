@@ -50,6 +50,7 @@ use the listed pattern in the listed way. A pattern outside this catalog needs a
 | Contract between backend and app | **Contract-first client generation** | OpenAPI snapshot `api/openapi.v1.json`, Dart client generated and committed, oasdiff in CI | ADR 0017 |
 | Screens depending only on interfaces | **Dependency Injection via providers** | Riverpod provider typed with a domain interface, default throws, overridden in `app/` and tests | `sessionRepositoryProvider` |
 | Variants chosen at run time (e.g. one sender per operation kind) | **Strategy** | A map or interface of implementations registered in the composition root | `operationSendersProvider` |
+| Knowing that the system works | **Metrics + alert rules as code** | OpenTelemetry in the hosts (`System.Diagnostics.Metrics` meters named `Memorio.<Area>`, `ILogger` with message templates, no content), OTLP to the collector, Prometheus rules with `promtool` unit tests, external probes of `/health` and `/ready` | ADR 0014, `MemorioTelemetry`, `monitoring/` (D-160..D-164) |
 
 ## Avoid
 

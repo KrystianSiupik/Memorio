@@ -1,0 +1,38 @@
+# OpenTelemetry Collector (ADR 0014, D-038), next to the application: the API and the worker send OTLP
+# here; metrics are served for Prometheus to scrape (:8889) and logs are pushed to Loki.
+# LOKI_OTLP_ENDPOINT: Loki's OTLP address (local Compose: http://loki:3100/otlp; production: the
+# monitoring server, D-160).
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 200
+  batch: {}
+
+exporters:
+  # Job and instance labels come from service.name and service.instance.id.
+  prometheus:
+    endpoint: 0.0.0.0:8889
+  otlphttp/loki:
+    endpoint: ${env:LOKI_OTLP_ENDPOINT}
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+service:
+  extensions: [health_check]
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlphttp/loki]

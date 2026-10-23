@@ -38,6 +38,8 @@ or missing variable stops the host and the log names the variable, never its val
 | `Account__Apple__ClientIds__0`, ... | API, worker | optional: our Apple app ids (bundle id, services id); none: Apple sign-in off |
 | `Database__MigrateOnStartup` | API, worker | optional, default `true`: apply the modules' migrations at start |
 | `Scheduling__ConnectionString` | worker | PostgreSQL connection of the role `memorio_scheduler` (scheduled jobs and deadlines) |
+| `Telemetry__OtlpEndpoint` | API, worker | optional: OTLP/HTTP address of the OpenTelemetry Collector; none: no metrics or logs exported |
+| `Telemetry__Environment` | API, worker | optional: environment name sent with metrics and logs (`production`, `staging`) |
 
 `dotnet run` takes development values from `Properties/launchSettings.json` (local database on port
 5432, local bucket on 3900). `GET /health` answers while the process lives; `GET /ready` also checks
@@ -80,7 +82,7 @@ the role `memorio_messaging`; a module role may only add outbox rows.
 The worker publishes backlog metrics (meter `Memorio.Messaging`, sampled every 15 s):
 `memorio.messaging.pending.oldest_age` and `.pending.count` per `stage` (`outbox`, `queue`, `inbox`) and
 `memorio.messaging.dead_letters.count`. Alert when an age passes 10 minutes or a dead letter appears
-(QS12; export and alert rules come with MEM-E0-PLAT-10).
+(QS12; exported and alerted on as described under Observability).
 
 ### Scheduled jobs and deadlines (ADR 0012)
 
@@ -91,8 +93,8 @@ firing a dead node left behind is recovered by another. A module registers a job
 `AddScheduledJob<TJob>("Module.Job", cron)` (cron in UTC) and sets deadlines with `IDeadlines` (worker only);
 modules never see Quartz. A failed firing is retried after 1 min, 10 min and 1 h. Retries and recovery
 mean a firing can run twice, so every job is idempotent (SD12, see `src/Modules/README.md`).
-Metric `memorio.scheduling.runs` (meter `Memorio.Scheduling`) per `job` and `outcome` (`succeeded`,
-`failed`, `given_up`, `unknown`): alert on `given_up` and `unknown` (export with MEM-E0-PLAT-10).
+Metric `memorio.scheduling.runs` (meter `Memorio.Scheduling`) per `scheduled_job` and `outcome` (`succeeded`,
+`failed`, `given_up`, `unknown`): alert on `given_up` and `unknown` (see Observability).
 
 ### OpenStreetMap places
 
@@ -141,7 +143,32 @@ docker compose run --rm storage-bootstrap     # bucket memorio-media: upload zon
 `tools/storage/bootstrap.sh` prepares the bucket of any environment the same way (idempotent, in the
 `amazon/aws-cli` image, with `S3_ENDPOINT`, `S3_BUCKET` and the `AWS_*` credentials);
 `tools/storage/check-private.sh` is the SD5 check that the bucket refuses anonymous reads, run after
-every bootstrap and daily.
+every bootstrap; the monitoring server checks the same continuously (alert `MediaBucketNotPrivate`).
+
+## Observability (ADR 0014)
+
+Both hosts send metrics and logs with OpenTelemetry (OTLP) to the OpenTelemetry Collector, which serves
+the metrics to Prometheus and pushes the logs to Loki (kept 30 days); Grafana shows the dashboard
+"Memorio", Alertmanager sends the alerts. Metrics: HTTP server and client, .NET runtime and every meter
+named `Memorio.*` (backlog `memorio.messaging.*`, scheduled jobs `memorio.scheduling.runs`, accounts
+`memorio.accounts.count` for the cost per user, SD14). Logs carry message templates and their
+parameters, never request bodies or what users wrote (D-038). The blackbox exporter probes the public
+`/health` and `/ready` addresses from the monitoring server: the external monitor. Alert rules are in
+`monitoring/prometheus/rules` with `promtool` unit tests; among them QS12 (a waiting message older than
+10 minutes, dead letters), SD5 (the media bucket answers an anonymous read), hosts down or not ready,
+server errors above 5%, disk below 10% free.
+
+```bash
+docker compose --profile app --profile monitoring up -d --build   # Grafana :3000 (admin / memorio_local), Prometheus :9090, Alertmanager :9093
+MSYS_NO_PATHCONV=1 bash tools/monitoring/validate.sh             # every monitoring configuration and the alert rule tests
+bash tools/monitoring/check-pipeline.sh                            # metrics and logs of both hosts arrive (running stack)
+```
+
+Production (D-038, D-160): the collector and the node exporter run on the application server; Prometheus,
+Loki, Grafana, Alertmanager and the blackbox exporter on the separate monitoring server, with the target
+files of that environment mounted at `/etc/prometheus/targets` (see `monitoring/prometheus/prometheus.yml`)
+and the alert webhook address as a secret file (MEM-E0-PLAT-18). Test environments run everything on one
+server, like local Compose.
 
 ## API contract (v1)
 
@@ -169,7 +196,7 @@ src/
   Host/
     Memorio.Hosting/        shared by both hosts: ModuleCatalog (the only place that knows every module),
                             configuration errors, health endpoints, messaging (Wolverine, backlog metrics),
-                            object storage (S3 adapter), scheduler (Quartz.NET)
+                            object storage (S3 adapter), scheduler (Quartz.NET), telemetry (OpenTelemetry)
     Memorio.Api/            ASP.NET Core API host (/v1)
     Memorio.Worker/         worker host: integration event delivery and scheduled jobs (only /health and /ready)
   Modules/<Module>/
@@ -187,6 +214,8 @@ tests/
 db/bootstrap.sql              PostGIS, messaging and scheduler roles and schemas, module schemas and roles
 tools/osm-import/             OSM import (osm2pgsql flex style, synthetic sample)
 tools/storage/                media bucket: bootstrap and SD5 check scripts, local Garage configuration
+tools/monitoring/             validation of the monitoring configurations, end-to-end pipeline check
+monitoring/                   collector, Prometheus (rules, rule tests, targets), Loki, Alertmanager, blackbox, Grafana
 ```
 
 Modules (from the module map): Access, Account, AiNarration, Album, Archive, Limits, Moderation,

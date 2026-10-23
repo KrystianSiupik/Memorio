@@ -1,0 +1,170 @@
+# promtool test rules monitoring/prometheus/tests/memorio.test.yml (CI job observability)
+rule_files:
+  - ../rules/memorio.yml
+
+evaluation_interval: 30s
+
+tests:
+  # QS12: the oldest outbox message passes 10 minutes at minute 11; the alert fires at once, and only for
+  # that stage. Before, the backlog is young and nothing fires.
+  - interval: 1m
+    input_series:
+      - series: 'memorio_messaging_pending_oldest_age_seconds{job="memorio-worker",stage="outbox"}'
+        values: '0+60x15'
+      - series: 'memorio_messaging_pending_oldest_age_seconds{job="memorio-worker",stage="inbox"}'
+        values: '0x15'
+      - series: 'memorio_messaging_dead_letters_count{job="memorio-worker"}'
+        values: '0x15'
+    alert_rule_test:
+      - eval_time: 9m
+        alertname: MessageBacklogTooOld
+        exp_alerts: []
+      - eval_time: 11m
+        alertname: MessageBacklogTooOld
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              stage: outbox
+            exp_annotations:
+              summary: "The oldest outbox message waits for more than 10 minutes."
+      - eval_time: 11m
+        alertname: MessageDeadLettered
+        exp_alerts: []
+      - eval_time: 11m
+        alertname: MessagingMetricsMissing
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'memorio_messaging_dead_letters_count{job="memorio-worker"}'
+        values: '0 0 1 1'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: MessageDeadLettered
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "1 integration event(s) failed every retry and wait in the dead letters."
+
+  # No backlog metric for 10 minutes: the worker is gone.
+  - interval: 1m
+    input_series:
+      - series: 'up{job="collector",instance="otel-collector:8889"}'
+        values: '1x15'
+    alert_rule_test:
+      - eval_time: 9m
+        alertname: MessagingMetricsMissing
+        exp_alerts: []
+      - eval_time: 11m
+        alertname: MessagingMetricsMissing
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+            exp_annotations:
+              summary: "The worker sends no message backlog metric."
+
+  # The API stops answering: an alert after 2 minutes; the worker is fine.
+  - interval: 30s
+    input_series:
+      - series: 'probe_success{job="health",instance="https://api.example/health"}'
+        values: '1 1 0 0 0 0 0 0 0 0'
+      - series: 'probe_success{job="health",instance="https://worker.example/health"}'
+        values: '1x9'
+    alert_rule_test:
+      - eval_time: 1m30s
+        alertname: MemorioDown
+        exp_alerts: []
+      - eval_time: 3m30s
+        alertname: MemorioDown
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: health
+              instance: https://api.example/health
+            exp_annotations:
+              summary: "https://api.example/health does not answer (external probe)."
+
+  - interval: 1m
+    input_series:
+      - series: 'node_filesystem_avail_bytes{instance="app",mountpoint="/",fstype="ext4"}'
+        values: '50x5 5x15'
+      - series: 'node_filesystem_size_bytes{instance="app",mountpoint="/",fstype="ext4"}'
+        values: '100x20'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: DiskAlmostFull
+        exp_alerts: []
+      - eval_time: 17m
+        alertname: DiskAlmostFull
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              instance: app
+              mountpoint: /
+              fstype: ext4
+            exp_annotations:
+              summary: "app /: less than 10% of the disk is free."
+
+  # 10% of API requests fail for 10 minutes.
+  - interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{job="memorio-api",http_response_status_code="200"}'
+        values: '0+90x15'
+      - series: 'http_server_request_duration_seconds_count{job="memorio-api",http_response_status_code="500"}'
+        values: '0+10x15'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: HighServerErrorRate
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: memorio-api
+            exp_annotations:
+              summary: "memorio-api: more than 5% of requests end with a server error."
+
+  # SD5: the bucket starts answering anonymous reads with 200 (the alert fires at once); an unreachable
+  # bucket (status 0) is not this alert's business.
+  - interval: 1m
+    input_series:
+      - series: 'probe_success{job="bucket-private",instance="https://s3.example/memorio-media/"}'
+        values: '1 1 0 0'
+      - series: 'probe_http_status_code{job="bucket-private",instance="https://s3.example/memorio-media/"}'
+        values: '403 403 200 200'
+      - series: 'probe_success{job="bucket-private",instance="https://s3.example/memorio-media/?list-type=2"}'
+        values: '0 0 0 0'
+      - series: 'probe_http_status_code{job="bucket-private",instance="https://s3.example/memorio-media/?list-type=2"}'
+        values: '0 0 0 0'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: MediaBucketNotPrivate
+        exp_alerts: []
+      - eval_time: 2m
+        alertname: MediaBucketNotPrivate
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: bucket-private
+              instance: https://s3.example/memorio-media/
+            exp_annotations:
+              summary: "Anonymous https://s3.example/memorio-media/ was not refused: the media bucket is not private."
+
+  - interval: 1m
+    input_series:
+      - series: 'memorio_scheduling_runs_total{job="memorio-worker",scheduled_job="Succession.CloseWindow",outcome="succeeded"}'
+        values: '0+1x10'
+      - series: 'memorio_scheduling_runs_total{job="memorio-worker",scheduled_job="Succession.CloseWindow",outcome="given_up"}'
+        values: '0 0 0 0 0 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: ScheduledJobGivenUp
+        exp_alerts: []
+      - eval_time: 7m
+        alertname: ScheduledJobGivenUp
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              scheduled_job: Succession.CloseWindow
+              outcome: given_up
+            exp_annotations:
+              summary: "Scheduled job Succession.CloseWindow: a firing ended as given_up."

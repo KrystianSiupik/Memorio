@@ -9,7 +9,7 @@ namespace Memorio.Hosting.Messaging;
 /// Backlog metrics of the worker (SD6, QS12): age of the oldest pending message and number of pending
 /// messages per stage (outbox: stored, not yet sent; queue: sent, not yet received; inbox: received,
 /// not yet handled) and the number of dead letters. Alert when an age passes 10 minutes or a dead
-/// letter appears (rules and export: MEM-E0-PLAT-10).
+/// letter appears (alert rules in monitoring/prometheus/rules).
 /// </summary>
 internal sealed partial class BacklogMonitor : BackgroundService
 {
