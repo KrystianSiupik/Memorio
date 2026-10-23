@@ -1,6 +1,7 @@
 # CI for every push and pull request: build with warnings as errors, formatting, and all tests
 # (including the architecture tests: backend SD1/SD2, app import rules; ADR 0001 and 0019),
-# plus the API v1 contract (ADR 0017): snapshot, backward compatibility, generated Dart client.
+# plus the API v1 contract (ADR 0017): snapshot, backward compatibility, generated Dart client,
+# and the database: schema and role per module (SD4, ADR 0004), OSM import.
 name: ci
 
 on:
@@ -35,6 +36,24 @@ jobs:
       - name: Refuses to start without it
         run: |
           if docker run --rm memorio-api:${{ github.sha }}; then echo "started without AppVersion__Minimum"; exit 1; fi
+
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Schema-per-module rights (SD4) are tested in the backend job (Memorio.Database.Tests); this job
+      # checks the local Compose database and the OSM import on the synthetic sample.
+      - run: docker compose up -d --wait postgres
+      - name: OSM import loads the places of the sample, owned by the Places module only
+        run: |
+          docker compose --profile tools run --rm --build osm-import /samples/sample.osm
+          docker compose --profile tools run --rm --build osm-import /samples/sample.osm   # replaces, does not add
+          psql() { docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U memorio_admin -d memorio -tAc "$1"; }
+          test "$(psql "SELECT string_agg(name, ',' ORDER BY osm_id) FROM places.osm_places")" = "Sample Village,Sample Viewpoint,Sample Lake"
+          test "$(psql "SELECT count(*) FROM pg_tables WHERE schemaname = 'places' AND tableowner <> 'memorio_places'")" = "0"
+          test "$(psql "SELECT count(*) FROM pg_tables WHERE schemaname = 'public' AND tablename <> 'spatial_ref_sys'")" = "0"
+          if psql "SET ROLE memorio_album; SELECT 1 FROM places.osm_places LIMIT 1"; then echo "another module reads places.osm_places"; exit 1; fi
+      - run: bash tools/db-bootstrap.sh   # applies again without errors
 
   contract:
     runs-on: ubuntu-latest

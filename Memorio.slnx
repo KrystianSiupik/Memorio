@@ -67,6 +67,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/Memorio.Api.Tests/Memorio.Api.Tests.csproj" />
     <Project Path="tests/Memorio.ArchitectureTests/Memorio.ArchitectureTests.csproj" />
+    <Project Path="tests/Memorio.Database.Tests/Memorio.Database.Tests.csproj" />
     <Project Path="tests/Memorio.SharedKernel.Tests/Memorio.SharedKernel.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/Modules/">

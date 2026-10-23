@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic extract for the import check in CI: 3 places (village, viewpoint, lake as a closed way);
+     the unnamed bench, the shop and the open path are not places. -->
+<osm version="0.6" generator="memorio-sample">
+  <node id="1" version="1" lat="49.2992" lon="19.9496">
+    <tag k="place" v="village"/>
+    <tag k="name" v="Sample Village"/>
+  </node>
+  <node id="2" version="1" lat="49.2010" lon="20.0710">
+    <tag k="tourism" v="viewpoint"/>
+    <tag k="name" v="Sample Viewpoint"/>
+  </node>
+  <node id="3" version="1" lat="49.2100" lon="20.0500">
+    <tag k="amenity" v="bench"/>
+  </node>
+  <node id="4" version="1" lat="49.2200" lon="20.0400">
+    <tag k="shop" v="bakery"/>
+    <tag k="name" v="Sample Bakery"/>
+  </node>
+  <node id="10" version="1" lat="49.1000" lon="20.0000"/>
+  <node id="11" version="1" lat="49.1000" lon="20.0100"/>
+  <node id="12" version="1" lat="49.1100" lon="20.0100"/>
+  <node id="13" version="1" lat="49.1100" lon="20.0000"/>
+  <way id="100" version="1">
+    <nd ref="10"/>
+    <nd ref="11"/>
+    <nd ref="12"/>
+    <nd ref="13"/>
+    <nd ref="10"/>
+    <tag k="natural" v="water"/>
+    <tag k="name" v="Sample Lake"/>
+  </way>
+  <way id="101" version="1">
+    <nd ref="10"/>
+    <nd ref="12"/>
+    <tag k="highway" v="path"/>
+    <tag k="name" v="Sample Path"/>
+  </way>
+</osm>

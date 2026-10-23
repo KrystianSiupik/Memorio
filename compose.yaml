@@ -1,0 +1,41 @@
+# Local development services (MEM-E0-PLAT-03). Not used in deployed environments.
+#   docker compose up -d --wait postgres                         # PostgreSQL + PostGIS, bootstrapped
+#   docker compose run --rm osm-import /data/<extract.osm.pbf>   # OSM import from ./osm (see README)
+services:
+  postgres:
+    image: postgis/postgis:18-3.6
+    environment:
+      POSTGRES_DB: memorio
+      POSTGRES_USER: memorio_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-memorio_local}
+    ports:
+      # POSTGRES_PORT when 5432 is taken or reserved on the host (Windows reserves some ranges).
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # Runs once, when the data volume is created; tools/db-bootstrap.sh applies it again later.
+      - ./db/bootstrap.sql:/docker-entrypoint-initdb.d/20-bootstrap.sql:ro
+      - postgres-data:/var/lib/postgresql
+    # Over TCP: during first-start initialization the server listens only on its socket.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U memorio_admin -d memorio"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  osm-import:
+    build: tools/osm-import
+    profiles: [tools]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGDATABASE: memorio
+      PGUSER: memorio_admin
+      PGPASSWORD: ${POSTGRES_PASSWORD:-memorio_local}
+    volumes:
+      - ./osm:/data:ro
+      - ./tools/osm-import/sample.osm:/samples/sample.osm:ro
+
+volumes:
+  postgres-data:
