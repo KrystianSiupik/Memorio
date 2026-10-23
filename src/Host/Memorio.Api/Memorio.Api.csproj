@@ -4,6 +4,7 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Memorio.Api.Tests" />
+    <InternalsVisibleTo Include="Memorio.Database.Tests" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../BuildingBlocks/Memorio.Modularity/Memorio.Modularity.csproj" />
