@@ -4,11 +4,13 @@ import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memorio/app/memorio_app.dart';
 import 'package:memorio/core/api/api.dart';
+import 'package:memorio/core/auth/token_store.dart';
 import 'package:memorio/core/offline/local_database.dart';
 import 'package:memorio/core/offline/offline.dart';
 import 'package:memorio/features/account/account.dart';
 
 import 'fake_http.dart';
+import 'fake_token_store.dart';
 
 /// Session store answering with a fixed session; null means signed out.
 class FakeSessionRepository implements SessionRepository {
@@ -37,6 +39,7 @@ Future<ProviderContainer> pumpMemorioApp(
     overrides: [
       appVersionProvider.overrideWithValue('1.0.0'),
       apiBaseUrlProvider.overrideWithValue('https://api.example.invalid'),
+      tokenStoreProvider.overrideWithValue(InMemoryTokenStore()),
       sessionRepositoryProvider.overrideWithValue(FakeSessionRepository(session)),
       localDatabaseProvider.overrideWithValue(database),
       isOnlineProvider.overrideWith((ref) => online ?? Stream.value(true)),

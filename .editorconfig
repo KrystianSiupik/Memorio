@@ -28,3 +28,7 @@ dotnet_diagnostic.CA1707.severity = none
 [*.cs]
 # "Error" is a keyword in VB only; this code base is C# only.
 dotnet_diagnostic.CA1716.severity = none
+
+# EF Core migrations are generated (dotnet ef migrations add); analyzers and formatting leave them as generated.
+[**/Migrations/*.cs]
+generated_code = true

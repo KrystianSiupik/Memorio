@@ -1,7 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../auth/auth_interceptor.dart';
+import '../auth/token_store.dart';
 import 'app_version_interceptor.dart';
+import 'generated/clients/auth_client.dart';
+import 'generated/models/refresh_request.dart';
 import 'generated/memorio_api_client.dart';
 
 /// Base URL of the backend, set at build time: `--dart-define=API_BASE_URL=https://...`.
@@ -25,7 +29,18 @@ class UpdateRequiredNotifier extends Notifier<String?> {
   void require(String minimumVersion) => state = minimumVersion;
 }
 
-final dioProvider = Provider<Dio>((ref) {
+/// Counts sessions the backend ended (refresh token refused); the account feature restores its session
+/// again when it changes, which signs the app out.
+final sessionEndedProvider = NotifierProvider<SessionEndedNotifier, int>(SessionEndedNotifier.new);
+
+class SessionEndedNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void end() => state++;
+}
+
+Dio _newDio(Ref ref) {
   final dio = Dio(
     BaseOptions(
       baseUrl: ref.watch(apiBaseUrlProvider),
@@ -40,6 +55,26 @@ final dioProvider = Provider<Dio>((ref) {
     ),
   );
   ref.onDispose(dio.close);
+  return dio;
+}
+
+/// Client for renewing tokens only: without the auth interceptor, so a refused refresh never loops.
+final refreshDioProvider = Provider<Dio>(_newDio);
+
+final dioProvider = Provider<Dio>((ref) {
+  final dio = _newDio(ref);
+  final auth = AuthClient(ref.watch(refreshDioProvider));
+  dio.interceptors.add(
+    AuthInterceptor(
+      store: ref.watch(tokenStoreProvider),
+      refresh: (refreshToken) async {
+        final tokens = await auth.refreshToken(body: RefreshRequest(refreshToken: refreshToken));
+        return (accessToken: tokens.accessToken, refreshToken: tokens.refreshToken);
+      },
+      retry: dio.fetch,
+      onSignedOut: () => ref.read(sessionEndedProvider.notifier).end(),
+    ),
+  );
   return dio;
 });
 
