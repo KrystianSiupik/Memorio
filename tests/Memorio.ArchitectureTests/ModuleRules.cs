@@ -78,13 +78,16 @@ internal static class ModuleRules
             Types().That().ResideInNamespaceMatching(Layer("Application"))
                 .Should().NotDependOnAnyTypesThat().ResideInNamespaceMatching(FrameworksForbiddenInApplication)));
 
-        // Wolverine only runs public handlers (D-135): a module's message handlers are the one exception.
+        // Wolverine only runs public handlers (D-135): a module's message handlers are an exception, and
+        // so are EF Core migrations, which dotnet ef generates public (D-152).
         var messaging = $@"^{r}\.\w+\.Infrastructure\.Messaging$";
+        var migrations = $@"^{r}\.\w+\.Infrastructure\.Persistence\.Migrations$";
 
         rules.Add(Rule(
             "Visibility: the only public types inside a module are its IModule entry point and its message handlers",
             Types().That().ResideInNamespaceMatching(insideOfAnyModule).And().ArePublic()
                 .And().DoNotResideInNamespaceMatching(messaging)
+                .And().DoNotResideInNamespaceMatching(migrations)
                 .Should().ImplementInterface(typeof(IModule))));
 
         rules.Add(Rule(

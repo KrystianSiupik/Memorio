@@ -24,10 +24,10 @@ public sealed class ModuleCatalogTests
         await using var factory = new MemorioApiFactory();
         using var client = factory.CreateClient();
 
-        // No endpoints yet (health comes with MEM-E0-PLAT-17); starting and answering proves the
-        // modules registered their services and endpoints without errors.
+        // Starting and answering proves the modules registered their services and endpoints without
+        // errors. An unknown address needs sign-in like any other (SD10), so it does not reveal what exists.
         using var response = await client.GetAsync(new Uri("/does-not-exist", UriKind.Relative), TestContext.Current.CancellationToken);
 
-        Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
     }
 }

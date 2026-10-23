@@ -2,8 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memorio/core/api/api.dart';
+import 'package:memorio/core/auth/token_store.dart';
 
 import '../helpers/fake_http.dart';
+import '../helpers/fake_token_store.dart';
 
 void main() {
   ProviderContainer containerWith(FakeHttpAdapter adapter) {
@@ -11,6 +13,7 @@ void main() {
       overrides: [
         appVersionProvider.overrideWithValue('1.0.0'),
         apiBaseUrlProvider.overrideWithValue('https://api.example.invalid'),
+        tokenStoreProvider.overrideWithValue(InMemoryTokenStore()),
       ],
     );
     container.read(dioProvider).httpClientAdapter = adapter;

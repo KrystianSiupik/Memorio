@@ -90,6 +90,7 @@ services:
     environment:
       AppVersion__Minimum: 0.1.0
       Messaging__ConnectionString: &messaging Host=postgres;Database=memorio;Username=memorio_messaging;Password=memorio_local
+      Account__ConnectionString: &account Host=postgres;Database=memorio;Username=memorio_account;Password=memorio_local
       <<: &app-storage
         Storage__Endpoint: http://garage:3900
         Storage__PublicEndpoint: http://localhost:${STORAGE_PORT:-3900}
@@ -107,6 +108,7 @@ services:
     depends_on: *app-dependencies
     environment:
       Messaging__ConnectionString: *messaging
+      Account__ConnectionString: *account
       <<: *app-storage
     ports:
       - "127.0.0.1:${WORKER_PORT:-8081}:8080"

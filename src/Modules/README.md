@@ -25,13 +25,19 @@ Rules (checked by `tests/Memorio.ArchitectureTests`, ADR 0001 and 0019):
 - Inside a module: Domain ← Application ← Infrastructure ← Api.
 - Domain knows no framework (HTTP, EF Core, Wolverine, Quartz, DI); Application knows no HTTP or
   persistence framework.
-- Business failures are `Result` / `Error` (`Memorio.SharedKernel`), codes "<Module>.<Reason>";
+- Business failures are `Result` / `Error` (`Memorio.SharedKernel`), codes "<Module>.<Reason>", turned
+  into problem details only in `Api/` with `Problems.From(error)` (`Memorio.Modularity`, D-153);
   exceptions only for bugs.
 - Aggregates: private constructor + static factory returning `Result`, strongly typed id, state
   changes only through methods that check invariants, domain events raised inside.
 - Queries are read-only projections to DTOs with no business logic; they never return aggregates.
   Commands use EF Core, query handlers use Dapper with parameterized SQL on the module's own schema.
 - Every query about someone else's content goes through the Access module (ADR 0011).
+- Endpoints require a signed-in account by default (SD10); `AllowAnonymous` only with an entry in
+  `tests/Memorio.Api.Tests/AnonymousEndpointsTests`. Web pages outside `/v1` go in `MapPages`.
+- Database: the module's `DbContext` uses its schema and role (ADR 0004), connection from
+  `<Module>__ConnectionString`; EF Core migrations in `Infrastructure/Persistence/Migrations`, applied at
+  host start (D-152). Reference: `Account`.
 - Reacting to another module's integration event (ADR 0006): the policy implements
   `IIntegrationEventPolicy<TEvent>` in `Application/Policies` (internal, registered in `AddServices`);
   `Infrastructure/Messaging/<Event>Handler` is a public static class whose `Handle(TEvent, IServiceProvider,

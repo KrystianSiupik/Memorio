@@ -32,6 +32,10 @@ or missing variable stops the host and the log names the variable, never its val
 | `Storage__PublicEndpoint` | API, worker | optional: address the apps reach the bucket at, used in signed addresses |
 | `Storage__Region`, `Storage__Bucket` | API, worker | signing region of the provider, bucket name |
 | `Storage__AccessKey`, `Storage__SecretKey` | API, worker | bucket credentials (secrets) |
+| `Account__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_account` (accounts, sign-in) |
+| `Account__Google__ClientIds__0`, `__1`, ... | API, worker | optional: our Google app ids (ID token audiences); none: Google sign-in off |
+| `Account__Apple__ClientIds__0`, ... | API, worker | optional: our Apple app ids (bundle id, services id); none: Apple sign-in off |
+| `Database__MigrateOnStartup` | API, worker | optional, default `true`: apply the modules' migrations at start |
 
 `dotnet run` takes development values from `Properties/launchSettings.json` (local database on port
 5432, local bucket on 3900). `GET /health` answers while the process lives; `GET /ready` also checks
@@ -90,6 +94,20 @@ docker compose --profile tools run --rm osm-import /samples/sample.osm   # synth
 ```
 
 In Git Bash on Windows prefix these with `MSYS_NO_PATHCONV=1`, otherwise the container path is rewritten.
+
+## Accounts and sign-in (ADR 0010)
+
+The Account module keeps accounts with ASP.NET Core Identity in its schema. `POST /v1/auth/register`,
+`/login`, `/refresh` and `/external/{google|apple}` answer with bearer tokens (access 1 h, refresh 14
+days); every other endpoint needs `Authorization: Bearer <access token>`. A new account always needs
+the declaration of being at least 16. Apple and Google sign-in: the app sends the ID token from the
+native sign-in; the API checks it against the provider's keys and our app ids. `/account/delete` is the
+public page on deleting an account. The app keeps the tokens in secure storage and renews them on 401.
+
+```bash
+dotnet ef migrations add <Name> --project src/Modules/Account/Memorio.Modules.Account \
+  --output-dir Infrastructure/Persistence/Migrations   # after `dotnet tool restore`
+```
 
 ## Object storage (ADR 0005)
 
@@ -168,7 +186,10 @@ Publishing are outside the MVP and stay empty until their tickets.
 - Domain knows no framework (HTTP, EF Core, Wolverine, Quartz, DI); Application knows no HTTP or
   persistence framework.
 - The only public types inside a module are its `IModule` entry point and its message handlers (public
-  static `*Handler` classes in `Infrastructure.Messaging`, D-135); everything else is `internal`.
+  static `*Handler` classes in `Infrastructure.Messaging`, D-135) and its generated EF Core migrations
+  (D-152); everything else is `internal`.
 - Every message handler has an idempotency test in its module's tests (SD6).
+- Every endpoint requires a signed-in account; anonymous ones are explicit and on the allowlist in
+  `AnonymousEndpointsTests` (SD10).
 - Business failures are returned as `Result` / `Error` (Validation, NotFound, Conflict, Forbidden,
   Failure), mapped to HTTP only at the API edge.

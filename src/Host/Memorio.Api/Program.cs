@@ -5,6 +5,7 @@ using Memorio.Hosting.Configuration;
 using Memorio.Hosting.Health;
 using Memorio.Hosting.Messaging;
 using Memorio.Hosting.Storage;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,11 @@ builder.Services.AddAppVersionPolicy(builder.Configuration);
 builder.Services.AddMemorioMessaging(builder.Configuration, MessagingHost.Api, handlerAssemblies: []);
 builder.Services.AddMemorioObjectStorage(builder.Configuration);
 
+// SD10: every endpoint requires a signed-in account unless it is explicitly anonymous; the anonymous
+// ones are checked against an allowlist in CI (AnonymousEndpointsTests).
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+
 foreach (var module in ModuleCatalog.All)
 {
     module.AddServices(builder.Services, builder.Configuration);
@@ -24,7 +30,9 @@ foreach (var module in ModuleCatalog.All)
 var app = builder.Build();
 
 app.UseAppVersionPolicy();
-app.MapOpenApi();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapOpenApi().AllowAnonymous();
 app.MapMemorioHealthChecks();
 
 // Every public endpoint lives under /v1; changes to it must stay backward compatible (ADR 0017).
@@ -34,6 +42,7 @@ v1.MapAppVersionEndpoints();
 foreach (var module in ModuleCatalog.All)
 {
     module.MapEndpoints(v1);
+    module.MapPages(app);
 }
 
 try

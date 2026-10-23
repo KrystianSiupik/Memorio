@@ -5,6 +5,8 @@
 import 'package:dio/dio.dart';
 
 import 'clients/app_client.dart';
+import 'clients/account_client.dart';
+import 'clients/auth_client.dart';
 
 /// Memorio API `vv1`
 class MemorioApiClient {
@@ -16,6 +18,12 @@ class MemorioApiClient {
   static String get version => 'v1';
 
   AppClient? _app;
+  AccountClient? _account;
+  AuthClient? _auth;
 
   AppClient get app => _app ??= AppClient(_dio, baseUrl: _baseUrl);
+
+  AccountClient get account => _account ??= AccountClient(_dio, baseUrl: _baseUrl);
+
+  AuthClient get auth => _auth ??= AuthClient(_dio, baseUrl: _baseUrl);
 }

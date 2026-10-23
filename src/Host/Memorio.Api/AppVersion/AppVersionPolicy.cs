@@ -38,7 +38,8 @@ internal static class AppVersionPolicy
         v1.MapGet("/app/version-policy", GetPolicy)
             .WithName("GetAppVersionPolicy")
             .WithTags("App")
-            .WithSummary("Minimum app version the API serves.");
+            .WithSummary("Minimum app version the API serves.")
+            .AllowAnonymous();
         return v1;
     }
 

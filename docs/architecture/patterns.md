@@ -45,8 +45,8 @@ use the listed pattern in the listed way. A pattern outside this catalog needs a
 | Problem | Pattern | How in Memorio | Reference |
 |---|---|---|---|
 | Wiring implementations to interfaces | **Composition Root** | Backend: `ModuleCatalog` + each `<Module>Module.AddServices`; app: `app/composition.dart` (provider overrides) | `ModuleCatalog.cs`, `composition.dart` |
-| Behaviour shared by every request | **Middleware / Interceptor** | ASP.NET middleware and Dio interceptors (app version, later auth, correlation id) | `AppVersionPolicy`, `AppVersionInterceptor` |
-| Errors over HTTP | **Problem Details** | RFC 7807 with extension `code`; mapping from `Error.Type` only at the API edge | D-102 |
+| Behaviour shared by every request | **Middleware / Interceptor** | ASP.NET middleware and Dio interceptors (app version, sign-in and token refresh, later correlation id) | `AppVersionPolicy`, `AppVersionInterceptor`, `AuthInterceptor` |
+| Errors over HTTP | **Problem Details** | RFC 7807 with extension `code`; mapping from `Error.Type` only at the API edge: `Problems.From(error)` (Memorio.Modularity) | D-102, D-153 |
 | Contract between backend and app | **Contract-first client generation** | OpenAPI snapshot `api/openapi.v1.json`, Dart client generated and committed, oasdiff in CI | ADR 0017 |
 | Screens depending only on interfaces | **Dependency Injection via providers** | Riverpod provider typed with a domain interface, default throws, overridden in `app/` and tests | `sessionRepositoryProvider` |
 | Variants chosen at run time (e.g. one sender per operation kind) | **Strategy** | A map or interface of implementations registered in the composition root | `operationSendersProvider` |
