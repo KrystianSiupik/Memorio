@@ -40,7 +40,8 @@ public sealed class ModuleRulesTests
     [InlineData("InfrastructureUsesApi", "SD2: Infrastructure does not depend on Api")]
     [InlineData("DomainUsesFramework", "SD2: Domain does not know frameworks (HTTP, EF Core, Wolverine, Quartz, DI)")]
     [InlineData("ApplicationUsesFramework", "SD2: Application does not know HTTP or persistence frameworks")]
-    [InlineData("PublicInside", "Visibility: the only public type inside a module is its IModule entry point")]
+    [InlineData("PublicInside", "Visibility: the only public types inside a module are its IModule entry point and its message handlers")]
+    [InlineData("MessagingNotStaticHandler", "Visibility: public types in Infrastructure.Messaging are static *Handler classes")]
     public void A_violation_is_caught_by_its_rule_only(string fixture, string expectedRule)
     {
         var root = $"{FixturesRoot}.{fixture}.Modules";

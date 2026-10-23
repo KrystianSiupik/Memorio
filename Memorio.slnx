@@ -6,6 +6,8 @@
   </Folder>
   <Folder Name="/src/Host/">
     <Project Path="src/Host/Memorio.Api/Memorio.Api.csproj" />
+    <Project Path="src/Host/Memorio.Hosting/Memorio.Hosting.csproj" />
+    <Project Path="src/Host/Memorio.Worker/Memorio.Worker.csproj" />
   </Folder>
   <Folder Name="/src/Modules/" />
   <Folder Name="/src/Modules/Access/">
@@ -68,7 +70,9 @@
     <Project Path="tests/Memorio.Api.Tests/Memorio.Api.Tests.csproj" />
     <Project Path="tests/Memorio.ArchitectureTests/Memorio.ArchitectureTests.csproj" />
     <Project Path="tests/Memorio.Database.Tests/Memorio.Database.Tests.csproj" />
+    <Project Path="tests/Memorio.Messaging.Tests/Memorio.Messaging.Tests.csproj" />
     <Project Path="tests/Memorio.SharedKernel.Tests/Memorio.SharedKernel.Tests.csproj" />
+    <Project Path="tests/Memorio.Testing/Memorio.Testing.csproj" />
   </Folder>
   <Folder Name="/tests/Modules/">
     <Project Path="tests/Modules/Memorio.Modules.AiNarration.Tests/Memorio.Modules.AiNarration.Tests.csproj" />

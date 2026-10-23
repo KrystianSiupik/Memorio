@@ -87,3 +87,11 @@ namespace Memorio.ArchitectureTests.Fixtures.PublicInside.Modules.Alpha.Domain
 {
     public sealed record AlphaThing(string Name);
 }
+
+namespace Memorio.ArchitectureTests.Fixtures.MessagingNotStaticHandler.Modules.Alpha.Infrastructure.Messaging
+{
+    public sealed class BetaInfoChangedListener(string prefix)
+    {
+        public string Handle(string beta) => prefix + beta;
+    }
+}

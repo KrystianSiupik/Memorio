@@ -1,4 +1,4 @@
-using Memorio.Api;
+using Memorio.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Memorio.Api.Tests;

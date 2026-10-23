@@ -78,10 +78,23 @@ internal static class ModuleRules
             Types().That().ResideInNamespaceMatching(Layer("Application"))
                 .Should().NotDependOnAnyTypesThat().ResideInNamespaceMatching(FrameworksForbiddenInApplication)));
 
+        // Wolverine only runs public handlers (D-135): a module's message handlers are the one exception.
+        var messaging = $@"^{r}\.\w+\.Infrastructure\.Messaging$";
+
         rules.Add(Rule(
-            "Visibility: the only public type inside a module is its IModule entry point",
+            "Visibility: the only public types inside a module are its IModule entry point and its message handlers",
             Types().That().ResideInNamespaceMatching(insideOfAnyModule).And().ArePublic()
+                .And().DoNotResideInNamespaceMatching(messaging)
                 .Should().ImplementInterface(typeof(IModule))));
+
+        rules.Add(Rule(
+            "Visibility: public types in Infrastructure.Messaging are static *Handler classes",
+            Types().That().ResideInNamespaceMatching(messaging).And().ArePublic()
+                .Should().HaveNameEndingWith("Handler")
+                .AndShould().FollowCustomCondition(
+                    type => type is Class { IsAbstract: true, IsSealed: true },
+                    "be static classes",
+                    "is not a static class")));
 
         return rules;
     }

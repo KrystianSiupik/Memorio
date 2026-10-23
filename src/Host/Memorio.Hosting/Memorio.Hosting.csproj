@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Memorio.Messaging.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="WolverineFx.Postgresql" />
+    <PackageReference Include="WolverineFx.RuntimeCompilation" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../BuildingBlocks/Memorio.Modularity/Memorio.Modularity.csproj" />
+    <ProjectReference Include="../../BuildingBlocks/Memorio.SharedKernel/Memorio.SharedKernel.csproj" />
+    <ProjectReference Include="../../Modules/Access/Memorio.Modules.Access/Memorio.Modules.Access.csproj" />
+    <ProjectReference Include="../../Modules/Account/Memorio.Modules.Account/Memorio.Modules.Account.csproj" />
+    <ProjectReference Include="../../Modules/AiNarration/Memorio.Modules.AiNarration/Memorio.Modules.AiNarration.csproj" />
+    <ProjectReference Include="../../Modules/Album/Memorio.Modules.Album/Memorio.Modules.Album.csproj" />
+    <ProjectReference Include="../../Modules/Archive/Memorio.Modules.Archive/Memorio.Modules.Archive.csproj" />
+    <ProjectReference Include="../../Modules/Limits/Memorio.Modules.Limits/Memorio.Modules.Limits.csproj" />
+    <ProjectReference Include="../../Modules/Moderation/Memorio.Modules.Moderation/Memorio.Modules.Moderation.csproj" />
+    <ProjectReference Include="../../Modules/Notifications/Memorio.Modules.Notifications/Memorio.Modules.Notifications.csproj" />
+    <ProjectReference Include="../../Modules/PlaceProfiles/Memorio.Modules.PlaceProfiles/Memorio.Modules.PlaceProfiles.csproj" />
+    <ProjectReference Include="../../Modules/Places/Memorio.Modules.Places/Memorio.Modules.Places.csproj" />
+    <ProjectReference Include="../../Modules/Plans/Memorio.Modules.Plans/Memorio.Modules.Plans.csproj" />
+    <ProjectReference Include="../../Modules/Provenance/Memorio.Modules.Provenance/Memorio.Modules.Provenance.csproj" />
+    <ProjectReference Include="../../Modules/Publishing/Memorio.Modules.Publishing/Memorio.Modules.Publishing.csproj" />
+    <ProjectReference Include="../../Modules/Succession/Memorio.Modules.Succession/Memorio.Modules.Succession.csproj" />
+  </ItemGroup>
+</Project>

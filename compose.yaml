@@ -1,6 +1,7 @@
-# Local development services (MEM-E0-PLAT-03). Not used in deployed environments.
+# Local development services (MEM-E0-PLAT-03, MEM-E0-PLAT-02). Not used in deployed environments.
 #   docker compose up -d --wait postgres                         # PostgreSQL + PostGIS, bootstrapped
 #   docker compose run --rm osm-import /data/<extract.osm.pbf>   # OSM import from ./osm (see README)
+#   docker compose --profile app up -d --build                  # API (:8080) and worker (:8081) on it
 services:
   postgres:
     image: postgis/postgis:18-3.6
@@ -14,6 +15,7 @@ services:
     volumes:
       # Runs once, when the data volume is created; tools/db-bootstrap.sh applies it again later.
       - ./db/bootstrap.sql:/docker-entrypoint-initdb.d/20-bootstrap.sql:ro
+      - ./db/local-passwords.sql:/docker-entrypoint-initdb.d/30-local-passwords.sql:ro
       - postgres-data:/var/lib/postgresql
     # Over TCP: during first-start initialization the server listens only on its socket.
     healthcheck:
@@ -36,6 +38,31 @@ services:
     volumes:
       - ./osm:/data:ro
       - ./tools/osm-import/sample.osm:/samples/sample.osm:ro
+
+  api:
+    build: { context: ., target: api }
+    image: memorio-api:local
+    profiles: [app]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AppVersion__Minimum: 0.1.0
+      Messaging__ConnectionString: &messaging Host=postgres;Database=memorio;Username=memorio_messaging;Password=memorio_local
+    ports:
+      - "127.0.0.1:${API_PORT:-8080}:8080"
+
+  worker:
+    build: { context: ., target: worker }
+    image: memorio-worker:local
+    profiles: [app]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      Messaging__ConnectionString: *messaging
+    ports:
+      - "127.0.0.1:${WORKER_PORT:-8081}:8080"
 
 volumes:
   postgres-data:

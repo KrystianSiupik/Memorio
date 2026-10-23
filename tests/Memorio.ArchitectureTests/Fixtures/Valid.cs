@@ -77,3 +77,11 @@ namespace Memorio.ArchitectureTests.Fixtures.Valid.Modules.Beta.Contracts
 {
     public sealed record BetaInfo(string Name);
 }
+
+namespace Memorio.ArchitectureTests.Fixtures.Valid.Modules.Alpha.Infrastructure.Messaging
+{
+    public static class BetaInfoChangedHandler
+    {
+        public static string Handle(BetaInfo beta) => CreateAlphaThing.Handle(beta).Name;
+    }
+}

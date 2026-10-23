@@ -5,13 +5,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="xunit.v3" />
-    <PackageReference Include="Npgsql" />
-    <PackageReference Include="Testcontainers.PostgreSql" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/Host/Memorio.Api/Memorio.Api.csproj" />
+    <ProjectReference Include="../Memorio.Testing/Memorio.Testing.csproj" />
   </ItemGroup>
 </Project>

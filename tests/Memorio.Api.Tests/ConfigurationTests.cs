@@ -30,4 +30,16 @@ public sealed class ConfigurationTests
             Assert.DoesNotContain(value, error.ToString(), StringComparison.Ordinal);
         }
     }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData(" ")]
+    public void A_missing_messaging_connection_stops_the_host_and_names_the_variable(string? value)
+    {
+        using var factory = MemorioApiFactory.With("Messaging:ConnectionString", value);
+
+        var error = Assert.ThrowsAny<OptionsValidationException>(() => factory.CreateClient());
+
+        Assert.Equal("Messaging__ConnectionString is required.", Assert.Single(error.Failures));
+    }
 }

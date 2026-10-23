@@ -1,5 +1,10 @@
+using Memorio.Hosting.Messaging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Wolverine;
 
 namespace Memorio.Api.Tests;
 
@@ -12,6 +17,8 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
     public static readonly IReadOnlyDictionary<string, string?> RequiredSettings = new Dictionary<string, string?>
     {
         ["AppVersion:Minimum"] = "0.1.0",
+        // Not contacted: the factory runs Wolverine without persistence or transports.
+        ["Messaging:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_messaging",
     };
 
     private readonly IReadOnlyDictionary<string, string?> _settings;
@@ -44,5 +51,15 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
         {
             builder.UseSetting(key, value);
         }
+
+        // API tests run without a database: Wolverine keeps messages in memory and sends nothing,
+        // and the messaging database is not part of readiness here (Memorio.Messaging.Tests covers it).
+        builder.ConfigureTestServices(services =>
+        {
+            services.DisableAllWolverineMessagePersistence();
+            services.DisableAllExternalWolverineTransports();
+            services.Configure<HealthCheckServiceOptions>(options =>
+                options.Registrations.Remove(options.Registrations.Single(check => check.Name == MemorioMessaging.HealthCheckName)));
+        });
     }
 }
