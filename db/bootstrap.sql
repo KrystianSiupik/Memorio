@@ -1,5 +1,6 @@
--- Database bootstrap (MEM-E0-PLAT-03, ADR 0004; messaging: MEM-E0-PLAT-02, ADR 0006): PostGIS, the
--- messaging role and schemas, and one schema plus one role per module.
+-- Database bootstrap (MEM-E0-PLAT-03, ADR 0004; messaging: MEM-E0-PLAT-02, ADR 0006; scheduler:
+-- MEM-E0-PLAT-08, ADR 0012): PostGIS, the messaging role and schemas, the scheduler role and schema,
+-- and one schema plus one role per module.
 -- Scope: every environment (local Compose runs it on first start; other environments run it once
 -- when the database is created and again after a module is added). Idempotent, not destructive.
 -- Run as the database owner:
@@ -36,6 +37,18 @@ BEGIN
     ALTER SCHEMA wolverine OWNER TO memorio_messaging;
     ALTER SCHEMA wolverine_queues OWNER TO memorio_messaging;
     REVOKE ALL ON SCHEMA wolverine, wolverine_queues FROM PUBLIC;
+
+    -- Scheduler (ADR 0012, MEM-E0-PLAT-08): Quartz.NET's job store (schema scheduler) belongs to
+    -- memorio_scheduler; only the worker connects as it and Quartz creates its tables there on startup.
+    -- No module role has rights on it: modules schedule through the worker's IDeadlines port.
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'memorio_scheduler') THEN
+        CREATE ROLE memorio_scheduler LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT;
+    END IF;
+    EXECUTE format('GRANT CONNECT ON DATABASE %I TO memorio_scheduler', current_database());
+    CREATE SCHEMA IF NOT EXISTS scheduler AUTHORIZATION memorio_scheduler;
+    ALTER SCHEMA scheduler OWNER TO memorio_scheduler;
+    REVOKE ALL ON SCHEMA scheduler FROM PUBLIC;
+    ALTER ROLE memorio_scheduler SET search_path = scheduler;
 
     FOREACH module_schema IN ARRAY ARRAY[
         'access', 'account', 'ai_narration', 'album', 'archive', 'limits', 'moderation',

@@ -12,12 +12,13 @@ dotnet build Memorio.slnx                          # warnings are errors
 dotnet test --solution Memorio.slnx                # all tests, including architecture tests
 dotnet format Memorio.slnx --verify-no-changes     # formatting (dotnet format to fix)
 dotnet run --project src/Host/Memorio.Api          # API host (needs the local database, below)
-dotnet run --project src/Host/Memorio.Worker       # worker: delivers integration events to the modules
+dotnet run --project src/Host/Memorio.Worker       # worker: delivers integration events, runs scheduled jobs
 ```
 
 Requires the .NET SDK pinned in `global.json`. Tests run on Microsoft.Testing.Platform (xUnit v3);
-`Memorio.Database.Tests`, `Memorio.Messaging.Tests` and `PrivateBucketTests` in `Memorio.Storage.Tests`
-also need Docker (they start PostgreSQL + PostGIS or Garage with Testcontainers).
+`Memorio.Database.Tests`, `Memorio.Messaging.Tests`, `Memorio.Scheduling.Tests`, `SignInTests` in the Account
+module tests and `PrivateBucketTests` in `Memorio.Storage.Tests` also need Docker (they start PostgreSQL +
+PostGIS or Garage with Testcontainers).
 
 ## Configuration, health, container
 
@@ -36,11 +37,12 @@ or missing variable stops the host and the log names the variable, never its val
 | `Account__Google__ClientIds__0`, `__1`, ... | API, worker | optional: our Google app ids (ID token audiences); none: Google sign-in off |
 | `Account__Apple__ClientIds__0`, ... | API, worker | optional: our Apple app ids (bundle id, services id); none: Apple sign-in off |
 | `Database__MigrateOnStartup` | API, worker | optional, default `true`: apply the modules' migrations at start |
+| `Scheduling__ConnectionString` | worker | PostgreSQL connection of the role `memorio_scheduler` (scheduled jobs and deadlines) |
 
 `dotnet run` takes development values from `Properties/launchSettings.json` (local database on port
 5432, local bucket on 3900). `GET /health` answers while the process lives; `GET /ready` also checks
-dependencies (503 when one fails: the database or the bucket). Both hosts need the database to start:
-Wolverine creates its tables then.
+dependencies (503 when one fails: the database, the bucket or the worker's scheduler). Both hosts need the
+database to start: Wolverine (and in the worker Quartz) creates its tables then.
 
 ```bash
 docker build -t memorio-api .                          # one image per host for every environment
@@ -79,6 +81,18 @@ The worker publishes backlog metrics (meter `Memorio.Messaging`, sampled every 1
 `memorio.messaging.pending.oldest_age` and `.pending.count` per `stage` (`outbox`, `queue`, `inbox`) and
 `memorio.messaging.dead_letters.count`. Alert when an age passes 10 minutes or a dead letter appears
 (QS12; export and alert rules come with MEM-E0-PLAT-10).
+
+### Scheduled jobs and deadlines (ADR 0012)
+
+The worker runs the modules' scheduled jobs with Quartz.NET 4.6, its store in the schema `scheduler` of the
+role `memorio_scheduler` (Quartz creates the tables at start; no module role has rights on them). The
+store is clustered from the start: a second worker shares the jobs, each firing runs on one node, and a
+firing a dead node left behind is recovered by another. A module registers a job with
+`AddScheduledJob<TJob>("Module.Job", cron)` (cron in UTC) and sets deadlines with `IDeadlines` (worker only);
+modules never see Quartz. A failed firing is retried after 1 min, 10 min and 1 h. Retries and recovery
+mean a firing can run twice, so every job is idempotent (SD12, see `src/Modules/README.md`).
+Metric `memorio.scheduling.runs` (meter `Memorio.Scheduling`) per `job` and `outcome` (`succeeded`,
+`failed`, `given_up`, `unknown`): alert on `given_up` and `unknown` (export with MEM-E0-PLAT-10).
 
 ### OpenStreetMap places
 
@@ -150,14 +164,14 @@ RFC 7807 problem details) and the app shows the update screen.
 src/
   BuildingBlocks/
     Memorio.SharedKernel/   Result + Error, Entity, AggregateRoot, IDomainEvent, IIntegrationEvent,
-                            IObjectStorage; no business logic
+                            IObjectStorage, IScheduledJob, IDeadlines; no business logic
     Memorio.Modularity/     IModule: how the host registers a module (endpoints under /v1)
   Host/
     Memorio.Hosting/        shared by both hosts: ModuleCatalog (the only place that knows every module),
                             configuration errors, health endpoints, messaging (Wolverine, backlog metrics),
-                            object storage (S3 adapter)
+                            object storage (S3 adapter), scheduler (Quartz.NET)
     Memorio.Api/            ASP.NET Core API host (/v1)
-    Memorio.Worker/         worker host: integration event delivery (only /health and /ready)
+    Memorio.Worker/         worker host: integration event delivery and scheduled jobs (only /health and /ready)
   Modules/<Module>/
     Memorio.Modules.<Module>/            the module's inside: Domain, Application, Infrastructure, Api
     Memorio.Modules.<Module>.Contracts/  its public contract (read ports, DTOs, integration events)
@@ -167,9 +181,10 @@ tests/
   Memorio.Api.Tests/
   Memorio.Database.Tests/     schema and role per module (SD4) against db/bootstrap.sql
   Memorio.Messaging.Tests/    outbox → queue → inbox → module handlers, backlog metric (ADR 0006)
+  Memorio.Scheduling.Tests/   deadlines, retries, recurring jobs on a two-node cluster, SD12 (ADR 0012)
   Memorio.Storage.Tests/      signed addresses (SD5), upload zone, private bucket on Garage (ADR 0005)
   Memorio.Testing/            PostgreSQL + PostGIS test container with the bootstrap applied
-db/bootstrap.sql              PostGIS, messaging role and schemas, module schemas and roles
+db/bootstrap.sql              PostGIS, messaging and scheduler roles and schemas, module schemas and roles
 tools/osm-import/             OSM import (osm2pgsql flex style, synthetic sample)
 tools/storage/                media bucket: bootstrap and SD5 check scripts, local Garage configuration
 ```
@@ -188,7 +203,8 @@ Publishing are outside the MVP and stay empty until their tickets.
 - The only public types inside a module are its `IModule` entry point and its message handlers (public
   static `*Handler` classes in `Infrastructure.Messaging`, D-135) and its generated EF Core migrations
   (D-152); everything else is `internal`.
-- Every message handler has an idempotency test in its module's tests (SD6).
+- Every message handler has an idempotency test in its module's tests (SD6), and so does every scheduled
+  job (SD12).
 - Every endpoint requires a signed-in account; anonymous ones are explicit and on the allowlist in
   `AnonymousEndpointsTests` (SD10).
 - Business failures are returned as `Result` / `Error` (Validation, NotFound, Conflict, Forbidden,

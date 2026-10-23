@@ -3,7 +3,7 @@ using ArchUnitNET.Loader;
 
 namespace Memorio.ArchitectureTests;
 
-/// <summary>Fitness functions SD1, SD2 (ADR 0001, 0002, 0019) and SD6 (ADR 0006) on the real modules.</summary>
+/// <summary>Fitness functions SD1, SD2 (ADR 0001, 0002, 0019), SD6 (ADR 0006) and SD12 (ADR 0012) on the real modules.</summary>
 public sealed class ApplicationArchitectureTests
 {
     private const string ModulesRoot = "Memorio.Modules";
@@ -65,6 +65,23 @@ public sealed class ApplicationArchitectureTests
         Assert.True(
             missing.Count == 0,
             $"SD6: add <Handler>{IdempotencyConvention.TestClassSuffix} (same event delivered twice) for: {string.Join(", ", missing)}");
+    }
+
+    [Fact]
+    public void Every_scheduled_job_has_an_idempotency_test_in_its_module_tests()
+    {
+        var jobs = IdempotencyConvention.ScheduledJobsIn(
+            ModuleAssemblyFiles.SelectMany(file => System.Reflection.Assembly.LoadFrom(file).GetTypes()),
+            ModulesRoot);
+        var moduleTests = Path.Combine(RepositoryRoot(), "tests", "Modules");
+
+        var missing = IdempotencyConvention.HandlersWithoutTest(
+            jobs,
+            module => IdempotencyConvention.TestClassesIn(Path.Combine(moduleTests, $"{ModulesRoot}.{module}.Tests")));
+
+        Assert.True(
+            missing.Count == 0,
+            $"SD12: add <Job>{IdempotencyConvention.TestClassSuffix} (same firing run twice) for: {string.Join(", ", missing)}");
     }
 
     private static string RepositoryRoot()

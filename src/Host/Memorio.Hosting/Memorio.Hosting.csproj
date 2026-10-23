@@ -4,11 +4,13 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Memorio.Messaging.Tests" />
+    <InternalsVisibleTo Include="Memorio.Scheduling.Tests" />
     <InternalsVisibleTo Include="Memorio.Storage.Tests" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" />
     <PackageReference Include="Npgsql" />
+    <PackageReference Include="Quartz" />
     <PackageReference Include="WolverineFx.Postgresql" />
     <PackageReference Include="WolverineFx.RuntimeCompilation" />
   </ItemGroup>

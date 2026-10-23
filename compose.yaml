@@ -109,6 +109,7 @@ services:
     environment:
       Messaging__ConnectionString: *messaging
       Account__ConnectionString: *account
+      Scheduling__ConnectionString: Host=postgres;Database=memorio;Username=memorio_scheduler;Password=memorio_local
       <<: *app-storage
     ports:
       - "127.0.0.1:${WORKER_PORT:-8081}:8080"

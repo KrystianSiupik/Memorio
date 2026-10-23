@@ -12,6 +12,7 @@ namespace Memorio.Testing;
 public class PostgresDatabase : IAsyncLifetime
 {
     public const string MessagingRole = "memorio_messaging";
+    public const string SchedulerRole = "memorio_scheduler";
 
     private const string RolePassword = "role-test";
 
@@ -26,7 +27,7 @@ public class PostgresDatabase : IAsyncLifetime
         await _container.StartAsync();
         await ApplyBootstrapAsync();
 
-        foreach (var role in ModuleSchemas.All.Select(ModuleSchemas.RoleOf).Append(MessagingRole))
+        foreach (var role in ModuleSchemas.All.Select(ModuleSchemas.RoleOf).Append(MessagingRole).Append(SchedulerRole))
         {
             await using var connection = await OpenAsOwnerAsync();
             await using var command = new NpgsqlCommand($"ALTER ROLE {role} PASSWORD '{RolePassword}'", connection);
@@ -55,7 +56,7 @@ public class PostgresDatabase : IAsyncLifetime
         }
     }
 
-    /// <summary>Connection string of a Memorio role (a module role or <see cref="MessagingRole"/>).</summary>
+    /// <summary>Connection string of a Memorio role (a module role, <see cref="MessagingRole"/> or <see cref="SchedulerRole"/>).</summary>
     public string ConnectionStringFor(string role) =>
         new NpgsqlConnectionStringBuilder(_container.GetConnectionString())
         {

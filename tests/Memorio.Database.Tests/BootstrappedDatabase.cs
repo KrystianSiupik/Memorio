@@ -7,11 +7,14 @@ namespace Memorio.Database.Tests;
 
 /// <summary>
 /// The bootstrapped database with one probe table in every module schema, created by the module's own
-/// role, and one in each messaging schema, created by memorio_messaging (as Wolverine creates its tables).
+/// role, one in each messaging schema, created by memorio_messaging (as Wolverine creates its tables), and
+/// one in the scheduler schema, created unqualified by memorio_scheduler (as Quartz creates its tables).
 /// </summary>
 public sealed class BootstrappedDatabase : PostgresDatabase
 {
     public const string ProbeTable = "fitness_probe";
+
+    public const string SchedulerSchema = "scheduler";
 
     public static readonly string[] MessagingSchemas = ["wolverine", "wolverine_queues"];
 
@@ -26,6 +29,8 @@ public sealed class BootstrappedDatabase : PostgresDatabase
         {
             await CreateProbeAsync(MessagingRole, $"{schema}.{ProbeTable}");
         }
+
+        await CreateProbeAsync(SchedulerRole, ProbeTable);
     }
 
     public Task<NpgsqlConnection> OpenAsModuleAsync(string schema) => OpenAsAsync(ModuleSchemas.RoleOf(schema));

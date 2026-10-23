@@ -9,6 +9,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "Messaging__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_messaging;Password=memorio_local",
         "Account__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_account;Password=memorio_local",
+        "Scheduling__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_scheduler;Password=memorio_local",
         "Storage__Endpoint": "http://localhost:3900",
         "Storage__Region": "garage",
         "Storage__Bucket": "memorio-media",

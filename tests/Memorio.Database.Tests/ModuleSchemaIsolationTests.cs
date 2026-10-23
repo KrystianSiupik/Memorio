@@ -15,7 +15,7 @@ public sealed class ModuleSchemaIsolationTests(BootstrappedDatabase database)
     public static TheoryData<string> Schemas => [.. ModuleSchemas.All];
 
     [Fact]
-    public async Task Bootstrap_creates_one_schema_per_module_and_the_messaging_schemas_each_owned_by_its_role()
+    public async Task Bootstrap_creates_one_schema_per_module_the_messaging_and_scheduler_schemas_each_owned_by_its_role()
     {
         await using var connection = await database.OpenAsOwnerAsync();
         await using var command = new NpgsqlCommand(
@@ -35,6 +35,7 @@ public sealed class ModuleSchemaIsolationTests(BootstrappedDatabase database)
 
         var expected = ModuleSchemas.All.Select(schema => (schema, ModuleSchemas.RoleOf(schema)))
             .Concat(MessagingSchemas.Select(schema => (schema, PostgresDatabase.MessagingRole)))
+            .Append((SchedulerSchema, PostgresDatabase.SchedulerRole))
             .OrderBy(owned => owned.Item1, StringComparer.Ordinal);
         Assert.Equal(expected, schemas);
     }
@@ -106,6 +107,32 @@ public sealed class ModuleSchemaIsolationTests(BootstrappedDatabase database)
         await AssertDeniedAsync(connection, "CREATE TABLE wolverine.intruder (id int)");
         await AssertDeniedAsync(connection, $"SELECT * FROM wolverine_queues.{ProbeTable}");
         await AssertDeniedAsync(connection, $"INSERT INTO wolverine_queues.{ProbeTable} VALUES (2)");
+    }
+
+    [Theory]
+    [MemberData(nameof(Schemas))]
+    public async Task A_module_has_no_rights_on_the_scheduler_store(string schema)
+    {
+        await using var connection = await database.OpenAsModuleAsync(schema);
+
+        // Deadlines go through the worker's IDeadlines port (ADR 0012), never straight into Quartz's tables.
+        await AssertDeniedAsync(connection, $"SELECT * FROM {SchedulerSchema}.{ProbeTable}");
+        await AssertDeniedAsync(connection, $"INSERT INTO {SchedulerSchema}.{ProbeTable} VALUES (2)");
+        await AssertDeniedAsync(connection, $"CREATE TABLE {SchedulerSchema}.intruder (id int)");
+    }
+
+    [Fact]
+    public async Task The_scheduler_role_creates_its_tables_in_its_own_schema_and_reaches_no_module()
+    {
+        await using var connection = await database.OpenAsAsync(PostgresDatabase.SchedulerRole);
+
+        // Quartz names its tables unqualified; the role's search_path puts them in the scheduler schema.
+        await ExecuteAsync(connection, "CREATE TABLE IF NOT EXISTS qrtz_probe (id int)");
+        Assert.Equal(SchedulerSchema, await ScalarAsync<string>(connection, "SELECT schemaname::text FROM pg_tables WHERE tablename = 'qrtz_probe'"));
+        foreach (var schema in ModuleSchemas.All)
+        {
+            await AssertDeniedAsync(connection, $"SELECT * FROM {schema}.{ProbeTable}");
+        }
     }
 
     private static async Task AssertDeniedAsync(NpgsqlConnection connection, string sql)
