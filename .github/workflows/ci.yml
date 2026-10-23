@@ -4,6 +4,8 @@
 # and the database: schema and role per module (SD4, ADR 0004), OSM import; messaging (ADR 0006):
 # outbox to worker delivery, inbox, module isolation, backlog metric and SD6 in the backend tests;
 # object storage (ADR 0005): private bucket, upload zone, signatures ≤ 300 s (SD5).
+# Observability (ADR 0014): monitoring configurations, alert rules with unit tests (QS12), and metrics
+# and logs of both hosts reaching Prometheus and Loki.
 name: ci
 
 on:
@@ -69,6 +71,16 @@ jobs:
       - run: docker compose up -d --wait garage
       - run: docker compose run --rm storage-bootstrap
       - run: docker compose run --rm storage-bootstrap
+
+  observability:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash tools/monitoring/validate.sh
+      - run: docker compose --profile app --profile monitoring up -d --build
+      - run: bash tools/monitoring/check-pipeline.sh
+      - if: failure()
+        run: docker compose --profile app --profile monitoring logs
 
   contract:
     runs-on: ubuntu-latest

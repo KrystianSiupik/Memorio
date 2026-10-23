@@ -1,0 +1,62 @@
+# Prometheus on the monitoring server (D-038). Targets come from files, one directory per environment
+# (mounted at /etc/prometheus/targets): collector.yml (the application's OpenTelemetry Collector, :8889),
+# node.yml (node exporter of the application server), health.yml and ready.yml (public /health and
+# /ready addresses, probed through the blackbox exporter), bucket.yml (anonymous addresses of the media
+# bucket, which must be refused, SD5). Local Compose: targets/local.
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+rule_files:
+  - /etc/prometheus/rules/*.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: [alertmanager:9093]
+
+scrape_configs:
+  # Metrics of the API and the worker; their job label (memorio-api, memorio-worker) is kept.
+  - job_name: collector
+    honor_labels: true
+    file_sd_configs:
+      - files: [/etc/prometheus/targets/collector.yml]
+
+  - job_name: node
+    file_sd_configs:
+      - files: [/etc/prometheus/targets/node.yml]
+
+  - job_name: health
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    file_sd_configs:
+      - files: [/etc/prometheus/targets/health.yml]
+    relabel_configs: &probe
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+
+  - job_name: ready
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    file_sd_configs:
+      - files: [/etc/prometheus/targets/ready.yml]
+    relabel_configs: *probe
+
+  # SD5: anonymous reads of the media bucket (bucket address and its listing) must be refused.
+  - job_name: bucket-private
+    metrics_path: /probe
+    params:
+      module: [http_refused]
+    file_sd_configs:
+      - files: [/etc/prometheus/targets/bucket.yml]
+    relabel_configs: *probe
+
+  - job_name: prometheus
+    static_configs:
+      - targets: [localhost:9090]

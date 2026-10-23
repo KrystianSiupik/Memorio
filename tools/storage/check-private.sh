@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Fitness function SD5 (ADR 0005): the media bucket allows no anonymous access. Run after every
-# bootstrap and daily against each environment (scheduling: MEM-E0-PLAT-10). Needs S3_ENDPOINT and
-# S3_BUCKET; an optional argument names an existing object to try as well.
+# bootstrap; between runs the monitoring server checks the same addresses continuously (blackbox job
+# bucket-private, alert MediaBucketNotPrivate, D-163). Needs S3_ENDPOINT and S3_BUCKET; an optional
+# argument names an existing object to try as well.
 set -euo pipefail
 
 : "${S3_ENDPOINT:?}" "${S3_BUCKET:?}"

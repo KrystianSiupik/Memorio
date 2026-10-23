@@ -1,0 +1,15 @@
+# Alertmanager on the monitoring server (D-038). Every alert goes to the on-call receiver, a webhook
+# whose address is a secret kept outside the repository (file /etc/alertmanager/secrets/webhook-url,
+# MEM-E0-PLAT-18); which channel it reaches (e-mail, SMS, chat) is decided with the on-call duty (HS-006).
+route:
+  receiver: on-call
+  group_by: [alertname, job]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+receivers:
+  - name: on-call
+    webhook_configs:
+      - url_file: /etc/alertmanager/secrets/webhook-url
+        send_resolved: true

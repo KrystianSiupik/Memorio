@@ -1,0 +1,94 @@
+# Alerts of Memorio (ADR 0014, MEM-E0-PLAT-10), tested by monitoring/prometheus/tests/memorio.test.yml.
+# Delay from an event to an alert: backlog sampled every 15 s, exported every 60 s, scraped every 30 s,
+# rules evaluated every 30 s, so at most about 2.5 min plus the rule's "for" (QS12: detection within 5 min).
+groups:
+  - name: availability
+    rules:
+      - alert: MemorioDown
+        expr: probe_success{job="health"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.instance }} does not answer (external probe)."
+
+      - alert: MemorioNotReady
+        expr: probe_success{job="ready"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.instance }} is not ready: a dependency (database, bucket, scheduler) fails."
+
+      - alert: TelemetryMissing
+        expr: up{job="collector"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "No metrics from the application: the OpenTelemetry Collector cannot be scraped."
+
+      - alert: HighServerErrorRate
+        expr: >
+          sum by (job) (rate(http_server_request_duration_seconds_count{http_response_status_code=~"5.."}[5m]))
+            / sum by (job) (rate(http_server_request_duration_seconds_count[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.job }}: more than 5% of requests end with a server error."
+
+      - alert: DiskAlmostFull
+        expr: >
+          node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"}
+            / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"} < 0.10
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.instance }} {{ $labels.mountpoint }}: less than 10% of the disk is free."
+
+  - name: storage
+    rules:
+      # SD5 (ADR 0005): the media bucket answered an anonymous read; at once, it is a data leak.
+      - alert: MediaBucketNotPrivate
+        expr: probe_success{job="bucket-private"} == 0 and on (instance) probe_http_status_code{job="bucket-private"} > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "Anonymous {{ $labels.instance }} was not refused: the media bucket is not private."
+
+  - name: messaging
+    rules:
+      # QS12: an outbox (or queue, inbox) message older than 10 minutes is an alert.
+      - alert: MessageBacklogTooOld
+        expr: max by (stage) (memorio_messaging_pending_oldest_age_seconds) > 600
+        labels:
+          severity: critical
+        annotations:
+          summary: "The oldest {{ $labels.stage }} message waits for more than 10 minutes."
+
+      - alert: MessageDeadLettered
+        expr: max(memorio_messaging_dead_letters_count) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $value }} integration event(s) failed every retry and wait in the dead letters."
+
+      # Without the backlog metric QS12 cannot be checked at all: the worker is down or not exporting.
+      - alert: MessagingMetricsMissing
+        expr: absent(memorio_messaging_pending_oldest_age_seconds)
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "The worker sends no message backlog metric."
+
+  - name: scheduling
+    rules:
+      - alert: ScheduledJobGivenUp
+        expr: sum by (scheduled_job, outcome) (increase(memorio_scheduling_runs_total{outcome=~"given_up|unknown"}[15m])) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Scheduled job {{ $labels.scheduled_job }}: a firing ended as {{ $labels.outcome }}."

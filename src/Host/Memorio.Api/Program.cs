@@ -5,6 +5,7 @@ using Memorio.Hosting.Configuration;
 using Memorio.Hosting.Health;
 using Memorio.Hosting.Messaging;
 using Memorio.Hosting.Storage;
+using Memorio.Hosting.Telemetry;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
@@ -13,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi(ApiDocument.Name, ApiDocument.Configure);
 builder.Services.AddMemorioHealthChecks();
+builder.Services.AddMemorioTelemetry(builder.Configuration, "memorio-api");
 builder.Services.AddAppVersionPolicy(builder.Configuration);
 builder.Services.AddMemorioMessaging(builder.Configuration, MessagingHost.Api, handlerAssemblies: []);
 builder.Services.AddMemorioObjectStorage(builder.Configuration);

@@ -4,6 +4,7 @@ using Memorio.Hosting.Health;
 using Memorio.Hosting.Messaging;
 using Memorio.Hosting.Scheduling;
 using Memorio.Hosting.Storage;
+using Memorio.Hosting.Telemetry;
 using Microsoft.Extensions.Options;
 
 // Worker (D-036, ADR 0006, ADR 0012): delivers integration events from the outbox to the modules' handlers
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Options;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMemorioHealthChecks();
+builder.Services.AddMemorioTelemetry(builder.Configuration, "memorio-worker");
 builder.Services.AddMemorioMessaging(
     builder.Configuration,
     MessagingHost.Worker,

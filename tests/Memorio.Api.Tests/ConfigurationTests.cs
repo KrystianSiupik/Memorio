@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Metrics;
 
 namespace Memorio.Api.Tests;
 
@@ -56,5 +58,27 @@ public sealed class ConfigurationTests
         var error = Assert.ThrowsAny<OptionsValidationException>(() => factory.CreateClient());
 
         Assert.Equal("Messaging__ConnectionString is required.", Assert.Single(error.Failures));
+    }
+
+    [Theory]
+    [InlineData("otel-collector:4318")]
+    [InlineData("ftp://otel-collector")]
+    public void An_invalid_telemetry_address_stops_the_host_and_names_the_variable(string value)
+    {
+        using var factory = MemorioApiFactory.With("Telemetry:OtlpEndpoint", value);
+
+        var error = Assert.ThrowsAny<OptionsValidationException>(() => factory.CreateClient());
+
+        Assert.Equal("Telemetry__OtlpEndpoint must be an http(s) address when set.", Assert.Single(error.Failures));
+    }
+
+    [Fact]
+    public void Telemetry_is_exported_only_when_its_address_is_set()
+    {
+        using var without = new MemorioApiFactory();
+        using var with = MemorioApiFactory.With("Telemetry:OtlpEndpoint", "http://localhost:4318");
+
+        Assert.Null(without.Services.GetService<MeterProvider>());
+        Assert.NotNull(with.Services.GetService<MeterProvider>());
     }
 }

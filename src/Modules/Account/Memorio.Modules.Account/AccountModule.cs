@@ -3,6 +3,7 @@ using Memorio.Modules.Account.Api;
 using Memorio.Modules.Account.Application.Ports;
 using Memorio.Modules.Account.Infrastructure;
 using Memorio.Modules.Account.Infrastructure.Identity;
+using Memorio.Modules.Account.Infrastructure.Metrics;
 using Memorio.Modules.Account.Infrastructure.Persistence;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -54,6 +55,7 @@ public sealed class AccountModule : IModule
         services.AddSingleton<IExternalIdentityVerifier>(OpenIdIdentityVerifier.ForProvider(ExternalProvider.Apple, options.Apple.ClientIds));
 
         services.AddHealthChecks().AddCheck<AccountDatabaseHealthCheck>(AccountDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
+        services.AddHostedService<AccountMetrics>();
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))
         {
             // Before every other hosted service: Data Protection reads its keys from the account schema
