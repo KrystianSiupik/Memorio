@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 
 namespace Memorio.Modules.Account;
 
@@ -55,7 +56,9 @@ public sealed class AccountModule : IModule
         services.AddHealthChecks().AddCheck<AccountDatabaseHealthCheck>(AccountDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))
         {
-            services.AddHostedService<AccountDatabaseMigrator>();
+            // Before every other hosted service: Data Protection reads its keys from the account schema
+            // as soon as it starts, so the tables must exist by then (hosted services start in order).
+            services.Insert(0, ServiceDescriptor.Singleton<IHostedService, AccountDatabaseMigrator>());
         }
     }
 
