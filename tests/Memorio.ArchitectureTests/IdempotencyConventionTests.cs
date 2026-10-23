@@ -36,3 +36,34 @@ public sealed class IdempotencyConventionTests
         Assert.Equal(["Alpha.BetaInfoChangedHandler"], missing);
     }
 }
+
+/// <summary>The SD12 convention, on the fixture module Alpha with one scheduled job.</summary>
+public sealed class ScheduledJobIdempotencyConventionTests
+{
+    private const string FixturesRoot = "Memorio.ArchitectureTests.Fixtures.Valid.Modules";
+
+    private static readonly IReadOnlyList<(string Module, Type Job)> Jobs =
+        IdempotencyConvention.ScheduledJobsIn(typeof(ScheduledJobIdempotencyConventionTests).Assembly.GetTypes(), FixturesRoot);
+
+    [Fact]
+    public void Finds_the_scheduled_jobs_of_the_modules()
+    {
+        Assert.Equal(["Alpha.ExpireAlphaThings"], Jobs.Select(job => $"{job.Module}.{job.Job.Name}"));
+    }
+
+    [Fact]
+    public void A_job_with_an_idempotency_test_in_its_module_passes()
+    {
+        Assert.Empty(IdempotencyConvention.HandlersWithoutTest(
+            Jobs,
+            module => module == "Alpha" ? ["ExpireAlphaThingsIdempotencyTests"] : []));
+    }
+
+    [Fact]
+    public void A_job_without_an_idempotency_test_fails()
+    {
+        Assert.Equal(
+            ["Alpha.ExpireAlphaThings"],
+            IdempotencyConvention.HandlersWithoutTest(Jobs, _ => ["ExpireAlphaThingsTests"]));
+    }
+}

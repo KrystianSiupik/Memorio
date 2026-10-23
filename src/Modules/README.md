@@ -45,6 +45,14 @@ Rules (checked by `tests/Memorio.ArchitectureTests`, ADR 0001 and 0019):
   The worker runs it at least once per event, in the module's own queue: the policy must be idempotent,
   and `tests/Modules/Memorio.Modules.<Module>.Tests` has `<Event>HandlerIdempotencyTests` delivering the
   same event twice (SD6, checked by the architecture tests).
+- Deadlines and recurring work (ADR 0012): a job implements `IScheduledJob` (SharedKernel, internal in
+  `Infrastructure/Scheduling`) and only calls the module's aggregates; it is registered in `AddServices`
+  with `services.AddScheduledJob<TJob>("<Module>.<Job>", cron)` (cron in UTC, or none for a job run only
+  at deadlines). Deadlines are set and cancelled through `IDeadlines` (worker only: schedule a deadline
+  from the handler of the event the change stored in the outbox, D-157). The worker may run a firing
+  more than once (retry, recovery after a node died, the same deadline scheduled again): the job must be
+  idempotent, and the module's tests have `<Job>IdempotencyTests` running the same firing twice (SD12,
+  checked by the architecture tests). The job's name is stored with every firing: never rename it.
 
 Which pattern solves which problem: `docs/architecture/patterns.md`.
 

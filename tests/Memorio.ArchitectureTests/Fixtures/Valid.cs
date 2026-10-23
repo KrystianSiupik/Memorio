@@ -94,3 +94,13 @@ namespace Memorio.ArchitectureTests.Fixtures.Valid.Modules.Alpha.Infrastructure.
         public string Name { get; } = nameof(InitialAlpha);
     }
 }
+
+namespace Memorio.ArchitectureTests.Fixtures.Valid.Modules.Alpha.Infrastructure.Scheduling
+{
+    // A scheduled job (ADR 0012): internal, found by the SD12 convention through IScheduledJob.
+    internal sealed class ExpireAlphaThings : Memorio.SharedKernel.Scheduling.IScheduledJob
+    {
+        public Task RunAsync(Memorio.SharedKernel.Scheduling.ScheduledJobRun run, CancellationToken cancellationToken) =>
+            Task.CompletedTask;
+    }
+}
