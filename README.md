@@ -16,8 +16,8 @@ dotnet run --project src/Host/Memorio.Worker       # worker: delivers integratio
 ```
 
 Requires the .NET SDK pinned in `global.json`. Tests run on Microsoft.Testing.Platform (xUnit v3);
-`Memorio.Database.Tests` and `Memorio.Messaging.Tests` also need Docker (they start PostgreSQL +
-PostGIS with Testcontainers).
+`Memorio.Database.Tests`, `Memorio.Messaging.Tests` and `PrivateBucketTests` in `Memorio.Storage.Tests`
+also need Docker (they start PostgreSQL + PostGIS or Garage with Testcontainers).
 
 ## Configuration, health, container
 
@@ -28,10 +28,15 @@ or missing variable stops the host and the log names the variable, never its val
 |---|---|---|
 | `AppVersion__Minimum` | API | oldest app version the API serves (`major.minor.patch`) |
 | `Messaging__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_messaging` (outbox, inbox, queue) |
+| `Storage__Endpoint` | API, worker | S3 API address of the media bucket the hosts call (http(s)) |
+| `Storage__PublicEndpoint` | API, worker | optional: address the apps reach the bucket at, used in signed addresses |
+| `Storage__Region`, `Storage__Bucket` | API, worker | signing region of the provider, bucket name |
+| `Storage__AccessKey`, `Storage__SecretKey` | API, worker | bucket credentials (secrets) |
 
 `dotnet run` takes development values from `Properties/launchSettings.json` (local database on port
-5432). `GET /health` answers while the process lives; `GET /ready` also checks dependencies (503 when
-one fails, e.g. the database). Both hosts need the database to start: Wolverine creates its tables then.
+5432, local bucket on 3900). `GET /health` answers while the process lives; `GET /ready` also checks
+dependencies (503 when one fails: the database or the bucket). Both hosts need the database to start:
+Wolverine creates its tables then.
 
 ```bash
 docker build -t memorio-api .                          # one image per host for every environment
@@ -86,6 +91,26 @@ docker compose --profile tools run --rm osm-import /samples/sample.osm   # synth
 
 In Git Bash on Windows prefix these with `MSYS_NO_PATHCONV=1`, otherwise the container path is rewritten.
 
+## Object storage (ADR 0005)
+
+Photos and other media live in one private S3-compatible bucket in the EU (stage 1: the VPS provider's
+object storage; stage 2: S3). Nothing in it is public: modules hand out signed addresses through
+`IObjectStorage` (SharedKernel), valid for 5 minutes (`ObjectStorageRules.SignatureLifetime`: a
+requirement, not configuration; SD5: at most 300 s), signed for a whole gallery at once, after the
+Access module allowed it. The app uploads to the temporary zone `uploads/` with a signed PUT (its
+content type is signed); the module checks the upload and moves it to its final key
+(`PromoteUploadAsync`); whatever stays in `uploads/` expires after a day.
+
+```bash
+docker compose up -d --wait garage            # local S3-compatible server (Garage), :3900
+docker compose run --rm storage-bootstrap     # bucket memorio-media: upload zone rule + anonymous access check
+```
+
+`tools/storage/bootstrap.sh` prepares the bucket of any environment the same way (idempotent, in the
+`amazon/aws-cli` image, with `S3_ENDPOINT`, `S3_BUCKET` and the `AWS_*` credentials);
+`tools/storage/check-private.sh` is the SD5 check that the bucket refuses anonymous reads, run after
+every bootstrap and daily.
+
 ## API contract (v1)
 
 Every public endpoint is under `/v1` and changes only in backward-compatible ways (ADR 0017).
@@ -106,11 +131,13 @@ RFC 7807 problem details) and the app shows the update screen.
 ```
 src/
   BuildingBlocks/
-    Memorio.SharedKernel/   Result + Error, Entity, AggregateRoot, IDomainEvent, IIntegrationEvent; no business logic
+    Memorio.SharedKernel/   Result + Error, Entity, AggregateRoot, IDomainEvent, IIntegrationEvent,
+                            IObjectStorage; no business logic
     Memorio.Modularity/     IModule: how the host registers a module (endpoints under /v1)
   Host/
     Memorio.Hosting/        shared by both hosts: ModuleCatalog (the only place that knows every module),
-                            configuration errors, health endpoints, messaging (Wolverine, backlog metrics)
+                            configuration errors, health endpoints, messaging (Wolverine, backlog metrics),
+                            object storage (S3 adapter)
     Memorio.Api/            ASP.NET Core API host (/v1)
     Memorio.Worker/         worker host: integration event delivery (only /health and /ready)
   Modules/<Module>/
@@ -122,9 +149,11 @@ tests/
   Memorio.Api.Tests/
   Memorio.Database.Tests/     schema and role per module (SD4) against db/bootstrap.sql
   Memorio.Messaging.Tests/    outbox → queue → inbox → module handlers, backlog metric (ADR 0006)
+  Memorio.Storage.Tests/      signed addresses (SD5), upload zone, private bucket on Garage (ADR 0005)
   Memorio.Testing/            PostgreSQL + PostGIS test container with the bootstrap applied
 db/bootstrap.sql              PostGIS, messaging role and schemas, module schemas and roles
 tools/osm-import/             OSM import (osm2pgsql flex style, synthetic sample)
+tools/storage/                media bucket: bootstrap and SD5 check scripts, local Garage configuration
 ```
 
 Modules (from the module map): Access, Account, AiNarration, Album, Archive, Limits, Moderation,

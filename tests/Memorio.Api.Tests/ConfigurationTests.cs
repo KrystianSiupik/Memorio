@@ -32,6 +32,21 @@ public sealed class ConfigurationTests
     }
 
     [Theory]
+    [InlineData("Storage:Endpoint", null, "Storage__Endpoint is required and must be an http(s) address.")]
+    [InlineData("Storage:Endpoint", "fsn1.example.com", "Storage__Endpoint is required and must be an http(s) address.")]
+    [InlineData("Storage:PublicEndpoint", "not an address", "Storage__PublicEndpoint must be an http(s) address when set.")]
+    [InlineData("Storage:Bucket", null, "Storage__Bucket is required.")]
+    [InlineData("Storage:SecretKey", "", "Storage__SecretKey is required.")]
+    public void An_invalid_storage_setting_stops_the_host_and_names_the_variable_not_the_value(string key, string? value, string expected)
+    {
+        using var factory = MemorioApiFactory.With(key, value);
+
+        var error = Assert.ThrowsAny<OptionsValidationException>(() => factory.CreateClient());
+
+        Assert.Equal(expected, Assert.Single(error.Failures));
+    }
+
+    [Theory]
     [InlineData(null)]
     [InlineData(" ")]
     public void A_missing_messaging_connection_stops_the_host_and_names_the_variable(string? value)

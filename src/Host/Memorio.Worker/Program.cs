@@ -2,6 +2,7 @@ using Memorio.Hosting;
 using Memorio.Hosting.Configuration;
 using Memorio.Hosting.Health;
 using Memorio.Hosting.Messaging;
+using Memorio.Hosting.Storage;
 using Microsoft.Extensions.Options;
 
 // Worker (D-036, ADR 0006): delivers integration events from the outbox to the modules' handlers.
@@ -13,6 +14,7 @@ builder.Services.AddMemorioMessaging(
     builder.Configuration,
     MessagingHost.Worker,
     ModuleCatalog.All.Select(module => module.GetType().Assembly));
+builder.Services.AddMemorioObjectStorage(builder.Configuration);
 
 foreach (var module in ModuleCatalog.All)
 {

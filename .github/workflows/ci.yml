@@ -2,7 +2,8 @@
 # (including the architecture tests: backend SD1/SD2, app import rules; ADR 0001 and 0019),
 # plus the API v1 contract (ADR 0017): snapshot, backward compatibility, generated Dart client,
 # and the database: schema and role per module (SD4, ADR 0004), OSM import; messaging (ADR 0006):
-# outbox to worker delivery, inbox, module isolation, backlog metric and SD6 in the backend tests.
+# outbox to worker delivery, inbox, module isolation, backlog metric and SD6 in the backend tests;
+# object storage (ADR 0005): private bucket, upload zone, signatures ≤ 300 s (SD5).
 name: ci
 
 on:
@@ -58,6 +59,16 @@ jobs:
           test "$(psql "SELECT count(*) FROM pg_tables WHERE schemaname = 'public' AND tablename <> 'spatial_ref_sys'")" = "0"
           if psql "SET ROLE memorio_album; SELECT 1 FROM places.osm_places LIMIT 1"; then echo "another module reads places.osm_places"; exit 1; fi
       - run: bash tools/db-bootstrap.sh   # applies again without errors
+
+  storage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # ADR 0005 / SD5: the bucket script prepares a private bucket with the upload zone expiring after a
+      # day and checks that anonymous access is refused; it must succeed again on a prepared bucket.
+      - run: docker compose up -d --wait garage
+      - run: docker compose run --rm storage-bootstrap
+      - run: docker compose run --rm storage-bootstrap
 
   contract:
     runs-on: ubuntu-latest
