@@ -27,7 +27,7 @@ eventually() {
       echo "FAIL: $description"
       exit 1
     fi
-    curl -fs -o /dev/null http://localhost:${API_PORT:-8080}/health || true   # some API traffic to measure
+    curl -fs -o /dev/null "http://localhost:${API_PORT:-8080}/health" || true   # some API traffic to measure
     sleep 5
   done
   echo "ok: $description"

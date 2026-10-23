@@ -170,6 +170,18 @@ files of that environment mounted at `/etc/prometheus/targets` (see `monitoring/
 and the alert webhook address as a secret file (MEM-E0-PLAT-18). Test environments run everything on one
 server, like local Compose.
 
+## Stage 1 server and backups (ADR 0013)
+
+One VPS runs PostgreSQL + PostGIS with WAL-G, the API, the worker and nginx with Docker Compose
+(`deploy/compose.yaml`); the monitoring server is separate. The WAL is archived to a bucket in the EU at
+least every 5 minutes and a base backup is taken daily (QS2: RPO ≤ 15 min); a point-in-time restore test
+runs every month and writes a report (SD13). Installation, new versions, backups and disaster recovery:
+`deploy/README.md`.
+
+```bash
+bash tools/deploy/check-stage1.sh   # the whole server locally: nginx, backup, restore test, disaster recovery
+```
+
 ## API contract (v1)
 
 Every public endpoint is under `/v1` and changes only in backward-compatible ways (ADR 0017).
@@ -215,6 +227,8 @@ db/bootstrap.sql              PostGIS, messaging and scheduler roles and schemas
 tools/osm-import/             OSM import (osm2pgsql flex style, synthetic sample)
 tools/storage/                media bucket: bootstrap and SD5 check scripts, local Garage configuration
 tools/monitoring/             validation of the monitoring configurations, end-to-end pipeline check
+tools/deploy/                 local check of the stage 1 server
+deploy/                       stage 1 server: Compose, nginx, PostgreSQL with WAL-G, backup scripts, timers, provisioning
 monitoring/                   collector, Prometheus (rules, rule tests, targets), Loki, Alertmanager, blackbox, Grafana
 ```
 

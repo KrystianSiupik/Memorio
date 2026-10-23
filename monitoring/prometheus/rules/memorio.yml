@@ -58,6 +58,38 @@ groups:
         annotations:
           summary: "Anonymous {{ $labels.instance }} was not refused: the media bucket is not private."
 
+  # Backups of the stage 1 server (QS2: RPO ≤ 15 min, SD13: monthly restore test), from the metrics the
+  # operation scripts of deploy/backup write for the node exporter.
+  - name: backups
+    rules:
+      - alert: WalArchiveStale
+        expr: time() - max(memorio_wal_archived_last_timestamp_seconds) > 900
+        labels:
+          severity: critical
+        annotations:
+          summary: "No WAL segment archived for more than 15 minutes: a crash now would lose more than the RPO allows."
+
+      - alert: WalArchiveFailing
+        expr: increase(memorio_wal_archive_failed_total[15m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "WAL archiving to the backup bucket failed in the last 15 minutes."
+
+      - alert: BackupOverdue
+        expr: time() - max(memorio_backup_last_success_timestamp_seconds) > 26 * 3600
+        labels:
+          severity: critical
+        annotations:
+          summary: "No base backup for more than 26 hours."
+
+      - alert: RestoreTestOverdue
+        expr: time() - max(memorio_restore_test_last_success_timestamp_seconds) > 35 * 86400
+        labels:
+          severity: warning
+        annotations:
+          summary: "No passed restore test for more than 35 days (SD13: monthly)."
+
   - name: messaging
     rules:
       # QS12: an outbox (or queue, inbox) message older than 10 minutes is an alert.

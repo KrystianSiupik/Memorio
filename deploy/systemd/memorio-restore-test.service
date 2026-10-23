@@ -1,0 +1,11 @@
+[Unit]
+Description=Memorio monthly point-in-time restore test (SD13, QS2)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/memorio/deploy
+ExecStart=/opt/memorio/deploy/backup/restore-test.sh
+# The restore may legitimately take up to the RTO of 8 hours.
+TimeoutStartSec=9h

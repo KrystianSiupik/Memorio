@@ -1,0 +1,68 @@
+# Local check of the stage 1 server (tools/deploy/check-stage1.sh, CI job stage1), on top of compose.yaml
+# with deploy/local/local.env: images built from this checkout, a local S3-compatible server (Garage)
+# for media and backups, a self-signed certificate for localhost. Fixed, public test values only.
+services:
+  postgres:
+    build: { context: .., dockerfile: deploy/postgres/Dockerfile }
+    depends_on:
+      storage-bootstrap:
+        condition: service_completed_successfully
+
+  api:
+    build: { context: .., target: api }
+    depends_on:
+      storage-bootstrap:
+        condition: service_completed_successfully
+
+  worker:
+    build: { context: .., target: worker }
+
+  nginx:
+    depends_on:
+      certificate:
+        condition: service_completed_successfully
+
+  # Media bucket memorio-media; the local backups go to its prefix backups/ (a separate bucket in the EU
+  # in deployed environments).
+  garage:
+    image: dxflrs/garage:v2.4.1
+    command: ["/garage", "server", "--single-node", "--default-bucket"]
+    environment:
+      GARAGE_DEFAULT_ACCESS_KEY: GK6d656d6f72696f2d6c6f63616c6b6579
+      GARAGE_DEFAULT_SECRET_KEY: 6d656d6f72696f2d6c6f63616c2d6761726167652d7365637265742d6b657921
+      GARAGE_DEFAULT_BUCKET: memorio-media
+    volumes:
+      - ../tools/storage/garage.toml:/etc/garage.toml:ro
+    healthcheck:
+      test: ["CMD", "/garage", "status"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  storage-bootstrap:
+    image: amazon/aws-cli:2.37.11
+    depends_on:
+      garage:
+        condition: service_healthy
+    entrypoint: ["bash", "/storage/bootstrap.sh"]
+    environment:
+      S3_ENDPOINT: http://garage:3900
+      S3_BUCKET: memorio-media
+      AWS_ACCESS_KEY_ID: GK6d656d6f72696f2d6c6f63616c6b6579
+      AWS_SECRET_ACCESS_KEY: 6d656d6f72696f2d6c6f63616c2d6761726167652d7365637265742d6b657921
+      AWS_DEFAULT_REGION: garage
+    volumes:
+      - ../tools/storage:/storage:ro
+
+  # Self-signed certificate where certbot would put the real one.
+  certificate:
+    image: postgis/postgis:18-3.6
+    entrypoint: ["bash", "-c"]
+    command:
+      - >-
+        mkdir -p /etc/letsencrypt/live/localhost &&
+        openssl req -x509 -newkey rsa:2048 -nodes -days 7 -subj /CN=localhost
+        -keyout /etc/letsencrypt/live/localhost/privkey.pem
+        -out /etc/letsencrypt/live/localhost/fullchain.pem
+    volumes:
+      - letsencrypt:/etc/letsencrypt

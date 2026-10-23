@@ -1,0 +1,143 @@
+# Stage 1 application server (ADR 0013, D-037, MEM-E0-PLAT-09): one VPS runs PostgreSQL + PostGIS with
+# WAL-G, the API, the worker and nginx (TLS), plus the OpenTelemetry Collector and the node exporter
+# that the separate monitoring server reads (D-038, D-160). The server holds the repository at the
+# released version in /opt/memorio and runs this file from /opt/memorio/deploy (deploy/README.md).
+# Values: .env next to this file (compose variables), postgres.env and app.env (secrets, MEM-E0-PLAT-18);
+# the *.example files list every variable.
+name: ${MEMORIO_PROJECT:-memorio}
+
+x-walg: &walg
+  # WAL-G (QS2): base backups and WAL in an S3-compatible bucket in the EU, other than the media bucket,
+  # encrypted on this server before they leave it (libsodium key, a secret).
+  WALG_S3_PREFIX: ${BACKUP_S3_PREFIX:?}
+  AWS_ENDPOINT: ${BACKUP_S3_ENDPOINT:?}
+  AWS_REGION: ${BACKUP_S3_REGION:?}
+  AWS_ACCESS_KEY_ID: ${BACKUP_S3_ACCESS_KEY:?}
+  AWS_SECRET_ACCESS_KEY: ${BACKUP_S3_SECRET_KEY:?}
+  AWS_S3_FORCE_PATH_STYLE: "true"
+  WALG_LIBSODIUM_KEY: ${BACKUP_ENCRYPTION_KEY:?}
+  WALG_LIBSODIUM_KEY_TRANSFORM: hex
+  WALG_COMPRESSION_METHOD: zstd
+  # WAL-G and psql inside the container connect over the socket as the database owner.
+  PGUSER: memorio_admin
+  PGDATABASE: memorio
+
+x-postgres-image: &postgres-image ${MEMORIO_REGISTRY:?}/memorio-postgres:${MEMORIO_VERSION:?}
+
+services:
+  postgres:
+    image: *postgres-image
+    restart: unless-stopped
+    # Continuous archiving: a WAL segment is archived when full and at least every 5 minutes (QS2: RPO
+    # ≤ 15 min); the daily base backup is deploy/backup/backup.sh.
+    command:
+      - postgres
+      - -c
+      - wal_level=replica
+      - -c
+      - archive_mode=on
+      - -c
+      - archive_command=wal-g wal-push %p
+      - -c
+      - archive_timeout=300
+    env_file: ["${POSTGRES_ENV_FILE:-postgres.env}"]
+    environment:
+      POSTGRES_DB: memorio
+      POSTGRES_USER: memorio_admin
+      <<: *walg
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U memorio_admin -d memorio"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+  # Monthly restore test (SD13): restores the latest base backup and the WAL up to a target time into a
+  # throwaway data directory, never the live one. Run by deploy/backup/restore-test.sh.
+  restore-test:
+    image: *postgres-image
+    profiles: [operations]
+    entrypoint: ["bash", "/operations/restore-inside.sh"]
+    environment:
+      <<: *walg
+    volumes:
+      - ./backup/restore-inside.sh:/operations/restore-inside.sh:ro
+      - /var/lib/postgresql
+
+  api:
+    image: ${MEMORIO_REGISTRY}/memorio-api:${MEMORIO_VERSION}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: ["${APP_ENV_FILE:-app.env}"]
+    environment: &telemetry
+      Telemetry__OtlpEndpoint: http://otel-collector:4318
+      Telemetry__Environment: ${MEMORIO_ENVIRONMENT:?}
+
+  worker:
+    image: ${MEMORIO_REGISTRY}/memorio-worker:${MEMORIO_VERSION}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: ["${APP_ENV_FILE:-app.env}"]
+    environment: *telemetry
+
+  # The only service open to the internet: TLS for the API and the public pages, HTTP only for the
+  # certificate challenge and the redirect.
+  nginx:
+    image: nginx:1.30.5-alpine
+    restart: unless-stopped
+    depends_on: [api]
+    environment:
+      MEMORIO_DOMAIN: ${MEMORIO_DOMAIN:?}
+      MONITORING_IP: ${MONITORING_IP:?}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - letsencrypt:/etc/letsencrypt:ro
+      - certbot-webroot:/var/www/certbot:ro
+
+  # Certificates from Let's Encrypt (webroot challenge through nginx); renewed by memorio-certificates.timer.
+  certbot:
+    image: certbot/certbot:v5.8.0
+    profiles: [operations]
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+
+  # Read by the monitoring server over the private network only (bound to PRIVATE_IP, never public).
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.162.0
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol/config.yaml"]
+    environment:
+      LOKI_OTLP_ENDPOINT: ${LOKI_OTLP_ENDPOINT:?}
+    ports:
+      - "${PRIVATE_IP:?}:8889:8889"
+    volumes:
+      - ../monitoring/otel-collector.yaml:/etc/otelcol/config.yaml:ro
+
+  node-exporter:
+    image: prom/node-exporter:v1.12.1
+    restart: unless-stopped
+    # The textfile directory holds the backup, WAL archive and restore test metrics the operation
+    # scripts write (deploy/backup).
+    command: ["--path.rootfs=/host", "--collector.textfile.directory=/textfile"]
+    pid: host
+    ports:
+      - "${PRIVATE_IP}:9100:9100"
+    volumes:
+      - /:/host:ro
+      - ${METRICS_DIR:-/var/lib/memorio/metrics}:/textfile:ro
+
+volumes:
+  postgres-data:
+  letsencrypt:
+  certbot-webroot:
