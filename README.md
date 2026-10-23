@@ -11,27 +11,32 @@ Product, architecture decisions and tickets live in `docs/`; the patterns we use
 dotnet build Memorio.slnx                          # warnings are errors
 dotnet test --solution Memorio.slnx                # all tests, including architecture tests
 dotnet format Memorio.slnx --verify-no-changes     # formatting (dotnet format to fix)
-dotnet run --project src/Host/Memorio.Api          # API host
+dotnet run --project src/Host/Memorio.Api          # API host (needs the local database, below)
+dotnet run --project src/Host/Memorio.Worker       # worker: delivers integration events to the modules
 ```
 
 Requires the .NET SDK pinned in `global.json`. Tests run on Microsoft.Testing.Platform (xUnit v3);
-`Memorio.Database.Tests` also needs Docker (it starts PostgreSQL + PostGIS with Testcontainers).
+`Memorio.Database.Tests` and `Memorio.Messaging.Tests` also need Docker (they start PostgreSQL +
+PostGIS with Testcontainers).
 
 ## Configuration, health, container
 
 Configuration comes only from environment variables (`Section__Key`), validated at startup; an invalid
-or missing variable stops the API and the log names the variable, never its value. Required:
+or missing variable stops the host and the log names the variable, never its value. Required:
 
-| Variable | Meaning |
-|---|---|
-| `AppVersion__Minimum` | oldest app version the API serves (`major.minor.patch`) |
+| Variable | Host | Meaning |
+|---|---|---|
+| `AppVersion__Minimum` | API | oldest app version the API serves (`major.minor.patch`) |
+| `Messaging__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_messaging` (outbox, inbox, queue) |
 
-`dotnet run` takes development values from `Properties/launchSettings.json`. `GET /health` answers while
-the process lives; `GET /ready` also checks dependencies (503 when one fails).
+`dotnet run` takes development values from `Properties/launchSettings.json` (local database on port
+5432). `GET /health` answers while the process lives; `GET /ready` also checks dependencies (503 when
+one fails, e.g. the database). Both hosts need the database to start: Wolverine creates its tables then.
 
 ```bash
-docker build -t memorio-api .                                     # one image for every environment
-docker run -p 8080:8080 -e AppVersion__Minimum=0.1.0 memorio-api
+docker build -t memorio-api .                          # one image per host for every environment
+docker build --target worker -t memorio-worker .
+docker compose --profile app up -d --build              # both on the local database: API :8080, worker :8081
 ```
 
 ## Database (PostgreSQL + PostGIS)
@@ -46,8 +51,25 @@ docker compose up -d --wait postgres     # local database, bootstrapped on first
 tools/db-bootstrap.sh                    # apply db/bootstrap.sql again
 ```
 
-`POSTGRES_PORT=55432` when Windows reserves port 5432; `POSTGRES_PASSWORD` sets the owner password
-(default `memorio_local`, local only). Module roles get their passwords from each environment's secrets.
+`POSTGRES_PORT=55432` when Windows reserves port 5432 (then also in `Messaging__ConnectionString`);
+`POSTGRES_PASSWORD` sets the owner password (default `memorio_local`). Locally every Memorio role has the
+password `memorio_local` (`db/local-passwords.sql`); deployed environments set them from their secrets.
+
+## Messaging: outbox, worker, inbox (ADR 0006)
+
+Modules talk later through integration events (`IIntegrationEvent`, in the publisher's `Contracts`),
+with Wolverine and PostgreSQL only, no broker. The event is stored in the outbox in the publisher's own
+transaction (`IDbContextOutbox`); the API sends it to the PostgreSQL queue `integration_events`; only
+the worker receives it, through the durable inbox (a message id is handled once), and gives every
+module handler its own durable queue, so a failing module is retried alone (1 s, 10 s, 1 min, then dead
+letters) and the others go on. Delivery is at least once: every module policy is idempotent (SD6, see
+`src/Modules/README.md`). Wolverine's tables live in the schemas `wolverine` and `wolverine_queues` of
+the role `memorio_messaging`; a module role may only add outbox rows.
+
+The worker publishes backlog metrics (meter `Memorio.Messaging`, sampled every 15 s):
+`memorio.messaging.pending.oldest_age` and `.pending.count` per `stage` (`outbox`, `queue`, `inbox`) and
+`memorio.messaging.dead_letters.count`. Alert when an age passes 10 minutes or a dead letter appears
+(QS12; export and alert rules come with MEM-E0-PLAT-10).
 
 ### OpenStreetMap places
 
@@ -84,9 +106,13 @@ RFC 7807 problem details) and the app shows the update screen.
 ```
 src/
   BuildingBlocks/
-    Memorio.SharedKernel/   Result + Error, Entity, AggregateRoot, IDomainEvent; no business logic
+    Memorio.SharedKernel/   Result + Error, Entity, AggregateRoot, IDomainEvent, IIntegrationEvent; no business logic
     Memorio.Modularity/     IModule: how the host registers a module (endpoints under /v1)
-  Host/Memorio.Api/         ASP.NET Core host; ModuleCatalog is the only place that knows every module
+  Host/
+    Memorio.Hosting/        shared by both hosts: ModuleCatalog (the only place that knows every module),
+                            configuration errors, health endpoints, messaging (Wolverine, backlog metrics)
+    Memorio.Api/            ASP.NET Core API host (/v1)
+    Memorio.Worker/         worker host: integration event delivery (only /health and /ready)
   Modules/<Module>/
     Memorio.Modules.<Module>/            the module's inside: Domain, Application, Infrastructure, Api
     Memorio.Modules.<Module>.Contracts/  its public contract (read ports, DTOs, integration events)
@@ -95,7 +121,9 @@ tests/
   Memorio.SharedKernel.Tests/
   Memorio.Api.Tests/
   Memorio.Database.Tests/     schema and role per module (SD4) against db/bootstrap.sql
-db/bootstrap.sql              PostGIS, module schemas and roles
+  Memorio.Messaging.Tests/    outbox → queue → inbox → module handlers, backlog metric (ADR 0006)
+  Memorio.Testing/            PostgreSQL + PostGIS test container with the bootstrap applied
+db/bootstrap.sql              PostGIS, messaging role and schemas, module schemas and roles
 tools/osm-import/             OSM import (osm2pgsql flex style, synthetic sample)
 ```
 
@@ -110,6 +138,8 @@ Publishing are outside the MVP and stay empty until their tickets.
 - Inside a module: Domain ← Application ← Infrastructure ← Api; dependencies point inwards only (SD2).
 - Domain knows no framework (HTTP, EF Core, Wolverine, Quartz, DI); Application knows no HTTP or
   persistence framework.
-- The only public type inside a module is its `IModule` entry point; everything else is `internal`.
+- The only public types inside a module are its `IModule` entry point and its message handlers (public
+  static `*Handler` classes in `Infrastructure.Messaging`, D-135); everything else is `internal`.
+- Every message handler has an idempotency test in its module's tests (SD6).
 - Business failures are returned as `Result` / `Error` (Validation, NotFound, Conflict, Forbidden,
   Failure), mapped to HTTP only at the API edge.

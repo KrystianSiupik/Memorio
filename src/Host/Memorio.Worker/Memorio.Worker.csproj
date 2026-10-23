@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="../Memorio.Hosting/Memorio.Hosting.csproj" />
+  </ItemGroup>
+</Project>

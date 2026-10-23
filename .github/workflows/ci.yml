@@ -1,7 +1,8 @@
 # CI for every push and pull request: build with warnings as errors, formatting, and all tests
 # (including the architecture tests: backend SD1/SD2, app import rules; ADR 0001 and 0019),
 # plus the API v1 contract (ADR 0017): snapshot, backward compatibility, generated Dart client,
-# and the database: schema and role per module (SD4, ADR 0004), OSM import.
+# and the database: schema and role per module (SD4, ADR 0004), OSM import; messaging (ADR 0006):
+# outbox to worker delivery, inbox, module isolation, backlog metric and SD6 in the backend tests.
 name: ci
 
 on:
@@ -26,16 +27,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # RD2: the same image goes to every environment.
-      - run: docker build -t memorio-api:${{ github.sha }} .
-      - name: Starts with the required configuration and answers /health
+      # RD2: the same images go to every environment (targets api and worker of one Dockerfile).
+      - run: docker compose --profile app build
+      - name: API and worker start against the bootstrapped database and are ready
         run: |
-          docker run -d --name api -p 8080:8080 -e AppVersion__Minimum=0.1.0 memorio-api:${{ github.sha }}
-          for i in $(seq 1 30); do curl -fs http://localhost:8080/health && exit 0; sleep 1; done
-          docker logs api; exit 1
-      - name: Refuses to start without it
+          docker compose --profile app up -d
+          for port in 8080 8081; do
+            for i in $(seq 1 60); do curl -fs http://localhost:$port/ready && continue 2; sleep 1; done
+            docker compose --profile app logs; exit 1
+          done
+      - name: Each refuses to start without its required configuration
         run: |
-          if docker run --rm memorio-api:${{ github.sha }}; then echo "started without AppVersion__Minimum"; exit 1; fi
+          if docker run --rm memorio-api:local; then echo "API started without configuration"; exit 1; fi
+          if docker run --rm memorio-worker:local; then echo "worker started without configuration"; exit 1; fi
 
   database:
     runs-on: ubuntu-latest

@@ -27,13 +27,13 @@ use the listed pattern in the listed way. A pattern outside this catalog needs a
 | External services (AI, storage, stores, clock) | **Ports & Adapters** | Interface in `Application/Ports`, implementation in `Infrastructure/<Provider>`; the domain never knows the provider | `ITextGenerator` → `MistralTextGenerator` |
 | Time in rules and tests | **Clock abstraction** | Inject `TimeProvider` (backend) / `DateTime Function() now` (app); never `DateTime.Now` in domain or handlers | `AiTextService`, `OfflineQueue` |
 | A module needs another module's answer now | **Read port / write port** | Interface in the owning module's `Contracts`, implemented inside it; carries only the effect, never the caller's reasons | ADR 0001, map §10 |
-| A module reacts later to another module | **Integration event** | Event type in the publisher's `Contracts`, delivered through the outbox; every handler is idempotent | ADR 0006 |
+| A module reacts later to another module | **Integration event** + **Policy** | Event `record` implementing `IIntegrationEvent` in the publisher's `Contracts`, published through `IDbContextOutbox` in the publisher's unit of work. The reacting module implements `IIntegrationEventPolicy<TEvent>` (internal, `Application`) and a public static `<Event>Handler` in `Infrastructure/Messaging` that only resolves and calls it (D-135). Every policy is idempotent; its handler has `<Handler>IdempotencyTests` in the module tests (SD6) | ADR 0006, `tests/Memorio.Messaging.Tests` |
 
 ## Integration and reliability
 
 | Problem | Pattern | How in Memorio | Reference |
 |---|---|---|---|
-| Saving data and publishing its event atomically | **Transactional Outbox / Inbox** | Wolverine with PostgreSQL storage; inbox deduplicates by message id | ADR 0006, MEM-E0-PLAT-02 |
+| Saving data and publishing its event atomically | **Transactional Outbox / Inbox** | Wolverine with PostgreSQL storage and a PostgreSQL queue, no broker: the API stores events in the outbox, only the worker receives them, through the durable inbox (duplicates of a message id dropped); each module handler has its own durable queue; retries 1 s, 10 s, 1 min, then dead letters; backlog age metric per stage (D-133..D-137) | ADR 0006, `MemorioMessaging` |
 | The same request arriving twice | **Idempotency Key** | Client UUID v7 per operation (offline queue), unique per effect on the server; a retry returns the first result | ADR 0016, D-113, D-118 |
 | Long processes over days or weeks | **Process Manager** | Explicit state plus deadlines in Quartz.NET; jobs call aggregates, never change data directly | ADR 0012, succession, 30-day windows |
 | Concurrent writes that can break a rule | **Optimistic concurrency** / **conditional update** | `version` column only on aggregates that need it (D-018, D-021); a conditional `UPDATE` for counters and pools (D-016, D-024) | agregaty AG1–AG11 |
@@ -59,5 +59,5 @@ use the listed pattern in the listed way. A pattern outside this catalog needs a
 - **Dapper on the write side** or **EF Core change tracking in queries**: commands load and save aggregates with EF Core; queries read with Dapper (D-126).
 - **SQL built by string concatenation**: values always go as Dapper parameters.
 - **Shared database tables between modules**: each module owns its schema (ADR 0004); others go through `Contracts`.
-- **Static singletons and service locators**: dependencies come through constructors or providers.
+- **Static singletons and service locators**: dependencies come through constructors or providers. The one exception: a module's message handler resolves its internal policy from the message scope, because Wolverine runs only public handlers (D-135).
 - **Exceptions for business outcomes**: use `Result`.

@@ -1,4 +1,4 @@
-using Memorio.Api.Configuration;
+using Memorio.Hosting.Configuration;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

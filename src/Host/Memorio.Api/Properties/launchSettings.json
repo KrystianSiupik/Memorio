@@ -7,7 +7,8 @@
       "applicationUrl": "http://localhost:5080",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "AppVersion__Minimum": "0.1.0"
+        "AppVersion__Minimum": "0.1.0",
+        "Messaging__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_messaging;Password=memorio_local"
       }
     }
   }

@@ -14,13 +14,13 @@ using Memorio.Modules.Provenance;
 using Memorio.Modules.Publishing;
 using Memorio.Modules.Succession;
 
-namespace Memorio.Api;
+namespace Memorio.Hosting;
 
 /// <summary>
-/// Composition root of the modules: the only place that knows every module. A module that is not
-/// listed here is not part of the application.
+/// Composition root of the modules: the only place that knows every module (both hosts, API and
+/// worker, register them from here). A module that is not listed here is not part of the application.
 /// </summary>
-internal static class ModuleCatalog
+public static class ModuleCatalog
 {
     public static IReadOnlyList<IModule> All { get; } =
     [

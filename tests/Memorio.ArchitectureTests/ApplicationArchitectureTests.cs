@@ -3,7 +3,7 @@ using ArchUnitNET.Loader;
 
 namespace Memorio.ArchitectureTests;
 
-/// <summary>Fitness functions SD1 and SD2 (ADR 0001, 0002, 0019) on the real modules.</summary>
+/// <summary>Fitness functions SD1, SD2 (ADR 0001, 0002, 0019) and SD6 (ADR 0006) on the real modules.</summary>
 public sealed class ApplicationArchitectureTests
 {
     private const string ModulesRoot = "Memorio.Modules";
@@ -48,5 +48,33 @@ public sealed class ApplicationArchitectureTests
         Assert.True(
             rule.Rule.HasNoViolations(Application),
             $"Architecture rule broken: {ruleName}");
+    }
+
+    [Fact]
+    public void Every_message_handler_has_an_idempotency_test_in_its_module_tests()
+    {
+        var handlers = IdempotencyConvention.HandlersIn(
+            ModuleAssemblyFiles.SelectMany(file => System.Reflection.Assembly.LoadFrom(file).GetTypes()),
+            ModulesRoot);
+        var moduleTests = Path.Combine(RepositoryRoot(), "tests", "Modules");
+
+        var missing = IdempotencyConvention.HandlersWithoutTest(
+            handlers,
+            module => IdempotencyConvention.TestClassesIn(Path.Combine(moduleTests, $"{ModulesRoot}.{module}.Tests")));
+
+        Assert.True(
+            missing.Count == 0,
+            $"SD6: add <Handler>{IdempotencyConvention.TestClassSuffix} (same event delivered twice) for: {string.Join(", ", missing)}");
+    }
+
+    private static string RepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Memorio.slnx")))
+        {
+            directory = directory.Parent;
+        }
+
+        return directory?.FullName ?? throw new InvalidOperationException("Memorio.slnx not found above the test output.");
     }
 }
