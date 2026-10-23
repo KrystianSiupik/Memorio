@@ -1,0 +1,10 @@
+[Unit]
+Description=Memorio TLS certificate renewal (Let's Encrypt)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/memorio/deploy
+ExecStart=/usr/bin/docker compose run --rm certbot renew --webroot --webroot-path /var/www/certbot --quiet
+ExecStartPost=/usr/bin/docker compose exec -T nginx nginx -s reload

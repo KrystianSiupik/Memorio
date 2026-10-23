@@ -6,6 +6,7 @@
 # object storage (ADR 0005): private bucket, upload zone, signatures ≤ 300 s (SD5).
 # Observability (ADR 0014): monitoring configurations, alert rules with unit tests (QS12), and metrics
 # and logs of both hosts reaching Prometheus and Loki.
+# Stage 1 server (ADR 0013): nginx, WAL-G backups and the point-in-time restore test (SD13, QS2).
 name: ci
 
 on:
@@ -81,6 +82,15 @@ jobs:
       - run: bash tools/monitoring/check-pipeline.sh
       - if: failure()
         run: docker compose --profile app --profile monitoring logs
+
+  stage1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell scripts
+        run: docker run --rm -v "$PWD:/mnt:ro" -w /mnt koalaman/shellcheck:v0.11.0 -x deploy/provision.sh deploy/backup/*.sh deploy/postgres/*.sh tools/*.sh tools/*/*.sh
+      # nginx, WAL archiving, base backup and the point-in-time restore test with its report (SD13, QS2).
+      - run: KEEP=0 bash tools/deploy/check-stage1.sh
 
   contract:
     runs-on: ubuntu-latest

@@ -1,0 +1,67 @@
+# nginx of stage 1 (MEM-E0-PLAT-09). Rendered at start by the image (envsubst): only MEMORIO_DOMAIN and
+# MONITORING_IP are substituted; nginx's own $variables stay.
+
+# Sign-in and registration: 10 attempts a minute per address, bursts of 20 (password guessing).
+limit_req_zone $binary_remote_addr zone=auth:10m rate=10r/m;
+limit_req_status 429;
+
+server {
+    listen 80;
+    server_name ${MEMORIO_DOMAIN};
+    server_tokens off;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${MEMORIO_DOMAIN};
+    server_tokens off;
+
+    ssl_certificate /etc/letsencrypt/live/${MEMORIO_DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${MEMORIO_DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy no-referrer always;
+
+    # Media never pass through here: the app sends them to the bucket with signed addresses (D-143).
+    client_max_body_size 1m;
+
+    # Names resolved at request time through Docker's DNS: a redeployed container gets a new address,
+    # and a name resolved once at start would send requests to whatever has the old one.
+    resolver 127.0.0.11 valid=1s ipv6=off;
+    set $api http://api:8080;
+    set $worker http://worker:8080;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 60s;
+
+    location /v1/auth/ {
+        limit_req zone=auth burst=20 nodelay;
+        proxy_pass $api;
+    }
+
+    # The worker serves no public endpoint; its readiness is for the monitoring server only.
+    location = /internal/worker/ready {
+        allow ${MONITORING_IP};
+        deny all;
+        proxy_pass $worker/ready;
+    }
+
+    location / {
+        proxy_pass $api;
+    }
+}

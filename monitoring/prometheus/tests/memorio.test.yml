@@ -149,6 +149,66 @@ tests:
             exp_annotations:
               summary: "Anonymous https://s3.example/memorio-media/ was not refused: the media bucket is not private."
 
+  # QS2: the last WAL segment was archived at minute 0 and nothing since; the alert fires after 15 minutes.
+  # Archiving failures appear at minute 20.
+  - interval: 1m
+    input_series:
+      - series: 'memorio_wal_archived_last_timestamp_seconds{instance="app"}'
+        values: '0x30'
+      - series: 'memorio_wal_archive_failed_total{instance="app"}'
+        values: '0x20 1x10'
+    alert_rule_test:
+      - eval_time: 14m
+        alertname: WalArchiveStale
+        exp_alerts: []
+      - eval_time: 16m
+        alertname: WalArchiveStale
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+            exp_annotations:
+              summary: "No WAL segment archived for more than 15 minutes: a crash now would lose more than the RPO allows."
+      - eval_time: 19m
+        alertname: WalArchiveFailing
+        exp_alerts: []
+      - eval_time: 22m
+        alertname: WalArchiveFailing
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              instance: app
+            exp_annotations:
+              summary: "WAL archiving to the backup bucket failed in the last 15 minutes."
+
+  # The last base backup and restore test both finished at time 0.
+  - interval: 1h
+    input_series:
+      - series: 'memorio_backup_last_success_timestamp_seconds{instance="app"}'
+        values: '0x900'
+      - series: 'memorio_restore_test_last_success_timestamp_seconds{instance="app"}'
+        values: '0x900'
+    alert_rule_test:
+      - eval_time: 25h
+        alertname: BackupOverdue
+        exp_alerts: []
+      - eval_time: 27h
+        alertname: BackupOverdue
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+            exp_annotations:
+              summary: "No base backup for more than 26 hours."
+      - eval_time: 34d
+        alertname: RestoreTestOverdue
+        exp_alerts: []
+      - eval_time: 36d
+        alertname: RestoreTestOverdue
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "No passed restore test for more than 35 days (SD13: monthly)."
+
   - interval: 1m
     input_series:
       - series: 'memorio_scheduling_runs_total{job="memorio-worker",scheduled_job="Succession.CloseWindow",outcome="succeeded"}'
