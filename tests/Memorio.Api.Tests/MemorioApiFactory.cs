@@ -1,4 +1,5 @@
 using Memorio.Hosting.Messaging;
+using Memorio.Hosting.Storage;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -19,6 +20,12 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
         ["AppVersion:Minimum"] = "0.1.0",
         // Not contacted: the factory runs Wolverine without persistence or transports.
         ["Messaging:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_messaging",
+        // Not contacted either: no API test reads or writes media (Memorio.Storage.Tests covers storage).
+        ["Storage:Endpoint"] = "http://localhost:3900",
+        ["Storage:Region"] = "garage",
+        ["Storage:Bucket"] = "memorio-media",
+        ["Storage:AccessKey"] = "test-access-key",
+        ["Storage:SecretKey"] = "test-secret-key",
     };
 
     private readonly IReadOnlyDictionary<string, string?> _settings;
@@ -52,14 +59,21 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
             builder.UseSetting(key, value);
         }
 
-        // API tests run without a database: Wolverine keeps messages in memory and sends nothing,
-        // and the messaging database is not part of readiness here (Memorio.Messaging.Tests covers it).
+        // API tests run without a database or a bucket: Wolverine keeps messages in memory and sends
+        // nothing, and neither dependency is part of readiness here (their own test projects cover them).
         builder.ConfigureTestServices(services =>
         {
             services.DisableAllWolverineMessagePersistence();
             services.DisableAllExternalWolverineTransports();
             services.Configure<HealthCheckServiceOptions>(options =>
-                options.Registrations.Remove(options.Registrations.Single(check => check.Name == MemorioMessaging.HealthCheckName)));
+            {
+                foreach (var check in options.Registrations
+                    .Where(check => check.Name is MemorioMessaging.HealthCheckName or ObjectStorage.HealthCheckName)
+                    .ToList())
+                {
+                    options.Registrations.Remove(check);
+                }
+            });
         });
     }
 }
