@@ -112,6 +112,12 @@ services:
       - letsencrypt:/etc/letsencrypt
       - certbot-webroot:/var/www/certbot
 
+  # S3 client for the key rotation of the media bucket (deploy/secrets/rotate.sh): checks a key on the
+  # bucket before the hosts switch to it, and that the old one is refused after it was deleted.
+  storage-cli:
+    image: amazon/aws-cli:2.37.11
+    profiles: [operations]
+
   # Read by the monitoring server over the private network only (bound to PRIVATE_IP, never public).
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.162.0

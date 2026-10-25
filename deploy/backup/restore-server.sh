@@ -15,6 +15,13 @@ compose stop api worker postgres
 MSYS_NO_PATHCONV=1 compose run --rm --no-deps -T -v "$deploy_dir/backup:/operations:ro" --entrypoint bash \
     postgres /operations/restore-server-inside.sh "$target"
 compose up -d --wait postgres
+# The restored roles have the passwords of the restored moment; a rotation since then is in postgres.env.
+# Roles change only once the replay has ended and the database is promoted.
+for _ in $(seq 1 600); do
+    [ "$(psql_live 'SELECT pg_is_in_recovery()')" = f ] && break
+    sleep 1
+done
+bash "$deploy_dir/secrets/rotate.sh" apply-passwords
 compose up -d --wait
 
 echo "Database restored${target:+ to $target} and the stack started in $(($(date +%s) - started)) s."

@@ -13,4 +13,6 @@ osm/
 # Stage 1 server: secrets (MEM-E0-PLAT-18) and the local check's output
 deploy/postgres.env
 deploy/app.env
+.previous-storage-key
+*.env.new
 deploy/local/run/

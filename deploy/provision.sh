@@ -11,8 +11,10 @@ deploy_dir="$(cd "$(dirname "$0")" && pwd)"
 cd "$deploy_dir"
 : "${CERTBOT_EMAIL:?e-mail address for the certificate notices}"
 for file in .env postgres.env app.env; do
-    [ -f "$file" ] || { echo "Missing $deploy_dir/$file (see $file.example and MEM-E0-PLAT-18)." >&2; exit 1; }
+    [ -f "$file" ] || { echo "Missing $deploy_dir/$file: secrets/secrets.sh decrypt <environment> (deploy/README.md, Secrets)." >&2; exit 1; }
 done
+# Read by Docker Compose and the operation scripts, which run as root: nobody else reads them.
+chown root:root .env postgres.env app.env
 chmod 0600 .env postgres.env app.env
 # shellcheck disable=SC1091
 domain="$(set -a && source ./.env && echo "$MEMORIO_DOMAIN")"
@@ -32,6 +34,17 @@ if ! command -v docker >/dev/null; then
         > /etc/apt/sources.list.d/docker.list
     apt-get update -q
     apt-get install -yq docker-ce docker-ce-cli containerd.io docker-compose-plugin
+fi
+
+echo "== sops and age: the encrypted copy of the secrets after a rotation (MEM-E0-PLAT-18)"
+if ! command -v sops >/dev/null || ! command -v age >/dev/null; then
+    curl -fsSLo /tmp/sops https://github.com/getsops/sops/releases/download/v3.13.3/sops-v3.13.3.linux.amd64
+    curl -fsSLo /tmp/age.tar.gz https://github.com/FiloSottile/age/releases/download/v1.3.2/age-v1.3.2-linux-amd64.tar.gz
+    echo "e5bec3346a873ae91d871550f3e698c1aad962aff462a080e40f25fde17fef6b  /tmp/sops" | sha256sum -c -
+    echo "cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10  /tmp/age.tar.gz" | sha256sum -c -
+    install -m 0755 /tmp/sops /usr/local/bin/sops
+    tar -xzf /tmp/age.tar.gz -C /usr/local/bin --strip-components=1 age/age age/age-keygen
+    rm /tmp/sops /tmp/age.tar.gz
 fi
 
 echo "== Firewall: SSH, HTTP, HTTPS only"
