@@ -228,3 +228,48 @@ tests:
               outcome: given_up
             exp_annotations:
               summary: "Scheduled job Succession.CloseWindow: a firing ended as given_up."
+
+  # PLAT-21: 150 of 200 connections (75%) is fine; 170 (85%) for 2 minutes is an alert.
+  - interval: 1m
+    input_series:
+      - series: 'memorio_postgres_max_connections{job="node"}'
+        values: '200x10'
+      - series: 'memorio_postgres_connections{job="node",role="memorio_messaging"}'
+        values: '100x3 120x7'
+      - series: 'memorio_postgres_connections{job="node",role="memorio_account"}'
+        values: '50x10'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: DatabaseConnectionsHigh
+        exp_alerts: []
+      - eval_time: 5m
+        alertname: DatabaseConnectionsHigh
+        exp_alerts: []
+      - eval_time: 7m
+        alertname: DatabaseConnectionsHigh
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "The database server uses more than 80% of max_connections: soon it refuses new connections (53300)."
+
+  # PLAT-21: a request that waited for a connection until the pool's timeout, only for that pool.
+  - interval: 1m
+    input_series:
+      - series: 'db_client_connection_npgsql_timeouts_total{job="memorio-api",db_client_connection_pool_name="messaging"}'
+        values: '0x10'
+      - series: 'db_client_connection_npgsql_timeouts_total{job="memorio-api",db_client_connection_pool_name="account"}'
+        values: '0 0 0 0 1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: ConnectionPoolExhausted
+        exp_alerts: []
+      - eval_time: 5m
+        alertname: ConnectionPoolExhausted
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: memorio-api
+              db_client_connection_pool_name: account
+            exp_annotations:
+              summary: "memorio-api: the pool account was used up; requests waited for a connection until the timeout."

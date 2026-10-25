@@ -124,3 +124,22 @@ groups:
           severity: warning
         annotations:
           summary: "Scheduled job {{ $labels.scheduled_job }}: a firing ended as {{ $labels.outcome }}."
+
+  # Connections (PLAT-21, D-182): the server's slots, from deploy/backup/connections-status.sh, and the pools
+  # of the hosts, from Npgsql's meter (one pool per role and process, D-181).
+  - name: database
+    rules:
+      - alert: DatabaseConnectionsHigh
+        expr: sum(memorio_postgres_connections) / max(memorio_postgres_max_connections) > 0.8
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "The database server uses more than 80% of max_connections: soon it refuses new connections (53300)."
+
+      - alert: ConnectionPoolExhausted
+        expr: sum by (job, db_client_connection_pool_name) (increase(db_client_connection_npgsql_timeouts_total[5m])) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.job }}: the pool {{ $labels.db_client_connection_pool_name }} was used up; requests waited for a connection until the timeout."

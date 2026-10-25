@@ -66,6 +66,11 @@ bash "$root/deploy/backup/archive-status.sh"
 grep -q '^memorio_wal_archived_last_timestamp_seconds [1-9]' "$METRICS_DIR/wal-archive.prom" || fail "WAL archive metrics"
 echo "ok: WAL archive status"
 
+bash "$root/deploy/backup/connections-status.sh"
+grep -q '^memorio_postgres_max_connections 200$' "$METRICS_DIR/connections.prom" || fail "max_connections metric (200 from compose.yaml)"
+grep -q '^memorio_postgres_connections{role="memorio_messaging"} [1-9]' "$METRICS_DIR/connections.prom" || fail "connections per role"
+echo "ok: database connections per role against max_connections"
+
 # Disaster recovery: the database volume is lost; the server is restored from the bucket and the account
 # registered before the backup signs in again.
 compose stop api worker postgres

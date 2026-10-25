@@ -69,7 +69,7 @@ echo "ok: Data Protection keys rotated, tokens from before refused"
 # A database role used by the API: new password, hosts ready, the old one refused (rotate.sh checks both).
 rotate database memorio_account
 wait_for_api
-grep -q 'Username=memorio_account;Password=stage1_local' "$root/deploy/local/run/app.env" \
+grep -q 'Username=memorio_account;.*Password=stage1_local' "$root/deploy/local/run/app.env" \
     && fail "the connection string still has the old password"
 [ "$(me_with "$(sign_in)")" = 200 ] || fail "signing in works with the new password of memorio_account"
 echo "ok: database role password rotated without the hosts losing readiness"

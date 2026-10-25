@@ -92,6 +92,15 @@ point's time.
 
 The server pulls private images: once, `docker login ghcr.io` with a read-only token (MEM-E0-PLAT-18).
 
+## Database connections (PLAT-21, D-181, D-182)
+
+Each role has one pool per process with an explicit `Maximum Pool Size` and `Timeout=5` in `app.env`; API
+and worker read the same file, so every pool counts twice. Their sum stays under `POSTGRES_MAX_CONNECTIONS`
+minus 20 (owner scripts, backups, an administrator): the server never refuses a connection while a pool
+still has room. CI checks it (`tools/deploy/check-connection-budget.sh`). A used-up pool fails its own
+requests after 5 s (`ConnectionPoolExhausted`) and leaves the other modules alone. `POSTGRES_*` memory
+settings in `.env` follow the server's RAM (`env.example`: 4 GB).
+
 ## Backups and restore (QS2: RPO ≤ 15 min, RTO ≤ 8 h; SD13)
 
 | What | How | Timer |
@@ -99,6 +108,7 @@ The server pulls private images: once, `docker login ghcr.io` with a read-only t
 | WAL archiving | `archive_command = wal-g wal-push`, a segment at least every 5 min | continuous |
 | Base backup | `backup/backup.sh`; 14 kept (`BACKUP_RETAIN_FULL`), so any moment of the last 14 days | daily 02:30 UTC |
 | Archive status | `backup/archive-status.sh` → alerts `WalArchiveStale`, `WalArchiveFailing` | every 5 min |
+| Connections | `backup/connections-status.sh`: client connections per role against `max_connections` → alert `DatabaseConnectionsHigh` (> 80%) | every minute |
 | Restore test | `backup/restore-test.sh`: point-in-time restore into a throwaway container, report + metrics | 1st of the month |
 | Certificates | `certbot renew` + nginx reload | twice a day |
 
