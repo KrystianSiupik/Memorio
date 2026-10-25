@@ -15,6 +15,18 @@ psql_live() {
     compose exec -T postgres psql -v ON_ERROR_STOP=1 -qtAX -c "$1"
 }
 
+# Both hosts answer /ready inside the network (database, messaging, object storage), within a minute.
+hosts_ready() {
+    for _ in $(seq 1 60); do
+        if compose exec -T nginx wget -qO /dev/null http://api:8080/ready 2>/dev/null \
+            && compose exec -T nginx wget -qO /dev/null http://worker:8080/ready 2>/dev/null; then
+            return 0
+        fi
+        sleep 1
+    done
+    return 1
+}
+
 # Replaces <name>.prom in the node exporter's textfile directory atomically with the standard input.
 write_metrics() {
     mkdir -p "$metrics_dir"

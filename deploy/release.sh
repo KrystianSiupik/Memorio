@@ -46,12 +46,9 @@ set_version() { sed -i "s/^MEMORIO_VERSION=[^ #]*/MEMORIO_VERSION=$1/" "$env_fil
 
 # Ready means: both hosts answer /ready inside the network, and the API answers through nginx and TLS.
 ready() {
+    hosts_ready || return 1
     for _ in $(seq 1 60); do
-        if compose exec -T nginx wget -qO /dev/null http://api:8080/ready 2>/dev/null \
-            && compose exec -T nginx wget -qO /dev/null http://worker:8080/ready 2>/dev/null \
-            && curl -fsk -o /dev/null --resolve "$domain:$https_port:127.0.0.1" "https://$domain:$https_port/v1/app/version-policy"; then
-            return 0
-        fi
+        curl -fsk -o /dev/null --resolve "$domain:$https_port:127.0.0.1" "https://$domain:$https_port/v1/app/version-policy" && return 0
         sleep 1
     done
     return 1

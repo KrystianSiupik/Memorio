@@ -88,10 +88,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Shell scripts
-        run: docker run --rm -v "$PWD:/mnt:ro" -w /mnt koalaman/shellcheck:v0.11.0 -x deploy/*.sh deploy/backup/*.sh deploy/postgres/*.sh tools/*.sh tools/*/*.sh
+        run: docker run --rm -v "$PWD:/mnt:ro" -w /mnt koalaman/shellcheck:v0.11.0 -x deploy/*.sh deploy/backup/*.sh deploy/postgres/*.sh deploy/secrets/*.sh tools/*.sh tools/*/*.sh
+      - name: sops and age (encrypted copy of the secrets, MEM-E0-PLAT-18)
+        run: |
+          curl -fsSLo /tmp/sops https://github.com/getsops/sops/releases/download/v3.13.3/sops-v3.13.3.linux.amd64
+          curl -fsSLo /tmp/age.tar.gz https://github.com/FiloSottile/age/releases/download/v1.3.2/age-v1.3.2-linux-amd64.tar.gz
+          echo "e5bec3346a873ae91d871550f3e698c1aad962aff462a080e40f25fde17fef6b  /tmp/sops" | sha256sum -c -
+          echo "cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10  /tmp/age.tar.gz" | sha256sum -c -
+          sudo install -m 0755 /tmp/sops /usr/local/bin/sops
+          sudo tar -xzf /tmp/age.tar.gz -C /usr/local/bin --strip-components=1 age/age age/age-keygen
+      # Env files out of the repository, the leak runbook complete, the encrypted copy round-trips.
+      - run: bash tools/secrets/check.sh
       # nginx, WAL archiving, base backup, the point-in-time restore test with its report (SD13, QS2) and
-      # disaster recovery; then the one-command deployment and its rollback on the same server (D-041).
+      # disaster recovery; the secret rotation; then the one-command deployment and its rollback on the
+      # same server (D-041).
       - run: bash tools/deploy/check-stage1.sh
+      - run: bash tools/deploy/check-secrets.sh
       - run: KEEP=0 bash tools/deploy/check-release.sh
 
   contract:
