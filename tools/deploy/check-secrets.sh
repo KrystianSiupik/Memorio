@@ -12,6 +12,8 @@ export COMPOSE_FILE="compose.yaml:compose.local.yaml"
 export COMPOSE_ENV_FILES="local/local.env"
 export APP_ENV_FILE="local/run/app.env"
 export POSTGRES_ENV_FILE="local/run/postgres.env"
+# The same metrics directory as check-stage1.sh, so the node exporter is not recreated with another one.
+export METRICS_DIR="$root/deploy/local/run/metrics"
 https="https://localhost:8443"
 compose() { (cd "$root/deploy" && docker compose "$@"); }
 rotate() { bash "$root/deploy/secrets/rotate.sh" "$@"; }
@@ -46,7 +48,7 @@ link_status() {
     compose exec -T nginx wget -S -q -O /dev/null "$1" 2>&1 | grep -o 'HTTP/1.1 [0-9]*' | tail -n 1 | cut -d' ' -f2
 }
 
-mkdir -p "$root/deploy/local/run"
+mkdir -p "$METRICS_DIR"
 install -m 0600 "$root/deploy/local/app.env" "$root/deploy/local/run/app.env"
 install -m 0600 "$root/deploy/local/postgres.env" "$root/deploy/local/run/postgres.env"
 rotate apply-passwords >/dev/null   # a run that stopped half way may have left other passwords
