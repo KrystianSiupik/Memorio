@@ -13,6 +13,7 @@ export COMPOSE_PATH_SEPARATOR=":"
 export COMPOSE_FILE="compose.yaml:compose.local.yaml"
 export COMPOSE_ENV_FILES="local/run/release.env"
 export METRICS_DIR="$run/metrics"
+mkdir -p "$METRICS_DIR"   # by this user: Docker would create a missing mounted directory as root
 export DEPLOYMENTS_LOG="$run/deployments.log"
 export RELEASE_CHECKOUT=0 RELEASE_PULL=0
 compose() { (cd "$root/deploy" && docker compose "$@"); }

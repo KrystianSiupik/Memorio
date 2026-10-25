@@ -20,6 +20,9 @@ fail() { echo "FAIL: $1"; compose logs --tail 60; exit 1; }
 status_of() { curl -ks -o /dev/null -w '%{http_code}' "$@"; }
 
 rm -rf "$root/deploy/local/run"
+# Created here, not by Docker: a bind mount of a missing directory makes it owned by root, and the backup
+# scripts (run as this user) could not write their metrics into it.
+mkdir -p "$METRICS_DIR" "$REPORTS_DIR"
 compose up -d --build --wait --wait-timeout 300
 
 # The API needs a few seconds after its container starts (migrations, Wolverine). Only the API answers
