@@ -49,3 +49,5 @@
 | [MEM-E0-SUKCESJA-01](../MEM-E0-SUKCESJA-01-szkielet-modulu-sukcesja-struktura-publiczny-kontr.md) | Szkielet modułu sukcesja: struktura, publiczny kontrakt, testy architektury | sukcesja / szkielet modułu | 1–2 | gotowy |
 | [MEM-E0-POWIADOMIENIA-01](../MEM-E0-POWIADOMIENIA-01-szkielet-modulu-powiadomienia-struktura-publiczny-.md) | Szkielet modułu powiadomienia: struktura, publiczny kontrakt, testy architektury | powiadomienia / szkielet modułu | 1–2 | gotowy |
 | [MEM-E0-PLAT-19](../MEM-E0-PLAT-19-nawigacja-aplikacji-zakladki-mapa-albumy-udostepni.md) | Nawigacja aplikacji: zakładki Mapa · Albumy · Udostępnione mi · Konto, typy tras, przekierowanie niezalogowanych (S02) | - / UI | 2–3 | gotowy |
+| [MEM-E0-PLAT-20](../MEM-E0-PLAT-20-dead-letters-runbook-skrypt-ponowienia-test-replayu.md) | Dead letters: runbook, skrypt przeglądu i ponowienia, test replayu | - / infrastruktura | 2–3 | do zrobienia |
+| [MEM-E0-PLAT-21](../MEM-E0-PLAT-21-pule-polaczen-max-connections-alert-test-obciazenia.md) | Pule połączeń: rozmiary pul, max_connections, alert na zużycie, test obciążenia | - / infrastruktura | 2–4 | do zrobienia |
