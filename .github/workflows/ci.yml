@@ -37,7 +37,7 @@ jobs:
         run: |
           docker compose --profile app up -d
           for port in 8080 8081; do
-            for i in $(seq 1 60); do curl -fs http://localhost:$port/ready && continue 2; sleep 1; done
+            for _ in $(seq 1 60); do curl -fs http://localhost:$port/ready && continue 2; sleep 1; done
             docker compose --profile app logs; exit 1
           done
       - name: Each refuses to start without its required configuration
@@ -88,9 +88,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Shell scripts
-        run: docker run --rm -v "$PWD:/mnt:ro" -w /mnt koalaman/shellcheck:v0.11.0 -x deploy/provision.sh deploy/backup/*.sh deploy/postgres/*.sh tools/*.sh tools/*/*.sh
-      # nginx, WAL archiving, base backup and the point-in-time restore test with its report (SD13, QS2).
-      - run: KEEP=0 bash tools/deploy/check-stage1.sh
+        run: docker run --rm -v "$PWD:/mnt:ro" -w /mnt koalaman/shellcheck:v0.11.0 -x deploy/*.sh deploy/backup/*.sh deploy/postgres/*.sh tools/*.sh tools/*/*.sh
+      # nginx, WAL archiving, base backup, the point-in-time restore test with its report (SD13, QS2) and
+      # disaster recovery; then the one-command deployment and its rollback on the same server (D-041).
+      - run: bash tools/deploy/check-stage1.sh
+      - run: KEEP=0 bash tools/deploy/check-release.sh
 
   contract:
     runs-on: ubuntu-latest
@@ -124,3 +126,29 @@ jobs:
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze
       - run: flutter test
+
+  # A tag v<version> publishes the release images, only after every other job passed (D-171). The
+  # servers pull them by version (deploy/release.sh); SBOM and provenance are attached (D-052).
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [backend, image, database, storage, observability, stage1, contract, app]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Images memorio-api, memorio-worker and memorio-postgres
+        env:
+          OWNER: ${{ github.repository_owner }}
+          ACTOR: ${{ github.actor }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          registry="ghcr.io/${OWNER,,}"
+          version="${GITHUB_REF_NAME#v}"
+          echo "$TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
+          docker buildx create --use
+          build() { docker buildx build --sbom=true --provenance=mode=max --push "$@"; }
+          build --target api -t "$registry/memorio-api:$version" .
+          build --target worker -t "$registry/memorio-worker:$version" .
+          build -f deploy/postgres/Dockerfile -t "$registry/memorio-postgres:$version" .

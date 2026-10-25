@@ -37,15 +37,22 @@ The three env files are secrets (MEM-E0-PLAT-18): mode 0600, never in the reposi
    `health.yml`, `ready.yml` with the public `/health` and `/ready`, `/internal/worker/ready`,
    `bucket.yml` with the media bucket's anonymous addresses).
 
-## New version (until MEM-E0-PLAT-13 automates it)
+## Releases and deployment (D-041, MEM-E0-PLAT-13)
 
-```bash
-cd /opt/memorio && git fetch --tags && git checkout <tag>
-cd deploy && sed -i 's/^MEMORIO_VERSION=.*/MEMORIO_VERSION=<tag>/' .env
-docker compose pull && docker compose up -d --wait
-```
+1. Release: `git tag v0.2.0 && git push origin v0.2.0`. CI runs every check and only then publishes
+   `memorio-api`, `memorio-worker` and `memorio-postgres` `:0.2.0` (with SBOM and provenance).
+2. Deploy, one command: `DEPLOY_HOST=deploy@server tools/deploy/deploy.sh 0.2.0`, or the `deploy` workflow
+   (version, environment; production can require an approval).
 
-A short restart of the API (D-041); migrations run when the API starts (D-152).
+On the server `release.sh` checks the repository out at the tag, sets a named restore point
+(`before-0.2.0`, its time in `/var/lib/memorio/deployments.log`), pulls the images and restarts: about half
+a minute without the API (D-041), migrations run when the API starts (D-152). Then it checks both hosts
+and the API through nginx; if a check fails it starts the previous version again (about 4 minutes in
+all) and exits with an error. The database stays migrated: migrations only expand (SD18), so the
+previous version runs on it. Data damaged by a release: `backup/restore-server.sh` with the restore
+point's time.
+
+The server pulls private images: once, `docker login ghcr.io` with a read-only token (MEM-E0-PLAT-18).
 
 ## Backups and restore (QS2: RPO ≤ 15 min, RTO ≤ 8 h; SD13)
 

@@ -38,6 +38,10 @@ Rules (checked by `tests/Memorio.ArchitectureTests`, ADR 0001 and 0019):
 - Database: the module's `DbContext` uses its schema and role (ADR 0004), connection from
   `<Module>__ConnectionString`; EF Core migrations in `Infrastructure/Persistence/Migrations`, applied at
   host start (D-152). Reference: `Account`.
+- Schema changes are expand/contract (SD18, D-041): the previous version runs on the migrated database
+  during a deployment and after a rollback, so a migration only adds (tables, nullable or defaulted
+  columns, indexes, wider types). Removing or renaming takes two releases: stop using it, then a
+  migration marked `[ContractMigration("reason")]` (`Memorio.Modularity`) in a later release.
 - Reacting to another module's integration event (ADR 0006): the policy implements
   `IIntegrationEventPolicy<TEvent>` in `Application/Policies` (internal, registered in `AddServices`);
   `Infrastructure/Messaging/<Event>Handler` is a public static class whose `Handle(TEvent, IServiceProvider,
