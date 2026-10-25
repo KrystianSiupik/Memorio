@@ -32,6 +32,8 @@ Sekrety etapu 1: .env poza repo + sops/age do odtworzenia (RD10) — część ep
 
 - plik .env poza repo z uprawnieniami użytkownika usługi (źródło: infra RD10; D-061)
 - zaszyfrowana kopia w repo (sops+age), procedura odtworzenia (źródło: infra RD10; D-061)
+- rotacja sekretów bez przestoju, osobno dla każdego rodzaju: klucz magazynu obiektów (nowy klucz obok starego, przełączenie API i workera, usunięcie starego, co unieważnia wszystkie podpisane linki), hasła ról bazy (moduły, `memorio_messaging`, `memorio_scheduler`), klucz Data Protection (źródło: rozmowa 2026-10-25, PLAT-04: pojedynczego podpisanego linku nie da się odwołać)
+- runbook „wyciek sekretu” w `docs/runbooks/`: który sekret, kolejność kroków, skutki dla użytkowników, potwierdzenie, że stary sekret nie działa
 
 ## Poza zakresem
 
@@ -41,6 +43,9 @@ Sekrety etapu 1: .env poza repo + sops/age do odtworzenia (RD10) — część ep
 
 - [ ] plik .env poza repo z uprawnieniami użytkownika usługi. *Sprawdzenie: test/skrypt w CI lub ręcznie na środowisku*
 - [ ] zaszyfrowana kopia w repo (sops+age), procedura odtworzenia. *Sprawdzenie: test/skrypt w CI lub ręcznie na środowisku*
+- [ ] Rotacja klucza magazynu na lokalnym serwerze etapu 1: link podpisany starym kluczem po jego usunięciu dostaje 403, nowe linki działają, API i worker gotowe. *Sprawdzenie: skrypt na lokalnym serwerze etapu 1*
+- [ ] Rotacja hasła roli bazy bez utraty gotowości API i workera. *Sprawdzenie: skrypt na lokalnym serwerze etapu 1*
+- [ ] Runbook „wyciek sekretu” opisuje każdy sekret z `.env`. *Sprawdzenie: przegląd + porównanie z `deploy/env.example`*
 
 ## Ryzyka i pytania
 

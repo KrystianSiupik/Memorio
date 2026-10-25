@@ -33,6 +33,7 @@ Umowy powierzenia z dostawcami + rejestr czynności + lista podwykonawców (D-04
 - lista podmiotów z C4 (źródło: legal review R02, R13)
 - umowy art. 28 z VPS, magazynem, e-mail/push, AI (źródło: legal review R02, R13)
 - rejestr czynności (art. 30) (źródło: legal review R02, R13)
+- warunki dla dostawcy AI w umowie i w ustawieniach konta: brak trenowania modeli na naszych danych (zapytania i odpowiedzi), retencja zapytań i odpowiedzi zero albo możliwie krótka (bez domyślnego przechowywania do monitorowania nadużyć, jeśli dostawca pozwala to wyłączyć), przetwarzanie w UE (źródło: rozmowa 2026-10-25, PLAT-06: pseudonimizacja nie jest anonimizacją, dane w ładunku nadal są osobowe)
 
 ## Poza zakresem
 
@@ -43,6 +44,8 @@ Umowy powierzenia z dostawcami + rejestr czynności + lista podwykonawców (D-04
 - [ ] lista podmiotów z C4. *Sprawdzenie: przegląd dokumentu przez PO/prawnika*
 - [ ] umowy art. 28 z VPS, magazynem, e-mail/push, AI. *Sprawdzenie: przegląd dokumentu przez PO/prawnika*
 - [ ] rejestr czynności (art. 30). *Sprawdzenie: przegląd dokumentu przez PO/prawnika*
+- [ ] Umowa z dostawcą AI wyklucza trenowanie na naszych danych i określa retencję zapytań i odpowiedzi (zero albo konkretna liczba dni); ustawienia konta u dostawcy są z tym zgodne (zrzut ekranu lub eksport ustawień w dokumentacji). *Sprawdzenie: przegląd dokumentu przez PO/prawnika*
+- [ ] Ryzyko szczątkowe pseudonimizacji (identyfikacja z kontekstu) i retencja u dostawcy opisane w DPIA (MEM-E11-PLAT-01). *Sprawdzenie: przegląd dokumentu przez PO/prawnika*
 
 ## Ryzyka i pytania
 
