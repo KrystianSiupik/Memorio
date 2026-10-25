@@ -180,7 +180,11 @@ runs every month and writes a report (SD13). Installation, new versions, backups
 
 ```bash
 bash tools/deploy/check-stage1.sh   # the whole server locally: nginx, backup, restore test, disaster recovery
+bash tools/deploy/check-release.sh  # one-command deployment and rollback on that local server
 ```
+
+Releases: a tag `v<version>` publishes the images after every CI check; `tools/deploy/deploy.sh <version>`
+(or the `deploy` workflow) deploys one with a short restart and rolls back when its checks fail (D-041).
 
 ## API contract (v1)
 
@@ -248,6 +252,9 @@ Publishing are outside the MVP and stay empty until their tickets.
   (D-152); everything else is `internal`.
 - Every message handler has an idempotency test in its module's tests (SD6), and so does every scheduled
   job (SD12).
+- Migrations only expand the schema (SD18): no drop, rename, narrowing, required column without a default
+  or raw SQL unless the migration is marked `[ContractMigration(reason)]` and ships a release after the
+  code stopped using what it removes (`MigrationLintTests`).
 - Every endpoint requires a signed-in account; anonymous ones are explicit and on the allowlist in
   `AnonymousEndpointsTests` (SD10).
 - Business failures are returned as `Result` / `Error` (Validation, NotFound, Conflict, Forbidden,

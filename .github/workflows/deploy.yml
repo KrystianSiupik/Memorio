@@ -1,0 +1,40 @@
+# Deploys a released version to an environment with the one command (D-041, MEM-E0-PLAT-13):
+# tools/deploy/deploy.sh over SSH; the server restarts on the release and rolls back when its checks
+# fail. Started by hand; each GitHub environment holds DEPLOY_HOST, DEPLOY_SSH_KEY and
+# DEPLOY_KNOWN_HOSTS (MEM-E0-PLAT-18) and may require an approval (production).
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Released version (tag v<version>, images published by the ci workflow)
+        required: true
+      environment:
+        description: Where to deploy
+        type: choice
+        options: [staging, production]
+        required: true
+
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: SSH key of the environment
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 0700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_ed25519 && chmod 0600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - run: bash tools/deploy/deploy.sh "$VERSION"
+        env:
+          VERSION: ${{ inputs.version }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
