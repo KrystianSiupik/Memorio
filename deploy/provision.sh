@@ -73,10 +73,10 @@ fi
 echo "== Stack"
 docker compose up -d --wait
 
-echo "== Timers: backup, WAL archive status, restore test, certificate renewal"
+echo "== Timers: backup, WAL archive status, connections, restore test, certificate renewal"
 install -m 0644 systemd/*.service systemd/*.timer /etc/systemd/system/
 systemctl daemon-reload
-systemctl enable --now memorio-backup.timer memorio-archive-status.timer memorio-restore-test.timer memorio-certificates.timer
+systemctl enable --now memorio-backup.timer memorio-archive-status.timer memorio-connections-status.timer memorio-restore-test.timer memorio-certificates.timer
 
 echo "== First base backup, so the WAL archive has something to start from"
 ./backup/backup.sh

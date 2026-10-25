@@ -13,7 +13,7 @@ namespace Memorio.Hosting.Telemetry;
 /// <summary>
 /// Metrics and logs of both hosts with OpenTelemetry (ADR 0014, D-038), sent over OTLP to the
 /// OpenTelemetry Collector, which hands metrics to Prometheus and logs to Loki. Metrics: HTTP server and
-/// client, .NET runtime and every meter named <see cref="MeterPrefix"/>*. Logs carry the message and its
+/// client, .NET runtime, Npgsql's connection pools and every meter named <see cref="MeterPrefix"/>*. Logs carry the message and its
 /// parameters only, never request bodies or scopes: no content of users reaches monitoring (D-038).
 /// No traces in stage 1 (D-161).
 /// </summary>
@@ -21,6 +21,9 @@ public static class MemorioTelemetry
 {
     /// <summary>Every Memorio meter is named "Memorio.&lt;Area&gt;", so it is exported without being listed here.</summary>
     public const string MeterPrefix = "Memorio.";
+
+    /// <summary>The meter of Npgsql's connection pools and commands.</summary>
+    public const string NpgsqlMeterName = "Npgsql";
 
     public static IServiceCollection AddMemorioTelemetry(this IServiceCollection services, IConfiguration configuration, string serviceName)
     {
@@ -51,7 +54,10 @@ public static class MemorioTelemetry
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
                 .AddRuntimeInstrumentation()
-                .AddMeter(MeterPrefix + "*"))
+                .AddMeter(MeterPrefix + "*")
+                // Npgsql's pools (PLAT-21): connections idle and used against the pool's maximum, requests
+                // waiting for one, and timeouts of a pool used up.
+                .AddMeter(NpgsqlMeterName))
             .WithLogging(configureBuilder: null, configureOptions: logging =>
             {
                 logging.IncludeFormattedMessage = true;

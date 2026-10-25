@@ -38,6 +38,12 @@ Rules (checked by `tests/Memorio.ArchitectureTests`, ADR 0001 and 0019):
 - Database: the module's `DbContext` uses its schema and role (ADR 0004), connection from
   `<Module>__ConnectionString`; EF Core migrations in `Infrastructure/Persistence/Migrations`, applied at
   host start (D-152). Reference: `Account`.
+- Connections (PLAT-21, D-181, D-182): one pool per process, named after the schema
+  (`ConfigureDataSource(dataSource => dataSource.Name = Schema)`); the connection string has an explicit
+  `Maximum Pool Size` (5 unless the module needs more) and `Timeout=5` in `deploy/app.env.example`,
+  `deploy/local/app.env` and `compose.yaml`. `tools/deploy/check-connection-budget.sh` (CI) fails when the
+  pools of both hosts no longer fit under `max_connections`: then raise it with the server's RAM or bring
+  in PgBouncer (`docs/decisions.md`, D-182).
 - Schema changes are expand/contract (SD18, D-041): the previous version runs on the migrated database
   during a deployment and after a rollback, so a migration only adds (tables, nullable or defaulted
   columns, indexes, wider types). Removing or renaming takes two releases: stop using it, then a

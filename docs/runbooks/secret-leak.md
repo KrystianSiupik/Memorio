@@ -26,7 +26,7 @@ All commands run on the application server as root in `/opt/memorio/deploy`.
 |---|---|---|---|---|
 | `BACKUP_S3_ACCESS_KEY`, `BACKUP_S3_SECRET_KEY` | yes | read (encrypted) backups, delete them | new key at the provider next to the old one; both values in `.env`; `docker compose up -d postgres` (a few seconds without the database, the hosts reconnect); `./backup/archive-status.sh` and `./backup/backup.sh` succeed; delete the old key; a request with it gets 403 | none |
 | `BACKUP_ENCRYPTION_KEY` | yes | with the backup key too: read every backup | new key (`openssl rand -hex 32`) in `.env`; `docker compose up -d postgres`; `./backup/backup.sh` right away (a new base backup under the new key); keep the old key, encrypted, until the last backup made with it expires (`BACKUP_RETAIN_FULL`, 14 days), then delete it. If the backup key leaked too, also delete the old backups once the new base backup passed `./backup/restore-test.sh` | none |
-| `MEMORIO_REGISTRY`, `MEMORIO_VERSION`, `MEMORIO_ENVIRONMENT`, `MEMORIO_DOMAIN`, `MONITORING_IP`, `PRIVATE_IP`, `LOKI_OTLP_ENDPOINT`, `BACKUP_S3_PREFIX`, `BACKUP_S3_ENDPOINT`, `BACKUP_S3_REGION` | no | nothing to rotate | — | — |
+| `MEMORIO_REGISTRY`, `MEMORIO_VERSION`, `MEMORIO_ENVIRONMENT`, `MEMORIO_DOMAIN`, `MONITORING_IP`, `PRIVATE_IP`, `LOKI_OTLP_ENDPOINT`, `BACKUP_S3_PREFIX`, `BACKUP_S3_ENDPOINT`, `BACKUP_S3_REGION`, `POSTGRES_MAX_CONNECTIONS`, `POSTGRES_SHARED_BUFFERS`, `POSTGRES_EFFECTIVE_CACHE_SIZE`, `POSTGRES_WORK_MEM`, `POSTGRES_MAINTENANCE_WORK_MEM` | no | nothing to rotate | — | — |
 
 ## Application server: database passwords (`postgres.env`, from `deploy/postgres.env.example`)
 

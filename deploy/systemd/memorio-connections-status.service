@@ -1,0 +1,9 @@
+[Unit]
+Description=Memorio database connections for monitoring (PLAT-21)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/memorio/deploy
+ExecStart=/opt/memorio/deploy/backup/connections-status.sh

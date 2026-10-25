@@ -40,6 +40,18 @@ services:
       - archive_command=wal-g wal-push %p
       - -c
       - archive_timeout=300
+      # Connections and memory (PLAT-21, D-182): the pools of both hosts together stay under
+      # max_connections minus a reserve (tools/deploy/check-connection-budget.sh); memory for the server's RAM.
+      - -c
+      - max_connections=${POSTGRES_MAX_CONNECTIONS:-200}
+      - -c
+      - shared_buffers=${POSTGRES_SHARED_BUFFERS:-1GB}
+      - -c
+      - effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE:-3GB}
+      - -c
+      - work_mem=${POSTGRES_WORK_MEM:-4MB}
+      - -c
+      - maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-256MB}
     env_file: ["${POSTGRES_ENV_FILE:-postgres.env}"]
     environment:
       POSTGRES_DB: memorio

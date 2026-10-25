@@ -90,8 +90,8 @@ services:
         condition: service_completed_successfully
     environment:
       AppVersion__Minimum: 0.1.0
-      Messaging__ConnectionString: &messaging Host=postgres;Database=memorio;Username=memorio_messaging;Password=memorio_local
-      Account__ConnectionString: &account Host=postgres;Database=memorio;Username=memorio_account;Password=memorio_local
+      Messaging__ConnectionString: &messaging Host=postgres;Database=memorio;Username=memorio_messaging;Maximum Pool Size=20;Timeout=5;Password=memorio_local
+      Account__ConnectionString: &account Host=postgres;Database=memorio;Username=memorio_account;Maximum Pool Size=10;Timeout=5;Password=memorio_local
       # Telemetry goes to the collector of the monitoring profile; without it nothing is lost but metrics and logs.
       Telemetry__OtlpEndpoint: &otlp http://otel-collector:4318
       Telemetry__Environment: &environment local
@@ -113,7 +113,7 @@ services:
     environment:
       Messaging__ConnectionString: *messaging
       Account__ConnectionString: *account
-      Scheduling__ConnectionString: Host=postgres;Database=memorio;Username=memorio_scheduler;Password=memorio_local
+      Scheduling__ConnectionString: Host=postgres;Database=memorio;Username=memorio_scheduler;Maximum Pool Size=15;Timeout=5;Password=memorio_local
       Telemetry__OtlpEndpoint: *otlp
       Telemetry__Environment: *environment
       <<: *app-storage

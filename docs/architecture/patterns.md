@@ -39,6 +39,7 @@ use the listed pattern in the listed way. A pattern outside this catalog needs a
 | Changing the schema while the previous version still runs | **Expand/Contract (parallel change)** | Migrations only add; removing or renaming takes two releases, the second marked `[ContractMigration]`; checked by `MigrationLintTests` (SD18) | D-041, D-172 |
 | Concurrent writes that can break a rule | **Optimistic concurrency** / **conditional update** | `version` column only on aggregates that need it (D-018, D-021); a conditional `UPDATE` for counters and pools (D-016, D-024) | agregaty AG1–AG11 |
 | A foreign model (OpenStreetMap, app stores) | **Anti-Corruption Layer** | Translate at the adapter into our own types; foreign ids and terms never cross into the domain | Places, Plans (D-078) |
+| One part using up a shared resource (database connections) | **Bulkhead** | One bounded Npgsql pool per role and process (D-181) with an explicit `Maximum Pool Size` and a short `Timeout`; the ceilings of all pools fit under `max_connections` minus a reserve (CI, D-182) | PLAT-21, `ConnectionPoolTests` |
 | Unreliable external services | **Retry + Circuit Breaker + Timeout** | `Microsoft.Extensions.Http.Resilience` standard handler, timeouts set per provider | `AiNarrationModule` |
 
 ## Edge and composition

@@ -99,6 +99,8 @@ jobs:
           sudo tar -xzf /tmp/age.tar.gz -C /usr/local/bin --strip-components=1 age/age age/age-keygen
       # Env files out of the repository, the leak runbook complete, the encrypted copy round-trips.
       - run: bash tools/secrets/check.sh
+      # Every pool with an explicit ceiling, all of them under max_connections minus a reserve (PLAT-21).
+      - run: bash tools/deploy/check-connection-budget.sh
       # nginx, WAL archiving, base backup, the point-in-time restore test with its report (SD13, QS2) and
       # disaster recovery; the secret rotation; then the one-command deployment and its rollback on the
       # same server (D-041).

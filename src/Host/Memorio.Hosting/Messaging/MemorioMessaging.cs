@@ -57,7 +57,11 @@ public static class MemorioMessaging
         connectionString = new NpgsqlConnectionStringBuilder(connectionString) { GssEncryptionMode = GssEncryptionMode.Disable }
             .ConnectionString;
 
-        services.AddSingleton(_ => new MessagingDatabase(NpgsqlDataSource.Create(connectionString)));
+        // One pool for the role in this process (D-181): Wolverine (outbox, inbox, queue), the backlog
+        // metrics and the readiness check share it, so its Maximum Pool Size is the process's whole ceiling
+        // for memorio_messaging. Wolverine does not dispose a data source it is given; MessagingDatabase does.
+        var dataSource = new NpgsqlDataSourceBuilder(connectionString) { Name = "messaging" }.Build();
+        services.AddSingleton(_ => new MessagingDatabase(dataSource));
         services.AddHealthChecks().AddCheck<MessagingDatabaseHealthCheck>(HealthCheckName, tags: [HealthEndpoints.ReadyTag]);
         services.AddResourceSetupOnStartup();
 
@@ -71,8 +75,8 @@ public static class MemorioMessaging
         services.AddWolverine(options =>
         {
             options.ServiceName = host == MessagingHost.Api ? "memorio-api" : "memorio-worker";
-            options.UsePostgresqlPersistenceAndTransport(connectionString, EnvelopeSchema, transportSchema: QueueSchema)
-                .AutoProvision();
+            options.PersistMessagesWithPostgresql(dataSource, EnvelopeSchema)
+                .EnableMessageTransport(transport => transport.TransportSchemaName(QueueSchema).AutoProvision());
             options.Publish(rule => rule.MessagesImplementing<IIntegrationEvent>().ToPostgresqlQueue(Queue));
 
             if (host == MessagingHost.Api)
