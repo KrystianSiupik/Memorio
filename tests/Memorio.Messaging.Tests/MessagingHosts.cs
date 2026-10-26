@@ -17,6 +17,9 @@ namespace Memorio.Messaging.Tests;
 /// </summary>
 public sealed class MessagingHosts : PostgresDatabase
 {
+    /// <summary>Short waits between attempts, so a failing handler reaches the dead letters within a second.</summary>
+    public static readonly TimeSpan[] RetryDelays = [TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(100)];
+
     private IHost? _api;
     private IHost? _worker;
 
@@ -77,7 +80,8 @@ public sealed class MessagingHosts : PostgresDatabase
         builder.Services.AddMemorioMessaging(
             builder.Configuration,
             side,
-            side == MessagingHost.Worker ? [typeof(ProbeRecordedHandler).Assembly] : []);
+            side == MessagingHost.Worker ? [typeof(ProbeRecordedHandler).Assembly] : [],
+            RetryDelays);
         configure(builder.Services);
         return builder.Build();
     }

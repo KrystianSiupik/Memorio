@@ -106,6 +106,7 @@ groups:
           severity: warning
         annotations:
           summary: "{{ $value }} integration event(s) failed every retry and wait in the dead letters."
+          runbook_url: "https://github.com/KrystianSiupik/Memorio/blob/main/docs/runbooks/dead-letters.md"
 
       # Without the backlog metric QS12 cannot be checked at all: the worker is down or not exporting.
       - alert: MessagingMetricsMissing

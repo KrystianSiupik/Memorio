@@ -46,6 +46,7 @@ tests:
               severity: warning
             exp_annotations:
               summary: "1 integration event(s) failed every retry and wait in the dead letters."
+              runbook_url: "https://github.com/KrystianSiupik/Memorio/blob/main/docs/runbooks/dead-letters.md"
 
   # No backlog metric for 10 minutes: the worker is gone.
   - interval: 1m

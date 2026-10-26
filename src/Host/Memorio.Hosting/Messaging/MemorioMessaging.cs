@@ -32,11 +32,13 @@ public static class MemorioMessaging
     public static readonly TimeSpan[] RetryDelays = [TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(10), TimeSpan.FromMinutes(1)];
 
     /// <param name="handlerAssemblies">Where the worker finds handlers: public static *Handler classes (module assemblies).</param>
+    /// <param name="retryDelays">Waits between attempts of a failing handler; <see cref="RetryDelays"/> unless a test shortens them.</param>
     public static IServiceCollection AddMemorioMessaging(
         this IServiceCollection services,
         IConfiguration configuration,
         MessagingHost host,
-        IEnumerable<System.Reflection.Assembly> handlerAssemblies)
+        IEnumerable<System.Reflection.Assembly> handlerAssemblies,
+        IReadOnlyList<TimeSpan>? retryDelays = null)
     {
         services.AddOptions<MessagingOptions>()
             .Bind(configuration.GetSection(MessagingOptions.Section))
@@ -81,6 +83,11 @@ public static class MemorioMessaging
 
             if (host == MessagingHost.Api)
             {
+                // The database's durability agent (inbox recovery, replayed dead letters, stale outbox rows)
+                // must run where the listeners are: on a node without them, recovered inbox rows have no
+                // listener and stay put (found in PLAT-20, D-185). The worker sends the API's stale outbox
+                // rows as well, through the same PostgreSQL queue.
+                options.Durability.DurabilityAgentEnabled = false;
                 options.Discovery.DisableConventionalDiscovery();
                 return;
             }
@@ -88,7 +95,7 @@ public static class MemorioMessaging
             options.ListenToPostgresqlQueue(Queue).UseDurableInbox();
             options.MultipleHandlerBehavior = MultipleHandlerBehavior.Separated;
             options.Policies.UseDurableLocalQueues();
-            options.Policies.OnAnyException().RetryWithCooldown(RetryDelays).Then.MoveToErrorQueue();
+            options.Policies.OnAnyException().RetryWithCooldown([.. retryDelays ?? RetryDelays]).Then.MoveToErrorQueue();
 
             // Handlers are thin public adapters; what they call is internal to their module, so they
             // resolve it from the message's service scope (D-135).
