@@ -88,7 +88,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Shell scripts
-        run: docker run --rm -v "$PWD:/mnt:ro" -w /mnt koalaman/shellcheck:v0.11.0 -x deploy/*.sh deploy/backup/*.sh deploy/postgres/*.sh deploy/secrets/*.sh tools/*.sh tools/*/*.sh
+        run: docker run --rm -v "$PWD:/mnt:ro" -w /mnt koalaman/shellcheck:v0.11.0 -x deploy/*.sh deploy/backup/*.sh deploy/postgres/*.sh deploy/secrets/*.sh deploy/messaging/*.sh tools/*.sh tools/*/*.sh
       - name: sops and age (encrypted copy of the secrets, MEM-E0-PLAT-18)
         run: |
           curl -fsSLo /tmp/sops https://github.com/getsops/sops/releases/download/v3.13.3/sops-v3.13.3.linux.amd64

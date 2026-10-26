@@ -92,6 +92,13 @@ point's time.
 
 The server pulls private images: once, `docker login ghcr.io` with a read-only token (MEM-E0-PLAT-18).
 
+## Dead letters (MEM-E0-PLAT-20)
+
+An integration event whose module handler failed every attempt waits in the dead letters (alert
+`MessageDeadLettered`) for a decision: `messaging/dead-letters.sh list | show <id> | replay <id>|--all |
+discard <id> --reason "…"`, step by step in [docs/runbooks/dead-letters.md](../docs/runbooks/dead-letters.md).
+Discards are written to `/var/lib/memorio/operations.log`.
+
 ## Database connections (PLAT-21, D-181, D-182)
 
 Each role has one pool per process with an explicit `Maximum Pool Size` and `Timeout=5` in `app.env`; API

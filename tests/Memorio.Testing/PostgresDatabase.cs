@@ -84,7 +84,8 @@ public class PostgresDatabase : IAsyncLifetime
     /// <summary>Stops what <see cref="OnBootstrappedAsync"/> started, before the container goes.</summary>
     protected virtual Task OnDisposingAsync() => Task.CompletedTask;
 
-    private static string RepositoryRoot()
+    /// <summary>The checkout this test runs from (the directory with Memorio.slnx).</summary>
+    public static string RepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Memorio.slnx")))
