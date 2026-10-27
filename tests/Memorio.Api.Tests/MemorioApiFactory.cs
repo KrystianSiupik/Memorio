@@ -32,6 +32,8 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
         // Not contacted: migrations are off and no API test signs in against the database
         // (tests/Modules/Memorio.Modules.Account.Tests covers sign-in on a real database).
         ["Account:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_account",
+        // Not contacted either (tests/Modules/Memorio.Modules.Plans.Tests covers the ledger on a real database).
+        ["Plans:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_plans",
         ["Database:MigrateOnStartup"] = "false",
     };
 
@@ -78,7 +80,7 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
             services.Configure<HealthCheckServiceOptions>(options =>
             {
                 foreach (var check in options.Registrations
-                    .Where(check => check.Name is MemorioMessaging.HealthCheckName or ObjectStorage.HealthCheckName or "account-database")
+                    .Where(check => check.Name is MemorioMessaging.HealthCheckName or ObjectStorage.HealthCheckName or "account-database" or "plans-database")
                     .ToList())
                 {
                     options.Registrations.Remove(check);
