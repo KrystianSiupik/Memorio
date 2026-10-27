@@ -73,6 +73,7 @@ while IFS= read -r line; do
     fi
     sum=$((sum + size))
 done < <(grep -E '__ConnectionString: ' compose.yaml)
-budget "compose.yaml (local development)" "$sum" 100
+local_max="$(sed -n 's/.*max_connections=\([0-9]*\).*/\1/p' compose.yaml | head -1)"
+budget "compose.yaml (local development)" "$sum" "${local_max:-100}"
 
 exit "$failed"

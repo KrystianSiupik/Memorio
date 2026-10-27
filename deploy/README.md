@@ -99,6 +99,19 @@ An integration event whose module handler failed every attempt waits in the dead
 discard <id> --reason "…"`, step by step in [docs/runbooks/dead-letters.md](../docs/runbooks/dead-letters.md).
 Discards are written to `/var/lib/memorio/operations.log`.
 
+## Manual plan entitlements (MEM-E0-PLAT-15, D-188)
+
+A paid plan for testers, a goodwill extension or a complaint settled outside the stores is a line in the
+entitlement ledger of Plans, the same thing the plan cycle reads for a store payment:
+`plans/entitlements.sh list <account|album> <id> | grant <account|album> <id> --until YYYY-MM-DD --reason "…" |
+end <account|album> <id> --reason "…"`. Lines are never edited: `end` adds a manual line valid until now. Every
+grant and end is written to `/var/lib/memorio/operations.log`.
+
+Releasing the version that brings the ledger needs `Plans__ConnectionString` in the server's `app.env` (see
+`app.env.example`; the password is `PG_PASSWORD_MEMORIO_PLANS` from `postgres.env`), then
+`secrets/secrets.sh encrypt <environment>` (`secrets.sh check` names a variable missing from the copy).
+Without it the API and the worker refuse to start.
+
 ## Database connections (PLAT-21, D-181, D-182)
 
 Each role has one pool per process with an explicit `Maximum Pool Size` and `Timeout=5` in `app.env`; API
