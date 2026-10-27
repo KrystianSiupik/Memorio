@@ -32,7 +32,15 @@ Rules (checked by `tests/Memorio.ArchitectureTests`, ADR 0001 and 0019):
   changes only through methods that check invariants, domain events raised inside.
 - Queries are read-only projections to DTOs with no business logic; they never return aggregates.
   Commands use EF Core, query handlers use Dapper with parameterized SQL on the module's own schema.
-- Every query about someone else's content goes through the Access module (ADR 0011).
+- Every query about someone else's content goes through the Access module (ADR 0011): `IAccessReader`
+  (`Access.Contracts`) asked at every query and never cached; a list or search puts
+  `VisibleAlbumsAsync` into its own SQL (`album_id = ANY(@visibleAlbums)`, D-031). No rule, no access.
+- Such a query gets rows in an access matrix (`AccessMatrix` in `Memorio.Testing`, PLAT-14, D-186): the
+  module's test describes its scenario on the real database as an `IAccessWorld` (named actors and
+  resources, read the way the module's queries read), decides every actor × resource pair with `Sees` /
+  `DoesNotSee` (`Rows()` fails on a pair left undecided), runs `Rows()` as a theory through
+  `AccessMatrix.AssertRowAsync` (single read and list or search) and calls `AssertRevokedAsync` for every
+  way access is taken away (revoke, block, hide). Example: `tests/Modules/Memorio.Modules.Access.Tests`.
 - Endpoints require a signed-in account by default (SD10); `AllowAnonymous` only with an entry in
   `tests/Memorio.Api.Tests/AnonymousEndpointsTests`. Web pages outside `/v1` go in `MapPages`.
 - Database: the module's `DbContext` uses its schema and role (ADR 0004), connection from
