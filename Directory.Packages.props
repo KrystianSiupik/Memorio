@@ -27,6 +27,7 @@
     <PackageVersion Include="WolverineFx.Postgresql" Version="6.51.3" />
     <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="6.51.3" />
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
+    <PackageVersion Include="xunit.v3.assert" Version="4.0.2" />
     <PackageVersion Include="xunit.v3.extensibility.core" Version="4.0.2" />
   </ItemGroup>
 </Project>

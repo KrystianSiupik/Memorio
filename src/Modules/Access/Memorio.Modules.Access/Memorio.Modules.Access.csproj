@@ -1,5 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <InternalsVisibleTo Include="Memorio.Modules.Access.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="../../../BuildingBlocks/Memorio.SharedKernel/Memorio.SharedKernel.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Memorio.Modularity/Memorio.Modularity.csproj" />
     <ProjectReference Include="../Memorio.Modules.Access.Contracts/Memorio.Modules.Access.Contracts.csproj" />
