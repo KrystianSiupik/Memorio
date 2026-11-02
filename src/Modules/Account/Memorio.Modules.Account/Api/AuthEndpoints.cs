@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Memorio.Modularity;
+using Memorio.Modules.Account.Application.Commands.RegisterAccount;
 using Memorio.Modules.Account.Application.Ports;
 using Memorio.Modules.Account.Domain.Accounts;
 using Memorio.Modules.Account.Infrastructure.Identity;
@@ -50,29 +51,18 @@ internal static class AuthEndpoints
 
     private static async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>> RegisterAsync(
         RegisterRequest request,
+        RegisterAccountHandler handler,
         UserManager<AccountUser> users,
-        SignInManager<AccountUser> signIn,
-        TimeProvider time)
+        SignInManager<AccountUser> signIn)
     {
-        var declaration = AgeDeclaration.Declare(request.DeclaresMinimumAge, time.GetUtcNow());
-        if (declaration.IsFailure)
+        var registered = await handler.HandleAsync(new RegisterAccount(request.Email, request.Password, request.DeclaresMinimumAge));
+        if (registered.IsFailure)
         {
-            return Problems.From(declaration.Error);
+            return Problems.From(registered.Error);
         }
 
-        var user = new AccountUser
-        {
-            Id = Guid.CreateVersion7(),
-            UserName = request.Email,
-            Email = request.Email,
-            AgeDeclaredAt = declaration.Value.DeclaredAt,
-        };
-        var created = await users.CreateAsync(user, request.Password ?? "");
-        if (!created.Succeeded)
-        {
-            return Problems.From(ErrorOf(created));
-        }
-
+        var user = await users.FindByIdAsync(registered.Value.AccountId.Value.ToString())
+            ?? throw new InvalidOperationException("The account just registered is missing.");
         await SignInAsync(signIn, user);
         return TypedResults.Empty;
     }
@@ -183,7 +173,7 @@ internal static class AuthEndpoints
             created = await users.AddLoginAsync(user, new UserLoginInfo(identity.Provider.ToString(), identity.Subject, identity.Provider.ToString()));
         }
 
-        return created.Succeeded ? user : ErrorOf(created);
+        return created.Succeeded ? user : IdentityAccountRegistry.ErrorOf(created);
     }
 
     private static async Task<Results<Ok<AccountResponse>, UnauthorizedHttpResult>> GetMeAsync(
@@ -202,15 +192,6 @@ internal static class AuthEndpoints
         signIn.AuthenticationScheme = IdentityConstants.BearerScheme;
         return signIn.SignInAsync(user, isPersistent: false);
     }
-
-    private static Error ErrorOf(IdentityResult result) =>
-        result.Errors.Select(error => error.Code).ToList() switch
-        {
-            var codes when codes.Exists(code => code is "DuplicateEmail" or "DuplicateUserName") => AccountErrors.EmailTaken,
-            var codes when codes.Exists(code => code.StartsWith("Password", StringComparison.Ordinal)) => AccountErrors.InvalidPassword,
-            var codes when codes.Exists(code => code is "InvalidEmail" or "InvalidUserName") => AccountErrors.InvalidEmail,
-            _ => Error.Failure("Account.CreateFailed", string.Join("; ", result.Errors.Select(error => error.Code))),
-        };
 }
 
 /// <param name="DeclaresMinimumAge">The person declares being at least 16; required for a new account.</param>

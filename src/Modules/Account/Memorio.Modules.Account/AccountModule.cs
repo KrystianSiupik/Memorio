@@ -1,6 +1,8 @@
 using Memorio.Modularity;
 using Memorio.Modules.Account.Api;
+using Memorio.Modules.Account.Application.Commands.RegisterAccount;
 using Memorio.Modules.Account.Application.Ports;
+using Memorio.Modules.Account.Domain.Accounts;
 using Memorio.Modules.Account.Infrastructure;
 using Memorio.Modules.Account.Infrastructure.Identity;
 using Memorio.Modules.Account.Infrastructure.Metrics;
@@ -37,8 +39,7 @@ public sealed class AccountModule : IModule
             {
                 identity.User.RequireUniqueEmail = true;
 
-                // Length over character classes (D-148).
-                identity.Password.RequiredLength = 10;
+                identity.Password.RequiredLength = AccountPassword.MinimumLength;
                 identity.Password.RequireDigit = false;
                 identity.Password.RequireLowercase = false;
                 identity.Password.RequireUppercase = false;
@@ -50,6 +51,9 @@ public sealed class AccountModule : IModule
             .AddApiEndpoints();
         services.AddAuthentication(IdentityConstants.BearerScheme).AddBearerToken(IdentityConstants.BearerScheme);
         services.AddDataProtection().SetApplicationName("Memorio").PersistKeysToDbContext<AccountDbContext>();
+
+        services.AddScoped<IAccountRegistry, IdentityAccountRegistry>();
+        services.AddScoped<RegisterAccountHandler>();
 
         services.AddSingleton<IExternalIdentityVerifier>(OpenIdIdentityVerifier.ForProvider(ExternalProvider.Google, options.Google.ClientIds));
         services.AddSingleton<IExternalIdentityVerifier>(OpenIdIdentityVerifier.ForProvider(ExternalProvider.Apple, options.Apple.ClientIds));
