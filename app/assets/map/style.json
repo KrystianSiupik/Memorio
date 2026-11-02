@@ -1,0 +1,47 @@
+{
+  "version": 8,
+  "glyphs": "{{base}}/fonts/{fontstack}/{range}.pbf",
+  "sources": {
+    "basemap": {
+      "type": "vector",
+      "url": "pmtiles://{{base}}/basemap.pmtiles",
+      "attribution": "© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>"
+    }
+  },
+  "layers": [
+    { "id": "ocean", "type": "background", "paint": { "background-color": "#bcd9e6" } },
+    {
+      "id": "earth",
+      "type": "fill",
+      "source": "basemap",
+      "source-layer": "earth",
+      "paint": { "fill-color": "#f2efe6" }
+    },
+    {
+      "id": "water",
+      "type": "fill",
+      "source": "basemap",
+      "source-layer": "water",
+      "paint": { "fill-color": "#bcd9e6" }
+    },
+    {
+      "id": "boundaries",
+      "type": "line",
+      "source": "basemap",
+      "source-layer": "boundaries",
+      "paint": { "line-color": "#b5aeb8", "line-width": 0.6 }
+    },
+    {
+      "id": "places",
+      "type": "symbol",
+      "source": "basemap",
+      "source-layer": "places",
+      "layout": {
+        "text-field": ["get", "name:en"],
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 11
+      },
+      "paint": { "text-color": "#5f5a66", "text-halo-color": "#ffffff", "text-halo-width": 1 }
+    }
+  ]
+}

@@ -137,9 +137,28 @@ jobs:
           bash ../tools/generate-app-code.sh
           git diff --exit-code -- lib
           test -z "$(git status --porcelain -- lib)"
-      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: dart format --output=none --set-exit-if-changed lib test benchmark
       - run: flutter analyze
       - run: flutter test
+
+  # SD3, SD8, QS3 and D-032 on the real app with 10 000 points (MEM-E0-PLAT-05, D-192). No GPU here, so the
+  # first-image budget only guards against regressions; QS3 itself is measured with --gpu.
+  map:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.7
+          channel: stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: flutter pub get
+        working-directory: app
+      - run: flutter build web --release --no-web-resources-cdn -t benchmark/map_benchmark_main.dart
+        working-directory: app
+      - run: node tools/map-benchmark/run.mjs --runs=5 --check
 
   # A tag v<version> publishes the release images, only after every other job passed (D-171). The
   # servers pull them by version (deploy/release.sh); SBOM and provenance are attached (D-052).
