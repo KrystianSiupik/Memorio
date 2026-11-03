@@ -686,3 +686,12 @@ Pytanie otwarte: czy zlecenie usunięcia ma wymagać ponownego podania hasła. T
 | D-212 | Nowe ekrany mają teksty po polsku wprost w kodzie, a reszta aplikacji jest jeszcze po angielsku (zakładki, S03). Liczby w OpenAPI ASP.NET opisuje jako `integer` lub `string`, więc wygenerowany model Dart ma je jako `dynamic`; repozytorium rzutuje je na `int`. Nie zmieniam globalnych opcji JSON API | kryteria podają polskie etykiety, a mechanizmu tłumaczeń jeszcze nie ma; globalna zmiana objęłaby cały kontrakt. **Do decyzji:** język interfejsu i tłumaczenia |
 
 Poza zakresem: przyciski Apple i Google, bo wymagają natywnych SDK i identyfikatorów aplikacji (backend jest gotowy od PLAT-07), oraz „zapomniałem hasła” (pytanie z PLAT-07). **Stan testów:** testy komponentu pól, wszystkich stanów i przejścia S01 → S03 na atrapach repozytoriów przechodzą. **Ekranu nie uruchamiałem w przeglądarce ani na urządzeniu.**
+
+## MEM-E1-PLAT-02 · Ekran S24 „Konto i prywatność” (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-213 | „Wskaż kontakt spadkowy” jest widoczne, ale wyłączone, a kontakt pokazuje „Nie wskazano”: ticket zależy od MEM-E9-SUKCESJA-01, którego jeszcze nie ma. Wskazanie następcy też jeszcze nie istnieje (E3, E9), więc właściciel bez następcy ma na ekranie działającą tylko zgodę na wygaśnięcie i informację o następcy | E1 idzie przed E9; atrapa przycisku udawałaby działanie. **Kryterium akcji jest przez to spełnione częściowo.** Dokończyć w E9 |
+| D-214 | Potwierdzenie i zgoda to pola na ekranie, nie okno dialogowe. Odpowiedź 409 pokazuje komunikat i zostawia zaznaczenia. Dane offline to ostatnia odpowiedź trzymana w pamięci providera przez czas działania aplikacji: **po zimnym starcie bez sieci ekran pokaże błąd z „Ponów”, bo nie ma trwałej pamięci podręcznej** | kryterium „bez utraty danych”; trwała kopia w Drift byłaby przesadą dla jednego ekranu, a baza lokalna nie działa jeszcze na webie (D-115) |
+
+Braki bez ticketu, do decyzji: **przycisk „Wyloguj”**, którego nie wymienia żaden ticket, a `signOut` istnieje w repozytorium. **Stan testów:** testy komponentu pól, akcji, stanów, odpowiedzi 409 i przejść na atrapie repozytorium oraz testy `HttpAccountRepository` na atrapie HTTP przechodzą. **Ekranu nie uruchamiałem w przeglądarce ani na urządzeniu.**

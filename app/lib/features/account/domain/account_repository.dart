@@ -26,7 +26,7 @@ class AccountOverview {
 }
 
 /// Why an account operation did not work; the screens say it in words.
-sealed class AccountFailure {
+sealed class AccountFailure implements Exception {
   const AccountFailure();
 }
 

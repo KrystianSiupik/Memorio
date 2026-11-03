@@ -22,10 +22,16 @@ void main() {
     testWidgets('each tab opens its screen', (tester) async {
       await pumpMemorioApp(tester, session: signedIn);
 
-      for (final label in ['Albums', 'Shared with me', 'Account', 'Map']) {
+      const titles = {
+        'Albums': 'Albums',
+        'Shared with me': 'Shared with me',
+        'Account': 'Konto i prywatność',
+        'Map': 'Map',
+      };
+      for (final MapEntry(key: label, value: title) in titles.entries) {
         await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(label)));
         await tester.pumpAndSettle();
-        expect(find.widgetWithText(AppBar, label), findsOneWidget, reason: label);
+        expect(find.widgetWithText(AppBar, title), findsOneWidget, reason: label);
       }
     });
 
@@ -35,7 +41,7 @@ void main() {
       container.read(routerProvider).go(const AccountRoute().location);
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(AppBar, 'Account'), findsOneWidget);
+      expect(find.widgetWithText(AppBar, 'Konto i prywatność'), findsOneWidget);
     });
   });
 
