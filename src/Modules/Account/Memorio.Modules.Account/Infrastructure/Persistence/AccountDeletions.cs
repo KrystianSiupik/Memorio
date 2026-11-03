@@ -55,8 +55,8 @@ internal sealed class AccountDeletions(IDbContextOutbox<AccountDbContext> outbox
         DeletionCancelled cancelled => outbox.PublishAsync(new AccountDeletionCancelled(
             cancelled.EventId, cancelled.OccurredAt, cancelled.AccountId.Value, cancelled.Sequence)),
 
-        // Goes out with its contract (MEM-E1-KONTO-08).
-        DeletionCompleted => ValueTask.CompletedTask,
+        DeletionCompleted completed => outbox.PublishAsync(new AccountDeleted(
+            completed.EventId, completed.OccurredAt, completed.AccountId.Value, completed.Sequence)),
         _ => throw new InvalidOperationException($"No integration event for {domainEvent.GetType().Name}."),
     };
 }
