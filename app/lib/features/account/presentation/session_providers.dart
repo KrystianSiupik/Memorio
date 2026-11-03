@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/api/api.dart';
+import '../../../core/result.dart';
 import '../domain/account_repository.dart';
 import '../domain/auth_repository.dart';
 import '../domain/session.dart';
@@ -19,6 +20,15 @@ final authRepositoryProvider = Provider<AuthRepository>(
 final accountRepositoryProvider = Provider<AccountRepository>(
   (ref) => throw UnimplementedError('accountRepositoryProvider is overridden in app/'),
 );
+
+/// What S24 shows. Kept for the whole session: without a connection the screen reads the last answer.
+final accountOverviewProvider = FutureProvider<AccountOverview>((ref) async {
+  final loaded = await ref.watch(accountRepositoryProvider).loadOverview();
+  return switch (loaded) {
+    Ok(:final value) => value,
+    Err(:final failure) => throw failure,
+  };
+});
 
 /// The current session: loading while it is restored, then the session or null (signed out). Restored
 /// again when the backend ends the session; screens invalidate it after signing in or out.
