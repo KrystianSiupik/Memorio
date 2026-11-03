@@ -11,5 +11,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../../src/Modules/AiNarration/Memorio.Modules.AiNarration/Memorio.Modules.AiNarration.csproj" />
+    <ProjectReference Include="../../Memorio.Testing/Memorio.Testing.csproj" />
   </ItemGroup>
 </Project>

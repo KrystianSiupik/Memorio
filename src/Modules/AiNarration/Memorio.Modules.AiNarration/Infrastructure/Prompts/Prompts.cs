@@ -6,6 +6,12 @@ namespace Memorio.Modules.AiNarration.Infrastructure.Prompts;
 /// Versioned prompts. Change the instructions only together with a higher version: the version is
 /// stored with every AI text (SD9) and tells which instructions produced it.
 /// </summary>
+internal sealed class PromptCatalog : IPromptCatalog
+{
+    public Prompt MemoryDescriptionDraft => Prompts.MemoryDescriptionDraft;
+}
+
+/// <summary>The prompts themselves.</summary>
 internal static class Prompts
 {
     private const string Rules =

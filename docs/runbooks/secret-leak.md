@@ -52,7 +52,7 @@ server; rotate anyway. Effect on users: none.
 | Variable | Secret | If it leaked | Rotation | Effect on users |
 |---|---|---|---|---|
 | `Storage__AccessKey`, `Storage__SecretKey` | yes | read, change and delete every photo; **sign links to any file** | below | none: links handed out before keep working until the old key is deleted; the app asks for new ones (5-minute links) |
-| `Messaging__ConnectionString`, `Account__ConnectionString`, `Plans__ConnectionString`, `Archive__ConnectionString`, `Album__ConnectionString`, `Places__ConnectionString`, `Limits__ConnectionString`, `Scheduling__ConnectionString` | the password in it | as the role's password | `./secrets/rotate.sh database <role>` (the role is the `Username` in it) | none |
+| `Messaging__ConnectionString`, `Account__ConnectionString`, `Plans__ConnectionString`, `Archive__ConnectionString`, `Album__ConnectionString`, `AiNarration__ConnectionString`, `Places__ConnectionString`, `Limits__ConnectionString`, `Scheduling__ConnectionString` | the password in it | as the role's password | `./secrets/rotate.sh database <role>` (the role is the `Username` in it) | none |
 | `AppVersion__Minimum`, `Storage__Endpoint`, `Storage__Region`, `Storage__Bucket`, `Account__Google__ClientIds__0`, `Account__Apple__ClientIds__0` | no (the client ids are public, they are in the apps) | nothing to rotate | — | — |
 
 **Media bucket key.** The secret signs every link to a photo (PLAT-04); a single link cannot be revoked,
