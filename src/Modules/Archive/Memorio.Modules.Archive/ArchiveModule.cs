@@ -1,5 +1,7 @@
 using Memorio.Modularity;
 using Memorio.Modules.Account.Contracts;
+using Memorio.Modules.Archive.Api;
+using Memorio.Modules.Archive.Application.Commands.CreateMemory;
 using Memorio.Modules.Archive.Application.Commands.DeleteAccountContent;
 using Memorio.Modules.Archive.Application.Policies;
 using Memorio.Modules.Archive.Contracts;
@@ -12,6 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Wolverine.EntityFrameworkCore;
 
 namespace Memorio.Modules.Archive;
 
@@ -35,10 +38,11 @@ public sealed class ArchiveModule : IModule
         }
 
         services.TryAddSingleton(TimeProvider.System);
-        services.AddDbContext<ArchiveDbContext>(database => database.UseArchiveDatabase(connectionString));
+        services.AddDbContextWithWolverineIntegration<ArchiveDbContext>(database => database.UseArchiveDatabase(connectionString));
         services.AddScoped<IAccountContentReader, AccountContentReader>();
         services.AddScoped<IMemories, Memories>();
         services.AddScoped<DeleteAccountContentHandler>();
+        services.AddScoped<CreateMemoryHandler>();
         services.AddScoped<IIntegrationEventPolicy<AccountDeleted>, DeleteContentWhenAccountDeleted>();
 
         services.AddHealthChecks().AddCheck<ArchiveDatabaseHealthCheck>(ArchiveDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
@@ -48,7 +52,5 @@ public sealed class ArchiveModule : IModule
         }
     }
 
-    public void MapEndpoints(IEndpointRouteBuilder endpoints)
-    {
-    }
+    public void MapEndpoints(IEndpointRouteBuilder endpoints) => endpoints.MapMemoriesEndpoints();
 }

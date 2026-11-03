@@ -71,6 +71,7 @@ public sealed class AccountModule : IModule
         services.AddScoped<AcceptTermsHandler>();
         services.AddScoped<IAccountDeletionImpactQuery, AccountDeletionImpactQuery>();
         services.AddScoped<IAccountDeletions, AccountDeletions>();
+        services.AddScoped<ITermsReader, TermsReader>();
         services.AddScoped<RequestAccountDeletionHandler>();
         services.AddScoped<DeleteAccountHandler>();
         services.AddScoped<CancelAccountDeletionHandler>();

@@ -52,6 +52,54 @@ namespace Memorio.Modules.Archive.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<DateOnly>("DateFrom")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("date")
+                        .HasDefaultValue(new DateOnly(2000, 1, 1))
+                        .HasColumnName("date_from");
+
+                    b.Property<string>("DatePrecision")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("Day")
+                        .HasColumnName("date_precision");
+
+                    b.Property<DateOnly>("DateTo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("date")
+                        .HasDefaultValue(new DateOnly(2000, 1, 1))
+                        .HasColumnName("date_to");
+
+                    b.Property<double>("Latitude")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("double precision")
+                        .HasDefaultValue(0.0)
+                        .HasColumnName("latitude");
+
+                    b.Property<double>("Longitude")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("double precision")
+                        .HasDefaultValue(0.0)
+                        .HasColumnName("longitude");
+
+                    b.Property<string>("PlaceName")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasDefaultValue("")
+                        .HasColumnName("place_name");
+
+                    b.Property<string>("PlaceReference")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("")
+                        .HasColumnName("place_reference");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorAccountId")

@@ -29,7 +29,11 @@ internal sealed class DeleteAccountContentHandler(IMemories memories, IObjectSto
             memories.Remove(memory);
         }
 
-        await memories.SaveAsync(cancellationToken);
+        if (!await memories.SaveAsync(cancellationToken))
+        {
+            throw new InvalidOperationException("A memory of the deleted account changed meanwhile; the retry finds it again.");
+        }
+
         return deleted;
     }
 }
