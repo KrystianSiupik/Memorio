@@ -38,6 +38,9 @@ internal sealed class AccountDbContext(DbContextOptions<AccountDbContext> option
             deletion.Property(item => item.WindowEndsAt).HasColumnName("window_ends_at");
             deletion.Property(item => item.ConsentsToAlbumExpiry).HasColumnName("consents_to_album_expiry");
             deletion.Ignore(item => item.DomainEvents);
+            deletion.HasIndex(item => item.WindowEndsAt)
+                .HasDatabaseName("ix_account_deletions_pending_window_ends_at")
+                .HasFilter("state = 'Pending'");
         });
     }
 }

@@ -55,6 +55,10 @@ namespace Memorio.Modules.Account.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("WindowEndsAt")
+                        .HasDatabaseName("ix_account_deletions_pending_window_ends_at")
+                        .HasFilter("state = 'Pending'");
+
                     b.ToTable("account_deletions", "account");
                 });
 

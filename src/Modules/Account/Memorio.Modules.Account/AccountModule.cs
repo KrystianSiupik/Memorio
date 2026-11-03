@@ -84,6 +84,7 @@ public sealed class AccountModule : IModule
         services.AddScoped<IIntegrationEventPolicy<AccountDeletionRequested>>(provider => provider.GetRequiredService<AccountDeletionWindowDeadline>());
         services.AddScoped<IIntegrationEventPolicy<AccountDeletionCancelled>>(provider => provider.GetRequiredService<AccountDeletionWindowDeadline>());
         services.AddScheduledJob<AccountDeletionWindowJob>(AccountDeletionWindowDeadline.JobName);
+        services.AddScheduledJob<AccountDeletionSweepJob>(AccountDeletionSweepJob.JobName, AccountDeletionSweepJob.Cron);
         services.AddScoped<IPendingAccountDeletionQuery, PendingAccountDeletionQuery>();
 
         services.AddSingleton<IExternalIdentityVerifier>(OpenIdIdentityVerifier.ForProvider(ExternalProvider.Google, options.Google.ClientIds));
