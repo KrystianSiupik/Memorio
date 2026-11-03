@@ -676,3 +676,13 @@ Pytanie otwarte: czy zlecenie usunięcia ma wymagać ponownego podania hasła. T
 | D-209 | `AccountDeletedHandler` w workerze woła `DeleteContentWhenAccountDeleted`. Ostatnio zastosowany numer zdarzenia dla konta w `archive.applied_account_events`; starsze jest pomijane (D-013). Archive zależy od `Account.Contracts`, a `AccountDeletionFlowTests` sprawdza całą ścieżkę między modułami | konto usuwa się raz, więc kolejność jest tu czysto zabezpieczająca, ale wymaga jej ticket |
 
 **Stan testów:** `AccountDeletedHandlerIdempotencyTests` i `AccountDeletionFlowTests` na PostgreSQL, z outboxem i kolejkami workera, ale z atrapą harmonogramu i magazynu.
+
+## MEM-E1-PLAT-01 · Ekran S01 „Rejestracja” (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-210 | Na S01 jest też przełącznik „Mam już konto” z logowaniem e-mailem, choć ticket wymienia tylko rejestrację: router wysyła tu każdego niezalogowanego, więc bez logowania nie dałoby się wrócić do konta | ekran z D-106 jest wspólny dla rejestracji i logowania |
+| D-211 | Zgodnie z kryterium „Załóż konto” zależy tylko od deklaracji 16+. Regulamin zaznaczony na ekranie zapisywany jest zaraz po założeniu konta; niepowodzenie tego zapisu nie zatrzymuje wejścia do aplikacji, bo regulamin ma być wymuszony przed pierwszą treścią (MEM-E2-ARCHIWUM-01) | S2:C11: akceptacja przed dodaniem pierwszej treści, nie przed rejestracją |
+| D-212 | Nowe ekrany mają teksty po polsku wprost w kodzie, a reszta aplikacji jest jeszcze po angielsku (zakładki, S03). Liczby w OpenAPI ASP.NET opisuje jako `integer` lub `string`, więc wygenerowany model Dart ma je jako `dynamic`; repozytorium rzutuje je na `int`. Nie zmieniam globalnych opcji JSON API | kryteria podają polskie etykiety, a mechanizmu tłumaczeń jeszcze nie ma; globalna zmiana objęłaby cały kontrakt. **Do decyzji:** język interfejsu i tłumaczenia |
+
+Poza zakresem: przyciski Apple i Google, bo wymagają natywnych SDK i identyfikatorów aplikacji (backend jest gotowy od PLAT-07), oraz „zapomniałem hasła” (pytanie z PLAT-07). **Stan testów:** testy komponentu pól, wszystkich stanów i przejścia S01 → S03 na atrapach repozytoriów przechodzą. **Ekranu nie uruchamiałem w przeglądarce ani na urządzeniu.**

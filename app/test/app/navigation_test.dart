@@ -43,7 +43,7 @@ void main() {
     testWidgets('start on sign-in without the tabs', (tester) async {
       await pumpMemorioApp(tester);
 
-      expect(find.widgetWithText(AppBar, 'Sign in'), findsOneWidget);
+      expect(find.widgetWithText(AppBar, 'Rejestracja'), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
     });
 
@@ -53,7 +53,7 @@ void main() {
       container.read(routerProvider).go(const AlbumsRoute().location);
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(AppBar, 'Sign in'), findsOneWidget);
+      expect(find.widgetWithText(AppBar, 'Rejestracja'), findsOneWidget);
     });
   });
 

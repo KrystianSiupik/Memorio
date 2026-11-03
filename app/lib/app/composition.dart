@@ -15,4 +15,5 @@ List<Override> appOverrides({required String appVersion}) => [
     final api = ref.watch(apiClientProvider);
     return HttpAuthRepository(auth: api.auth, account: api.account, store: ref.watch(tokenStoreProvider));
   }),
+  accountRepositoryProvider.overrideWith((ref) => HttpAccountRepository(account: ref.watch(apiClientProvider).account)),
 ];
