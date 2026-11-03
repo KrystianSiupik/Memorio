@@ -41,6 +41,7 @@ class _MemoryDetailsPageState extends ConsumerState<MemoryDetailsPage> {
       case Ok():
         ref.invalidate(memoryDetailsProvider(widget.memoryId));
         ref.invalidate(trashProvider);
+        ref.invalidate(memoryPinsProvider);
         widget.onLeave();
       case Err(:final failure):
         setState(() => _failure = failure);

@@ -41,6 +41,8 @@ Future<ProviderContainer> pumpMemorioApp(
   PlacesRepository? places,
   FakeHttpAdapter? http,
   Stream<bool>? online,
+  Stream<List<PendingOperation>>? pending,
+  bool settle = true,
   List<Override> overrides = const [],
 }) async {
   final database = LocalDatabase(NativeDatabase.memory());
@@ -57,6 +59,8 @@ Future<ProviderContainer> pumpMemorioApp(
       photoPickerProvider.overrideWithValue(FakePhotoPicker()),
       localDatabaseProvider.overrideWithValue(database),
       isOnlineProvider.overrideWith((ref) => online ?? Stream.value(true)),
+      // A stream on the real database would leave a timer that keeps the test from closing it.
+      pendingOperationsProvider.overrideWith((ref) => pending ?? Stream.value(const [])),
       mapViewProvider.overrideWithValue(const SizedBox.expand()),
       ...overrides,
     ],
@@ -66,6 +70,8 @@ Future<ProviderContainer> pumpMemorioApp(
   container.read(dioProvider).httpClientAdapter = http ?? FakeHttpAdapter((_) => (200, {'minimumVersion': '0.1.0'}));
 
   await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const MemorioApp()));
-  await tester.pumpAndSettle();
+  if (settle) {
+    await tester.pumpAndSettle();
+  }
   return container;
 }

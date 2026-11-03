@@ -8,6 +8,7 @@ void main() {
     expect(geoJson['type'], 'FeatureCollection');
     final feature = (geoJson['features']! as List<Object?>).single! as Map<String, Object?>;
     expect(feature['id'], 'a');
+    expect(feature['properties'], {'id': 'a'});
     expect((feature['geometry']! as Map<String, Object?>)['coordinates'], [21.0, 52.2]);
   });
 

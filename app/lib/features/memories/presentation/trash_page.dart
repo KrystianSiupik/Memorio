@@ -40,6 +40,7 @@ class _TrashPageState extends ConsumerState<TrashPage> {
       }
     });
     ref.invalidate(trashProvider);
+    ref.invalidate(memoryPinsProvider);
     if (result is Ok) {
       widget.onRestored?.call();
     }
