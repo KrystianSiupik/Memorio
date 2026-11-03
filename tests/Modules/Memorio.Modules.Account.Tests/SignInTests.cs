@@ -50,6 +50,21 @@ public sealed class SignInTests(AccountHost host) : IClassFixture<AccountHost>
     }
 
     [Fact]
+    public async Task Registrations_of_one_email_at_once_give_one_account()
+    {
+        var email = NewEmail();
+        var body = new { email, password = Password, declaresMinimumAge = true };
+
+        var answers = await Task.WhenAll(Enumerable.Range(0, 5).Select(_ => PostAsync("/v1/auth/register", body)));
+
+        Assert.Single(answers, answer => answer.StatusCode == HttpStatusCode.OK);
+        foreach (var refused in answers.Where(answer => answer.StatusCode != HttpStatusCode.OK))
+        {
+            await AssertProblemAsync(refused, HttpStatusCode.Conflict, "Account.EmailTaken");
+        }
+    }
+
+    [Fact]
     public async Task Signing_in_with_the_password_works_and_a_wrong_one_does_not()
     {
         var email = NewEmail();

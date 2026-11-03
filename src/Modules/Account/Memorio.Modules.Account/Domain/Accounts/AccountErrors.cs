@@ -14,7 +14,7 @@ internal static class AccountErrors
 
     public static readonly Error InvalidPassword = Error.Validation(
         "Account.InvalidPassword",
-        "The password does not meet the password rules.");
+        $"The password needs at least {AccountPassword.MinimumLength} characters.");
 
     public static readonly Error InvalidEmail = Error.Validation(
         "Account.InvalidEmail",
