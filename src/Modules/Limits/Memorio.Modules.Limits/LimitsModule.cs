@@ -1,4 +1,5 @@
 using Memorio.Modularity;
+using Memorio.Modules.Limits.Application.Commands.ReleaseUnits;
 using Memorio.Modules.Limits.Application.Commands.ReserveUnits;
 using Memorio.Modules.Limits.Domain.Pools;
 using Memorio.Modules.Limits.Infrastructure;
@@ -33,6 +34,7 @@ public sealed class LimitsModule : IModule
         services.AddDbContext<LimitsDbContext>(database => database.UseLimitsDatabase(connectionString));
         services.AddScoped<IPools, Pools>();
         services.AddScoped<ReserveUnitsHandler>();
+        services.AddScoped<ReleaseUnitsHandler>();
 
         services.AddHealthChecks().AddCheck<LimitsDatabaseHealthCheck>(LimitsDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))

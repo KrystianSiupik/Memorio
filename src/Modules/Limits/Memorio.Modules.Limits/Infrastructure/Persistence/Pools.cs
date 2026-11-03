@@ -40,6 +40,34 @@ internal sealed class Pools(LimitsDbContext database) : IPools
         return true;
     }
 
+    public async Task<bool> ReleaseAsync(Guid operationKey, DateTimeOffset at, CancellationToken cancellationToken)
+    {
+        await using var transaction = await database.Database.BeginTransactionAsync(cancellationToken);
+        var released = await database.Database.ExecuteSqlAsync(
+            $"""
+            UPDATE limits.account_pools pool SET used_bytes = pool.used_bytes - operation.bytes
+            FROM limits.pool_operations operation
+            WHERE operation.operation_key = {operationKey} AND operation.released_at IS NULL AND pool.account_id = operation.account_id
+            """,
+            cancellationToken) == 1;
+        await database.Database.ExecuteSqlAsync(
+            $"UPDATE limits.pool_operations SET released_at = {at} WHERE operation_key = {operationKey} AND released_at IS NULL",
+            cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+        return released;
+    }
+
+    public async Task<bool> SetLimitAsync(Guid accountId, long limitBytes, long sequence, CancellationToken cancellationToken)
+    {
+        await EnsurePoolAsync(accountId, cancellationToken);
+        return await database.Database.ExecuteSqlAsync(
+            $"""
+            UPDATE limits.account_pools SET limit_bytes = {limitBytes}, limit_sequence = {sequence}
+            WHERE account_id = {accountId} AND limit_sequence < {sequence}
+            """,
+            cancellationToken) == 1;
+    }
+
     private Task<int> EnsurePoolAsync(Guid accountId, CancellationToken cancellationToken) =>
         database.Database.ExecuteSqlAsync(
             $"""
