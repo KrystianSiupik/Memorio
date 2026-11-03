@@ -70,6 +70,17 @@ public sealed class AccountHost : PostgresDatabase
         return (await response.Content.ReadFromJsonAsync<JsonElement>(Cancellation)).GetProperty("windowEndsAt").GetDateTimeOffset();
     }
 
+    /// <summary>The window of this account ended yesterday, and its deadline never fired.</summary>
+    public async Task BackdateDeletionWindowAsync(Guid accountId)
+    {
+        await using var account = await OpenAsAsync("memorio_account");
+        await using var update = new NpgsqlCommand(
+            "UPDATE account.account_deletions SET window_ends_at = now() - interval '1 day' WHERE account_id = @account",
+            account);
+        update.Parameters.AddWithValue("account", accountId);
+        Assert.Equal(1, await update.ExecuteNonQueryAsync(Cancellation));
+    }
+
     public async Task<HttpResponseMessage> SendAsync(HttpMethod method, string path, string accessToken, object? body = null)
     {
         using var request = new HttpRequestMessage(method, new Uri(path, UriKind.Relative));

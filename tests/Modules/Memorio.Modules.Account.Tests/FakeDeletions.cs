@@ -17,6 +17,9 @@ internal sealed class FakeDeletions : IAccountDeletions
     public Task<AccountDeletion?> FindAsync(AccountId accountId, CancellationToken cancellationToken) =>
         Task.FromResult(Stored?.Id == accountId ? Stored : null);
 
+    public Task<IReadOnlyList<OverdueDeletion>> FindOverdueAsync(DateTimeOffset at, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OverdueDeletion>>([]);
+
     public void Add(AccountDeletion deletion)
     {
     }

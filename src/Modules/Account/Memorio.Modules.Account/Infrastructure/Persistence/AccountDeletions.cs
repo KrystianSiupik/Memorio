@@ -16,6 +16,14 @@ internal sealed class AccountDeletions(IDbContextOutbox<AccountDbContext> outbox
     public Task<AccountDeletion?> FindAsync(AccountId accountId, CancellationToken cancellationToken) =>
         Database.AccountDeletions.FirstOrDefaultAsync(deletion => deletion.Id == accountId, cancellationToken);
 
+    public async Task<IReadOnlyList<OverdueDeletion>> FindOverdueAsync(DateTimeOffset at, CancellationToken cancellationToken) =>
+        await Database.AccountDeletions
+            .AsNoTracking()
+            .Where(deletion => deletion.State == DeletionState.Pending && deletion.WindowEndsAt <= at)
+            .OrderBy(deletion => deletion.WindowEndsAt)
+            .Select(deletion => new OverdueDeletion(deletion.Id, deletion.Sequence))
+            .ToListAsync(cancellationToken);
+
     public void Add(AccountDeletion deletion) => Database.AccountDeletions.Add(deletion);
 
     public async Task<bool> SaveAsync(AccountDeletion deletion, CancellationToken cancellationToken)

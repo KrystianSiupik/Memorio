@@ -2,9 +2,14 @@ using Memorio.Modules.Account.Domain.Accounts;
 
 namespace Memorio.Modules.Account.Domain.Deletions;
 
+internal sealed record OverdueDeletion(AccountId AccountId, int Sequence);
+
 internal interface IAccountDeletions
 {
     Task<AccountDeletion?> FindAsync(AccountId accountId, CancellationToken cancellationToken);
+
+    /// <summary>Windows still open although they ended by <paramref name="at"/>.</summary>
+    Task<IReadOnlyList<OverdueDeletion>> FindOverdueAsync(DateTimeOffset at, CancellationToken cancellationToken);
 
     void Add(AccountDeletion deletion);
 
