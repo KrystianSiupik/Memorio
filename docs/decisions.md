@@ -636,3 +636,11 @@ Pytanie otwarte: czy zlecenie usunięcia ma wymagać ponownego podania hasła. T
 | D-204 | `AccountDeletion.Complete(sequence, at)` działa tylko dla bieżącego okna, w stanie `Pending` i nie przed jego końcem. Dane logowania (`AspNetUsers`, kaskadą loginy i tokeny) znikają w tej samej transakcji co zmiana stanu. Wiersz `account_deletions` zostaje na stałe: identyfikator, daty i zgoda, bez e-maila | jeden wynik okna; ślad, co się stało z oknem. **Do oceny prawnika:** przechowywanie tego śladu po usunięciu konta |
 
 **Stan testów:** reguły bez bazy oraz na PostgreSQL: równoległe usuwanie ma jednego zwycięzcę, po usunięciu token zwraca 401.
+
+## MEM-E1-KONTO-05 · Cofnij usunięcie konta (C5) (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-205 | `DELETE /v1/account/deletion` (204). Cofnąć można tylko przed końcem okna: w chwili końca odpowiedź to 409 `Account.DeletionAlreadyDecided`, także gdy termin jeszcze się nie wykonał. Ponowne cofnięcie nic nie zmienia i kończy się sukcesem; brak zlecenia to 404 `Account.NoDeletionRequested`. E8 idzie przez outbox | granica okna jest jedna i nie zależy od opóźnienia workera |
+
+**Stan testów:** reguły bez bazy, 10 rund równoległego cofania i usuwania na PostgreSQL: zawsze jeden zwycięzca, a stan konta zgadza się z wynikiem.

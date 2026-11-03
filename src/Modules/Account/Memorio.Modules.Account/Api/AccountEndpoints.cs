@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Memorio.Modularity;
 using Memorio.Modules.Account.Application.Commands.AcceptTerms;
+using Memorio.Modules.Account.Application.Commands.CancelAccountDeletion;
 using Memorio.Modules.Account.Application.Commands.RequestAccountDeletion;
 using Memorio.Modules.Account.Application.Queries.AccountDeletionImpact;
 using Memorio.Modules.Account.Application.Queries.PendingAccountDeletion;
@@ -31,6 +32,9 @@ internal static class AccountEndpoints
         account.MapGet("/deletion", GetDeletionAsync)
             .WithName("GetAccountDeletion")
             .WithSummary("Whether a window for deleting the account is open, and until when.");
+        account.MapDelete("/deletion", CancelDeletionAsync)
+            .WithName("CancelAccountDeletion")
+            .WithSummary("Cancels the deletion of the account while its window lasts.");
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> AcceptTermsAsync(
@@ -71,6 +75,15 @@ internal static class AccountEndpoints
         IPendingAccountDeletionQuery query,
         CancellationToken cancellationToken) =>
         TypedResults.Ok(new AccountDeletionResponse(await query.GetWindowEndAsync(AccountOf(principal), cancellationToken)));
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> CancelDeletionAsync(
+        ClaimsPrincipal principal,
+        CancelAccountDeletionHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var cancelled = await handler.HandleAsync(new CancelAccountDeletion(AccountOf(principal)), cancellationToken);
+        return cancelled.IsFailure ? Problems.From(cancelled.Error) : TypedResults.NoContent();
+    }
 
     /// <summary>The account of the signed-in person; every endpoint here requires sign-in (SD10).</summary>
     private static AccountId AccountOf(ClaimsPrincipal principal) =>

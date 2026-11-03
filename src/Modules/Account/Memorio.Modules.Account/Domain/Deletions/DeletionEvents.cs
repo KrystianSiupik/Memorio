@@ -11,5 +11,8 @@ internal sealed record DeletionRequested(
     int Sequence,
     DateTimeOffset WindowEndsAt) : IDomainEvent;
 
+/// <summary>E8: the person changed their mind during the window.</summary>
+internal sealed record DeletionCancelled(Guid EventId, DateTimeOffset OccurredAt, AccountId AccountId, int Sequence) : IDomainEvent;
+
 /// <summary>E7: the window ended without being cancelled, the account is gone.</summary>
 internal sealed record DeletionCompleted(Guid EventId, DateTimeOffset OccurredAt, AccountId AccountId, int Sequence) : IDomainEvent;
