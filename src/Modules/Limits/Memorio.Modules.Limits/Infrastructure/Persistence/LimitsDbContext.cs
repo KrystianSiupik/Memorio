@@ -33,6 +33,7 @@ internal sealed class LimitsDbContext(DbContextOptions<LimitsDbContext> options)
             operation.Property(item => item.AccountId).HasColumnName("account_id");
             operation.Property(item => item.Bytes).HasColumnName("bytes");
             operation.Property(item => item.ReservedAt).HasColumnName("reserved_at");
+            operation.Property(item => item.ReleasedAt).HasColumnName("released_at");
         });
     }
 }

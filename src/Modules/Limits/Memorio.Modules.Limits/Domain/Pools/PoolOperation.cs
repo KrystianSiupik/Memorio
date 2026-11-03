@@ -10,4 +10,6 @@ internal sealed class PoolOperation
     public long Bytes { get; private set; }
 
     public DateTimeOffset ReservedAt { get; private set; }
+
+    public DateTimeOffset? ReleasedAt { get; private set; }
 }

@@ -60,6 +60,10 @@ namespace Memorio.Modules.Limits.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("bytes");
 
+                    b.Property<DateTimeOffset?>("ReleasedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("released_at");
+
                     b.Property<DateTimeOffset>("ReservedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("reserved_at");
