@@ -20,6 +20,14 @@ internal static class AccountErrors
         "Account.InvalidEmail",
         "The email address is not valid.");
 
+    public static readonly Error TermsVersionNotCurrent = Error.Validation(
+        "Account.TermsVersionNotCurrent",
+        $"Only the current terms ({TermsOfService.CurrentVersion}) can be accepted.");
+
+    public static readonly Error NotFound = Error.NotFound(
+        "Account.NotFound",
+        "This account does not exist.");
+
     public static readonly Error ProviderUnavailable = Error.NotFound(
         "Account.ProviderUnavailable",
         "This sign-in provider is not available.");

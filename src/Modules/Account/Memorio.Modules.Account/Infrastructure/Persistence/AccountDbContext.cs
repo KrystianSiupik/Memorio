@@ -20,5 +20,6 @@ internal sealed class AccountDbContext(DbContextOptions<AccountDbContext> option
     {
         base.OnModelCreating(builder);
         builder.HasDefaultSchema(Schema);
+        builder.Entity<AccountUser>().Property(user => user.AcceptedTermsVersion).HasMaxLength(20);
     }
 }

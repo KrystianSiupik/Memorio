@@ -34,7 +34,7 @@ void main() {
   }
 
   (int, Object?) signedInServer(RequestOptions request) => switch (request.path) {
-    '/v1/account/me' => (200, {'accountId': 'account-1', 'email': 'ola@example.com'}),
+    '/v1/account/me' => (200, {'accountId': 'account-1', 'email': 'ola@example.com', 'currentTermsVersion': '2026-11'}),
     _ => (200, _tokens),
   };
 

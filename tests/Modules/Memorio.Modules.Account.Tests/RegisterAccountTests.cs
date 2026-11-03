@@ -110,5 +110,8 @@ public sealed class RegisterAccountTests
             Declaration = declaration;
             return Task.FromResult<Result<AccountId>>(Created.Value);
         }
+
+        public Task<Result> RecordTermsAcceptanceAsync(AccountId accountId, string version, DateTimeOffset acceptedAt) =>
+            throw new NotSupportedException();
     }
 }
