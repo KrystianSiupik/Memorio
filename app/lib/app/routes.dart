@@ -38,6 +38,16 @@ final class MapRoute extends TabRoute {
   String get location => path;
 }
 
+/// S06: the trash, on the way through the map tab.
+final class TrashRoute extends AppRoute {
+  const TrashRoute();
+
+  static const path = 'trash';
+
+  @override
+  String get location => '${MapRoute.path}/$path';
+}
+
 /// S09: albums.
 final class AlbumsRoute extends TabRoute {
   const AlbumsRoute();
