@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Memorio.Modularity;
 using Memorio.Modules.Archive.Application.Commands.AddPhoto;
+using Memorio.Modules.Archive.Application.Commands.ApproveDescription;
 using Memorio.Modules.Archive.Application.Commands.CreateMemory;
 using Memorio.Modules.Archive.Domain.Memories;
 using Microsoft.AspNetCore.Builder;
@@ -20,6 +21,9 @@ internal static class MemoriesEndpoints
         memories.MapPost("/", CreateAsync)
             .WithName("CreateMemory")
             .WithSummary("Records a memory; the id comes from the client, so a retry changes nothing.");
+        memories.MapPut("/{id:guid}/description", ApproveDescriptionAsync)
+            .WithName("ApproveDescription")
+            .WithSummary("The author approves the description of a memory, naming the AI draft it started from, if any.");
         memories.MapPost("/uploads", StartUploadAsync)
             .WithName("StartPhotoUpload")
             .WithSummary("An address to send one photo to, valid for 5 minutes.");
@@ -63,7 +67,24 @@ internal static class MemoriesEndpoints
             cancellationToken);
         return added.IsFailure ? Problems.From(added.Error) : TypedResults.NoContent();
     }
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> ApproveDescriptionAsync(
+        Guid id,
+        ApproveDescriptionRequest request,
+        ClaimsPrincipal principal,
+        ApproveDescriptionHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var approved = await handler.HandleAsync(
+            new ApproveDescription(new MemoryId(id), CurrentAccount.IdOf(principal), request.Text, request.AiDraftId),
+            cancellationToken);
+        return approved.IsFailure ? Problems.From(approved.Error) : TypedResults.NoContent();
+    }
 }
+
+/// <param name="Text">The description.</param>
+/// <param name="AiDraftId">The AI draft it started from, if any.</param>
+internal sealed record ApproveDescriptionRequest(string? Text, Guid? AiDraftId);
 
 internal sealed record StartUploadRequest(string? ContentType);
 

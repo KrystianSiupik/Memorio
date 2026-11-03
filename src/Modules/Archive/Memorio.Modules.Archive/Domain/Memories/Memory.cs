@@ -1,4 +1,5 @@
 using Memorio.SharedKernel.Domain;
+using Memorio.SharedKernel.Results;
 
 namespace Memorio.Modules.Archive.Domain.Memories;
 
@@ -8,6 +9,8 @@ namespace Memorio.Modules.Archive.Domain.Memories;
 /// </summary>
 internal sealed class Memory : AggregateRoot<MemoryId>
 {
+    public const int MaximumDescriptionLength = 20_000;
+
     private readonly List<Photo> _photos = [];
 
     private Memory(MemoryId id, Guid authorAccountId, DateTimeOffset createdAt)
@@ -37,6 +40,13 @@ internal sealed class Memory : AggregateRoot<MemoryId>
 
     public IReadOnlyCollection<Photo> Photos => _photos.AsReadOnly();
 
+    public string? Description { get; private set; }
+
+    /// <summary>With <see cref="DescriptionAiPromptVersion"/>: set when the text started as an AI draft (SD9).</summary>
+    public string? DescriptionAiModel { get; private set; }
+
+    public string? DescriptionAiPromptVersion { get; private set; }
+
     public static Memory Create(MemoryId id, Guid authorAccountId, MemoryPlace place, MemoryDate date, DateTimeOffset now)
     {
         var memory = new Memory(id, authorAccountId, now)
@@ -53,6 +63,25 @@ internal sealed class Memory : AggregateRoot<MemoryId>
         return memory;
     }
 
+    /// <summary>
+    /// The person stands behind this text. A text that started as an AI draft keeps the marker, also after
+    /// edits: the person may change a word, and it is still written with AI (AI Act art. 50, K9).
+    /// </summary>
+    public Result ApproveDescription(string? text, MemoryAiOrigin? aiOrigin, DateTimeOffset now)
+    {
+        var trimmed = text?.Trim();
+        if (string.IsNullOrEmpty(trimmed) || trimmed.Length > MaximumDescriptionLength)
+        {
+            return MemoryErrors.InvalidDescription;
+        }
+
+        Description = trimmed;
+        DescriptionAiModel = aiOrigin?.Model;
+        DescriptionAiPromptVersion = aiOrigin?.PromptVersion;
+        Raise(new DescriptionApproved(Guid.CreateVersion7(), now, Id));
+        return Result.Success();
+    }
+
     public bool HasPhoto(Guid photoId) => _photos.Exists(photo => photo.Id == photoId);
 
     public void AddPhoto(Guid photoId, string storageKey, long sizeBytes, DateTimeOffset now)
@@ -64,6 +93,9 @@ internal sealed class Memory : AggregateRoot<MemoryId>
     public void DeleteDefinitively(DateTimeOffset now) =>
         Raise(new ContentDeletedDefinitively(Guid.CreateVersion7(), now, Id, AuthorAccountId));
 }
+
+/// <summary>Which AI wrote the draft a description started from.</summary>
+internal sealed record MemoryAiOrigin(string Model, string PromptVersion);
 
 /// <summary>What a memory keeps of its place.</summary>
 internal sealed record MemoryPlace(string Reference, string Name, double Latitude, double Longitude);

@@ -25,6 +25,10 @@ internal static class MemoryErrors
     /// <summary>Somebody got there first: the state of this memory changed under this operation.</summary>
     public static readonly Error AlreadyDecided = Error.Conflict("Archive.AlreadyDecided", "This has already been decided.");
 
+    public static readonly Error InvalidDescription = Error.Validation("Archive.InvalidDescription", $"A description has some text, up to {Memory.MaximumDescriptionLength} characters.");
+
+    public static readonly Error DraftNotFound = Error.Validation("Archive.DraftNotFound", "This is not a draft of this person.");
+
     public static readonly Error IdTaken = Error.Conflict("Archive.IdTaken", "This id belongs to another memory.");
 
     /// <summary>The same answer for a memory that does not exist and one of somebody else: no way to tell them apart.</summary>

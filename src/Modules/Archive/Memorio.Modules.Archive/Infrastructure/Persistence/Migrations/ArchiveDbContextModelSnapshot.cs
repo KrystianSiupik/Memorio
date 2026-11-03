@@ -72,6 +72,21 @@ namespace Memorio.Modules.Archive.Infrastructure.Persistence.Migrations
                         .HasDefaultValue(new DateOnly(2000, 1, 1))
                         .HasColumnName("date_to");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(20000)
+                        .HasColumnType("character varying(20000)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("DescriptionAiModel")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("description_ai_model");
+
+                    b.Property<string>("DescriptionAiPromptVersion")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("description_ai_prompt_version");
+
                     b.Property<double>("Latitude")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("double precision")
