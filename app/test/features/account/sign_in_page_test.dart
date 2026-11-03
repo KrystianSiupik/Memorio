@@ -66,7 +66,7 @@ void main() {
     expect(auth.registered.single.declaresMinimumAge, isTrue);
     expect(auth.registered.single.email, 'ola@example.com');
     expect(account.termsAccepted, 1);
-    expect(find.widgetWithText(AppBar, 'Map'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Mapa'), findsOneWidget);
   });
 
   testWidgets('registering without the terms does not record them', (tester) async {
@@ -90,7 +90,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(auth.signedIn.single.email, 'ola@example.com');
-    expect(find.widgetWithText(AppBar, 'Map'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Mapa'), findsOneWidget);
   });
 
   testWidgets('loading: the actions are inactive until the answer comes', (tester) async {
@@ -137,7 +137,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(auth.registered, hasLength(2));
-        expect(find.widgetWithText(AppBar, 'Map'), findsOneWidget);
+        expect(find.widgetWithText(AppBar, 'Mapa'), findsOneWidget);
       });
     });
   });

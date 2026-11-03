@@ -9,7 +9,7 @@ import '../helpers/app.dart';
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
-  const bannerText = 'You are offline. New memories and photos are saved and sent when you are back online.';
+  const bannerText = 'Jesteś bez połączenia. Nowe wspomnienia i zdjęcia zapiszą się i wyślą, gdy wróci sieć.';
 
   testWidgets('the offline banner shows on the tabs while there is no connection', (tester) async {
     final online = StreamController<bool>();
@@ -20,7 +20,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(bannerText), findsOneWidget);
 
-    await tester.tap(find.text('Albums'));
+    await tester.tap(find.text('Albumy'));
     await tester.pumpAndSettle();
     expect(find.text(bannerText), findsOneWidget);
 

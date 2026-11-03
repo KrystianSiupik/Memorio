@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/api/api.dart';
+import '../core/l10n/l10n.dart';
 import 'router.dart';
 import 'update_required_screen.dart';
 
@@ -18,6 +19,8 @@ class MemorioApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Memorio',
       theme: ThemeData(colorSchemeSeed: Colors.teal, useMaterial3: true),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: ref.watch(routerProvider),
       builder: (context, child) => minimumVersion == null
           ? child ?? const SizedBox.shrink()

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/offline/offline.dart';
 import '../../../core/result.dart';
 import '../domain/auth_repository.dart';
@@ -66,9 +67,10 @@ class _SignInPageState extends ConsumerState<SignInPage> {
     final offline = ref.watch(isOnlineProvider).value == false;
     final canSubmit = !_busy && !offline && (_hasAccount || _declaresMinimumAge);
     final failure = _failure;
+    final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: Text(_hasAccount ? 'Logowanie' : 'Rejestracja')),
+      appBar: AppBar(title: Text(_hasAccount ? l10n.signInTitle : l10n.registerTitle)),
       body: Column(
         children: [
           if (offline) const _NoConnectionBanner(),
@@ -82,24 +84,24 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                   enabled: !_busy,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
-                  decoration: const InputDecoration(labelText: 'E-mail'),
+                  decoration: InputDecoration(labelText: l10n.email),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _password,
                   enabled: !_busy,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Hasło'),
+                  decoration: InputDecoration(labelText: l10n.password),
                 ),
                 const SizedBox(height: 12),
                 if (!_hasAccount) ...[
                   CheckboxListTile(
-                    title: const Text('Mam ukończone 16 lat'),
+                    title: Text(l10n.ageDeclaration),
                     value: _declaresMinimumAge,
                     onChanged: _busy ? null : (value) => setState(() => _declaresMinimumAge = value ?? false),
                   ),
                   CheckboxListTile(
-                    title: const Text('Akceptuję regulamin'),
+                    title: Text(l10n.acceptTerms),
                     value: _acceptsTerms,
                     onChanged: _busy ? null : (value) => setState(() => _acceptsTerms = value ?? false),
                   ),
@@ -107,16 +109,16 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                 ],
                 if (failure != null) ...[
                   Text(
-                    _messageOf(failure),
+                    _messageOf(l10n, failure),
                     key: const Key('s01-error'),
                     style: TextStyle(color: Theme.of(context).colorScheme.error),
                   ),
-                  TextButton(onPressed: canSubmit ? _submit : null, child: const Text('Ponów')),
+                  TextButton(onPressed: canSubmit ? _submit : null, child: Text(l10n.retry)),
                   const SizedBox(height: 12),
                 ],
                 FilledButton(
                   onPressed: canSubmit ? _submit : null,
-                  child: Text(_hasAccount ? 'Zaloguj się' : 'Załóż konto'),
+                  child: Text(_hasAccount ? l10n.signIn : l10n.createAccount),
                 ),
                 TextButton(
                   onPressed: _busy
@@ -125,7 +127,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                           _hasAccount = !_hasAccount;
                           _failure = null;
                         }),
-                  child: Text(_hasAccount ? 'Nie mam konta' : 'Mam już konto'),
+                  child: Text(_hasAccount ? l10n.noAccount : l10n.hasAccount),
                 ),
               ],
             ),
@@ -135,16 +137,16 @@ class _SignInPageState extends ConsumerState<SignInPage> {
     );
   }
 
-  static String _messageOf(AuthFailure failure) => switch (failure) {
-    AuthOffline() => 'Brak połączenia. Sprawdź internet i spróbuj ponownie.',
-    InvalidCredentials() => 'Nieprawidłowy e-mail lub hasło.',
-    AgeDeclarationRequired() => 'Konto może założyć osoba, która ma ukończone 16 lat.',
-    EmailTaken() => 'Konto z tym adresem już istnieje. Zaloguj się.',
-    InvalidPassword() => 'Hasło musi mieć co najmniej 10 znaków.',
-    InvalidEmail() => 'To nie wygląda na poprawny adres e-mail.',
-    InvalidProviderToken() => 'Logowanie nie powiodło się. Spróbuj ponownie.',
-    ProviderUnavailable() => 'Ten sposób logowania jest teraz niedostępny.',
-    AuthServerError() => 'Błąd serwera. Spróbuj ponownie za chwilę.',
+  static String _messageOf(AppLocalizations l10n, AuthFailure failure) => switch (failure) {
+    AuthOffline() => l10n.authOffline,
+    InvalidCredentials() => l10n.invalidCredentials,
+    AgeDeclarationRequired() => l10n.ageRequired,
+    EmailTaken() => l10n.emailTaken,
+    InvalidPassword() => l10n.invalidPassword,
+    InvalidEmail() => l10n.invalidEmail,
+    InvalidProviderToken() => l10n.invalidProviderToken,
+    ProviderUnavailable() => l10n.providerUnavailable,
+    AuthServerError() => l10n.serverError,
   };
 }
 
@@ -165,7 +167,7 @@ class _NoConnectionBanner extends StatelessWidget {
               Icon(Icons.cloud_off, color: colors.onSecondaryContainer),
               const SizedBox(width: 12),
               Expanded(
-                child: Text('Brak połączenia', style: TextStyle(color: colors.onSecondaryContainer)),
+                child: Text(context.l10n.noConnection, style: TextStyle(color: colors.onSecondaryContainer)),
               ),
             ],
           ),

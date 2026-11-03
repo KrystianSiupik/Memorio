@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/offline/offline.dart';
 import '../../../core/result.dart';
 import '../domain/account_repository.dart';
@@ -72,16 +73,18 @@ class _AccountPageState extends ConsumerState<AccountPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Konto i prywatność'),
+        title: Text(context.l10n.accountTitle),
         // In the bar: available also when the data did not load, and without a connection.
-        actions: [IconButton(tooltip: 'Wyloguj', icon: const Icon(Icons.logout), onPressed: _busy ? null : _signOut)],
+        actions: [
+          IconButton(tooltip: context.l10n.signOut, icon: const Icon(Icons.logout), onPressed: _busy ? null : _signOut),
+        ],
       ),
       body: Column(
         children: [
           if (offline)
-            const Padding(
-              padding: EdgeInsets.all(12),
-              child: Text('Brak połączenia', key: Key('s24-offline')),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(context.l10n.noConnection, key: const Key('s24-offline')),
             ),
           if (_busy) const LinearProgressIndicator(key: Key('s24-busy')),
           Expanded(
@@ -100,8 +103,8 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(_messageOf(error), key: const Key('s24-error')),
-        TextButton(onPressed: () => ref.invalidate(accountOverviewProvider), child: const Text('Ponów')),
+        Text(_messageOf(context.l10n, error), key: const Key('s24-error')),
+        TextButton(onPressed: () => ref.invalidate(accountOverviewProvider), child: Text(context.l10n.retry)),
       ],
     ),
   );
@@ -114,54 +117,55 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     final canDelete = active && _understood && (withoutSuccessor == 0 || _consentsToAlbumExpiry);
     final failure = _failure;
     final lastAction = _lastAction;
+    final l10n = context.l10n;
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text('Skutki usunięcia', style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.deletionEffects, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
-        Text('Wspomnienia: ${impact.memories}'),
-        Text('Zdjęcia: ${impact.photos}'),
-        Text('Twoje albumy: ${impact.ownAlbums}, w tym bez następcy: $withoutSuccessor'),
-        Text('Cudze albumy, w których uczestniczysz: ${impact.otherPeoplesAlbums}'),
+        Text(l10n.effectMemories(impact.memories)),
+        Text(l10n.effectPhotos(impact.photos)),
+        Text(l10n.effectOwnAlbums(impact.ownAlbums, withoutSuccessor)),
+        Text(l10n.effectOtherAlbums(impact.otherPeoplesAlbums)),
         const SizedBox(height: 24),
-        Text('Kontakt spadkowy', style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.legacyContact, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
-        const Text('Nie wskazano'),
+        Text(l10n.legacyContactNone),
         // Comes with succession (MEM-E9-SUKCESJA-01).
-        const OutlinedButton(onPressed: null, child: Text('Wskaż kontakt spadkowy')),
+        OutlinedButton(onPressed: null, child: Text(l10n.legacyContactChoose)),
         const SizedBox(height: 24),
         if (failure != null) ...[
           Text(
-            _messageOf(failure),
+            _messageOf(l10n, failure),
             key: const Key('s24-error'),
             style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
           if (lastAction != null && failure is! DeletionAlreadyDecided)
-            TextButton(onPressed: active ? () => _run(lastAction) : null, child: const Text('Ponów')),
+            TextButton(onPressed: active ? () => _run(lastAction) : null, child: Text(context.l10n.retry)),
           const SizedBox(height: 12),
         ],
         if (windowEnd != null) ...[
-          Text('Konto zostanie usunięte ${_dateOf(windowEnd)}.', key: const Key('s24-window')),
+          Text(l10n.deletionDate(_dateOf(windowEnd)), key: const Key('s24-window')),
           const SizedBox(height: 8),
-          FilledButton(onPressed: active ? _cancelDeletion : null, child: const Text('Cofnij usunięcie')),
+          FilledButton(onPressed: active ? _cancelDeletion : null, child: Text(l10n.cancelDeletion)),
         ] else ...[
           CheckboxListTile(
-            title: const Text('Rozumiem skutki usunięcia konta'),
+            title: Text(l10n.understandDeletion),
             value: _understood,
             onChanged: active ? (value) => setState(() => _understood = value ?? false) : null,
           ),
           if (withoutSuccessor > 0) ...[
-            const Text('Masz albumy bez następcy. Wskaż następcę w albumie albo zgódź się na ich wygaśnięcie.'),
+            Text(l10n.albumsWithoutSuccessor),
             CheckboxListTile(
-              title: const Text('Zgadzam się na wygaśnięcie albumów bez następcy'),
+              title: Text(l10n.consentAlbumExpiry),
               value: _consentsToAlbumExpiry,
               onChanged: active ? (value) => setState(() => _consentsToAlbumExpiry = value ?? false) : null,
             ),
           ],
-          const Text('Konto zniknie po 30 dniach. Do tego czasu możesz się wycofać.'),
+          Text(l10n.deletionWindowInfo),
           const SizedBox(height: 8),
-          FilledButton(onPressed: canDelete ? _requestDeletion : null, child: const Text('Usuń konto')),
+          FilledButton(onPressed: canDelete ? _requestDeletion : null, child: Text(l10n.deleteAccount)),
         ],
       ],
     );
@@ -173,12 +177,12 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     return '${twoDigits(local.day)}.${twoDigits(local.month)}.${local.year}';
   }
 
-  static String _messageOf(Object? failure) => switch (failure) {
-    AccountOffline() => 'Brak połączenia. Sprawdź internet i spróbuj ponownie.',
-    AccountForbidden() => 'Brak dostępu. Zaloguj się ponownie.',
-    DeletionAlreadyDecided() => 'To już rozstrzygnięte: okno usunięcia konta się zakończyło.',
-    AlbumWithoutSuccessor() => 'Masz albumy bez następcy. Wskaż następcę albo zgódź się na ich wygaśnięcie.',
-    _ => 'Błąd serwera. Spróbuj ponownie za chwilę.',
+  static String _messageOf(AppLocalizations l10n, Object? failure) => switch (failure) {
+    AccountOffline() => l10n.authOffline,
+    AccountForbidden() => l10n.noAccess,
+    DeletionAlreadyDecided() => l10n.alreadyDecidedAccount,
+    AlbumWithoutSuccessor() => l10n.albumWithoutSuccessorError,
+    _ => l10n.serverError,
   };
 }
 

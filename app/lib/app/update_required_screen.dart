@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../core/l10n/l10n.dart';
+
 /// Shown instead of the app when the backend no longer serves this version (HTTP 426).
 class UpdateRequiredScreen extends StatelessWidget {
   const UpdateRequiredScreen({super.key, required this.minimumVersion});
@@ -17,12 +19,10 @@ class UpdateRequiredScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Please update Memorio', style: theme.textTheme.headlineSmall, textAlign: TextAlign.center),
+                Text(context.l10n.updateTitle, style: theme.textTheme.headlineSmall, textAlign: TextAlign.center),
                 const SizedBox(height: 12),
                 Text(
-                  minimumVersion.isEmpty
-                      ? 'This version of the app is no longer supported.'
-                      : 'This version of the app is no longer supported. Version $minimumVersion or newer is required.',
+                  minimumVersion.isEmpty ? context.l10n.updateBody : context.l10n.updateBodyVersion(minimumVersion),
                   textAlign: TextAlign.center,
                 ),
               ],

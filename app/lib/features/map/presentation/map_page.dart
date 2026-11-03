@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n.dart';
+
 import 'map_providers.dart';
 
 /// S03 Map and globe. Only the map for now; the screen itself is MEM-E2-PLAT-01.
@@ -10,7 +12,7 @@ class MapPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Map')),
+      appBar: AppBar(title: Text(context.l10n.mapTitle)),
       body: ref.watch(mapViewProvider),
     );
   }
