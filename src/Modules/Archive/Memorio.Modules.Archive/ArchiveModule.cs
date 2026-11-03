@@ -1,5 +1,7 @@
 using Memorio.Modularity;
+using Memorio.Modules.Archive.Application.Commands.DeleteAccountContent;
 using Memorio.Modules.Archive.Contracts;
+using Memorio.Modules.Archive.Domain.Memories;
 using Memorio.Modules.Archive.Infrastructure;
 using Memorio.Modules.Archive.Infrastructure.Persistence;
 using Memorio.Modules.Archive.Infrastructure.Queries;
@@ -32,6 +34,8 @@ public sealed class ArchiveModule : IModule
         services.TryAddSingleton(TimeProvider.System);
         services.AddDbContext<ArchiveDbContext>(database => database.UseArchiveDatabase(connectionString));
         services.AddScoped<IAccountContentReader, AccountContentReader>();
+        services.AddScoped<IMemories, Memories>();
+        services.AddScoped<DeleteAccountContentHandler>();
 
         services.AddHealthChecks().AddCheck<ArchiveDatabaseHealthCheck>(ArchiveDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))

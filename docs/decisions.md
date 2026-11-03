@@ -660,3 +660,11 @@ Pytanie otwarte: czy zlecenie usunięcia ma wymagać ponownego podania hasła. T
 | D-207 | E6 to odpalenie terminu `Account.DeletionWindow` (klucz: konto, dane: `sequence`), a nie osobna wiadomość w kolejce. Termin ustawia i zdejmuje handler E4 i E8 w workerze. Oba sprawdzają aktualny stan agregatu, więc spóźnione zdarzenie o wcześniejszym oknie niczego nie zmienia (kolejność z D-013 bez osobnej tabeli pozycji). Zadanie decyduje czasem `ScheduledFor`. Polityki z `IDeadlines` rejestrowane fabryką, bo w API tego portu nie ma | wzorzec Process Manager z katalogu; termin nie zginie po zatwierdzeniu zmiany (D-157); `ValidateOnBuild` w trybie Development nie wywraca API |
 
 **Ryzyko do decyzji:** zadanie po nieudanych ponowieniach (1 min, 10 min, 1 h, D-158) jest porzucane z metryką `given_up`. Konto mogłoby wtedy zostać po 30 dniach mimo obietnicy usunięcia, dopóki ktoś nie zareaguje na metrykę. Rozważyć dzienne sprzątanie zaległych okien; nie dodałem go, bo ticket go nie obejmuje. **Stan testów:** `AccountDeletionRequestedHandlerIdempotencyTests`, `AccountDeletionCancelledHandlerIdempotencyTests`, `AccountDeletionWindowJobIdempotencyTests` na PostgreSQL, z workerem Wolverine i atrapą harmonogramu. Prawdziwy Quartz dla tego zadania nie był uruchamiany; mechanizm terminów sprawdza `Memorio.Scheduling.Tests`.
+
+## MEM-E1-ARCHIWUM-01 · Usuń treści konta (C25) (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-208 | C25 kasuje od razu, z pominięciem 30 dni kosza: najpierw pliki, potem wiersze w jednej transakcji. Awaria magazynu rzuca wyjątek i ponowienie znajduje te same wspomnienia; drugi przebieg nie ma nic do zrobienia. E22 to na razie zdarzenie domenowe zwracane przez handler, bez outboxu: kontrakt integracyjny i jego publikacja należą do MEM-E2-ARCHIWUM-12, a treści i tak jeszcze nie powstają | okno 30 dni dotyczy konta i już minęło; nie wyprzedzam kontraktu z E2 |
+
+**Do pilnowania w E2:** MEM-E2-ARCHIWUM-12 musi objąć też tę ścieżkę, inaczej Pochodzenie (MEM-E6-POCHODZENIE-04) nie dowie się o treściach skasowanych razem z kontem. Treści wniesione do cudzych albumów obsłuży P2 (MEM-E3-ALBUM-19). **Stan testów:** na PostgreSQL z atrapą magazynu: kasowanie, cudze treści nietknięte, ponowienie, awaria magazynu. Prawdziwy magazyn S3 nie był tu użyty; `DeleteAsync` sprawdza `Memorio.Storage.Tests`.

@@ -1,5 +1,6 @@
 using Memorio.Modules.Archive.Domain.Memories;
 using Memorio.Modules.Archive.Infrastructure.Persistence;
+using Memorio.SharedKernel.Storage;
 using Memorio.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +19,9 @@ public sealed class ArchiveDatabase : PostgresDatabase
     public const string Role = "memorio_archive";
 
     private ServiceProvider _services = null!;
+
+    /// <summary>The object storage of the module, in memory.</summary>
+    public FakeObjectStorage Storage { get; } = new();
 
     public AsyncServiceScope CreateScope() => _services.CreateAsyncScope();
 
@@ -48,7 +52,7 @@ public sealed class ArchiveDatabase : PostgresDatabase
             .Build();
         var services = new ServiceCollection();
         new ArchiveModule().AddServices(services, configuration);
-        ConfigureServices(services);
+        services.AddSingleton<IObjectStorage>(Storage);
         _services = services.BuildServiceProvider();
 
         await using var scope = CreateScope();
@@ -56,6 +60,4 @@ public sealed class ArchiveDatabase : PostgresDatabase
     }
 
     protected override async Task OnDisposingAsync() => await _services.DisposeAsync();
-
-    private static void ConfigureServices(IServiceCollection services) => services.AddLogging();
 }
