@@ -774,3 +774,15 @@ Alertu na ten log nie dodałem. **Stan testów:** `AccountDeletionSweepJobIdempo
 | D-227 | Zgoda na AI jest polem żądania (`consentsToAi`), bez zapisu na serwerze; imiona i nazwy do ukrycia podaje aplikacja. Czego aplikacja nie poda, to dostawca zobaczy | trwałe „Moje zgody” to osobny ticket. **Ryzyko prywatności do sprawdzenia:** imię wpisane w opisie, a niewymienione na liście, trafia do dostawcy |
 
 **Stan testów:** `AddPhotoTests` i `RequestDraftTests` na PostgreSQL z atrapami magazynu, puli i dostawcy. Prawdziwy dostawca AI i prawdziwe przesyłanie pliku nie były użyte.
+
+## Archiwum: opis, kosz, kasowanie, mapa (MEM-E2-ARCHIWUM-03 do -12, 2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-228 | Kosz: stan i `sequence` wspomnienia to tokeny współbieżności, jak w AG11 (D-202). Termin okna ustawia worker z E20 i E24 (`Archive.TrashWindow`), a dzienne sprzątanie `Archive.TrashSweep` (03:30 UTC) łapie okna po terminie, jak D-215. Przywrócić można tylko przed końcem okna; materiał przycięty tylko z opłaconym planem (`MoveToTrashByTrimming`, wywoła go E7) | AG10, D-024, HS-022 |
+| D-229 | Jedna droga definitywnego kasowania: `MemoryEraser` (najpierw zwrot miejsca i pliki, na końcu wiersz) dla P3, żądania formalnego (C20) i usunięcia konta (C25). E22 idzie przez outbox ze wszystkich trzech ścieżek, co zamyka D-208 | jedno miejsce, którego nie da się pominąć. **Koszt:** zwrot miejsca przed zapisem wiersza: przy awarii pula na chwilę zaniża zużycie, dopóki ponowienie nie dokończy kasowania |
+| D-230 | Opis: tekst z szkicu AI zachowuje znacznik, także po edycji (D-226, AI Act art. 50, K9), a pochodzenie sprawdza port `IAiDraftReader`, nie aplikacja. Wspomnienie w koszu nie przyjmuje zdjęć ani opisu | SD9 |
+| D-231 | Zapytania R11, R12 i R15 pokazują **na razie tylko własne treści**. Albumy i reguły dostępu dojdą z E3 i E4 (ADR 0011). Filtry osób i albumów na mapie jeszcze nie działają: backend ma tylko filtr dat | kryterium „własne + z albumów” spełnione częściowo; nie ma jeszcze ani albumów, ani treści w nich. **Do dokończenia w E3/E4**, razem z wierszami macierzy dostępu |
+| D-232 | MEM-E2-ARCHIWUM-13 (P5) **nie jest zrobiony**: zależy od zdarzenia E33 z MEM-E10-ARCHIWUM-02 (import zdjęć, E10), którego nie ma | handler bez źródła zdarzenia byłby martwym kodem |
+
+**Stan testów:** `Modules.Archive.Tests` na PostgreSQL z outboxem, w tym równoległe przywracanie i kasowanie. Pula, magazyn i harmonogram w tych testach to atrapy. Prawdziwy Quartz nie był uruchamiany.
