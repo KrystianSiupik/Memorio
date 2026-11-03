@@ -65,6 +65,34 @@ public sealed class SignInTests(AccountHost host) : IClassFixture<AccountHost>
     }
 
     [Fact]
+    public async Task Terms_are_accepted_once_for_the_current_version_and_only_when_signed_in()
+    {
+        var tokens = await PostAsync("/v1/auth/register", new { email = NewEmail(), password = Password, declaresMinimumAge = true });
+        var accessToken = await AccessTokenAsync(tokens);
+        var before = await GetMeAsync(accessToken);
+        var version = before.GetProperty("currentTermsVersion").GetString();
+
+        using var old = await PostWithTokenAsync("/v1/account/terms-acceptance", new { version = "1999-01" }, accessToken);
+        using var first = await PostWithTokenAsync("/v1/account/terms-acceptance", new { version }, accessToken);
+        using var again = await PostWithTokenAsync("/v1/account/terms-acceptance", new { version }, accessToken);
+        using var anonymous = await PostAsync("/v1/account/terms-acceptance", new { version });
+
+        Assert.Equal(JsonValueKind.Null, before.GetProperty("acceptedTermsVersion").ValueKind);
+        await AssertProblemAsync(old, HttpStatusCode.BadRequest, "Account.TermsVersionNotCurrent");
+        Assert.Equal(HttpStatusCode.NoContent, first.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, again.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
+        Assert.Equal(version, (await GetMeAsync(accessToken)).GetProperty("acceptedTermsVersion").GetString());
+    }
+
+    private async Task<HttpResponseMessage> PostWithTokenAsync(string path, object body, string accessToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(path, UriKind.Relative)) { Content = JsonContent.Create(body) };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        return await Client.SendAsync(request, Cancellation);
+    }
+
+    [Fact]
     public async Task Signing_in_with_the_password_works_and_a_wrong_one_does_not()
     {
         var email = NewEmail();

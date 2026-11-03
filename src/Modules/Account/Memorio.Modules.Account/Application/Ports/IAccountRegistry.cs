@@ -8,4 +8,7 @@ internal interface IAccountRegistry
 {
     /// <summary>Fails with <see cref="AccountErrors.EmailTaken"/> when the email already has an account.</summary>
     Task<Result<AccountId>> CreateWithPasswordAsync(string email, string password, AgeDeclaration declaration);
+
+    /// <summary>Accepting a version again keeps the first acceptance. Fails with <see cref="AccountErrors.NotFound"/>.</summary>
+    Task<Result> RecordTermsAcceptanceAsync(AccountId accountId, string version, DateTimeOffset acceptedAt);
 }

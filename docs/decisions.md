@@ -593,3 +593,11 @@ Rozstrzygnięte przez PO (2026-11-02): płaska mapa na telefonach (D-191); **QS3
 Poza zakresem, zostaje jak w PLAT-07: logowanie przez Apple/Google zakłada konto własną ścieżką (ta sama reguła `AgeDeclaration`), bez E1. Teksty dla użytkownika należą do ekranu (MEM-E1-PLAT-01), bo `Error.Description` nie jest pokazywany użytkownikowi; aplikacja wybiera komunikat po kodzie.
 Pytania otwarte (KONTO-01): **HS-008, PO + prawnik:** kod zakłada samą deklarację 16+, bez weryfikacji wieku; nieustalone, co z kontem osoby, która okaże się młodsza.
 **Stan testów (2026-11-02):** `Memorio.Modules.Account.Tests` 33/33 na PostgreSQL w Dockerze, w tym po raz pierwszy lokalnie `SignInTests`; testy architektury 49/49; testy API z kontraktem OpenAPI 46/46. Test wyścigu sprawdzony negatywnie: bez obsługi unikalnego indeksu pada. Zmiana niezmergowana, czeka na akceptację.
+
+## MEM-E1-KONTO-02 · Zaakceptuj regulamin (C2) (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-197 | `POST /v1/account/terms-acceptance` z wersją; przyjmowana tylko wersja aktualna (`TermsOfService.CurrentVersion` = `2026-11`, stała w kodzie), inna daje 400 `Account.TermsVersionNotCurrent`. Wersja i czas w `AspNetUsers` (dwie kolumny dopuszczające null, migracja tylko dodaje), ponowna akceptacja tej samej wersji zachowuje pierwszy czas. `GET /v1/account/me` zwraca `acceptedTermsVersion` i `currentTermsVersion` | zapisujemy, którą treść osoba przyjęła; zmiana wersji wymaga nowej akceptacji |
+
+Założenie do sprawdzenia: **regulaminu jeszcze nie ma**, a `2026-11` to etykieta robocza. Wymuszenie akceptacji przed pierwszą treścią należy do tworzenia wspomnienia (MEM-E2-ARCHIWUM-01). **Stan testów:** handler i test na PostgreSQL przechodzą, testy aplikacji po regeneracji klienta też.

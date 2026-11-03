@@ -33,7 +33,16 @@ void main() {
 
   test('requests carry the access token, sign-in requests do not', () async {
     final adapter = wire(
-      (_) => (200, {'accountId': 'account-1', 'email': null, 'accessToken': 'x', 'refreshToken': 'y'}),
+      (_) => (
+        200,
+        {
+          'accountId': 'account-1',
+          'email': null,
+          'currentTermsVersion': '2026-11',
+          'accessToken': 'x',
+          'refreshToken': 'y',
+        },
+      ),
     );
 
     await container.read(apiClientProvider).account.getMe();
@@ -52,7 +61,7 @@ void main() {
         );
       }
       return request.headers['Authorization'] == 'Bearer access-2'
-          ? (200, {'accountId': 'account-1', 'email': null})
+          ? (200, {'accountId': 'account-1', 'email': null, 'currentTermsVersion': '2026-11'})
           : (401, null);
     });
 
@@ -98,7 +107,7 @@ void main() {
         );
       }
       return request.headers['Authorization'] == 'Bearer access-2'
-          ? (200, {'accountId': 'account-1', 'email': null})
+          ? (200, {'accountId': 'account-1', 'email': null, 'currentTermsVersion': '2026-11'})
           : (401, null);
     });
     final account = container.read(apiClientProvider).account;

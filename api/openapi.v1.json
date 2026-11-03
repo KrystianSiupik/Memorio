@@ -180,10 +180,48 @@
           }
         }
       }
+    },
+    "/v1/account/terms-acceptance": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Records that the signed-in person accepted the current version of the terms.",
+        "operationId": "AcceptTerms",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptTermsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AcceptTermsRequest": {
+        "required": [
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "AccessTokenResponse": {
         "required": [
           "accessToken",
@@ -217,7 +255,9 @@
       "AccountResponse": {
         "required": [
           "accountId",
-          "email"
+          "email",
+          "acceptedTermsVersion",
+          "currentTermsVersion"
         ],
         "type": "object",
         "properties": {
@@ -230,6 +270,15 @@
               "null",
               "string"
             ]
+          },
+          "acceptedTermsVersion": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "currentTermsVersion": {
+            "type": "string"
           }
         }
       },

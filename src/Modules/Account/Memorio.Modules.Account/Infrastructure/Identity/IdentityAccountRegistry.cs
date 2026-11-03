@@ -31,6 +31,25 @@ internal sealed class IdentityAccountRegistry(UserManager<AccountUser> users) : 
         }
     }
 
+    public async Task<Result> RecordTermsAcceptanceAsync(AccountId accountId, string version, DateTimeOffset acceptedAt)
+    {
+        var user = await users.FindByIdAsync(accountId.Value.ToString());
+        if (user is null)
+        {
+            return AccountErrors.NotFound;
+        }
+
+        if (user.AcceptedTermsVersion == version)
+        {
+            return Result.Success();
+        }
+
+        user.AcceptedTermsVersion = version;
+        user.TermsAcceptedAt = acceptedAt;
+        var updated = await users.UpdateAsync(user);
+        return updated.Succeeded ? Result.Success() : ErrorOf(updated);
+    }
+
     public static Error ErrorOf(IdentityResult result) =>
         result.Errors.Select(error => error.Code).ToList() switch
         {

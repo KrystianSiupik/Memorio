@@ -1,5 +1,6 @@
 using Memorio.Modularity;
 using Memorio.Modules.Account.Api;
+using Memorio.Modules.Account.Application.Commands.AcceptTerms;
 using Memorio.Modules.Account.Application.Commands.RegisterAccount;
 using Memorio.Modules.Account.Application.Ports;
 using Memorio.Modules.Account.Domain.Accounts;
@@ -54,6 +55,7 @@ public sealed class AccountModule : IModule
 
         services.AddScoped<IAccountRegistry, IdentityAccountRegistry>();
         services.AddScoped<RegisterAccountHandler>();
+        services.AddScoped<AcceptTermsHandler>();
 
         services.AddSingleton<IExternalIdentityVerifier>(OpenIdIdentityVerifier.ForProvider(ExternalProvider.Google, options.Google.ClientIds));
         services.AddSingleton<IExternalIdentityVerifier>(OpenIdIdentityVerifier.ForProvider(ExternalProvider.Apple, options.Apple.ClientIds));
@@ -68,7 +70,11 @@ public sealed class AccountModule : IModule
         }
     }
 
-    public void MapEndpoints(IEndpointRouteBuilder endpoints) => endpoints.MapAuthEndpoints();
+    public void MapEndpoints(IEndpointRouteBuilder endpoints)
+    {
+        endpoints.MapAuthEndpoints();
+        endpoints.MapAccountEndpoints();
+    }
 
     public void MapPages(IEndpointRouteBuilder root) => root.MapAccountDeletionPage();
 }

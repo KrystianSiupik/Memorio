@@ -183,7 +183,7 @@ internal static class AuthEndpoints
         var user = await users.GetUserAsync(principal);
         return user is null
             ? TypedResults.Unauthorized()
-            : TypedResults.Ok(new AccountResponse(user.Id, user.Email));
+            : TypedResults.Ok(new AccountResponse(user.Id, user.Email, user.AcceptedTermsVersion, TermsOfService.CurrentVersion));
     }
 
     /// <summary>Signs in on the bearer scheme: the handler writes the token response itself.</summary>
@@ -204,4 +204,6 @@ internal sealed record LoginRequest(string? Email, string? Password);
 internal sealed record ExternalSignInRequest(string? IdToken, bool DeclaresMinimumAge);
 
 /// <summary>Response of GET /v1/account/me.</summary>
-internal sealed record AccountResponse(Guid AccountId, string? Email);
+/// <param name="AcceptedTermsVersion">The version of the terms the person accepted; null until they accept any.</param>
+/// <param name="CurrentTermsVersion">The version to accept, when it differs.</param>
+internal sealed record AccountResponse(Guid AccountId, string? Email, string? AcceptedTermsVersion, string CurrentTermsVersion);

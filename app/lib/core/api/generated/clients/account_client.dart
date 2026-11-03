@@ -5,6 +5,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../models/accept_terms_request.dart';
 import '../models/account_response.dart';
 
 part 'account_client.g.dart';
@@ -16,4 +17,8 @@ abstract class AccountClient {
   /// The signed-in account.
   @GET('/v1/account/me')
   Future<AccountResponse> getMe();
+
+  /// Records that the signed-in person accepted the current version of the terms.
+  @POST('/v1/account/terms-acceptance')
+  Future<void> acceptTerms({@Body() required AcceptTermsRequest body});
 }

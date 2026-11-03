@@ -7,6 +7,7 @@ export 'clients/app_client.dart';
 export 'clients/account_client.dart';
 export 'clients/auth_client.dart';
 // Data classes
+export 'models/accept_terms_request.dart';
 export 'models/access_token_response.dart';
 export 'models/account_response.dart';
 export 'models/app_version_policy_response.dart';
