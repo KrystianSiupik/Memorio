@@ -48,6 +48,18 @@ final class TrashRoute extends AppRoute {
   String get location => '${MapRoute.path}/$path';
 }
 
+/// S05: one memory, on the way through the map tab.
+final class MemoryRoute extends AppRoute {
+  const MemoryRoute(this.id);
+
+  static const path = 'memories/:id';
+
+  final String id;
+
+  @override
+  String get location => '${MapRoute.path}/memories/$id';
+}
+
 /// S09: albums.
 final class AlbumsRoute extends TabRoute {
   const AlbumsRoute();

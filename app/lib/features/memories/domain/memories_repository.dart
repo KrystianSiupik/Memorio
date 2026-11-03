@@ -7,4 +7,12 @@ abstract interface class MemoriesRepository {
   Future<Result<List<TrashedMemory>, MemoryFailure>> loadTrash();
 
   Future<Result<void, MemoryFailure>> restore(String id);
+
+  Future<Result<MemoryDetails, MemoryFailure>> loadDetails(String id);
+
+  /// To the trash for 30 days.
+  Future<Result<void, MemoryFailure>> moveToTrash(String id);
+
+  /// The formal request: gone for good at once.
+  Future<Result<void, MemoryFailure>> deleteForGood(String id);
 }

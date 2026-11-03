@@ -33,7 +33,7 @@ final accountOverviewProvider = FutureProvider<AccountOverview>((ref) async {
     Ok(:final value) => value,
     Err(:final failure) => throw failure,
   };
-});
+}, retry: (retryCount, error) => null);
 
 /// The current session: loading while it is restored, then the session or null (signed out). Restored
 /// again when the backend ends the session; screens invalidate it after signing in or out.

@@ -31,7 +31,16 @@ final routerProvider = Provider<GoRouter>((ref) {
           _tab(
             MapRoute.path,
             const MapPage(),
-            routes: [GoRoute(path: TrashRoute.path, builder: (context, state) => const TrashPage())],
+            routes: [
+              GoRoute(path: TrashRoute.path, builder: (context, state) => const TrashPage()),
+              GoRoute(
+                path: MemoryRoute.path,
+                builder: (context, state) => MemoryDetailsPage(
+                  memoryId: state.pathParameters['id']!,
+                  onLeave: () => const MapRoute().go(context),
+                ),
+              ),
+            ],
           ),
           _tab(AlbumsRoute.path, const AlbumsPage()),
           _tab(SharedWithMeRoute.path, const SharedWithMePage()),

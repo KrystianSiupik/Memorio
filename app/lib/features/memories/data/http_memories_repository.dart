@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../../core/api/generated/clients/memories_client.dart';
+import '../../../core/api/generated/models/request_data_deletion_request.dart';
 import '../../../core/result.dart';
 import '../domain/memories_repository.dart';
 import '../domain/memory.dart';
@@ -32,6 +33,28 @@ class HttpMemoriesRepository implements MemoriesRepository {
 
   @override
   Future<Result<void, MemoryFailure>> restore(String id) => _attempt(() => memories.restoreMemory(id: id));
+
+  @override
+  Future<Result<MemoryDetails, MemoryFailure>> loadDetails(String id) => _attempt(() async {
+    final memory = await memories.getMemory(id: id);
+    return MemoryDetails(
+      id: memory.id,
+      placeName: memory.placeName,
+      dateFrom: memory.dateFrom,
+      dateTo: memory.dateTo,
+      isMine: memory.isMine,
+      description: memory.description,
+      descriptionIsAi: memory.descriptionIsAi,
+      photoUrls: [for (final photo in memory.photos) photo.url],
+    );
+  });
+
+  @override
+  Future<Result<void, MemoryFailure>> moveToTrash(String id) => _attempt(() => memories.trashMemory(id: id));
+
+  @override
+  Future<Result<void, MemoryFailure>> deleteForGood(String id) =>
+      _attempt(() => memories.requestDataDeletion(id: id, body: const RequestDataDeletionRequest(confirmed: true)));
 
   static Future<Result<T, MemoryFailure>> _attempt<T>(Future<T> Function() request) async {
     try {
