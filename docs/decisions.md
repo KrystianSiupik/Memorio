@@ -792,3 +792,15 @@ Alertu na ten log nie dodałem. **Stan testów:** `AccountDeletionSweepJobIdempo
 | D | Decyzja | Dlaczego |
 |---|---|---|
 | D-233 | Teksty aplikacji są w `lib/core/l10n/app_pl.arb`, generowane przez `flutter gen-l10n` (`flutter_localizations`), dostęp przez `context.l10n`. Na razie tylko polski, także w zakładkach, S01, S24 i ekranie aktualizacji. Wygenerowany kod jest w repozytorium, jak klient API | decyzja PO z 2026-11-03, zamyka D-212; kolejny język to kolejny plik `.arb` |
+
+## Ekrany S06, S05 i S04 (MEM-E2-PLAT-04, -03, -02, 2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-234 | S04 to kreator z dwoma krokami: miejsce i data, potem treść. Identyfikatory wspomnienia, zdjęć i nieudanego szkicu AI powstają raz na ekran, więc „Ponów” powtarza te same operacje | idempotencja po UUID z klienta (D-039); ponowienie nie dubluje wspomnienia i nie zużywa drugi raz limitu AI |
+| D-235 | Miejsce własne podaje się na razie **wpisując współrzędne**, bez wskazywania na mapie | kryterium S04 tego nie rozstrzyga, a wskazywanie zależy od S03. **Do oceny przez PO:** wpisywanie współrzędnych jest niewygodne dla zwykłej osoby |
+| D-236 | „Ostatnio użyte” miejsca, z których S04 korzysta bez sieci, są trzymane tylko w pamięci sesji (10 pozycji). Bez sieci zawsze można dodać miejsce własne, które idzie do kolejki przed wspomnieniem | najprostsze spełnienie kryterium. Po restarcie aplikacji bez sieci lista jest pusta |
+| D-237 | W przeglądarce zapis bez sieci jest zablokowany z komunikatem, bo kolejka nie ma tam bazy (D-115) | jawna blokada zamiast utraty danych |
+| D-238 | Szczegóły S05 i kosz S06 czytają dane przez dostawców trzymanych przez sesję: bez sieci pokazują ostatnią odpowiedź. Nieudany odczyt czeka na „Ponów”, automatyczne ponawianie Riverpoda jest wyłączone, także w S24 | ponawianie w tle zasłaniało stan błędu i brak dostępu |
+
+**Stan testów:** testy komponentów S04, S05 i S06 z atrapami repozytoriów; kolejka S04 na prawdziwej bazie w pamięci. Znalazły błąd: „Zatwierdź opis” nie włączał się podczas pisania. Nie użyto prawdziwego API, galerii zdjęć ani urządzenia. S04 jest osiągalny z aplikacji dopiero przez S03.

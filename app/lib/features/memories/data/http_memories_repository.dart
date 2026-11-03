@@ -1,7 +1,13 @@
 import 'package:dio/dio.dart';
 
+import '../../../core/api/generated/clients/ai_client.dart';
 import '../../../core/api/generated/clients/memories_client.dart';
+import '../../../core/api/generated/models/add_photo_request.dart';
+import '../../../core/api/generated/models/approve_description_request.dart';
+import '../../../core/api/generated/models/create_memory_request.dart';
+import '../../../core/api/generated/models/request_ai_draft_request.dart';
 import '../../../core/api/generated/models/request_data_deletion_request.dart';
+import '../../../core/api/generated/models/start_upload_request.dart';
 import '../../../core/result.dart';
 import '../domain/memories_repository.dart';
 import '../domain/memory.dart';
@@ -10,9 +16,81 @@ import '../domain/memory_failure.dart';
 /// [MemoriesRepository] on API v1. The contract describes numbers as "integer or string", so the
 /// generated models have them dynamic; the backend always sends numbers (D-212).
 class HttpMemoriesRepository implements MemoriesRepository {
-  const HttpMemoriesRepository({required this.memories});
+  const HttpMemoriesRepository({required this.memories, required this.ai, required this.uploads});
 
   final MemoriesClient memories;
+  final AiClient ai;
+
+  /// Sends files straight to the storage: its address is signed, so no sign-in and no API headers.
+  final Dio uploads;
+
+  @override
+  Future<Result<List<MemoryPin>, MemoryFailure>> loadPins({String? from, String? to}) => _attempt(() async {
+    final points = await memories.getMemoryMap(from: from, to: to);
+    return [
+      for (final point in points)
+        MemoryPin(
+          id: point.id,
+          latitude: (point.latitude as num).toDouble(),
+          longitude: (point.longitude as num).toDouble(),
+        ),
+    ];
+  });
+
+  @override
+  Future<Result<void, MemoryFailure>> create(NewMemory memory) => _attempt(
+    () => memories.createMemory(
+      body: CreateMemoryRequest(
+        id: memory.id,
+        placeReference: memory.placeReference,
+        datePrecision: memory.precision.apiName,
+        dateFrom: memory.from,
+        dateTo: memory.to,
+      ),
+    ),
+  );
+
+  @override
+  Future<Result<void, MemoryFailure>> addPhoto(String memoryId, String photoId, PickedPhoto photo) =>
+      _attempt(() async {
+        final upload = await memories.startPhotoUpload(body: StartUploadRequest(contentType: photo.contentType));
+        await uploads.put<void>(
+          upload.url,
+          data: await photo.read(),
+          options: Options(contentType: upload.contentType),
+        );
+        await memories.addPhoto(
+          id: memoryId,
+          body: AddPhotoRequest(photoId: photoId, uploadKey: upload.key),
+        );
+      });
+
+  @override
+  Future<Result<void, MemoryFailure>> approveDescription(String memoryId, String text, String? aiDraftId) => _attempt(
+    () => memories.approveDescription(
+      id: memoryId,
+      body: ApproveDescriptionRequest(text: text, aiDraftId: aiDraftId),
+    ),
+  );
+
+  @override
+  Future<Result<AiDraft, MemoryFailure>> requestAiDraft({
+    required String id,
+    required String material,
+    required bool consentsToAi,
+    required List<String> placeNames,
+  }) => _attempt(() async {
+    final draft = await ai.requestAiDraft(
+      body: RequestAiDraftRequest(
+        id: id,
+        material: material,
+        consentsToAi: consentsToAi,
+        peopleNames: const [],
+        placeNames: placeNames,
+      ),
+    );
+    return AiDraft(id: draft.id, text: draft.text);
+  });
 
   @override
   Future<Result<List<TrashedMemory>, MemoryFailure>> loadTrash() => _attempt(() async {

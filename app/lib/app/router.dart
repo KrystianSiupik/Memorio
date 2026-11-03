@@ -34,6 +34,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(path: TrashRoute.path, builder: (context, state) => const TrashPage()),
               GoRoute(
+                path: NewMemoryRoute.path,
+                builder: (context, state) => NewMemoryPage(onSaved: () => const MapRoute().go(context)),
+              ),
+              GoRoute(
                 path: MemoryRoute.path,
                 builder: (context, state) => MemoryDetailsPage(
                   memoryId: state.pathParameters['id']!,

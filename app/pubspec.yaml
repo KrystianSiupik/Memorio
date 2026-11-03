@@ -23,6 +23,7 @@ dependencies:
   package_info_plus: 10.2.2
   retrofit: 4.10.0
   uuid: 4.6.0
+  image_picker: 1.1.2
 
 dev_dependencies:
   flutter_test:

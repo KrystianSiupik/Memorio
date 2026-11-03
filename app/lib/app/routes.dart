@@ -60,6 +60,16 @@ final class MemoryRoute extends AppRoute {
   String get location => '${MapRoute.path}/memories/$id';
 }
 
+/// S04: a new memory, on the way through the map tab.
+final class NewMemoryRoute extends AppRoute {
+  const NewMemoryRoute();
+
+  static const path = 'new';
+
+  @override
+  String get location => '${MapRoute.path}/$path';
+}
+
 /// S09: albums.
 final class AlbumsRoute extends TabRoute {
   const AlbumsRoute();

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memorio/core/api/generated/clients/ai_client.dart';
 import 'package:memorio/core/api/generated/clients/memories_client.dart';
 import 'package:memorio/core/result.dart';
 import 'package:memorio/features/memories/memories.dart';
@@ -9,7 +10,7 @@ import '../../helpers/fake_http.dart';
 void main() {
   HttpMemoriesRepository repository(FakeHandler handler) {
     final dio = Dio(BaseOptions(baseUrl: 'https://api.example.invalid'))..httpClientAdapter = FakeHttpAdapter(handler);
-    return HttpMemoriesRepository(memories: MemoriesClient(dio));
+    return HttpMemoriesRepository(memories: MemoriesClient(dio), ai: AiClient(dio), uploads: dio);
   }
 
   test('the trash comes with its numbers', () async {

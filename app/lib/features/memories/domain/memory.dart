@@ -19,6 +19,27 @@ enum MemoryDatePrecision {
   final String apiName;
 }
 
+/// What creating a memory takes. [id] comes from the client, so a retry is the same memory.
+class NewMemory {
+  const NewMemory({
+    required this.id,
+    required this.placeReference,
+    required this.precision,
+    required this.from,
+    this.to,
+  });
+
+  final String id;
+  final String placeReference;
+  final MemoryDatePrecision precision;
+
+  /// yyyy-MM-dd.
+  final String from;
+
+  /// yyyy-MM-dd; only for a period.
+  final String? to;
+}
+
 /// What S05 shows.
 class MemoryDetails {
   const MemoryDetails({

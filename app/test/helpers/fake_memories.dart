@@ -14,7 +14,62 @@ class FakeMemoriesRepository implements MemoriesRepository {
     return failure == null ? Ok(trash) : Err(failure);
   }
 
+  List<MemoryPin> pins = [];
+  final pinRequests = <({String? from, String? to})>[];
   MemoryDetails? details;
+  final created = <NewMemory>[];
+  final photos = <String, PickedPhoto>{};
+  final approved = <({String text, String? aiDraftId})>[];
+  final draftRequests = <String>[];
+  MemoryFailure? createFailure;
+  MemoryFailure? photoFailure;
+  MemoryFailure? draftFailure;
+
+  @override
+  Future<Result<List<MemoryPin>, MemoryFailure>> loadPins({String? from, String? to}) async {
+    pinRequests.add((from: from, to: to));
+    final failure = loadFailure;
+    return failure == null ? Ok(pins) : Err(failure);
+  }
+
+  @override
+  Future<Result<void, MemoryFailure>> create(NewMemory memory) async {
+    final failure = createFailure;
+    if (failure != null) {
+      return Err(failure);
+    }
+    created.add(memory);
+    return const Ok(null);
+  }
+
+  @override
+  Future<Result<void, MemoryFailure>> addPhoto(String memoryId, String photoId, PickedPhoto photo) async {
+    final failure = photoFailure;
+    if (failure != null) {
+      return Err(failure);
+    }
+    photos[photoId] = photo;
+    return const Ok(null);
+  }
+
+  @override
+  Future<Result<void, MemoryFailure>> approveDescription(String memoryId, String text, String? aiDraftId) async {
+    approved.add((text: text, aiDraftId: aiDraftId));
+    return const Ok(null);
+  }
+
+  @override
+  Future<Result<AiDraft, MemoryFailure>> requestAiDraft({
+    required String id,
+    required String material,
+    required bool consentsToAi,
+    required List<String> placeNames,
+  }) async {
+    draftRequests.add(id);
+    final failure = draftFailure;
+    return failure == null ? Ok(AiDraft(id: id, text: 'Szkic: $material')) : Err(failure);
+  }
+
   final trashed = <String>[];
   final deleted = <String>[];
 
