@@ -23,7 +23,7 @@ public sealed class DeleteAccountContentTests(ArchiveDatabase database)
 
         Assert.Equal(new AccountContentSummary(0, 0), await SummarizeAsync(account));
         Assert.All(first.Photos, photo => Assert.Contains(new StorageKey(photo.StorageKey), database.Storage.Deleted));
-        var deleted = events.Cast<ContentDeletedDefinitively>().ToList();
+        var deleted = events.OfType<ContentDeletedDefinitively>().ToList();
         Assert.Equal(new HashSet<MemoryId> { first.Id, second.Id }, deleted.Select(item => item.MemoryId).ToHashSet());
         Assert.All(deleted, item => Assert.Equal(account, item.AuthorAccountId));
     }
@@ -49,7 +49,7 @@ public sealed class DeleteAccountContentTests(ArchiveDatabase database)
         var first = await HandleAsync(account);
         var second = await HandleAsync(account);
 
-        Assert.Single(first);
+        Assert.Single(first.OfType<ContentDeletedDefinitively>());
         Assert.Empty(second);
     }
 

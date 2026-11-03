@@ -119,8 +119,23 @@ internal sealed class Memory : AggregateRoot<MemoryId>
         Raise(new PhotoAdded(Guid.CreateVersion7(), now, Id, photoId));
     }
 
-    public void DeleteDefinitively(DateTimeOffset now) =>
-        Raise(new ContentDeletedDefinitively(Guid.CreateVersion7(), now, Id, AuthorAccountId));
+    /// <summary>The end of the trash window: only the window it was meant for, only when still open and only after its end.</summary>
+    public Result CanLeaveTrash(int sequence, DateTimeOffset at)
+    {
+        if (State != MemoryState.Trashed || sequence != Sequence)
+        {
+            return MemoryErrors.AlreadyDecided;
+        }
+
+        return at < WindowEndsAt ? MemoryErrors.TrashWindowOpen : Result.Success();
+    }
+
+    /// <summary>E22 and E23: one author, so the last content goes with the memory (D-221).</summary>
+    public void DeleteDefinitively(DateTimeOffset now)
+    {
+        Raise(new ContentDeletedDefinitively(Guid.CreateVersion7(), now, Id, AuthorAccountId, Sequence));
+        Raise(new MemoryCeasedToExist(Guid.CreateVersion7(), now, Id));
+    }
 }
 
 /// <summary>Which AI wrote the draft a description started from.</summary>
