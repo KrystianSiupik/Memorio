@@ -31,6 +31,13 @@ internal sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> option
             memory.Property(item => item.Id).HasColumnName("id").HasConversion(id => id.Value, value => new MemoryId(value));
             memory.Property(item => item.AuthorAccountId).HasColumnName("author_account_id");
             memory.Property(item => item.CreatedAt).HasColumnName("created_at");
+            memory.Property(item => item.PlaceReference).HasColumnName("place_reference").HasMaxLength(100).HasDefaultValue("");
+            memory.Property(item => item.PlaceName).HasColumnName("place_name").HasMaxLength(500).HasDefaultValue("");
+            memory.Property(item => item.Latitude).HasColumnName("latitude").HasDefaultValue(0d);
+            memory.Property(item => item.Longitude).HasColumnName("longitude").HasDefaultValue(0d);
+            memory.Property(item => item.DatePrecision).HasColumnName("date_precision").HasConversion<string>().HasMaxLength(10).HasDefaultValue(DatePrecision.Day).HasSentinel((DatePrecision)(-1));
+            memory.Property(item => item.DateFrom).HasColumnName("date_from").HasDefaultValue(new DateOnly(2000, 1, 1));
+            memory.Property(item => item.DateTo).HasColumnName("date_to").HasDefaultValue(new DateOnly(2000, 1, 1));
             memory.Ignore(item => item.DomainEvents);
             memory.HasIndex(item => item.AuthorAccountId).HasDatabaseName("ix_memories_author_account_id");
             memory.OwnsMany(item => item.Photos, photo =>

@@ -753,3 +753,14 @@ Alertu na ten log nie dodałem. **Stan testów:** `AccountDeletionSweepJobIdempo
 | D-220 | Podpowiedzi: dopasowanie początku nazwy bez rozróżniania wielkości liter, od 2 znaków, najwyżej 20, własne przed OSM. Pierwsza migracja zakłada pustą `places.osm_places`, jeśli importu jeszcze nie było; import ją zastępuje (D-131) | podpowiedzi działają bez importu. **Do zrobienia przed danymi produkcyjnymi:** indeks na `lower(name)` musi powstawać przy imporcie, bo `--create` kasuje tabelę; bez niego zapytanie skanuje całą tabelę. Nie sprawdzałem tego na realnym wycinku OSM |
 
 **Stan testów:** `Modules.Places.Tests` na PostgreSQL z PostGIS, w tym macierz osoba × miejsce własne. Same endpointy sprawdza dopiero test na działającym hoście, którego jeszcze nie było.
+
+## MEM-E2-ARCHIWUM-01 · Utwórz wspomnienie (C12) (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-221 | **Wspomnienie ma na razie jednego autora i jest jedną treścią** (stan kosza i E22 dotyczą całego wspomnienia, E23 powstaje razem z E22). Wkłady wielu autorów rozdzielą to w E3, przy rozstrzyganiu HS-019 | HS-019 jest nierozstrzygnięte, a w E2 nie ma drugiego autora. **Ryzyko do sprawdzenia:** E3 będzie musiało rozdzielić wspomnienie na pojemnik i treści migracją rozszerzającą |
+| D-222 | Wspomnienie zapisuje kopię miejsca: odwołanie, nazwę i współrzędne. Mapa nie pyta wtedy modułu Places o każdy punkt | **Do opinii prawnej (D-053, ODbL):** nazwa i współrzędne z OSM trafiają do tabel Archive |
+| D-223 | Data to dokładność (`Day`, `Month`, `Year`, `Period`) i zakres dni, przesyłane tekstem `yyyy-MM-dd`, bo wygenerowany klient Dart wysyła `DateTime`. Odrzucana jest data zaczynająca się później niż jutro według UTC, bo dzień na urządzeniu może wyprzedzać UTC | filtr mapy działa na zakresach; bez tolerancji osoba w Polsce nie zapisałaby wspomnienia tuż po północy |
+| D-224 | Tu wymuszam akceptację regulaminu (D-211): port `ITermsReader` z modułu Konto, 409 `Archive.TermsNotAccepted`. Identyfikator z aplikacji to klucz idempotencji (D-118): ten sam identyfikator i autor to to samo wspomnienie, inny autor dostaje 409 | S2:C11, kolejka offline wysyła tę samą operację wielokrotnie |
+
+**Stan testów:** `CreateMemoryTests` na PostgreSQL, sąsiednie moduły jako atrapy.
