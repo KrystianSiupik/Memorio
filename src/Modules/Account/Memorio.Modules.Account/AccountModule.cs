@@ -5,9 +5,11 @@ using Memorio.Modules.Account.Application.Commands.CancelAccountDeletion;
 using Memorio.Modules.Account.Application.Commands.DeleteAccount;
 using Memorio.Modules.Account.Application.Commands.RegisterAccount;
 using Memorio.Modules.Account.Application.Commands.RequestAccountDeletion;
+using Memorio.Modules.Account.Application.Policies;
 using Memorio.Modules.Account.Application.Ports;
 using Memorio.Modules.Account.Application.Queries.AccountDeletionImpact;
 using Memorio.Modules.Account.Application.Queries.PendingAccountDeletion;
+using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Account.Domain.Accounts;
 using Memorio.Modules.Account.Domain.Deletions;
 using Memorio.Modules.Account.Infrastructure;
@@ -15,6 +17,9 @@ using Memorio.Modules.Account.Infrastructure.Identity;
 using Memorio.Modules.Account.Infrastructure.Metrics;
 using Memorio.Modules.Account.Infrastructure.Persistence;
 using Memorio.Modules.Account.Infrastructure.Queries;
+using Memorio.Modules.Account.Infrastructure.Scheduling;
+using Memorio.SharedKernel.Messaging;
+using Memorio.SharedKernel.Scheduling;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
@@ -69,6 +74,16 @@ public sealed class AccountModule : IModule
         services.AddScoped<RequestAccountDeletionHandler>();
         services.AddScoped<DeleteAccountHandler>();
         services.AddScoped<CancelAccountDeletionHandler>();
+        services.AddScoped<DeleteAccountWhenWindowPassed>();
+
+        // IDeadlines exists in the worker only, the one host running these (D-157): built on demand, so the
+        // API, which never asks for them, still passes the container's validation in development.
+        services.AddScoped(provider => new AccountDeletionWindowDeadline(
+            provider.GetRequiredService<IAccountDeletions>(),
+            provider.GetRequiredService<IDeadlines>()));
+        services.AddScoped<IIntegrationEventPolicy<AccountDeletionRequested>>(provider => provider.GetRequiredService<AccountDeletionWindowDeadline>());
+        services.AddScoped<IIntegrationEventPolicy<AccountDeletionCancelled>>(provider => provider.GetRequiredService<AccountDeletionWindowDeadline>());
+        services.AddScheduledJob<AccountDeletionWindowJob>(AccountDeletionWindowDeadline.JobName);
         services.AddScoped<IPendingAccountDeletionQuery, PendingAccountDeletionQuery>();
 
         services.AddSingleton<IExternalIdentityVerifier>(OpenIdIdentityVerifier.ForProvider(ExternalProvider.Google, options.Google.ClientIds));
