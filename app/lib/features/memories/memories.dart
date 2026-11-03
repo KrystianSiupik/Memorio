@@ -1,7 +1,12 @@
 export 'data/http_memories_repository.dart' show HttpMemoriesRepository;
+export 'data/http_places_repository.dart' show HttpPlacesRepository;
+export 'data/image_photo_picker.dart' show ImagePhotoPicker;
+export 'data/memory_senders.dart' show memorySenders;
 export 'domain/memories_repository.dart';
 export 'domain/memory.dart';
 export 'domain/memory_failure.dart';
+export 'domain/memory_operations.dart';
 export 'presentation/memories_providers.dart';
 export 'presentation/memory_details_page.dart';
+export 'presentation/new_memory_page.dart';
 export 'presentation/trash_page.dart';

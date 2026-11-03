@@ -1,7 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/misc.dart';
 
 import '../core/api/api.dart';
 import '../core/auth/token_store.dart';
+import '../core/offline/offline.dart';
 import '../features/account/account.dart';
 import '../features/map/map.dart';
 import '../features/memories/memories.dart';
@@ -16,8 +18,14 @@ List<Override> appOverrides({required String appVersion}) => [
     final api = ref.watch(apiClientProvider);
     return HttpAuthRepository(auth: api.auth, account: api.account, store: ref.watch(tokenStoreProvider));
   }),
-  memoriesRepositoryProvider.overrideWith(
-    (ref) => HttpMemoriesRepository(memories: ref.watch(apiClientProvider).memories),
+  memoriesRepositoryProvider.overrideWith((ref) {
+    final api = ref.watch(apiClientProvider);
+    return HttpMemoriesRepository(memories: api.memories, ai: api.ai, uploads: Dio());
+  }),
+  placesRepositoryProvider.overrideWith((ref) => HttpPlacesRepository(places: ref.watch(apiClientProvider).places)),
+  photoPickerProvider.overrideWithValue(const ImagePhotoPicker()),
+  operationSendersProvider.overrideWith(
+    (ref) => memorySenders(ref.watch(memoriesRepositoryProvider), ref.watch(placesRepositoryProvider)),
   ),
   accountRepositoryProvider.overrideWith((ref) => HttpAccountRepository(account: ref.watch(apiClientProvider).account)),
 ];
