@@ -27,4 +27,7 @@ internal sealed class Memory : AggregateRoot<MemoryId>
         new(new MemoryId(Guid.CreateVersion7()), authorAccountId, createdAt);
 
     public void AddPhoto(string storageKey) => _photos.Add(Photo.Create(storageKey));
+
+    public void DeleteDefinitively(DateTimeOffset now) =>
+        Raise(new ContentDeletedDefinitively(Guid.CreateVersion7(), now, Id, AuthorAccountId));
 }
