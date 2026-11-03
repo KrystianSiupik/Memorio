@@ -764,3 +764,13 @@ Alertu na ten log nie dodałem. **Stan testów:** `AccountDeletionSweepJobIdempo
 | D-224 | Tu wymuszam akceptację regulaminu (D-211): port `ITermsReader` z modułu Konto, 409 `Archive.TermsNotAccepted`. Identyfikator z aplikacji to klucz idempotencji (D-118): ten sam identyfikator i autor to to samo wspomnienie, inny autor dostaje 409 | S2:C11, kolejka offline wysyła tę samą operację wielokrotnie |
 
 **Stan testów:** `CreateMemoryTests` na PostgreSQL, sąsiednie moduły jako atrapy.
+
+## MEM-E2-ARCHIWUM-02 i MEM-E2-NARRACJA-AI-01 · Zdjęcia i szkic AI (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-225 | Zdjęcie: `POST /v1/memories/uploads` daje podpisany adres, aplikacja wysyła plik, `POST /v1/memories/{id}/photos` przenosi go do `photos/<id>/original`, rezerwuje miejsce z kluczem = id zdjęcia i zapisuje wiersz. Pełna pula: plik znika, 409 `Archive.SpaceLimitExceeded`. Cudze i nieistniejące wspomnienie dają tę samą odpowiedź 403 `Archive.NoAccess` | D-015, D-143; nie zdradzamy, czy wspomnienie istnieje. **Znana luka:** padnięcie procesu między przeniesieniem pliku a zapisem wiersza zostawia plik i zajęte miejsce, a ponowienie dostaje `UploadMissing`. Rzadkie; bez sprzątania do decyzji |
+| D-226 | Szkic AI jest **synchroniczny** (`POST /v1/ai/drafts`, odpowiedź z tekstem), choć `AiTextService` zakłada przetwarzanie asynchroniczne (ADR 0009). Limit AI zużywany przed wywołaniem dostawcy, z kluczem = id szkicu: porażka dostawcy zostawia zużycie, ale ponowienie pod tym samym id nic nie dolicza. Szkice w `ai_narration.memory_drafts`, żeby ponowienie dało ten sam tekst | **Do decyzji:** ADR 0009; długie żądanie blokuje połączenie. Porzucona po awarii próba kosztuje jeden szkic. Treść szkicu to dane osobowe i zostaje na stałe: **do ustalenia retencja i kasowanie razem z kontem**, którego tu nie ma |
+| D-227 | Zgoda na AI jest polem żądania (`consentsToAi`), bez zapisu na serwerze; imiona i nazwy do ukrycia podaje aplikacja. Czego aplikacja nie poda, to dostawca zobaczy | trwałe „Moje zgody” to osobny ticket. **Ryzyko prywatności do sprawdzenia:** imię wpisane w opisie, a niewymienione na liście, trafia do dostawcy |
+
+**Stan testów:** `AddPhotoTests` i `RequestDraftTests` na PostgreSQL z atrapami magazynu, puli i dostawcy. Prawdziwy dostawca AI i prawdziwe przesyłanie pliku nie były użyte.

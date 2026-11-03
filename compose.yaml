@@ -95,6 +95,7 @@ services:
       Messaging__ConnectionString: &messaging Host=postgres;Database=memorio;Username=memorio_messaging;Maximum Pool Size=20;Timeout=5;Password=memorio_local
       Account__ConnectionString: &account Host=postgres;Database=memorio;Username=memorio_account;Maximum Pool Size=10;Timeout=5;Password=memorio_local
       Plans__ConnectionString: &plans Host=postgres;Database=memorio;Username=memorio_plans;Maximum Pool Size=5;Timeout=5;Password=memorio_local
+      AiNarration__ConnectionString: &ainarration Host=postgres;Database=memorio;Username=memorio_ai_narration;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Places__ConnectionString: &places Host=postgres;Database=memorio;Username=memorio_places;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Limits__ConnectionString: &limits Host=postgres;Database=memorio;Username=memorio_limits;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Album__ConnectionString: &album Host=postgres;Database=memorio;Username=memorio_album;Maximum Pool Size=5;Timeout=5;Password=memorio_local
@@ -121,6 +122,7 @@ services:
       Messaging__ConnectionString: *messaging
       Account__ConnectionString: *account
       Plans__ConnectionString: *plans
+      AiNarration__ConnectionString: *ainarration
       Places__ConnectionString: *places
       Limits__ConnectionString: *limits
       Album__ConnectionString: *album

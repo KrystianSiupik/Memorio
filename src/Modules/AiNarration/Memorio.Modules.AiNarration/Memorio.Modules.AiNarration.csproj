@@ -3,11 +3,14 @@
     <InternalsVisibleTo Include="Memorio.Modules.AiNarration.Tests" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../../BuildingBlocks/Memorio.SharedKernel/Memorio.SharedKernel.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Memorio.Modularity/Memorio.Modularity.csproj" />
     <ProjectReference Include="../Memorio.Modules.AiNarration.Contracts/Memorio.Modules.AiNarration.Contracts.csproj" />
+    <ProjectReference Include="../../Limits/Memorio.Modules.Limits.Contracts/Memorio.Modules.Limits.Contracts.csproj" />
   </ItemGroup>
 </Project>
