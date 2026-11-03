@@ -13,5 +13,7 @@
     <ProjectReference Include="../../../BuildingBlocks/Memorio.SharedKernel/Memorio.SharedKernel.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Memorio.Modularity/Memorio.Modularity.csproj" />
     <ProjectReference Include="../Memorio.Modules.Account.Contracts/Memorio.Modules.Account.Contracts.csproj" />
+    <ProjectReference Include="../../Album/Memorio.Modules.Album.Contracts/Memorio.Modules.Album.Contracts.csproj" />
+    <ProjectReference Include="../../Archive/Memorio.Modules.Archive.Contracts/Memorio.Modules.Archive.Contracts.csproj" />
   </ItemGroup>
 </Project>

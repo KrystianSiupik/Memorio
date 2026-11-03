@@ -610,3 +610,11 @@ Założenie do sprawdzenia: **regulaminu jeszcze nie ma**, a `2026-11` to etykie
 | D-199 | `IAccountContentReader` zwraca liczby wspomnień i zdjęć autora, `IAccountAlbumsReader`: albumy własne, własne bez następcy i cudze, w których osoba uczestniczy. Bycie następcą albumu nie liczy się jako uczestnictwo, właściciel na liście uczestników liczy się raz. Agregat nazywa się `SharedAlbum`, bo typ `Album` zderzałby się z przestrzenią nazw modułu | porty niosą tylko skutek, bez przyczyny (ADR 0001) |
 
 **Stan testów:** porty sprawdzone na PostgreSQL rolami modułów (przez `AccountContentReaderTests` i `AccountAlbumsReaderTests`), budżet połączeń przechodzi: 120 przy limicie 180.
+
+## MEM-E1-KONTO-06 · Skutki usunięcia konta, zapytanie R2 (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-200 | `GET /v1/account/deletion-impact` składa odpowiedź z portów Archive i Album przy każdym odczycie, bez zapisanej projekcji, więc nie ma czego odbudowywać. Zapytanie nie przyjmuje identyfikatora konta, tylko sesję: osoba nie zapyta o cudze dane. „Czyich” oznacza podział na albumy własne i cudze, **bez nazw właścicieli i bez rozbicia zdjęć na albumy**, bo wkłady dojdą dopiero w E3 | jedno źródło prawdy; kryterium o przebudowie projekcji spełnione przez brak projekcji |
+
+**Stan testów:** macierz osoba × zasób na PostgreSQL przechodzi (`AccountDeletionImpactTests`).
