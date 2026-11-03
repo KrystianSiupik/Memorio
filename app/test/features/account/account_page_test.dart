@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memorio/app/router.dart';
 import 'package:memorio/app/routes.dart';
@@ -150,6 +151,81 @@ void main() {
 
       expect(account.deletionRequests, [false]);
       expect(find.byKey(const Key('s24-window')), findsOneWidget);
+    });
+  });
+
+  group('signing out', () {
+    late MutableSessionRepository sessions;
+    late FakeAuthRepository auth;
+
+    setUp(() {
+      sessions = MutableSessionRepository()..session = signedIn;
+      auth = FakeAuthRepository(sessions: sessions);
+    });
+
+    Future<ProviderContainer> openSignedIn(WidgetTester tester, {Stream<bool>? online}) async {
+      tester.view.physicalSize = const Size(1000, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final container = await pumpMemorioApp(
+        tester,
+        sessions: sessions,
+        account: account,
+        online: online,
+        overrides: [authRepositoryProvider.overrideWithValue(auth)],
+      );
+      container.read(routerProvider).go(const AccountRoute().location);
+      await tester.pumpAndSettle();
+      return container;
+    }
+
+    testWidgets('S24 → S01: the session ends and the tabs are gone', (tester) async {
+      await openSignedIn(tester);
+
+      await tester.tap(find.byTooltip('Wyloguj'));
+      await tester.pumpAndSettle();
+
+      expect(sessions.session, isNull);
+      expect(find.widgetWithText(AppBar, 'Rejestracja'), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+    });
+
+    testWidgets('works without a connection and when the data did not load', (tester) async {
+      account.loadFailure = const AccountServerError();
+      await openSignedIn(tester, online: Stream.value(false));
+
+      await tester.tap(find.byTooltip('Wyloguj'));
+      await tester.pumpAndSettle();
+
+      expect(find.widgetWithText(AppBar, 'Rejestracja'), findsOneWidget);
+    });
+
+    testWidgets('the next person does not see the numbers of the previous one', (tester) async {
+      final container = await openSignedIn(tester);
+      expect(find.text('Wspomnienia: 3'), findsOneWidget);
+      await tester.tap(find.byTooltip('Wyloguj'));
+      await tester.pumpAndSettle();
+      account.overview = const AccountOverview(
+        impact: DeletionImpact(
+          memories: 9,
+          photos: 0,
+          ownAlbums: 0,
+          ownAlbumsWithoutSuccessor: 0,
+          otherPeoplesAlbums: 0,
+        ),
+      );
+
+      await tester.tap(find.text('Mam już konto'));
+      await tester.pump();
+      await tester.enterText(find.widgetWithText(TextField, 'E-mail'), 'jan@example.com');
+      await tester.enterText(find.widgetWithText(TextField, 'Hasło'), 'long-enough-password');
+      await tester.tap(find.widgetWithText(FilledButton, 'Zaloguj się'));
+      await tester.pumpAndSettle();
+      container.read(routerProvider).go(const AccountRoute().location);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Wspomnienia: 9'), findsOneWidget);
+      expect(find.text('Wspomnienia: 3'), findsNothing);
     });
   });
 
