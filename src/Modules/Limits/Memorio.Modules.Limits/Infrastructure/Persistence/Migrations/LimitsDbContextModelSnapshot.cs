@@ -29,6 +29,24 @@ namespace Memorio.Modules.Limits.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("account_id");
 
+                    b.Property<int>("AiLimit")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("ai_limit");
+
+                    b.Property<DateOnly>("AiPeriod")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("date")
+                        .HasDefaultValue(new DateOnly(2000, 1, 1))
+                        .HasColumnName("ai_period");
+
+                    b.Property<int>("AiUsed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("ai_used");
+
                     b.Property<long>("LimitBytes")
                         .HasColumnType("bigint")
                         .HasColumnName("limit_bytes");
@@ -44,6 +62,25 @@ namespace Memorio.Modules.Limits.Infrastructure.Persistence.Migrations
                     b.HasKey("AccountId");
 
                     b.ToTable("account_pools", "limits");
+                });
+
+            modelBuilder.Entity("Memorio.Modules.Limits.Domain.Pools.AiOperation", b =>
+                {
+                    b.Property<Guid>("OperationKey")
+                        .HasColumnType("uuid")
+                        .HasColumnName("operation_key");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<DateTimeOffset>("ConsumedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("consumed_at");
+
+                    b.HasKey("OperationKey");
+
+                    b.ToTable("ai_operations", "limits");
                 });
 
             modelBuilder.Entity("Memorio.Modules.Limits.Domain.Pools.PoolOperation", b =>

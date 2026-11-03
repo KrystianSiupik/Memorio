@@ -51,8 +51,8 @@ public sealed class ReleaseUnitsTests(LimitsDatabase database)
         await using var scope = database.CreateScope();
         var pools = scope.ServiceProvider.GetRequiredService<IPools>();
 
-        Assert.True(await pools.SetLimitAsync(account, 500, sequence: 2, Cancellation));
-        Assert.False(await pools.SetLimitAsync(account, 50, sequence: 1, Cancellation));
+        Assert.True(await pools.SetLimitAsync(account, 500, aiLimit: 0, sequence: 2, Cancellation));
+        Assert.False(await pools.SetLimitAsync(account, 50, aiLimit: 0, sequence: 1, Cancellation));
 
         Assert.Equal(500, (await database.PoolAsync(account)).LimitBytes);
     }
@@ -64,7 +64,7 @@ public sealed class ReleaseUnitsTests(LimitsDatabase database)
         await ReserveAsync(account, 80);
         await using (var scope = database.CreateScope())
         {
-            await scope.ServiceProvider.GetRequiredService<IPools>().SetLimitAsync(account, 50, sequence: 1, Cancellation);
+            await scope.ServiceProvider.GetRequiredService<IPools>().SetLimitAsync(account, 50, aiLimit: 0, sequence: 1, Cancellation);
         }
 
         await using var other = database.CreateScope();

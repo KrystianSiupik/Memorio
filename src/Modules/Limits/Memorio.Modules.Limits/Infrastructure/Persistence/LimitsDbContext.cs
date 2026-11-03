@@ -24,6 +24,17 @@ internal sealed class LimitsDbContext(DbContextOptions<LimitsDbContext> options)
             pool.Property(item => item.UsedBytes).HasColumnName("used_bytes");
             pool.Property(item => item.LimitBytes).HasColumnName("limit_bytes");
             pool.Property(item => item.LimitSequence).HasColumnName("limit_sequence");
+            pool.Property(item => item.AiLimit).HasColumnName("ai_limit").HasDefaultValue(0);
+            pool.Property(item => item.AiUsed).HasColumnName("ai_used").HasDefaultValue(0);
+            pool.Property(item => item.AiPeriod).HasColumnName("ai_period").HasDefaultValue(new DateOnly(2000, 1, 1));
+        });
+        builder.Entity<AiOperation>(operation =>
+        {
+            operation.ToTable("ai_operations");
+            operation.HasKey(item => item.OperationKey);
+            operation.Property(item => item.OperationKey).HasColumnName("operation_key").ValueGeneratedNever();
+            operation.Property(item => item.AccountId).HasColumnName("account_id");
+            operation.Property(item => item.ConsumedAt).HasColumnName("consumed_at");
         });
         builder.Entity<PoolOperation>(operation =>
         {
