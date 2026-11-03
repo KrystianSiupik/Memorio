@@ -3,6 +3,7 @@ using Memorio.Modularity;
 using Memorio.Modules.Archive.Application.Commands.AddPhoto;
 using Memorio.Modules.Archive.Application.Commands.ApproveDescription;
 using Memorio.Modules.Archive.Application.Commands.CreateMemory;
+using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
 using Memorio.Modules.Archive.Domain.Memories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -21,6 +22,9 @@ internal static class MemoriesEndpoints
         memories.MapPost("/", CreateAsync)
             .WithName("CreateMemory")
             .WithSummary("Records a memory; the id comes from the client, so a retry changes nothing.");
+        memories.MapGet("/{id:guid}", GetDetailsAsync)
+            .WithName("GetMemory")
+            .WithSummary("Everything about one memory the person may see.");
         memories.MapPut("/{id:guid}/description", ApproveDescriptionAsync)
             .WithName("ApproveDescription")
             .WithSummary("The author approves the description of a memory, naming the AI draft it started from, if any.");
@@ -80,11 +84,53 @@ internal static class MemoriesEndpoints
             cancellationToken);
         return approved.IsFailure ? Problems.From(approved.Error) : TypedResults.NoContent();
     }
+
+    private static async Task<Results<Ok<MemoryDetailsResponse>, ProblemHttpResult>> GetDetailsAsync(
+        Guid id,
+        ClaimsPrincipal principal,
+        IMemoryDetailsQuery query,
+        CancellationToken cancellationToken)
+    {
+        var accountId = CurrentAccount.IdOf(principal);
+        var memory = await query.GetAsync(id, accountId, cancellationToken);
+        return memory is null
+            ? Problems.From(MemoryErrors.NoAccess)
+            : TypedResults.Ok(new MemoryDetailsResponse(
+                memory.Id,
+                memory.PlaceName,
+                memory.Latitude,
+                memory.Longitude,
+                memory.DatePrecision,
+                memory.DateFrom,
+                memory.DateTo,
+                memory.AuthorAccountId == accountId,
+                memory.Description,
+                memory.DescriptionIsAi,
+                [.. memory.Photos.Select(photo => new MemoryPhotoResponse(photo.Id, photo.Url))]));
+    }
 }
 
 /// <param name="Text">The description.</param>
 /// <param name="AiDraftId">The AI draft it started from, if any.</param>
 internal sealed record ApproveDescriptionRequest(string? Text, Guid? AiDraftId);
+
+/// <param name="IsMine">The person asking is the author.</param>
+/// <param name="DescriptionIsAi">The description started as an AI draft: shown with the AI marker.</param>
+internal sealed record MemoryDetailsResponse(
+    Guid Id,
+    string PlaceName,
+    double Latitude,
+    double Longitude,
+    string DatePrecision,
+    string DateFrom,
+    string DateTo,
+    bool IsMine,
+    string? Description,
+    bool DescriptionIsAi,
+    IReadOnlyList<MemoryPhotoResponse> Photos);
+
+/// <param name="Url">Signed for 5 minutes.</param>
+internal sealed record MemoryPhotoResponse(Guid Id, Uri Url);
 
 internal sealed record StartUploadRequest(string? ContentType);
 
