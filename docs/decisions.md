@@ -644,3 +644,11 @@ Pytanie otwarte: czy zlecenie usunięcia ma wymagać ponownego podania hasła. T
 | D-205 | `DELETE /v1/account/deletion` (204). Cofnąć można tylko przed końcem okna: w chwili końca odpowiedź to 409 `Account.DeletionAlreadyDecided`, także gdy termin jeszcze się nie wykonał. Ponowne cofnięcie nic nie zmienia i kończy się sukcesem; brak zlecenia to 404 `Account.NoDeletionRequested`. E8 idzie przez outbox | granica okna jest jedna i nie zależy od opóźnienia workera |
 
 **Stan testów:** reguły bez bazy, 10 rund równoległego cofania i usuwania na PostgreSQL: zawsze jeden zwycięzca, a stan konta zgadza się z wynikiem.
+
+## MEM-E1-KONTO-08 · Zdarzenie integracyjne „Konto usunięte” (E7) (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-206 | `AccountDeleted(EventId, OccurredAt, AccountId, Sequence)` w `Account.Contracts`, zapisywane przez outbox w transakcji C4. Bez przyczyny i bez informacji o zgodzie na wygaśnięcie albumów: Album sam wie, które albumy nie mają następcy (MEM-E9-ALBUM-08) | ładunek niesie tylko skutek (ADR 0001) |
+
+**Stan testów:** test kontraktu; zdarzenie dociera do workera na PostgreSQL; nieudany warunkowy zapis nie zostawia ani zmiany, ani zdarzenia. Samo padnięcie procesu po zapisie sprawdzają ogólne testy `Memorio.Messaging.Tests`, nie test tego zdarzenia.
