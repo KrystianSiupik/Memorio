@@ -6,6 +6,7 @@ using Memorio.Modules.Archive.Application.Commands.TrashMemory;
 using Memorio.Modules.Archive.Application.Commands.ApproveDescription;
 using Memorio.Modules.Archive.Application.Commands.CreateMemory;
 using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
+using Memorio.Modules.Archive.Application.Queries.Trash;
 using Memorio.Modules.Archive.Domain.Memories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +25,9 @@ internal static class MemoriesEndpoints
         memories.MapPost("/", CreateAsync)
             .WithName("CreateMemory")
             .WithSummary("Records a memory; the id comes from the client, so a retry changes nothing.");
+        memories.MapGet("/trash", GetTrashAsync)
+            .WithName("GetTrash")
+            .WithSummary("The person's own content in the trash, while its 30 days last.");
         memories.MapPost("/{id:guid}/permanent-deletion", RequestDataDeletionAsync)
             .WithName("RequestDataDeletion")
             .WithSummary("The author's formal request: the memory goes for good at once, without the trash.");
@@ -137,6 +141,16 @@ internal static class MemoriesEndpoints
         var deleted = await handler.HandleAsync(new RequestDataDeletion(new MemoryId(id), CurrentAccount.IdOf(principal), request.Confirmed), cancellationToken);
         return deleted.IsFailure ? Problems.From(deleted.Error) : TypedResults.NoContent();
     }
+
+    private static async Task<Ok<IReadOnlyList<TrashedMemoryResponse>>> GetTrashAsync(
+        ClaimsPrincipal principal,
+        ITrashQuery query,
+        CancellationToken cancellationToken)
+    {
+        var trashed = await query.GetAsync(CurrentAccount.IdOf(principal), cancellationToken);
+        return TypedResults.Ok<IReadOnlyList<TrashedMemoryResponse>>(
+            [.. trashed.Select(item => new TrashedMemoryResponse(item.Id, item.PlaceName, item.DateFrom, item.Description, item.Photos, item.TrashedAt, item.DaysLeft))]);
+    }
 }
 
 /// <param name="Text">The description.</param>
@@ -163,6 +177,9 @@ internal sealed record MemoryPhotoResponse(Guid Id, Uri Url);
 
 /// <param name="Confirmed">The person confirmed that this cannot be undone.</param>
 internal sealed record RequestDataDeletionRequest(bool Confirmed);
+
+/// <param name="DaysLeft">Whole days, rounded up.</param>
+internal sealed record TrashedMemoryResponse(Guid Id, string PlaceName, string DateFrom, string? Description, int Photos, DateTimeOffset TrashedAt, int DaysLeft);
 
 internal sealed record StartUploadRequest(string? ContentType);
 
