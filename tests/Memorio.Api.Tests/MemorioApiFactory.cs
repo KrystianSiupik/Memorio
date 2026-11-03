@@ -82,7 +82,7 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
             services.Configure<HealthCheckServiceOptions>(options =>
             {
                 foreach (var check in options.Registrations
-                    .Where(check => check.Name is MemorioMessaging.HealthCheckName or ObjectStorage.HealthCheckName or "account-database" or "plans-database")
+                    .Where(check => check.Name is MemorioMessaging.HealthCheckName or ObjectStorage.HealthCheckName or "account-database" or "plans-database" or "archive-database" or "album-database")
                     .ToList())
                 {
                     options.Registrations.Remove(check);
