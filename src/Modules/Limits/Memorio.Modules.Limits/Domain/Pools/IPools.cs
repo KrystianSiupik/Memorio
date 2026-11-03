@@ -8,6 +8,9 @@ internal interface IPools
     /// <summary>True when this call gave the space back; an unknown key or one given back before changes nothing.</summary>
     Task<bool> ReleaseAsync(Guid operationKey, DateTimeOffset at, CancellationToken cancellationToken);
 
+    /// <summary>False when this month's allowance is used up. The same key again changes nothing and answers true.</summary>
+    Task<bool> ConsumeAiAsync(Guid accountId, Guid operationKey, DateTimeOffset at, CancellationToken cancellationToken);
+
     /// <summary>Only a newer limit overwrites (D-016). A lower limit may leave the pool over it: nothing new fits then.</summary>
-    Task<bool> SetLimitAsync(Guid accountId, long limitBytes, long sequence, CancellationToken cancellationToken);
+    Task<bool> SetLimitAsync(Guid accountId, long limitBytes, int aiLimit, long sequence, CancellationToken cancellationToken);
 }

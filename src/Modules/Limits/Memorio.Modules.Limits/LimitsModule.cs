@@ -37,6 +37,7 @@ public sealed class LimitsModule : IModule
         services.AddScoped<ReserveUnitsHandler>();
         services.AddScoped<ReleaseUnitsHandler>();
         services.AddScoped<ISpacePool, SpacePool>();
+        services.AddScoped<IAiAllowance, AiAllowance>();
 
         services.AddHealthChecks().AddCheck<LimitsDatabaseHealthCheck>(LimitsDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))

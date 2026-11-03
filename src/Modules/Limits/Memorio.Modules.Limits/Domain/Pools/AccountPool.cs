@@ -18,4 +18,12 @@ internal sealed class AccountPool
 
     /// <summary>Only a newer limit overwrites (D-016).</summary>
     public long LimitSequence { get; private set; }
+
+    /// <summary>Drafts per month; zero on the free plan (D-078).</summary>
+    public int AiLimit { get; private set; }
+
+    public int AiUsed { get; private set; }
+
+    /// <summary>The first day of the month <see cref="AiUsed"/> counts.</summary>
+    public DateOnly AiPeriod { get; private set; }
 }
