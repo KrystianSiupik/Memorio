@@ -1,13 +1,21 @@
 using System.Collections.Concurrent;
 using Memorio.Modules.Account.Contracts;
+using Memorio.Modules.AiNarration.Contracts;
 using Memorio.Modules.Limits.Contracts;
 using Memorio.Modules.Places.Contracts;
 
 namespace Memorio.Modules.Archive.Tests;
 
 /// <summary>The other modules Archive asks: every place exists but "missing", everybody accepted the terms unless told otherwise.</summary>
-public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool
+public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool, IAiDraftReader
 {
+    private readonly ConcurrentDictionary<(Guid Draft, Guid Account), AiDraftInfo> _drafts = new();
+
+    public void AddDraft(Guid draftId, Guid accountId) => _drafts[(draftId, accountId)] = new AiDraftInfo("Szkic.", "test-model", "draft@1");
+
+    public Task<AiDraftInfo?> FindAsync(Guid draftId, Guid accountId, CancellationToken cancellationToken) =>
+        Task.FromResult(_drafts.GetValueOrDefault((draftId, accountId)));
+
     public const string MissingPlace = "osm:N:404";
 
     private readonly ConcurrentDictionary<Guid, bool> _withoutTerms = new();

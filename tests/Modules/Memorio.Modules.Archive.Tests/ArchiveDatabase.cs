@@ -1,5 +1,6 @@
 using Memorio.Hosting.Messaging;
 using Memorio.Modules.Account.Contracts;
+using Memorio.Modules.AiNarration.Contracts;
 using Memorio.Modules.Archive.Domain.Memories;
 using Memorio.Modules.Archive.Infrastructure.Persistence;
 using Memorio.Modules.Limits.Contracts;
@@ -61,6 +62,7 @@ public sealed class ArchiveDatabase : PostgresDatabase
         builder.Services.AddSingleton<IPlaceReader>(Neighbours);
         builder.Services.AddSingleton<ITermsReader>(Neighbours);
         builder.Services.AddSingleton<ISpacePool>(Neighbours);
+        builder.Services.AddSingleton<IAiDraftReader>(Neighbours);
         _host = builder.Build();
 
         await using (var scope = CreateScope())
