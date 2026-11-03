@@ -10,9 +10,19 @@ internal sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> option
 
     public DbSet<Memory> Memories => Set<Memory>();
 
+    public DbSet<AppliedAccountEvent> AppliedAccountEvents => Set<AppliedAccountEvent>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.HasDefaultSchema(Schema);
+
+        builder.Entity<AppliedAccountEvent>(applied =>
+        {
+            applied.ToTable("applied_account_events");
+            applied.HasKey(item => item.AccountId);
+            applied.Property(item => item.AccountId).HasColumnName("account_id").ValueGeneratedNever();
+            applied.Property(item => item.Sequence).HasColumnName("sequence");
+        });
 
         builder.Entity<Memory>(memory =>
         {

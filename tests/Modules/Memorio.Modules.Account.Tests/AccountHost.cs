@@ -7,6 +7,7 @@ using Memorio.Modules.Account.Application.Ports;
 using Memorio.Modules.Album;
 using Memorio.Modules.Archive;
 using Memorio.SharedKernel.Scheduling;
+using Memorio.SharedKernel.Storage;
 using Memorio.Testing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -176,6 +177,7 @@ public sealed class AccountHost : PostgresDatabase
             [typeof(AccountModule).Assembly, typeof(ArchiveModule).Assembly, typeof(AccountHost).Assembly]);
         worker.Services.AddSingleton(Recorded);
         worker.Services.AddSingleton<IDeadlines>(Deadlines);
+        worker.Services.AddSingleton<IObjectStorage>(new UnusedOnThisRouteStorage());
         new AccountModule().AddServices(worker.Services, worker.Configuration);
         new ArchiveModule().AddServices(worker.Services, worker.Configuration);
         new AlbumModule().AddServices(worker.Services, worker.Configuration);
@@ -206,6 +208,21 @@ public sealed class AccountHost : PostgresDatabase
     }
 
     private static CancellationToken Cancellation => TestContext.Current.CancellationToken;
+
+    /// <summary>Deleting a file succeeds; nothing else is asked of the storage here.</summary>
+    private sealed class UnusedOnThisRouteStorage : IObjectStorage
+    {
+        public Task DeleteAsync(StorageKey key, CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task<IReadOnlyDictionary<StorageKey, SignedUrl>> SignReadsAsync(IReadOnlyCollection<StorageKey> keys, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public Task<UploadSlot> CreateUploadAsync(string contentType, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public Task<StoredObject?> PromoteUploadAsync(StorageKey upload, StorageKey destination, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+    }
 
     /// <summary>Accepts tokens "subject;email" (email optional, always verified); anything else is refused.</summary>
     private sealed class FakeGoogle : IExternalIdentityVerifier

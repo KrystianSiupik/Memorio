@@ -7,5 +7,9 @@ internal interface IMemories
 
     void Remove(Memory memory);
 
+    Task<AppliedAccountEvent?> FindAppliedAsync(Guid accountId, CancellationToken cancellationToken);
+
+    void Add(AppliedAccountEvent applied);
+
     Task SaveAsync(CancellationToken cancellationToken);
 }

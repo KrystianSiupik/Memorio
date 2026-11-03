@@ -10,5 +10,10 @@ internal sealed class Memories(ArchiveDbContext database) : IMemories
 
     public void Remove(Memory memory) => database.Memories.Remove(memory);
 
+    public Task<AppliedAccountEvent?> FindAppliedAsync(Guid accountId, CancellationToken cancellationToken) =>
+        database.AppliedAccountEvents.FirstOrDefaultAsync(applied => applied.AccountId == accountId, cancellationToken);
+
+    public void Add(AppliedAccountEvent applied) => database.AppliedAccountEvents.Add(applied);
+
     public Task SaveAsync(CancellationToken cancellationToken) => database.SaveChangesAsync(cancellationToken);
 }
