@@ -695,3 +695,27 @@ Poza zakresem: przyciski Apple i Google, bo wymagają natywnych SDK i identyfika
 | D-214 | Potwierdzenie i zgoda to pola na ekranie, nie okno dialogowe. Odpowiedź 409 pokazuje komunikat i zostawia zaznaczenia. Dane offline to ostatnia odpowiedź trzymana w pamięci providera przez czas działania aplikacji: **po zimnym starcie bez sieci ekran pokaże błąd z „Ponów”, bo nie ma trwałej pamięci podręcznej** | kryterium „bez utraty danych”; trwała kopia w Drift byłaby przesadą dla jednego ekranu, a baza lokalna nie działa jeszcze na webie (D-115) |
 
 Braki bez ticketu, do decyzji: **przycisk „Wyloguj”**, którego nie wymienia żaden ticket, a `signOut` istnieje w repozytorium. **Stan testów:** testy komponentu pól, akcji, stanów, odpowiedzi 409 i przejść na atrapie repozytorium oraz testy `HttpAccountRepository` na atrapie HTTP przechodzą. **Ekranu nie uruchamiałem w przeglądarce ani na urządzeniu.**
+
+## E1 · Do sprawdzenia przez PO (2026-11-03)
+
+Wszystkie tickety E1 zmergowano do `version/0.1` lokalnie, na polecenie PO: „rób całe E1 i daj w decyzjach, co zrobiłeś, a ja potem sprawdzę”. Nic nie wypchnięto. Decyzje są w sekcjach E1 powyżej (D-194–D-214). Założenia przyjęte bez potwierdzenia:
+
+1. **HS-003** (D-201): albumy bez następcy wstrzymują zlecenie tylko do wyboru, bez limitu czasu. Do potwierdzenia przez PO i prawnika.
+2. **HS-008** (pytanie przy KONTO-01): sama deklaracja 16+, bez weryfikacji wieku. Do potwierdzenia przez PO i prawnika.
+3. **Tabele Archive i Album** (D-198) wyprzedzają E2 i E3 i będą rozszerzane. Dziś nic ich nie zapełnia, więc w działającym systemie liczniki skutków są zerowe, a kasowanie treści nie ma czego kasować.
+4. **Regulamin** (D-197): wersja `2026-11` to etykieta robocza, treści regulaminu nie ma.
+5. **Ślad po usunięciu** (D-204): wiersz okna zostaje na stałe. Do oceny prawnika.
+
+Otwarte: ryzyko porzuconego terminu (D-207), brak „Wyloguj” (D-214), język interfejsu (D-212), kanał usuwania dla osoby bez dostępu do konta (pytanie z PLAT-07), ponowne podanie hasła przy usuwaniu (przy KONTO-03). E22 musi objąć ścieżkę usuwania konta w MEM-E2-ARCHIWUM-12 (D-208).
+
+Kryterium ukończenia epiku pozostaje nieodhaczone: wymaga testu na urządzeniu i CI, a żadne z nich jeszcze nie przeszło.
+
+**Stan testów całości (2026-11-03): pełny przebieg nie został ukończony.** System przerwał go z powodu braku pamięci (ok. 0,5–0,9 GB wolnego). Wynik częściowy:
+
+- Przeszły: `SharedKernel`, `Storage`, `AiNarration`, `ArchitectureTests`, `Database`, `Scheduling`, `Modules.Album`, `Modules.Archive`.
+- `Api.Tests`: 1 porażka, **błąd z E1**: `/ready` zwracał 503, bo filtr health checków w `MemorioApiFactory` nie znał `archive-database` i `album-database`. Filtr poprawiony, **poprawka nieuruchomiona** z powodu braku pamięci.
+- `Modules.Account.Tests`: 1 porażka, `AccountDeletionImpactTests`, limit czasu połączenia Npgsql podczas pełnego obciążenia. Wcześniej, uruchomiony bez reszty rozwiązania, test przechodził. Podejrzenie: brak pamięci; **nie potwierdzone**.
+- `Messaging.Tests`: proces zakończony błędem bez nazwanego testu, prawdopodobnie przez przerwanie; **wyniku nie ma**.
+- `Modules.Access` i `Modules.Plans`: brak wyniku w logu.
+
+Testy aplikacji: `flutter analyze` czysty, `flutter test` 95/95 przed ostatnim scaleniem. Host API i worker nie były uruchomione jako prawdziwe procesy, więc prawdziwy Quartz z zadaniem `Account.DeletionWindow` i ekrany z prawdziwym backendem pozostają niesprawdzone.
