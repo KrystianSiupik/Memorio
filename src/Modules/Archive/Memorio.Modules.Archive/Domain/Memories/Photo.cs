@@ -7,9 +7,13 @@ internal sealed class Photo
     {
     }
 
+    /// <summary>From the client; also the key of its reservation in the pool (D-015).</summary>
     public Guid Id { get; private set; }
 
     public string StorageKey { get; private set; } = "";
 
-    public static Photo Create(string storageKey) => new() { Id = Guid.CreateVersion7(), StorageKey = storageKey };
+    public long SizeBytes { get; private set; }
+
+    public static Photo Create(Guid id, string storageKey, long sizeBytes) =>
+        new() { Id = id, StorageKey = storageKey, SizeBytes = sizeBytes };
 }

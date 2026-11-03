@@ -47,6 +47,7 @@ internal sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> option
                 photo.HasKey(item => item.Id);
                 photo.Property(item => item.Id).HasColumnName("id").ValueGeneratedNever();
                 photo.Property(item => item.StorageKey).HasColumnName("storage_key").HasMaxLength(512);
+                photo.Property(item => item.SizeBytes).HasColumnName("size_bytes").HasDefaultValue(0L);
                 photo.HasIndex("memory_id").HasDatabaseName("ix_photos_memory_id");
             });
             memory.Navigation(item => item.Photos).UsePropertyAccessMode(PropertyAccessMode.Field);
