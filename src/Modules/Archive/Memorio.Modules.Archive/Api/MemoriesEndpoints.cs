@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Memorio.Modularity;
 using Memorio.Modules.Archive.Application.Commands.AddPhoto;
+using Memorio.Modules.Archive.Application.Commands.DeleteMemory;
 using Memorio.Modules.Archive.Application.Commands.TrashMemory;
 using Memorio.Modules.Archive.Application.Commands.ApproveDescription;
 using Memorio.Modules.Archive.Application.Commands.CreateMemory;
@@ -23,6 +24,9 @@ internal static class MemoriesEndpoints
         memories.MapPost("/", CreateAsync)
             .WithName("CreateMemory")
             .WithSummary("Records a memory; the id comes from the client, so a retry changes nothing.");
+        memories.MapPost("/{id:guid}/permanent-deletion", RequestDataDeletionAsync)
+            .WithName("RequestDataDeletion")
+            .WithSummary("The author's formal request: the memory goes for good at once, without the trash.");
         memories.MapDelete("/{id:guid}", TrashAsync)
             .WithName("TrashMemory")
             .WithSummary("Moves the person's content to the trash for 30 days.");
@@ -122,6 +126,17 @@ internal static class MemoriesEndpoints
         var trashed = await handler.HandleAsync(new TrashMemory(new MemoryId(id), CurrentAccount.IdOf(principal)), cancellationToken);
         return trashed.IsFailure ? Problems.From(trashed.Error) : TypedResults.NoContent();
     }
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> RequestDataDeletionAsync(
+        Guid id,
+        RequestDataDeletionRequest request,
+        ClaimsPrincipal principal,
+        RequestDataDeletionHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var deleted = await handler.HandleAsync(new RequestDataDeletion(new MemoryId(id), CurrentAccount.IdOf(principal), request.Confirmed), cancellationToken);
+        return deleted.IsFailure ? Problems.From(deleted.Error) : TypedResults.NoContent();
+    }
 }
 
 /// <param name="Text">The description.</param>
@@ -145,6 +160,9 @@ internal sealed record MemoryDetailsResponse(
 
 /// <param name="Url">Signed for 5 minutes.</param>
 internal sealed record MemoryPhotoResponse(Guid Id, Uri Url);
+
+/// <param name="Confirmed">The person confirmed that this cannot be undone.</param>
+internal sealed record RequestDataDeletionRequest(bool Confirmed);
 
 internal sealed record StartUploadRequest(string? ContentType);
 
