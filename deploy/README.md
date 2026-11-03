@@ -107,6 +107,8 @@ entitlement ledger of Plans, the same thing the plan cycle reads for a store pay
 end <account|album> <id> --reason "…"`. Lines are never edited: `end` adds a manual line valid until now. Every
 grant and end is written to `/var/lib/memorio/operations.log`.
 
+Releasing the version that brings E1 needs `Archive__ConnectionString` in the server's `app.env` as well.
+
 Releasing the version that brings the ledger needs `Plans__ConnectionString` in the server's `app.env` (see
 `app.env.example`; the password is `PG_PASSWORD_MEMORIO_PLANS` from `postgres.env`), then
 `secrets/secrets.sh encrypt <environment>` (`secrets.sh check` names a variable missing from the copy).

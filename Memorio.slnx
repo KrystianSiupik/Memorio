@@ -80,6 +80,7 @@
     <Project Path="tests/Modules/Memorio.Modules.Access.Tests/Memorio.Modules.Access.Tests.csproj" />
     <Project Path="tests/Modules/Memorio.Modules.Account.Tests/Memorio.Modules.Account.Tests.csproj" />
     <Project Path="tests/Modules/Memorio.Modules.AiNarration.Tests/Memorio.Modules.AiNarration.Tests.csproj" />
+    <Project Path="tests/Modules/Memorio.Modules.Archive.Tests/Memorio.Modules.Archive.Tests.csproj" />
     <Project Path="tests/Modules/Memorio.Modules.Plans.Tests/Memorio.Modules.Plans.Tests.csproj" />
   </Folder>
 </Solution>
