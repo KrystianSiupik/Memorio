@@ -31,6 +31,14 @@ internal sealed class Memories(IDbContextOutbox<ArchiveDbContext> outbox) : IMem
         return await FindAsync(memory.Id, cancellationToken) ?? throw new InvalidOperationException("The memory that won the race is gone.");
     }
 
+    public async Task<IReadOnlyList<OverdueMemory>> FindOverdueAsync(DateTimeOffset at, CancellationToken cancellationToken) =>
+        await Database.Memories
+            .AsNoTracking()
+            .Where(memory => memory.State == MemoryState.Trashed && memory.WindowEndsAt <= at)
+            .OrderBy(memory => memory.WindowEndsAt)
+            .Select(memory => new OverdueMemory(memory.Id, memory.Sequence))
+            .ToListAsync(cancellationToken);
+
     public void Remove(Memory memory) => Database.Memories.Remove(memory);
 
     public Task<AppliedAccountEvent?> FindAppliedAsync(Guid accountId, CancellationToken cancellationToken) =>
@@ -71,6 +79,12 @@ internal sealed class Memories(IDbContextOutbox<ArchiveDbContext> outbox) : IMem
     {
         ContentDeletedDefinitively deleted => outbox.PublishAsync(new ContentDeleted(
             deleted.EventId, deleted.OccurredAt, deleted.MemoryId.Value, deleted.AuthorAccountId, deleted.Sequence)),
+
+        MemoryMovedToTrash moved => outbox.PublishAsync(new MemoryMovedToTrashEvent(
+            moved.EventId, moved.OccurredAt, moved.MemoryId.Value, moved.Sequence, moved.WindowEndsAt)),
+
+        MemoryRestored restored => outbox.PublishAsync(new MemoryRestoredEvent(
+            restored.EventId, restored.OccurredAt, restored.MemoryId.Value, restored.Sequence)),
 
         // The others stay inside the module.
         _ => ValueTask.CompletedTask,

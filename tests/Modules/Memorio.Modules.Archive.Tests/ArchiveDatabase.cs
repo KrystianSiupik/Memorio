@@ -5,6 +5,7 @@ using Memorio.Modules.Archive.Domain.Memories;
 using Memorio.Modules.Archive.Infrastructure.Persistence;
 using Memorio.Modules.Limits.Contracts;
 using Memorio.Modules.Places.Contracts;
+using Memorio.SharedKernel.Scheduling;
 using Memorio.SharedKernel.Storage;
 using Memorio.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,8 @@ public sealed class ArchiveDatabase : PostgresDatabase
     public FakeObjectStorage Storage { get; } = new();
 
     public FakeNeighbours Neighbours { get; } = new();
+
+    public FakeDeadlines Deadlines { get; } = new();
 
     public AsyncServiceScope CreateScope() => _host!.Services.CreateAsyncScope();
 
@@ -95,6 +98,7 @@ public sealed class ArchiveDatabase : PostgresDatabase
         builder.Services.AddSingleton<ITermsReader>(Neighbours);
         builder.Services.AddSingleton<ISpacePool>(Neighbours);
         builder.Services.AddSingleton<IAiDraftReader>(Neighbours);
+        builder.Services.AddSingleton<IDeadlines>(Deadlines);
         _host = builder.Build();
 
         await using (var scope = CreateScope())
