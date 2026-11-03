@@ -90,7 +90,7 @@ class _TrashPageState extends ConsumerState<TrashPage> {
                 itemBuilder: (context, index) {
                   final item = list[index];
                   return ListTile(
-                    title: Text(l10n.trashItem(item.placeName, dayTextOf(item.dateFrom))),
+                    title: Text(l10n.trashItem(dayTextOf(item.dateFrom), item.placeName)),
                     subtitle: Text(
                       [
                         if (item.description case final String description) description,
