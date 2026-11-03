@@ -744,3 +744,12 @@ Alertu na ten log nie dodałem. **Stan testów:** `AccountDeletionSweepJobIdempo
 |---|---|---|
 | D-217 | E3-LIMITY-01 zrobiony już teraz, bo blokuje tickety E2. `limits.account_pools` (zużycie, limit, numer limitu, limit AI, zużycie i miesiąc AI), księgi `pool_operations` i `ai_operations` z kluczem unikalnym = id treści. Rezerwacja, zwrot i zużycie AI to warunkowe `UPDATE` z księgą w jednej transakcji (D-015, D-016). Pula powstaje przy pierwszym użyciu z limitem planu darmowego: 2 GB, 0 szkiców AI (propozycja z D-078) | E2 potrzebuje puli przed E7. **Skutek do sprawdzenia:** dopóki E7 nie nada planów, „Poproś AI o szkic” zawsze kończy się „limit wyczerpany” |
 | D-218 | Reguły AG2 sprawdzane testami na PostgreSQL, a nie testem klasy agregatu: `AccountPool` nie ma metod, bo cała logika to atomowy SQL (D-016). `SetLimitAsync` (tylko nowszy numer) istnieje bez wywołującego do E7-LIMITY-01, bo wymaga go kryterium AG2 | test agregatu w pamięci sprawdzałby kopię reguły, a nie to, co działa |
+
+## Miejsca: MEM-E2-MIEJSCA-01 do -04 (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-219 | Odwołanie do miejsca to tekst: `osm:N:123` albo `own:<uuid>`. Identyfikatory OSM nie wychodzą poza Places inaczej niż w tej postaci. C10 tylko sprawdza miejsce i je zwraca, niczego nie zapisuje; wspomnienie zapamiętuje swoje miejsce. C11 przyjmuje identyfikator z aplikacji (klucz idempotencji) | wzorzec ACL; offline wspomnienie może wskazać miejsce własne, którego serwer jeszcze nie zna |
+| D-220 | Podpowiedzi: dopasowanie początku nazwy bez rozróżniania wielkości liter, od 2 znaków, najwyżej 20, własne przed OSM. Pierwsza migracja zakłada pustą `places.osm_places`, jeśli importu jeszcze nie było; import ją zastępuje (D-131) | podpowiedzi działają bez importu. **Do zrobienia przed danymi produkcyjnymi:** indeks na `lower(name)` musi powstawać przy imporcie, bo `--create` kasuje tabelę; bez niego zapytanie skanuje całą tabelę. Nie sprawdzałem tego na realnym wycinku OSM |
+
+**Stan testów:** `Modules.Places.Tests` na PostgreSQL z PostGIS, w tym macierz osoba × miejsce własne. Same endpointy sprawdza dopiero test na działającym hoście, którego jeszcze nie było.
