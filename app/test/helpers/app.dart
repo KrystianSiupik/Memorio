@@ -9,10 +9,12 @@ import 'package:memorio/core/auth/token_store.dart';
 import 'package:memorio/core/offline/local_database.dart';
 import 'package:memorio/core/offline/offline.dart';
 import 'package:memorio/features/account/account.dart';
+import 'package:memorio/features/memories/memories.dart';
 import 'package:memorio/features/map/map.dart';
 
 import 'fake_account.dart';
 import 'fake_http.dart';
+import 'fake_memories.dart';
 import 'fake_token_store.dart';
 
 /// Session store answering with a fixed session; null means signed out.
@@ -34,6 +36,7 @@ Future<ProviderContainer> pumpMemorioApp(
   Session? session,
   SessionRepository? sessions,
   AccountRepository? account,
+  MemoriesRepository? memories,
   FakeHttpAdapter? http,
   Stream<bool>? online,
   List<Override> overrides = const [],
@@ -47,6 +50,7 @@ Future<ProviderContainer> pumpMemorioApp(
       tokenStoreProvider.overrideWithValue(InMemoryTokenStore()),
       sessionRepositoryProvider.overrideWithValue(sessions ?? FakeSessionRepository(session)),
       accountRepositoryProvider.overrideWithValue(account ?? FakeAccountRepository()),
+      memoriesRepositoryProvider.overrideWithValue(memories ?? FakeMemoriesRepository()),
       localDatabaseProvider.overrideWithValue(database),
       isOnlineProvider.overrideWith((ref) => online ?? Stream.value(true)),
       mapViewProvider.overrideWithValue(const SizedBox.expand()),

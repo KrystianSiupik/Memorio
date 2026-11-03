@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../features/account/account.dart';
 import '../features/albums/albums.dart';
 import '../features/map/map.dart';
+import '../features/memories/memories.dart';
 import '../features/shared_with_me/shared_with_me.dart';
 import 'home_shell.dart';
 import 'routes.dart';
@@ -27,7 +28,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => HomeShell(navigationShell: navigationShell),
         branches: [
-          _tab(MapRoute.path, const MapPage()),
+          _tab(
+            MapRoute.path,
+            const MapPage(),
+            routes: [GoRoute(path: TrashRoute.path, builder: (context, state) => const TrashPage())],
+          ),
           _tab(AlbumsRoute.path, const AlbumsPage()),
           _tab(SharedWithMeRoute.path, const SharedWithMePage()),
           _tab(AccountRoute.path, const AccountPage()),
@@ -42,8 +47,8 @@ final routerProvider = Provider<GoRouter>((ref) {
   return router;
 });
 
-StatefulShellBranch _tab(String path, Widget page) => StatefulShellBranch(
-  routes: [GoRoute(path: path, builder: (context, state) => page)],
+StatefulShellBranch _tab(String path, Widget page, {List<RouteBase> routes = const []}) => StatefulShellBranch(
+  routes: [GoRoute(path: path, builder: (context, state) => page, routes: routes)],
 );
 
 /// Where to send the user, or null to stay (S02 "forbidden": signed out → S01).
