@@ -2,6 +2,7 @@ using Memorio.Modularity;
 using Memorio.Modules.Places.Api;
 using Memorio.Modules.Places.Application.Commands.AddOwnPlace;
 using Memorio.Modules.Places.Application.Commands.ChoosePlace;
+using Memorio.Modules.Places.Contracts;
 using Memorio.Modules.Places.Domain.Places;
 using Memorio.Modules.Places.Application.Queries.PlaceLookup;
 using Memorio.Modules.Places.Application.Queries.PlaceSuggestions;
@@ -38,6 +39,7 @@ public sealed class PlacesModule : IModule
         services.AddDbContext<PlacesDbContext>(database => database.UsePlacesDatabase(connectionString));
         services.AddScoped<IPlaceSuggestionsQuery, PlaceSuggestionsQuery>();
         services.AddScoped<IPlaceLookup, PlaceLookup>();
+        services.AddScoped<IPlaceReader, PlaceReader>();
         services.AddScoped<ChoosePlaceHandler>();
         services.AddScoped<IOwnPlaces, OwnPlaces>();
         services.AddScoped<AddOwnPlaceHandler>();
