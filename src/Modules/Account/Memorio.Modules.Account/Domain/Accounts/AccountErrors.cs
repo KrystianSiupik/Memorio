@@ -28,6 +28,14 @@ internal static class AccountErrors
         "Account.NotFound",
         "This account does not exist.");
 
+    public static readonly Error AlbumWithoutSuccessor = Error.Conflict(
+        "Account.AlbumWithoutSuccessor",
+        "The person owns albums without a successor: name one, or agree that the albums expire.");
+
+    public static readonly Error DeletionAlreadyDecided = Error.Conflict(
+        "Account.DeletionAlreadyDecided",
+        "This deletion has already been decided.");
+
     public static readonly Error ProviderUnavailable = Error.NotFound(
         "Account.ProviderUnavailable",
         "This sign-in provider is not available.");

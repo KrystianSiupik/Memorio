@@ -225,6 +225,56 @@
           }
         }
       }
+    },
+    "/v1/account/deletion": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Opens the 30-day window for deleting the account; asking again changes nothing.",
+        "operationId": "RequestAccountDeletion",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestAccountDeletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDeletionResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Whether a window for deleting the account is open, and until when.",
+        "operationId": "GetAccountDeletion",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDeletionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -322,6 +372,21 @@
               "string"
             ],
             "format": "int32"
+          }
+        }
+      },
+      "AccountDeletionResponse": {
+        "required": [
+          "windowEndsAt"
+        ],
+        "type": "object",
+        "properties": {
+          "windowEndsAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -437,6 +502,17 @@
             ]
           },
           "declaresMinimumAge": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RequestAccountDeletionRequest": {
+        "required": [
+          "consentsToAlbumExpiry"
+        ],
+        "type": "object",
+        "properties": {
+          "consentsToAlbumExpiry": {
             "type": "boolean"
           }
         }

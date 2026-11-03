@@ -10,11 +10,13 @@ export 'clients/auth_client.dart';
 export 'models/accept_terms_request.dart';
 export 'models/access_token_response.dart';
 export 'models/account_deletion_impact_response.dart';
+export 'models/account_deletion_response.dart';
 export 'models/account_response.dart';
 export 'models/app_version_policy_response.dart';
 export 'models/external_sign_in_request.dart';
 export 'models/login_request.dart';
 export 'models/refresh_request.dart';
 export 'models/register_request.dart';
+export 'models/request_account_deletion_request.dart';
 // Root client
 export 'memorio_api_client.dart';
