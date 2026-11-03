@@ -95,6 +95,7 @@ services:
       Messaging__ConnectionString: &messaging Host=postgres;Database=memorio;Username=memorio_messaging;Maximum Pool Size=20;Timeout=5;Password=memorio_local
       Account__ConnectionString: &account Host=postgres;Database=memorio;Username=memorio_account;Maximum Pool Size=10;Timeout=5;Password=memorio_local
       Plans__ConnectionString: &plans Host=postgres;Database=memorio;Username=memorio_plans;Maximum Pool Size=5;Timeout=5;Password=memorio_local
+      Limits__ConnectionString: &limits Host=postgres;Database=memorio;Username=memorio_limits;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Album__ConnectionString: &album Host=postgres;Database=memorio;Username=memorio_album;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Archive__ConnectionString: &archive Host=postgres;Database=memorio;Username=memorio_archive;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       # Telemetry goes to the collector of the monitoring profile; without it nothing is lost but metrics and logs.
@@ -119,6 +120,7 @@ services:
       Messaging__ConnectionString: *messaging
       Account__ConnectionString: *account
       Plans__ConnectionString: *plans
+      Limits__ConnectionString: *limits
       Album__ConnectionString: *album
       Archive__ConnectionString: *archive
       Scheduling__ConnectionString: Host=postgres;Database=memorio;Username=memorio_scheduler;Maximum Pool Size=15;Timeout=5;Password=memorio_local

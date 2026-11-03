@@ -39,6 +39,7 @@ or missing variable stops the host and the log names the variable, never its val
 | `Plans__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_plans` (entitlement ledger, plans) |
 | `Archive__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_archive` (memories, photos) |
 | `Album__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_album` (albums, participants) |
+| `Limits__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_limits` (pools and their operations) |
 | `Database__MigrateOnStartup` | API, worker | optional, default `true`: apply the modules' migrations at start |
 | `Scheduling__ConnectionString` | worker | PostgreSQL connection of the role `memorio_scheduler` (scheduled jobs and deadlines) |
 | `Telemetry__OtlpEndpoint` | API, worker | optional: OTLP/HTTP address of the OpenTelemetry Collector; none: no metrics or logs exported |

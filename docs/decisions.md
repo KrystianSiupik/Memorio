@@ -737,3 +737,10 @@ Alertu na ten log nie dodałem. **Stan testów:** `AccountDeletionSweepJobIdempo
 | D-216 | Ikona „Wyloguj” na pasku S24, dostępna także bez sieci i gdy dane się nie wczytały: czyści tokeny na urządzeniu i wraca do S01. `accountOverviewProvider` śledzi konto w sesji, więc kolejna osoba nie zobaczy liczb poprzedniej | zamyka brak z D-214; dane w providerze przeżywały zmianę osoby |
 
 **Znane ograniczenia:** wylogowanie jest tylko lokalne: backend nie unieważnia tokenów, więc skopiowany token odświeżający działa do wygaśnięcia (14 dni). **Do pilnowania w E2:** kolejka offline nie jest przypisana do konta; gdy pojawią się w niej operacje, wylogowanie musi je obsłużyć. **Stan testów:** testy komponentu na atrapach. Na urządzeniu i w przeglądarce nieuruchomione.
+
+## Limity: MEM-E3-LIMITY-01 (wciągnięty z E3), MEM-E2-LIMITY-01, -02, -03 (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-217 | E3-LIMITY-01 zrobiony już teraz, bo blokuje tickety E2. `limits.account_pools` (zużycie, limit, numer limitu, limit AI, zużycie i miesiąc AI), księgi `pool_operations` i `ai_operations` z kluczem unikalnym = id treści. Rezerwacja, zwrot i zużycie AI to warunkowe `UPDATE` z księgą w jednej transakcji (D-015, D-016). Pula powstaje przy pierwszym użyciu z limitem planu darmowego: 2 GB, 0 szkiców AI (propozycja z D-078) | E2 potrzebuje puli przed E7. **Skutek do sprawdzenia:** dopóki E7 nie nada planów, „Poproś AI o szkic” zawsze kończy się „limit wyczerpany” |
+| D-218 | Reguły AG2 sprawdzane testami na PostgreSQL, a nie testem klasy agregatu: `AccountPool` nie ma metod, bo cała logika to atomowy SQL (D-016). `SetLimitAsync` (tylko nowszy numer) istnieje bez wywołującego do E7-LIMITY-01, bo wymaga go kryterium AG2 | test agregatu w pamięci sprawdzałby kopię reguły, a nie to, co działa |
