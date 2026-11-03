@@ -34,6 +34,7 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
         ["Account:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_account",
         // Not contacted either (tests/Modules/Memorio.Modules.Plans.Tests covers the ledger on a real database).
         ["Plans:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_plans",
+        ["Limits:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_limits",
         ["Album:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_album",
         ["Archive:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_archive",
         ["Database:MigrateOnStartup"] = "false",
@@ -82,7 +83,7 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
             services.Configure<HealthCheckServiceOptions>(options =>
             {
                 foreach (var check in options.Registrations
-                    .Where(check => check.Name is MemorioMessaging.HealthCheckName or ObjectStorage.HealthCheckName or "account-database" or "plans-database" or "archive-database" or "album-database")
+                    .Where(check => check.Name is MemorioMessaging.HealthCheckName or ObjectStorage.HealthCheckName or "account-database" or "plans-database" or "archive-database" or "album-database" or "limits-database")
                     .ToList())
                 {
                     options.Registrations.Remove(check);
