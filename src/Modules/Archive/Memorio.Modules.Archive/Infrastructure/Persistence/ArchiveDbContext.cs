@@ -41,6 +41,12 @@ internal sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> option
             memory.Property(item => item.Description).HasColumnName("description").HasMaxLength(Memory.MaximumDescriptionLength);
             memory.Property(item => item.DescriptionAiModel).HasColumnName("description_ai_model").HasMaxLength(200);
             memory.Property(item => item.DescriptionAiPromptVersion).HasColumnName("description_ai_prompt_version").HasMaxLength(200);
+            memory.Property(item => item.State).HasColumnName("state").HasConversion<string>().HasMaxLength(20).HasDefaultValue(MemoryState.Active).HasSentinel((MemoryState)(-1)).IsConcurrencyToken();
+            memory.Property(item => item.Sequence).HasColumnName("sequence").HasDefaultValue(1).HasSentinel(0).IsConcurrencyToken();
+            memory.Property(item => item.TrashReason).HasColumnName("trash_reason").HasConversion<string>().HasMaxLength(20);
+            memory.Property(item => item.TrashedAt).HasColumnName("trashed_at");
+            memory.Property(item => item.WindowEndsAt).HasColumnName("window_ends_at");
+            memory.HasIndex(item => item.WindowEndsAt).HasDatabaseName("ix_memories_trash_window_ends_at").HasFilter("state = 'Trashed'");
             memory.Ignore(item => item.DomainEvents);
             memory.HasIndex(item => item.AuthorAccountId).HasDatabaseName("ix_memories_author_account_id");
             memory.OwnsMany(item => item.Photos, photo =>

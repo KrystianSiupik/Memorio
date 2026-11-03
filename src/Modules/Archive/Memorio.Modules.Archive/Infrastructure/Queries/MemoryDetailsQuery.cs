@@ -17,7 +17,7 @@ internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStora
                date_from::text AS "DateFrom", date_to::text AS "DateTo", author_account_id AS "AuthorAccountId", description AS "Description",
                description_ai_model IS NOT NULL AS "DescriptionIsAi"
         FROM archive.memories
-        WHERE id = @memoryId AND author_account_id = @accountId
+        WHERE id = @memoryId AND author_account_id = @accountId AND state = 'Active'
         """;
 
     private const string PhotosSql = """

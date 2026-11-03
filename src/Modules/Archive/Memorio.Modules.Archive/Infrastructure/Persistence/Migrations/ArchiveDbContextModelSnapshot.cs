@@ -115,10 +115,43 @@ namespace Memorio.Modules.Archive.Infrastructure.Persistence.Migrations
                         .HasDefaultValue("")
                         .HasColumnName("place_reference");
 
+                    b.Property<int>("Sequence")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("sequence");
+
+                    b.Property<string>("State")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Active")
+                        .HasColumnName("state");
+
+                    b.Property<string>("TrashReason")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("trash_reason");
+
+                    b.Property<DateTimeOffset?>("TrashedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("trashed_at");
+
+                    b.Property<DateTimeOffset?>("WindowEndsAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("window_ends_at");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorAccountId")
                         .HasDatabaseName("ix_memories_author_account_id");
+
+                    b.HasIndex("WindowEndsAt")
+                        .HasDatabaseName("ix_memories_trash_window_ends_at")
+                        .HasFilter("state = 'Trashed'");
 
                     b.ToTable("memories", "archive");
                 });
