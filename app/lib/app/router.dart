@@ -30,7 +30,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         branches: [
           _tab(
             MapRoute.path,
-            const MapPage(),
+            Builder(
+              builder: (context) => MapPage(
+                onAddMemory: () => const NewMemoryRoute().go(context),
+                onOpenTrash: () => const TrashRoute().go(context),
+                onOpenMemory: (id) => MemoryRoute(id).go(context),
+              ),
+            ),
             routes: [
               GoRoute(path: TrashRoute.path, builder: (context, state) => const TrashPage()),
               GoRoute(

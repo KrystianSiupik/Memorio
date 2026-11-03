@@ -11,6 +11,7 @@ import 'package:memorio/app/memorio_app.dart';
 import 'package:memorio/core/api/api.dart';
 import 'package:memorio/features/account/account.dart';
 import 'package:memorio/features/map/map.dart';
+import 'package:memorio/features/memories/memories.dart';
 
 import 'report_device.dart' if (dart.library.js_interop) 'report_web.dart';
 
@@ -22,7 +23,7 @@ class _SignedIn implements SessionRepository {
 }
 
 /// Deterministic points gathered around a few dozen places, like a real user's memories.
-List<MapPoint> syntheticPoints(int count) {
+List<MemoryPin> syntheticPoints(int count) {
   final random = Random(42);
   final places = [for (var i = 0; i < 40; i++) (random.nextDouble() * 110 - 50, random.nextDouble() * 340 - 170)];
   double spread() => (random.nextDouble() - 0.5) * 3;
@@ -30,7 +31,7 @@ List<MapPoint> syntheticPoints(int count) {
     for (var i = 0; i < count; i++)
       () {
         final (latitude, longitude) = places[random.nextInt(places.length)];
-        return MapPoint(id: 'p$i', latitude: latitude + spread(), longitude: longitude + spread());
+        return MemoryPin(id: 'p$i', latitude: latitude + spread(), longitude: longitude + spread());
       }(),
   ];
 }
@@ -98,7 +99,7 @@ Future<void> main() async {
         ...appOverrides(appVersion: '1.0.0'),
         if (kIsWeb) apiBaseUrlProvider.overrideWithValue(Uri.base.origin),
         sessionRepositoryProvider.overrideWithValue(_SignedIn()),
-        mapPointsProvider.overrideWithValue(points),
+        memoryPinsProvider.overrideWith((ref) async => points),
         mapViewProvider.overrideWith((ref) {
           report('mapOpenedAt', now());
           return MapLibreMapView(onPointsAdded: script.pointsAdded, onIdle: script.idle);

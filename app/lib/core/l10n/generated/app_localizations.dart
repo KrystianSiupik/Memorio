@@ -463,6 +463,24 @@ abstract class AppLocalizations {
   /// **'Czeka na wysłanie: {count}'**
   String mapPendingUpload(Object count);
 
+  /// No description provided for @mapEmptyFiltered.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak wspomnień w tych datach'**
+  String get mapEmptyFiltered;
+
+  /// No description provided for @mapRejected.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie udało się wysłać: {count}'**
+  String mapRejected(Object count);
+
+  /// No description provided for @mapRejectedDismiss.
+  ///
+  /// In pl, this message translates to:
+  /// **'Rozumiem'**
+  String get mapRejectedDismiss;
+
   /// No description provided for @newMemoryTitle.
   ///
   /// In pl, this message translates to:

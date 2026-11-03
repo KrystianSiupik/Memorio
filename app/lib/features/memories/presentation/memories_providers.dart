@@ -30,7 +30,10 @@ class RecentPlacesNotifier extends Notifier<List<PlaceOption>> {
   static const _kept = 10;
 
   @override
-  List<PlaceOption> build() => const [];
+  List<PlaceOption> build() {
+    ref.watch(sessionProvider.select((session) => session.value?.accountId));
+    return const [];
+  }
 
   void remember(PlaceOption place) {
     state = [place, ...state.where((known) => known.reference != place.reference)].take(_kept).toList();
@@ -44,7 +47,10 @@ final memoryDateFilterProvider = NotifierProvider<MemoryDateFilterNotifier, ({Da
 
 class MemoryDateFilterNotifier extends Notifier<({DateTime from, DateTime to})?> {
   @override
-  ({DateTime from, DateTime to})? build() => null;
+  ({DateTime from, DateTime to})? build() {
+    ref.watch(sessionProvider.select((session) => session.value?.accountId));
+    return null;
+  }
 
   void set(({DateTime from, DateTime to})? range) => state = range;
 }
@@ -69,6 +75,7 @@ final memoryPinsProvider = FutureProvider<List<MemoryPin>>((ref) async {
 
 /// What S05 shows. Kept for the session: without a connection the screen reads the last answer.
 final memoryDetailsProvider = FutureProvider.family<MemoryDetails, String>((ref, id) async {
+  ref.watch(sessionProvider.select((session) => session.value?.accountId));
   final loaded = await ref.watch(memoriesRepositoryProvider).loadDetails(id);
   return switch (loaded) {
     Ok(:final value) => value,
@@ -78,6 +85,7 @@ final memoryDetailsProvider = FutureProvider.family<MemoryDetails, String>((ref,
 
 /// What S06 shows. Kept for the session: without a connection the screen reads the last answer.
 final trashProvider = FutureProvider<List<TrashedMemory>>((ref) async {
+  ref.watch(sessionProvider.select((session) => session.value?.accountId));
   final loaded = await ref.watch(memoriesRepositoryProvider).loadTrash();
   return switch (loaded) {
     Ok(:final value) => value,

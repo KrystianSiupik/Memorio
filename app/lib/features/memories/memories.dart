@@ -8,5 +8,6 @@ export 'domain/memory_failure.dart';
 export 'domain/memory_operations.dart';
 export 'presentation/memories_providers.dart';
 export 'presentation/memory_details_page.dart';
+export 'presentation/memory_texts.dart' show dayText, memoryFailureText;
 export 'presentation/new_memory_page.dart';
 export 'presentation/trash_page.dart';

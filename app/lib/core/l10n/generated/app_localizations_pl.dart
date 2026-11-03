@@ -214,6 +214,17 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get mapEmptyFiltered => 'Brak wspomnień w tych datach';
+
+  @override
+  String mapRejected(Object count) {
+    return 'Nie udało się wysłać: $count';
+  }
+
+  @override
+  String get mapRejectedDismiss => 'Rozumiem';
+
+  @override
   String get newMemoryTitle => 'Nowe wspomnienie';
 
   @override

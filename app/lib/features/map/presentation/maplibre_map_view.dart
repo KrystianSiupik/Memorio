@@ -1,3 +1,5 @@
+import 'dart:math' show Point;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -27,7 +29,8 @@ Map<String, Object> pointsToGeoJson(List<MapPoint> points) => {
       {
         'type': 'Feature',
         'id': point.id,
-        'properties': <String, Object>{},
+        // GL JS drops string feature ids; the source promotes this property back to the id.
+        'properties': <String, Object>{'id': point.id},
         'geometry': {
           'type': 'Point',
           'coordinates': [point.longitude, point.latitude],
@@ -54,6 +57,7 @@ class MapLibreMapView extends ConsumerStatefulWidget {
 class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
   late final Future<String> _style = _loadStyle();
   MapLibreMapController? _controller;
+  var _layersReady = false;
 
   Future<String> _loadStyle() async {
     final base = _mapBaseUrl.isEmpty ? Uri.base.resolve('map').toString() : _mapBaseUrl;
@@ -63,13 +67,15 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
 
   Future<void> _addPoints() async {
     final controller = _controller!;
+    final points = ref.read(mapPointsProvider);
     if (kIsWeb) {
       await controller.setProjection('globe');
     }
     await controller.addSource(
       _pointsSource,
       GeojsonSourceProperties(
-        data: pointsToGeoJson(ref.read(mapPointsProvider)),
+        data: pointsToGeoJson(points),
+        promoteId: 'id',
         cluster: true,
         clusterRadius: 50,
         clusterMaxZoom: 14,
@@ -114,11 +120,37 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
         ['has', 'point_count'],
       ],
     );
+    _layersReady = true;
+    controller.onFeatureTapped.add(_featureTapped);
+    final latest = ref.read(mapPointsProvider);
+    if (!identical(latest, points)) {
+      await controller.setGeoJsonSource(_pointsSource, pointsToGeoJson(latest));
+    }
     widget.onPointsAdded?.call(controller);
+  }
+
+  void _featureTapped(Point<double> point, LatLng coordinates, String id, String layerId, Annotation? annotation) {
+    if (layerId == _singlePointLayer) {
+      ref.read(tappedPointProvider.notifier).tap(id);
+    } else if (layerId == _clusterLayer || layerId == _clusterCountLayer) {
+      final controller = _controller!;
+      controller.animateCamera(CameraUpdate.newLatLngZoom(coordinates, (controller.cameraPosition?.zoom ?? 1) + 2));
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.onFeatureTapped.remove(_featureTapped);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(mapPointsProvider, (previous, points) {
+      if (_layersReady) {
+        _controller?.setGeoJsonSource(_pointsSource, pointsToGeoJson(points));
+      }
+    });
     return FutureBuilder<String>(
       future: _style,
       builder: (context, style) {
@@ -128,6 +160,7 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
         }
         return MapLibreMap(
           styleString: json,
+          trackCameraPosition: true,
           initialCameraPosition: const CameraPosition(target: LatLng(30, 15), zoom: 1.2),
           onMapCreated: (controller) => _controller = controller,
           onStyleLoadedCallback: _addPoints,

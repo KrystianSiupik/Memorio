@@ -31,6 +31,11 @@ final localDatabaseProvider = Provider<LocalDatabase>((ref) {
 
 final offlineQueueProvider = Provider<OfflineQueue>((ref) => OfflineQueue(ref.watch(localDatabaseProvider)));
 
+/// What waits in the queue or was rejected. Empty in a browser, which has no queue (D-115).
+final pendingOperationsProvider = StreamProvider<List<PendingOperation>>(
+  (ref) => kIsWeb ? Stream.value(const []) : ref.watch(offlineQueueProvider).watch(),
+);
+
 /// Senders per operation kind; features add theirs in app/composition.dart.
 final operationSendersProvider = Provider<Map<String, OperationSender>>((ref) => const {});
 

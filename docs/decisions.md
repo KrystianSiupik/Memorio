@@ -804,3 +804,23 @@ Alertu na ten log nie dodałem. **Stan testów:** `AccountDeletionSweepJobIdempo
 | D-238 | Szczegóły S05 i kosz S06 czytają dane przez dostawców trzymanych przez sesję: bez sieci pokazują ostatnią odpowiedź. Nieudany odczyt czeka na „Ponów”, automatyczne ponawianie Riverpoda jest wyłączone, także w S24 | ponawianie w tle zasłaniało stan błędu i brak dostępu |
 
 **Stan testów:** testy komponentów S04, S05 i S06 z atrapami repozytoriów; kolejka S04 na prawdziwej bazie w pamięci. Znalazły błąd: „Zatwierdź opis” nie włączał się podczas pisania. Nie użyto prawdziwego API, galerii zdjęć ani urządzenia. S04 jest osiągalny z aplikacji dopiero przez S03.
+
+## Ekran S03 Mapa (MEM-E2-PLAT-01, 2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-239 | Punkty mapy wynikają z `memoryPinsProvider` i zostają na mapie podczas odświeżania i po nieudanym odświeżeniu. Bez sieci znane punkty są pokazywane bez komunikatu o błędzie, a przy błędzie serwera z komunikatem i „Ponów” | kryterium stanu offline. **Ograniczenie:** punkty są pamiętane tylko w sesji, więc po restarcie bez sieci mapa jest pusta i pokazuje błąd. Tak samo jak w D-238 |
+| D-240 | Filtry osób i albumów są widoczne, ale wyłączone, do czasu E3 i E4 (D-231). Działa filtr dat | kryterium wymaga tych pól, a backend ma tylko daty |
+| D-241 | Wspomnienia z kolejki są na S03 **liczone** („Czeka na wysłanie: N”), a nie rysowane jako punkty | zapis w kolejce ma odwołanie do miejsca, bez współrzędnych. Kryterium spełnione w słabszej formie; **do oceny przez PO** |
+| D-242 | Operacja odrzucona przez backend jest pokazana na S03 z „Rozumiem”; opuszczenie kolejki odświeża punkty | wcześniej nikt nie mówił o odrzuceniu, więc wspomnienie zapisane offline mogło przepaść po cichu |
+| D-243 | Stuknięcie punktu idzie przez `tappedPointProvider` do S03 i otwiera S05; stuknięcie klastra przybliża mapę o 2 poziomy. Identyfikator trafia też do `properties` i wraca przez `promoteId`, bo GL JS gubi tekstowe id obiektów | widok mapy jest osobnym widgetem za `mapViewProvider`, którego testy nie rysują |
+| D-244 | Filtr dat, ostatnie miejsca, szczegóły (S05) i kosz (S06) przeładowują się po zmianie konta | **naprawiony błąd:** szczegóły i kosz poprzedniej osoby zostawały w pamięci po wylogowaniu i zalogowaniu kolejnej |
+
+**Stan testów:** `map_page_test.dart` 20 testów, cała aplikacja 165/165. Benchmark w prawdziwym Chrome z GPU, 10 przebiegów: pierwszy obraz p95 **1101 ms** (limit 2000), 60 kl./s, 10 klastrów na ekranie, nic nie wychodzi poza własny adres, brak błędów na stronie. Punkty w benchmarku nie idą przez sieć, więc to nie jest pełny pomiar QS3 z API; poprzedni wynik 2,11 s (PLAT-05) mierzył inny układ, różnica nie dowodzi poprawy.
+
+**Nie sprawdzono:** stuknięcia punktu i klastra na prawdziwej mapie (przeczytałem tylko kod wtyczki), urządzeń Android i iOS, kafelków bez sieci.
+
+**Do oceny przez PO:**
+- SD3: pierwsza wizyta to 3,49 MB przy limicie 3,5 MB. Kolejny ekran prawdopodobnie przekroczy budżet.
+- Kolejka offline nie jest przypisana do konta: operacje jednej osoby, niewysłane przed wylogowaniem, wyśle po powrocie sieci sesja kolejnej osoby na tym urządzeniu. Nie naprawiam, bo wymaga decyzji, co zrobić z niewysłanymi danymi.
+- Operacja, która dostała „spróbuj później”, czeka do następnej zmiany stanu sieci lub startu aplikacji: kolejka nie ponawia się sama przy stałym połączeniu.
