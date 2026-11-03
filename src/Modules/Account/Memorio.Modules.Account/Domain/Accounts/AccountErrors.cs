@@ -36,6 +36,14 @@ internal static class AccountErrors
         "Account.DeletionAlreadyDecided",
         "This deletion has already been decided.");
 
+    public static readonly Error DeletionWindowOpen = Error.Conflict(
+        "Account.DeletionWindowOpen",
+        "The window for deleting this account has not ended yet.");
+
+    public static readonly Error NoDeletionRequested = Error.NotFound(
+        "Account.NoDeletionRequested",
+        "Nobody asked for this account to be deleted.");
+
     public static readonly Error ProviderUnavailable = Error.NotFound(
         "Account.ProviderUnavailable",
         "This sign-in provider is not available.");

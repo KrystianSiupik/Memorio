@@ -628,3 +628,11 @@ Założenie do sprawdzenia: **regulaminu jeszcze nie ma**, a `2026-11` to etykie
 | D-203 | `POST /v1/account/deletion`, `GET /v1/account/deletion` (termin albo null). E4 trafia do outboxu w transakcji zmiany (`AccountDeletionRequested`), bo termin ustawia dopiero worker (D-157). `AccountDbContext` rejestrowany przez `AddDbContextWithWolverineIntegration`; moduł Konto zależy od `WolverineFx.EntityFrameworkCore` tylko w `Infrastructure` | ADR 0006 |
 
 Pytanie otwarte: czy zlecenie usunięcia ma wymagać ponownego podania hasła. Ticket mówi tylko o potwierdzeniu, więc na razie wystarcza sesja i potwierdzenie na ekranie. **Stan testów:** handler bez bazy oraz na PostgreSQL z outboxem i workerem: pojedyncze, podwójne i równoległe zlecenie daje jedno zdarzenie.
+
+## MEM-E1-KONTO-04 · Usuń konto definitywnie (C4) (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-204 | `AccountDeletion.Complete(sequence, at)` działa tylko dla bieżącego okna, w stanie `Pending` i nie przed jego końcem. Dane logowania (`AspNetUsers`, kaskadą loginy i tokeny) znikają w tej samej transakcji co zmiana stanu. Wiersz `account_deletions` zostaje na stałe: identyfikator, daty i zgoda, bez e-maila | jeden wynik okna; ślad, co się stało z oknem. **Do oceny prawnika:** przechowywanie tego śladu po usunięciu konta |
+
+**Stan testów:** reguły bez bazy oraz na PostgreSQL: równoległe usuwanie ma jednego zwycięzcę, po usunięciu token zwraca 401.

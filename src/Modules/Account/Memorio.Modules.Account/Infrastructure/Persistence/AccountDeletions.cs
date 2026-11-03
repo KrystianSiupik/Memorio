@@ -25,6 +25,13 @@ internal sealed class AccountDeletions(IDbContextOutbox<AccountDbContext> outbox
             await PublishAsync(domainEvent);
         }
 
+        // Sign-in, password and email go with the completed deletion, in its transaction; logins and tokens cascade.
+        if (deletion.State == DeletionState.Completed
+            && await Database.Users.FirstOrDefaultAsync(user => user.Id == deletion.Id.Value, cancellationToken) is { } user)
+        {
+            Database.Users.Remove(user);
+        }
+
         try
         {
             await outbox.SaveChangesAndFlushMessagesAsync(cancellationToken);
@@ -44,6 +51,9 @@ internal sealed class AccountDeletions(IDbContextOutbox<AccountDbContext> outbox
     {
         DeletionRequested requested => outbox.PublishAsync(new AccountDeletionRequested(
             requested.EventId, requested.OccurredAt, requested.AccountId.Value, requested.Sequence, requested.WindowEndsAt)),
+
+        // Goes out with its contract (MEM-E1-KONTO-08).
+        DeletionCompleted => ValueTask.CompletedTask,
         _ => throw new InvalidOperationException($"No integration event for {domainEvent.GetType().Name}."),
     };
 }
