@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Memorio.Modules.Limits;
 
-/// <summary>Module Limits. Key question: Is there still room in this pool for this operation?</summary>
+/// <summary>Module Limits. Key question: Will this operation fit in the pool, and how much is left?</summary>
 public sealed class LimitsModule : IModule
 {
     public string Name => "Limits";
