@@ -10,3 +10,6 @@ internal sealed record DeletionRequested(
     AccountId AccountId,
     int Sequence,
     DateTimeOffset WindowEndsAt) : IDomainEvent;
+
+/// <summary>E7: the window ended without being cancelled, the account is gone.</summary>
+internal sealed record DeletionCompleted(Guid EventId, DateTimeOffset OccurredAt, AccountId AccountId, int Sequence) : IDomainEvent;

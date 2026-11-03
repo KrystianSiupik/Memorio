@@ -35,6 +35,9 @@ public sealed class AccountHost : PostgresDatabase
 
     public HttpClient Client { get; private set; } = null!;
 
+    /// <summary>The services of the API side, for running a command the way a request does.</summary>
+    public IServiceProvider Api => _app!.Services;
+
     /// <summary>The events of this module the worker received.</summary>
     public RecordedEvents Recorded { get; } = new();
 
@@ -49,6 +52,14 @@ public sealed class AccountHost : PostgresDatabase
         using var me = await SendAsync(HttpMethod.Get, "/v1/account/me", accessToken);
         Assert.Equal(HttpStatusCode.OK, me.StatusCode);
         return ((await me.Content.ReadFromJsonAsync<JsonElement>(Cancellation)).GetProperty("accountId").GetGuid(), accessToken);
+    }
+
+    /// <summary>Opens the window for deleting the account and tells when it ends.</summary>
+    public async Task<DateTimeOffset> RequestDeletionAsync(string accessToken)
+    {
+        using var response = await SendAsync(HttpMethod.Post, "/v1/account/deletion", accessToken, new { consentsToAlbumExpiry = true });
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        return (await response.Content.ReadFromJsonAsync<JsonElement>(Cancellation)).GetProperty("windowEndsAt").GetDateTimeOffset();
     }
 
     public async Task<HttpResponseMessage> SendAsync(HttpMethod method, string path, string accessToken, object? body = null)

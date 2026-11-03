@@ -1,6 +1,7 @@
 using Memorio.Modularity;
 using Memorio.Modules.Account.Api;
 using Memorio.Modules.Account.Application.Commands.AcceptTerms;
+using Memorio.Modules.Account.Application.Commands.DeleteAccount;
 using Memorio.Modules.Account.Application.Commands.RegisterAccount;
 using Memorio.Modules.Account.Application.Commands.RequestAccountDeletion;
 using Memorio.Modules.Account.Application.Ports;
@@ -65,6 +66,7 @@ public sealed class AccountModule : IModule
         services.AddScoped<IAccountDeletionImpactQuery, AccountDeletionImpactQuery>();
         services.AddScoped<IAccountDeletions, AccountDeletions>();
         services.AddScoped<RequestAccountDeletionHandler>();
+        services.AddScoped<DeleteAccountHandler>();
         services.AddScoped<IPendingAccountDeletionQuery, PendingAccountDeletionQuery>();
 
         services.AddSingleton<IExternalIdentityVerifier>(OpenIdIdentityVerifier.ForProvider(ExternalProvider.Google, options.Google.ClientIds));
