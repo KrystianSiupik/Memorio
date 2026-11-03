@@ -16,7 +16,9 @@ using Memorio.Modules.Archive.Domain.Memories;
 using Memorio.Modules.Archive.Infrastructure;
 using Memorio.Modules.Archive.Infrastructure.Persistence;
 using Memorio.Modules.Archive.Infrastructure.Queries;
+using Memorio.Modules.Archive.Infrastructure.Scheduling;
 using Memorio.SharedKernel.Messaging;
+using Memorio.SharedKernel.Scheduling;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,6 +52,15 @@ public sealed class ArchiveModule : IModule
         services.AddScoped<IMemories, Memories>();
         services.AddScoped<DeleteAccountContentHandler>();
         services.AddScoped<CreateMemoryHandler>();
+        services.AddScoped<DeleteMemoryWhenTrashWindowPassed>();
+
+        // IDeadlines exists in the worker only, the one host running these (D-157): built on demand, so the
+        // API, which never asks for them, still passes the container's validation in development.
+        services.AddScoped(provider => new TrashWindowDeadline(provider.GetRequiredService<IMemories>(), provider.GetRequiredService<IDeadlines>()));
+        services.AddScoped<IIntegrationEventPolicy<MemoryMovedToTrashEvent>>(provider => provider.GetRequiredService<TrashWindowDeadline>());
+        services.AddScoped<IIntegrationEventPolicy<MemoryRestoredEvent>>(provider => provider.GetRequiredService<TrashWindowDeadline>());
+        services.AddScheduledJob<TrashWindowJob>(TrashWindowDeadline.JobName);
+        services.AddScheduledJob<TrashSweepJob>(TrashSweepJob.JobName, TrashSweepJob.Cron);
         services.AddScoped<RestoreMemoryHandler>();
         services.AddScoped<ITrashQuery, TrashQuery>();
         services.AddScoped<RequestDataDeletionHandler>();
