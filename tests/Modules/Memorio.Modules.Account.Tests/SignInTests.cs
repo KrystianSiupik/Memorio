@@ -6,7 +6,7 @@ using System.Text.Json;
 namespace Memorio.Modules.Account.Tests;
 
 /// <summary>MEM-E0-PLAT-07 on a real database: accounts, 16+ declaration, tokens, provider sign-in.</summary>
-public sealed class SignInTests(AccountHost host) : IClassFixture<AccountHost>
+public sealed class SignInTests(AccountHost host)
 {
     private const string Password = "long-enough-password";
 

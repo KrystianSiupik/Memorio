@@ -204,6 +204,27 @@
           }
         }
       }
+    },
+    "/v1/account/deletion-impact": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "In numbers, what goes when the signed-in person deletes their account.",
+        "operationId": "GetAccountDeletionImpact",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDeletionImpactResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -249,6 +270,58 @@
           },
           "refreshToken": {
             "type": "string"
+          }
+        }
+      },
+      "AccountDeletionImpactResponse": {
+        "required": [
+          "memories",
+          "photos",
+          "ownAlbums",
+          "ownAlbumsWithoutSuccessor",
+          "otherPeoplesAlbums"
+        ],
+        "type": "object",
+        "properties": {
+          "memories": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "photos": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "ownAlbums": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "ownAlbumsWithoutSuccessor": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "otherPeoplesAlbums": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           }
         }
       },

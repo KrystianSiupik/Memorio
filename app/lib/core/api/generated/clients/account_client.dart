@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../models/accept_terms_request.dart';
+import '../models/account_deletion_impact_response.dart';
 import '../models/account_response.dart';
 
 part 'account_client.g.dart';
@@ -21,4 +22,8 @@ abstract class AccountClient {
   /// Records that the signed-in person accepted the current version of the terms.
   @POST('/v1/account/terms-acceptance')
   Future<void> acceptTerms({@Body() required AcceptTermsRequest body});
+
+  /// In numbers, what goes when the signed-in person deletes their account.
+  @GET('/v1/account/deletion-impact')
+  Future<AccountDeletionImpactResponse> getAccountDeletionImpact();
 }
