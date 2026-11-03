@@ -668,3 +668,11 @@ Pytanie otwarte: czy zlecenie usunięcia ma wymagać ponownego podania hasła. T
 | D-208 | C25 kasuje od razu, z pominięciem 30 dni kosza: najpierw pliki, potem wiersze w jednej transakcji. Awaria magazynu rzuca wyjątek i ponowienie znajduje te same wspomnienia; drugi przebieg nie ma nic do zrobienia. E22 to na razie zdarzenie domenowe zwracane przez handler, bez outboxu: kontrakt integracyjny i jego publikacja należą do MEM-E2-ARCHIWUM-12, a treści i tak jeszcze nie powstają | okno 30 dni dotyczy konta i już minęło; nie wyprzedzam kontraktu z E2 |
 
 **Do pilnowania w E2:** MEM-E2-ARCHIWUM-12 musi objąć też tę ścieżkę, inaczej Pochodzenie (MEM-E6-POCHODZENIE-04) nie dowie się o treściach skasowanych razem z kontem. Treści wniesione do cudzych albumów obsłuży P2 (MEM-E3-ALBUM-19). **Stan testów:** na PostgreSQL z atrapą magazynu: kasowanie, cudze treści nietknięte, ponowienie, awaria magazynu. Prawdziwy magazyn S3 nie był tu użyty; `DeleteAsync` sprawdza `Memorio.Storage.Tests`.
+
+## MEM-E1-ARCHIWUM-03 · Polityka P35: po usunięciu konta usuń treści (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-209 | `AccountDeletedHandler` w workerze woła `DeleteContentWhenAccountDeleted`. Ostatnio zastosowany numer zdarzenia dla konta w `archive.applied_account_events`; starsze jest pomijane (D-013). Archive zależy od `Account.Contracts`, a `AccountDeletionFlowTests` sprawdza całą ścieżkę między modułami | konto usuwa się raz, więc kolejność jest tu czysto zabezpieczająca, ale wymaga jej ticket |
+
+**Stan testów:** `AccountDeletedHandlerIdempotencyTests` i `AccountDeletionFlowTests` na PostgreSQL, z outboxem i kolejkami workera, ale z atrapą harmonogramu i magazynu.

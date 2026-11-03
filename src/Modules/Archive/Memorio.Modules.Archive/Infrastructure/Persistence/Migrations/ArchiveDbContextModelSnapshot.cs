@@ -23,6 +23,21 @@ namespace Memorio.Modules.Archive.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Memorio.Modules.Archive.Domain.Memories.AppliedAccountEvent", b =>
+                {
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence");
+
+                    b.HasKey("AccountId");
+
+                    b.ToTable("applied_account_events", "archive");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Archive.Domain.Memories.Memory", b =>
                 {
                     b.Property<Guid>("Id")
