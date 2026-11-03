@@ -6,6 +6,7 @@ using Memorio.Hosting.Messaging;
 using Memorio.Modules.Account.Application.Ports;
 using Memorio.Modules.Album;
 using Memorio.Modules.Archive;
+using Memorio.SharedKernel.Scheduling;
 using Memorio.Testing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -40,6 +41,12 @@ public sealed class AccountHost : PostgresDatabase
 
     /// <summary>The events of this module the worker received.</summary>
     public RecordedEvents Recorded { get; } = new();
+
+    /// <summary>The worker's scheduler: tests fire its deadlines themselves, 30 days are long.</summary>
+    public FakeDeadlines Deadlines { get; } = new();
+
+    /// <summary>The services of the worker side, for delivering an event or a firing the way it does.</summary>
+    public IServiceProvider Worker => _worker!.Services;
 
     /// <summary>A new account, signed in: its id and access token.</summary>
     public async Task<(Guid AccountId, string AccessToken)> RegisterAsync()
@@ -168,6 +175,7 @@ public sealed class AccountHost : PostgresDatabase
             MessagingHost.Worker,
             [typeof(AccountModule).Assembly, typeof(ArchiveModule).Assembly, typeof(AccountHost).Assembly]);
         worker.Services.AddSingleton(Recorded);
+        worker.Services.AddSingleton<IDeadlines>(Deadlines);
         new AccountModule().AddServices(worker.Services, worker.Configuration);
         new ArchiveModule().AddServices(worker.Services, worker.Configuration);
         new AlbumModule().AddServices(worker.Services, worker.Configuration);

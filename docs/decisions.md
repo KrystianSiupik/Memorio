@@ -652,3 +652,11 @@ Pytanie otwarte: czy zlecenie usunięcia ma wymagać ponownego podania hasła. T
 | D-206 | `AccountDeleted(EventId, OccurredAt, AccountId, Sequence)` w `Account.Contracts`, zapisywane przez outbox w transakcji C4. Bez przyczyny i bez informacji o zgodzie na wygaśnięcie albumów: Album sam wie, które albumy nie mają następcy (MEM-E9-ALBUM-08) | ładunek niesie tylko skutek (ADR 0001) |
 
 **Stan testów:** test kontraktu; zdarzenie dociera do workera na PostgreSQL; nieudany warunkowy zapis nie zostawia ani zmiany, ani zdarzenia. Samo padnięcie procesu po zapisie sprawdzają ogólne testy `Memorio.Messaging.Tests`, nie test tego zdarzenia.
+
+## MEM-E1-KONTO-07 · Polityka P1: po oknie usuń konto (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-207 | E6 to odpalenie terminu `Account.DeletionWindow` (klucz: konto, dane: `sequence`), a nie osobna wiadomość w kolejce. Termin ustawia i zdejmuje handler E4 i E8 w workerze. Oba sprawdzają aktualny stan agregatu, więc spóźnione zdarzenie o wcześniejszym oknie niczego nie zmienia (kolejność z D-013 bez osobnej tabeli pozycji). Zadanie decyduje czasem `ScheduledFor`. Polityki z `IDeadlines` rejestrowane fabryką, bo w API tego portu nie ma | wzorzec Process Manager z katalogu; termin nie zginie po zatwierdzeniu zmiany (D-157); `ValidateOnBuild` w trybie Development nie wywraca API |
+
+**Ryzyko do decyzji:** zadanie po nieudanych ponowieniach (1 min, 10 min, 1 h, D-158) jest porzucane z metryką `given_up`. Konto mogłoby wtedy zostać po 30 dniach mimo obietnicy usunięcia, dopóki ktoś nie zareaguje na metrykę. Rozważyć dzienne sprzątanie zaległych okien; nie dodałem go, bo ticket go nie obejmuje. **Stan testów:** `AccountDeletionRequestedHandlerIdempotencyTests`, `AccountDeletionCancelledHandlerIdempotencyTests`, `AccountDeletionWindowJobIdempotencyTests` na PostgreSQL, z workerem Wolverine i atrapą harmonogramu. Prawdziwy Quartz dla tego zadania nie był uruchamiany; mechanizm terminów sprawdza `Memorio.Scheduling.Tests`.
