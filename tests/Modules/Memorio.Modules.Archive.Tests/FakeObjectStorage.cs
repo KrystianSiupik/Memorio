@@ -8,6 +8,15 @@ public sealed class FakeObjectStorage : IObjectStorage
 {
     private readonly ConcurrentBag<StorageKey> _deleted = [];
     private readonly ConcurrentDictionary<StorageKey, bool> _refused = new();
+    private readonly ConcurrentDictionary<StorageKey, long> _uploads = new();
+
+    /// <summary>A file sent to the upload zone.</summary>
+    public StorageKey AddUpload(long size)
+    {
+        var key = new StorageKey($"{ObjectStorageRules.UploadPrefix}{Guid.CreateVersion7()}");
+        _uploads[key] = size;
+        return key;
+    }
 
     public IReadOnlyCollection<StorageKey> Deleted => _deleted;
 
@@ -31,8 +40,8 @@ public sealed class FakeObjectStorage : IObjectStorage
         throw new NotSupportedException();
 
     public Task<UploadSlot> CreateUploadAsync(string contentType, CancellationToken cancellationToken) =>
-        throw new NotSupportedException();
+        Task.FromResult(new UploadSlot(AddUpload(1), new SignedUrl(new Uri("https://storage.example.invalid/upload"), DateTimeOffset.UtcNow.AddMinutes(5)), contentType));
 
     public Task<StoredObject?> PromoteUploadAsync(StorageKey upload, StorageKey destination, CancellationToken cancellationToken) =>
-        throw new NotSupportedException();
+        Task.FromResult(_uploads.TryRemove(upload, out var size) ? new StoredObject(destination, size, "image/jpeg") : null);
 }

@@ -5,6 +5,8 @@ internal interface IMemories
     /// <summary>Every memory the account is the author of, with its photos.</summary>
     Task<IReadOnlyList<Memory>> FindByAuthorAsync(Guid accountId, CancellationToken cancellationToken);
 
+    Task<Memory?> FindAsync(MemoryId id, CancellationToken cancellationToken);
+
     /// <summary>Stores the memory, or finds the one already under its id (the id comes from the client, D-118).</summary>
     Task<Memory> AddOrFindAsync(Memory memory, CancellationToken cancellationToken);
 

@@ -57,6 +57,6 @@ internal sealed class Memories(IDbContextOutbox<ArchiveDbContext> outbox) : IMem
         return true;
     }
 
-    private Task<Memory?> FindAsync(MemoryId id, CancellationToken cancellationToken) =>
+    public Task<Memory?> FindAsync(MemoryId id, CancellationToken cancellationToken) =>
         Database.Memories.FirstOrDefaultAsync(memory => memory.Id == id, cancellationToken);
 }

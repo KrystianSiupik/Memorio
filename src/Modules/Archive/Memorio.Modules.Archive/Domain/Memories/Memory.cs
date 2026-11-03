@@ -53,7 +53,13 @@ internal sealed class Memory : AggregateRoot<MemoryId>
         return memory;
     }
 
-    public void AddPhoto(string storageKey) => _photos.Add(Photo.Create(storageKey));
+    public bool HasPhoto(Guid photoId) => _photos.Exists(photo => photo.Id == photoId);
+
+    public void AddPhoto(Guid photoId, string storageKey, long sizeBytes, DateTimeOffset now)
+    {
+        _photos.Add(Photo.Create(photoId, storageKey, sizeBytes));
+        Raise(new PhotoAdded(Guid.CreateVersion7(), now, Id, photoId));
+    }
 
     public void DeleteDefinitively(DateTimeOffset now) =>
         Raise(new ContentDeletedDefinitively(Guid.CreateVersion7(), now, Id, AuthorAccountId));

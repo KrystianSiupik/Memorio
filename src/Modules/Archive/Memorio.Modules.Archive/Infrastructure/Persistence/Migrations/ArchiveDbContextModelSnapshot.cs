@@ -116,6 +116,12 @@ namespace Memorio.Modules.Archive.Infrastructure.Persistence.Migrations
                                 .HasColumnType("uuid")
                                 .HasColumnName("id");
 
+                            b1.Property<long>("SizeBytes")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("bigint")
+                                .HasDefaultValue(0L)
+                                .HasColumnName("size_bytes");
+
                             b1.Property<string>("StorageKey")
                                 .IsRequired()
                                 .HasMaxLength(512)

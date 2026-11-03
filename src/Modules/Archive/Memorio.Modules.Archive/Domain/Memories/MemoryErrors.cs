@@ -13,6 +13,18 @@ internal static class MemoryErrors
 
     public static readonly Error TermsNotAccepted = Error.Conflict("Archive.TermsNotAccepted", "The terms come before the first content.");
 
+    /// <summary>E15.</summary>
+    public static readonly Error SpaceLimitExceeded = Error.Conflict("Archive.SpaceLimitExceeded", "There is no room left for this photo.");
+
+    public static readonly Error InvalidUpload = Error.Validation("Archive.InvalidUpload", "This is not an upload.");
+
+    public static readonly Error UploadMissing = Error.NotFound("Archive.UploadMissing", "The upload does not exist; it may have expired.");
+
+    public static readonly Error InvalidContentType = Error.Validation("Archive.InvalidContentType", "Only JPEG, PNG, WebP and HEIC photos are accepted.");
+
+    /// <summary>Somebody got there first: the state of this memory changed under this operation.</summary>
+    public static readonly Error AlreadyDecided = Error.Conflict("Archive.AlreadyDecided", "This has already been decided.");
+
     public static readonly Error IdTaken = Error.Conflict("Archive.IdTaken", "This id belongs to another memory.");
 
     /// <summary>The same answer for a memory that does not exist and one of somebody else: no way to tell them apart.</summary>

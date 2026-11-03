@@ -2,6 +2,7 @@ using Memorio.Hosting.Messaging;
 using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Archive.Domain.Memories;
 using Memorio.Modules.Archive.Infrastructure.Persistence;
+using Memorio.Modules.Limits.Contracts;
 using Memorio.Modules.Places.Contracts;
 using Memorio.SharedKernel.Storage;
 using Memorio.Testing;
@@ -38,7 +39,7 @@ public sealed class ArchiveDatabase : PostgresDatabase
             new MemoryId(Guid.CreateVersion7()), accountId, new MemoryPlace("osm:N:1", "Giewont", 49.25, 19.93), date, DateTimeOffset.UtcNow);
         for (var photo = 0; photo < photos; photo++)
         {
-            memory.AddPhoto($"photos/{Guid.NewGuid():N}/original.jpg");
+            memory.AddPhoto(Guid.CreateVersion7(), $"photos/{Guid.NewGuid():N}/original.jpg", 100, DateTimeOffset.UtcNow);
         }
 
         await using var scope = CreateScope();
@@ -59,6 +60,7 @@ public sealed class ArchiveDatabase : PostgresDatabase
         builder.Services.AddSingleton<IObjectStorage>(Storage);
         builder.Services.AddSingleton<IPlaceReader>(Neighbours);
         builder.Services.AddSingleton<ITermsReader>(Neighbours);
+        builder.Services.AddSingleton<ISpacePool>(Neighbours);
         _host = builder.Build();
 
         await using (var scope = CreateScope())
