@@ -8,6 +8,9 @@ internal sealed record DescriptionApproved(Guid EventId, DateTimeOffset Occurred
 /// <summary>E20.</summary>
 internal sealed record MemoryMovedToTrash(Guid EventId, DateTimeOffset OccurredAt, MemoryId MemoryId, Guid AuthorAccountId, int Sequence, DateTimeOffset WindowEndsAt) : IDomainEvent;
 
+/// <summary>E24.</summary>
+internal sealed record MemoryRestored(Guid EventId, DateTimeOffset OccurredAt, MemoryId MemoryId, Guid AuthorAccountId, int Sequence) : IDomainEvent;
+
 /// <summary>E12.</summary>
 internal sealed record MemoryCreated(Guid EventId, DateTimeOffset OccurredAt, MemoryId MemoryId, Guid AuthorAccountId) : IDomainEvent;
 

@@ -119,6 +119,38 @@ internal sealed class Memory : AggregateRoot<MemoryId>
         Raise(new PhotoAdded(Guid.CreateVersion7(), now, Id, photoId));
     }
 
+    /// <summary>
+    /// Only before the window ends: at its end the content goes, even when the deadline is still on its way.
+    /// What was trimmed comes back only with a paid plan (HS-022).
+    /// </summary>
+    public Result Restore(DateTimeOffset now, bool planPaid)
+    {
+        if (State != MemoryState.Trashed || now >= WindowEndsAt)
+        {
+            return MemoryErrors.AlreadyDecided;
+        }
+
+        if (TrashReason == Memories.TrashReason.Trimmed && !planPaid)
+        {
+            return MemoryErrors.PlanRequired;
+        }
+
+        State = MemoryState.Active;
+        TrashReason = null;
+        TrashedAt = null;
+        WindowEndsAt = null;
+        Sequence++;
+        Raise(new MemoryRestored(Guid.CreateVersion7(), now, Id, AuthorAccountId, Sequence));
+        return Result.Success();
+    }
+
+    /// <summary>The trim of an archive over its limit moves material here (HS-022); called by MEM-E7-ARCHIWUM-01.</summary>
+    public void MoveToTrashByTrimming(DateTimeOffset now)
+    {
+        MoveToTrash(now);
+        TrashReason = Memories.TrashReason.Trimmed;
+    }
+
     /// <summary>The end of the trash window: only the window it was meant for, only when still open and only after its end.</summary>
     public Result CanLeaveTrash(int sequence, DateTimeOffset at)
     {

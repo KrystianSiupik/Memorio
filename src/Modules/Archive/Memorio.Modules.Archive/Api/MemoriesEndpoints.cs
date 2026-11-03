@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Memorio.Modularity;
 using Memorio.Modules.Archive.Application.Commands.AddPhoto;
+using Memorio.Modules.Archive.Application.Commands.RestoreMemory;
 using Memorio.Modules.Archive.Application.Commands.DeleteMemory;
 using Memorio.Modules.Archive.Application.Commands.TrashMemory;
 using Memorio.Modules.Archive.Application.Commands.ApproveDescription;
@@ -25,6 +26,9 @@ internal static class MemoriesEndpoints
         memories.MapPost("/", CreateAsync)
             .WithName("CreateMemory")
             .WithSummary("Records a memory; the id comes from the client, so a retry changes nothing.");
+        memories.MapPost("/{id:guid}/restore", RestoreAsync)
+            .WithName("RestoreMemory")
+            .WithSummary("Takes the person's content back from the trash while its 30 days last.");
         memories.MapGet("/trash", GetTrashAsync)
             .WithName("GetTrash")
             .WithSummary("The person's own content in the trash, while its 30 days last.");
@@ -150,6 +154,16 @@ internal static class MemoriesEndpoints
         var trashed = await query.GetAsync(CurrentAccount.IdOf(principal), cancellationToken);
         return TypedResults.Ok<IReadOnlyList<TrashedMemoryResponse>>(
             [.. trashed.Select(item => new TrashedMemoryResponse(item.Id, item.PlaceName, item.DateFrom, item.Description, item.Photos, item.TrashedAt, item.DaysLeft))]);
+    }
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> RestoreAsync(
+        Guid id,
+        ClaimsPrincipal principal,
+        RestoreMemoryHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var restored = await handler.HandleAsync(new RestoreMemory(new MemoryId(id), CurrentAccount.IdOf(principal)), cancellationToken);
+        return restored.IsFailure ? Problems.From(restored.Error) : TypedResults.NoContent();
     }
 }
 
