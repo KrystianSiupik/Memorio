@@ -11,6 +11,7 @@ import 'package:memorio/core/offline/offline.dart';
 import 'package:memorio/features/account/account.dart';
 import 'package:memorio/features/map/map.dart';
 
+import 'fake_account.dart';
 import 'fake_http.dart';
 import 'fake_token_store.dart';
 
@@ -31,6 +32,8 @@ const signedIn = Session(accountId: 'account-1');
 Future<ProviderContainer> pumpMemorioApp(
   WidgetTester tester, {
   Session? session,
+  SessionRepository? sessions,
+  AccountRepository? account,
   FakeHttpAdapter? http,
   Stream<bool>? online,
   List<Override> overrides = const [],
@@ -42,7 +45,8 @@ Future<ProviderContainer> pumpMemorioApp(
       appVersionProvider.overrideWithValue('1.0.0'),
       apiBaseUrlProvider.overrideWithValue('https://api.example.invalid'),
       tokenStoreProvider.overrideWithValue(InMemoryTokenStore()),
-      sessionRepositoryProvider.overrideWithValue(FakeSessionRepository(session)),
+      sessionRepositoryProvider.overrideWithValue(sessions ?? FakeSessionRepository(session)),
+      accountRepositoryProvider.overrideWithValue(account ?? FakeAccountRepository()),
       localDatabaseProvider.overrideWithValue(database),
       isOnlineProvider.overrideWith((ref) => online ?? Stream.value(true)),
       mapViewProvider.overrideWithValue(const SizedBox.expand()),

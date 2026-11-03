@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/api/api.dart';
+import '../domain/account_repository.dart';
 import '../domain/auth_repository.dart';
 import '../domain/session.dart';
 
@@ -12,6 +13,11 @@ final sessionRepositoryProvider = Provider<SessionRepository>(
 /// Overridden in app/ with the API repository, and in tests with a fake.
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => throw UnimplementedError('authRepositoryProvider is overridden in app/'),
+);
+
+/// Overridden in app/ with the API repository, and in tests with a fake.
+final accountRepositoryProvider = Provider<AccountRepository>(
+  (ref) => throw UnimplementedError('accountRepositoryProvider is overridden in app/'),
 );
 
 /// The current session: loading while it is restored, then the session or null (signed out). Restored

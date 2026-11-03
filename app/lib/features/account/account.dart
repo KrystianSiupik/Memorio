@@ -1,5 +1,7 @@
+export 'data/http_account_repository.dart' show HttpAccountRepository;
 export 'data/http_auth_repository.dart' show HttpAuthRepository;
 export 'data/token_session_repository.dart' show TokenSessionRepository;
+export 'domain/account_repository.dart';
 export 'domain/auth_repository.dart';
 export 'domain/session.dart' show Session, SessionRepository;
 export 'presentation/account_page.dart';
