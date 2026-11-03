@@ -6,6 +6,7 @@ using Memorio.Modules.Archive.Application.Commands.ApproveDescription;
 using Memorio.Modules.Archive.Application.Commands.CreateMemory;
 using Memorio.Modules.Archive.Application.Commands.DeleteAccountContent;
 using Memorio.Modules.Archive.Application.Policies;
+using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Archive.Domain.Memories;
 using Memorio.Modules.Archive.Infrastructure;
@@ -45,6 +46,7 @@ public sealed class ArchiveModule : IModule
         services.AddScoped<IMemories, Memories>();
         services.AddScoped<DeleteAccountContentHandler>();
         services.AddScoped<CreateMemoryHandler>();
+        services.AddScoped<IMemoryDetailsQuery, MemoryDetailsQuery>();
         services.AddScoped<ApproveDescriptionHandler>();
         services.AddScoped<AddPhotoHandler>();
         services.AddScoped<StartUploadHandler>();

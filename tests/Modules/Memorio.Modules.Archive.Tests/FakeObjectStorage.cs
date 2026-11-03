@@ -37,7 +37,9 @@ public sealed class FakeObjectStorage : IObjectStorage
     }
 
     public Task<IReadOnlyDictionary<StorageKey, SignedUrl>> SignReadsAsync(IReadOnlyCollection<StorageKey> keys, CancellationToken cancellationToken) =>
-        throw new NotSupportedException();
+        Task.FromResult<IReadOnlyDictionary<StorageKey, SignedUrl>>(keys.ToDictionary(
+            key => key,
+            key => new SignedUrl(new Uri($"https://storage.example.invalid/{key.Value}?signed"), DateTimeOffset.UtcNow.AddMinutes(5))));
 
     public Task<UploadSlot> CreateUploadAsync(string contentType, CancellationToken cancellationToken) =>
         Task.FromResult(new UploadSlot(AddUpload(1), new SignedUrl(new Uri("https://storage.example.invalid/upload"), DateTimeOffset.UtcNow.AddMinutes(5)), contentType));
