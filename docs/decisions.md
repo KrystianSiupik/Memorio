@@ -824,3 +824,17 @@ Alertu na ten log nie dodałem. **Stan testów:** `AccountDeletionSweepJobIdempo
 - SD3: pierwsza wizyta to 3,49 MB przy limicie 3,5 MB. Kolejny ekran prawdopodobnie przekroczy budżet.
 - Kolejka offline nie jest przypisana do konta: operacje jednej osoby, niewysłane przed wylogowaniem, wyśle po powrocie sieci sesja kolejnej osoby na tym urządzeniu. Nie naprawiam, bo wymaga decyzji, co zrobić z niewysłanymi danymi.
 - Operacja, która dostała „spróbuj później”, czeka do następnej zmiany stanu sieci lub startu aplikacji: kolejka nie ponawia się sama przy stałym połączeniu.
+
+## Podsumowanie E2 (2026-11-03)
+
+Wszystkie tickety E2 poza MEM-E2-ARCHIWUM-13 (czeka na E10, D-232) są w `version/0.1` lokalnie, na polecenie PO: „rób E2”, „rób dalej”. PO jeszcze tego nie sprawdzał. Kryterium epiku pozostaje niezaznaczone, bo wymaga CI i testu na urządzeniu.
+
+**Pierwsze prawdziwe uruchomienie API i workera** (procesy z buildu Release, PostgreSQL i magazyn plików z Compose, zapytania HTTP takie jak aplikacji): rejestracja, regulamin (bez niego 409), miejsce własne, wspomnienie (drugi raz z tym samym id bez dubla), zdjęcie przez podpisany adres, opis, mapa z filtrem dat, szczegóły, brak dostępu dla drugiej osoby i bez logowania, podpowiedzi, kosz, przywrócenie, kasowanie definitywne. Wszystko przeszło. Quartz zapisał termin `Archive.TrashWindow` na 30 dni oraz oba codzienne sprzątania. Outbox pusty, brak martwych wiadomości. Jedyne błędy w logu workera to odczyt historii migracji przed jej utworzeniem na świeżych schematach (6 razy), bez skutków.
+
+**Nadal niesprawdzone:**
+- aplikacja połączona z prawdziwym API (scenariusz wyżej szedł zwykłym HTTP, nie przez ekrany);
+- urządzenia Android i iOS, CI na GitHubie, stuknięcie punktu na prawdziwej mapie;
+- prawdziwy dostawca AI, zwrot miejsca do puli poza testami, odpalenie terminu po 30 dniach na prawdziwym harmonogramie;
+- `Api.Tests` zawiesza się w pierwszym przebiegu po buildzie (przyczyna nieznana), co może dotyczyć CI.
+
+**Do decyzji PO:** domyślny limit AI to 0 (D-217 do D-232), więc „Poproś AI o szkic” odpowiada każdemu „limit wyczerpany” (potwierdzone w uruchomieniu: 409 `AiNarration.LimitReached`), dopóki plany nie dadzą limitu. Pozostałe: D-235, D-241 i lista w sekcji S03.
