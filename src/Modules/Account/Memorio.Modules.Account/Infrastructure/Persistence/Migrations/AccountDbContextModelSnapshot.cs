@@ -23,6 +23,41 @@ namespace Memorio.Modules.Account.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Memorio.Modules.Account.Domain.Deletions.AccountDeletion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<bool>("ConsentsToAlbumExpiry")
+                        .HasColumnType("boolean")
+                        .HasColumnName("consents_to_album_expiry");
+
+                    b.Property<DateTimeOffset>("RequestedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("requested_at");
+
+                    b.Property<int>("Sequence")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence");
+
+                    b.Property<string>("State")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("state");
+
+                    b.Property<DateTimeOffset>("WindowEndsAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("window_ends_at");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("account_deletions", "account");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Account.Infrastructure.Identity.AccountUser", b =>
                 {
                     b.Property<Guid>("Id")

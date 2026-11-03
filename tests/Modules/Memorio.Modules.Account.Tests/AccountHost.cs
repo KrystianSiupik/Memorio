@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Memorio.Hosting.Messaging;
 using Memorio.Modules.Account.Application.Ports;
 using Memorio.Modules.Album;
 using Memorio.Modules.Archive;
@@ -11,7 +12,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Npgsql;
 
 [assembly: AssemblyFixture(typeof(Memorio.Modules.Account.Tests.AccountHost))]
@@ -28,8 +31,12 @@ public sealed class AccountHost : PostgresDatabase
     private const string Password = "long-enough-password";
 
     private WebApplication? _app;
+    private IHost? _worker;
 
     public HttpClient Client { get; private set; } = null!;
+
+    /// <summary>The events of this module the worker received.</summary>
+    public RecordedEvents Recorded { get; } = new();
 
     /// <summary>A new account, signed in: its id and access token.</summary>
     public async Task<(Guid AccountId, string AccessToken)> RegisterAsync()
@@ -100,13 +107,29 @@ public sealed class AccountHost : PostgresDatabase
         }
     }
 
+    /// <summary>Polls <paramref name="condition"/> until it holds or a minute (QS7) passes.</summary>
+    public static async Task<bool> EventuallyAsync(Func<Task<bool>> condition)
+    {
+        var deadline = DateTime.UtcNow + TimeSpan.FromMinutes(1);
+        while (DateTime.UtcNow < deadline)
+        {
+            if (await condition())
+            {
+                return true;
+            }
+
+            await Task.Delay(200, Cancellation);
+        }
+
+        return await condition();
+    }
+
     protected override async Task OnBootstrappedAsync()
     {
         var builder = WebApplication.CreateBuilder();
         builder.WebHost.UseTestServer();
-        builder.Configuration["Account:ConnectionString"] = ConnectionStringFor("memorio_account");
-        builder.Configuration["Archive:ConnectionString"] = ConnectionStringFor("memorio_archive");
-        builder.Configuration["Album:ConnectionString"] = ConnectionStringFor("memorio_album");
+        Configure(builder.Configuration);
+        builder.Services.AddMemorioMessaging(builder.Configuration, MessagingHost.Api, []);
         builder.Services.AddAuthorizationBuilder()
             .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
         builder.Services.AddProblemDetails();
@@ -124,10 +147,39 @@ public sealed class AccountHost : PostgresDatabase
         module.MapEndpoints(_app.MapGroup("/v1"));
         await _app.StartAsync();
         Client = _app.GetTestClient();
+
+        // After the API: its start applies the migrations the worker's handlers read.
+        var worker = Host.CreateApplicationBuilder();
+        Configure(worker.Configuration);
+        worker.Configuration["Database:MigrateOnStartup"] = "false";
+        worker.Services.AddMemorioMessaging(
+            worker.Configuration,
+            MessagingHost.Worker,
+            [typeof(AccountModule).Assembly, typeof(ArchiveModule).Assembly, typeof(AccountHost).Assembly]);
+        worker.Services.AddSingleton(Recorded);
+        new AccountModule().AddServices(worker.Services, worker.Configuration);
+        new ArchiveModule().AddServices(worker.Services, worker.Configuration);
+        new AlbumModule().AddServices(worker.Services, worker.Configuration);
+        _worker = worker.Build();
+        await _worker.StartAsync();
+    }
+
+    private void Configure(ConfigurationManager configuration)
+    {
+        configuration["Messaging:ConnectionString"] = ConnectionStringFor(MessagingRole);
+        configuration["Account:ConnectionString"] = ConnectionStringFor("memorio_account");
+        configuration["Archive:ConnectionString"] = ConnectionStringFor("memorio_archive");
+        configuration["Album:ConnectionString"] = ConnectionStringFor("memorio_album");
     }
 
     protected override async Task OnDisposingAsync()
     {
+        if (_worker is not null)
+        {
+            await _worker.StopAsync();
+            _worker.Dispose();
+        }
+
         if (_app is not null)
         {
             await _app.DisposeAsync();

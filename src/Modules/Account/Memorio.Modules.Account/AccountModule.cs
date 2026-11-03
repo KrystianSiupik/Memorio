@@ -2,9 +2,12 @@ using Memorio.Modularity;
 using Memorio.Modules.Account.Api;
 using Memorio.Modules.Account.Application.Commands.AcceptTerms;
 using Memorio.Modules.Account.Application.Commands.RegisterAccount;
+using Memorio.Modules.Account.Application.Commands.RequestAccountDeletion;
 using Memorio.Modules.Account.Application.Ports;
 using Memorio.Modules.Account.Application.Queries.AccountDeletionImpact;
+using Memorio.Modules.Account.Application.Queries.PendingAccountDeletion;
 using Memorio.Modules.Account.Domain.Accounts;
+using Memorio.Modules.Account.Domain.Deletions;
 using Memorio.Modules.Account.Infrastructure;
 using Memorio.Modules.Account.Infrastructure.Identity;
 using Memorio.Modules.Account.Infrastructure.Metrics;
@@ -17,6 +20,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Wolverine.EntityFrameworkCore;
 
 namespace Memorio.Modules.Account;
 
@@ -37,7 +41,7 @@ public sealed class AccountModule : IModule
         var connectionString = string.IsNullOrWhiteSpace(options.ConnectionString) ? "Host=unconfigured" : options.ConnectionString;
 
         services.TryAddSingleton(TimeProvider.System);
-        services.AddDbContext<AccountDbContext>(database => database.UseAccountDatabase(connectionString));
+        services.AddDbContextWithWolverineIntegration<AccountDbContext>(database => database.UseAccountDatabase(connectionString));
         services.AddIdentityCore<AccountUser>(identity =>
             {
                 identity.User.RequireUniqueEmail = true;
@@ -59,6 +63,9 @@ public sealed class AccountModule : IModule
         services.AddScoped<RegisterAccountHandler>();
         services.AddScoped<AcceptTermsHandler>();
         services.AddScoped<IAccountDeletionImpactQuery, AccountDeletionImpactQuery>();
+        services.AddScoped<IAccountDeletions, AccountDeletions>();
+        services.AddScoped<RequestAccountDeletionHandler>();
+        services.AddScoped<IPendingAccountDeletionQuery, PendingAccountDeletionQuery>();
 
         services.AddSingleton<IExternalIdentityVerifier>(OpenIdIdentityVerifier.ForProvider(ExternalProvider.Google, options.Google.ClientIds));
         services.AddSingleton<IExternalIdentityVerifier>(OpenIdIdentityVerifier.ForProvider(ExternalProvider.Apple, options.Apple.ClientIds));

@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using Memorio.Modularity;
 using Memorio.Modules.Account.Application.Commands.AcceptTerms;
+using Memorio.Modules.Account.Application.Commands.RequestAccountDeletion;
 using Memorio.Modules.Account.Application.Queries.AccountDeletionImpact;
+using Memorio.Modules.Account.Application.Queries.PendingAccountDeletion;
 using Memorio.Modules.Account.Domain.Accounts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +25,12 @@ internal static class AccountEndpoints
         account.MapGet("/deletion-impact", GetDeletionImpactAsync)
             .WithName("GetAccountDeletionImpact")
             .WithSummary("In numbers, what goes when the signed-in person deletes their account.");
+        account.MapPost("/deletion", RequestDeletionAsync)
+            .WithName("RequestAccountDeletion")
+            .WithSummary("Opens the 30-day window for deleting the account; asking again changes nothing.");
+        account.MapGet("/deletion", GetDeletionAsync)
+            .WithName("GetAccountDeletion")
+            .WithSummary("Whether a window for deleting the account is open, and until when.");
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> AcceptTermsAsync(
@@ -48,6 +56,22 @@ internal static class AccountEndpoints
             impact.OtherPeoplesAlbums));
     }
 
+    private static async Task<Results<Ok<AccountDeletionResponse>, ProblemHttpResult>> RequestDeletionAsync(
+        RequestAccountDeletionRequest request,
+        ClaimsPrincipal principal,
+        RequestAccountDeletionHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var requested = await handler.HandleAsync(new RequestAccountDeletion(AccountOf(principal), request.ConsentsToAlbumExpiry), cancellationToken);
+        return requested.IsFailure ? Problems.From(requested.Error) : TypedResults.Ok(new AccountDeletionResponse(requested.Value));
+    }
+
+    private static async Task<Ok<AccountDeletionResponse>> GetDeletionAsync(
+        ClaimsPrincipal principal,
+        IPendingAccountDeletionQuery query,
+        CancellationToken cancellationToken) =>
+        TypedResults.Ok(new AccountDeletionResponse(await query.GetWindowEndAsync(AccountOf(principal), cancellationToken)));
+
     /// <summary>The account of the signed-in person; every endpoint here requires sign-in (SD10).</summary>
     private static AccountId AccountOf(ClaimsPrincipal principal) =>
         new(Guid.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!));
@@ -55,6 +79,12 @@ internal static class AccountEndpoints
 
 /// <param name="Version">The version of the terms the person was shown.</param>
 internal sealed record AcceptTermsRequest(string? Version);
+
+/// <param name="ConsentsToAlbumExpiry">The person's albums without a successor expire with the account.</param>
+internal sealed record RequestAccountDeletionRequest(bool ConsentsToAlbumExpiry);
+
+/// <param name="WindowEndsAt">When the open window ends and the account goes; null when no window is open.</param>
+internal sealed record AccountDeletionResponse(DateTimeOffset? WindowEndsAt);
 
 /// <param name="Memories">Memories the person is the author of.</param>
 /// <param name="Photos">Photos in those memories.</param>

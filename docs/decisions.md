@@ -618,3 +618,13 @@ Założenie do sprawdzenia: **regulaminu jeszcze nie ma**, a `2026-11` to etykie
 | D-200 | `GET /v1/account/deletion-impact` składa odpowiedź z portów Archive i Album przy każdym odczycie, bez zapisanej projekcji, więc nie ma czego odbudowywać. Zapytanie nie przyjmuje identyfikatora konta, tylko sesję: osoba nie zapyta o cudze dane. „Czyich” oznacza podział na albumy własne i cudze, **bez nazw właścicieli i bez rozbicia zdjęć na albumy**, bo wkłady dojdą dopiero w E3 | jedno źródło prawdy; kryterium o przebudowie projekcji spełnione przez brak projekcji |
 
 **Stan testów:** macierz osoba × zasób na PostgreSQL przechodzi (`AccountDeletionImpactTests`).
+
+## MEM-E1-KONTO-03 · Zleć usunięcie konta (C3) (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-201 | **HS-003 wg rekomendacji, do potwierdzenia przez PO i prawnika:** albumy własne bez następcy wstrzymują zlecenie (E5, 409 `Account.AlbumWithoutSuccessor`) tylko do wyboru: wskazanie następcy albo zgoda na wygaśnięcie albumów (`consentsToAlbumExpiry`, zapisywana przy oknie). Wybór nie ma limitu czasu, a zgoda jest dostępna od ręki, więc usunięcia nikt nie blokuje | „wybór, nigdy blokada” (decyzja 35), wymóg sklepów i RODO, S3:L19 |
+| D-202 | Agregat `AccountDeletion` (AG11), jeden wiersz na konto w `account.account_deletions`. Stan i `sequence` to tokeny współbieżności EF, czyli warunkowy `UPDATE` z D-024. Po cofnięciu kolejne zlecenie otwiera nowe okno z wyższym `sequence`. Ponowne albo równoległe zlecenie w trakcie okna zwraca ten sam termin, bez drugiego zdarzenia | jeden wynik okna; idempotencja bez osobnego klucza |
+| D-203 | `POST /v1/account/deletion`, `GET /v1/account/deletion` (termin albo null). E4 trafia do outboxu w transakcji zmiany (`AccountDeletionRequested`), bo termin ustawia dopiero worker (D-157). `AccountDbContext` rejestrowany przez `AddDbContextWithWolverineIntegration`; moduł Konto zależy od `WolverineFx.EntityFrameworkCore` tylko w `Infrastructure` | ADR 0006 |
+
+Pytanie otwarte: czy zlecenie usunięcia ma wymagać ponownego podania hasła. Ticket mówi tylko o potwierdzeniu, więc na razie wystarcza sesja i potwierdzenie na ekranie. **Stan testów:** handler bez bazy oraz na PostgreSQL z outboxem i workerem: pojedyncze, podwójne i równoległe zlecenie daje jedno zdarzenie.
