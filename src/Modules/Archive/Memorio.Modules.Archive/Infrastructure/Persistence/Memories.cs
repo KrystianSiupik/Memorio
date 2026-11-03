@@ -1,4 +1,6 @@
+using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Archive.Domain.Memories;
+using Memorio.SharedKernel.Domain;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Wolverine.EntityFrameworkCore;
@@ -38,6 +40,14 @@ internal sealed class Memories(IDbContextOutbox<ArchiveDbContext> outbox) : IMem
 
     public async Task<bool> SaveAsync(CancellationToken cancellationToken)
     {
+        foreach (var memory in Database.ChangeTracker.Entries<Memory>().Select(entry => entry.Entity).ToList())
+        {
+            foreach (var domainEvent in memory.DomainEvents)
+            {
+                await PublishAsync(domainEvent);
+            }
+        }
+
         try
         {
             await outbox.SaveChangesAndFlushMessagesAsync(cancellationToken);
@@ -56,6 +66,15 @@ internal sealed class Memories(IDbContextOutbox<ArchiveDbContext> outbox) : IMem
 
         return true;
     }
+
+    private ValueTask PublishAsync(IDomainEvent domainEvent) => domainEvent switch
+    {
+        ContentDeletedDefinitively deleted => outbox.PublishAsync(new ContentDeleted(
+            deleted.EventId, deleted.OccurredAt, deleted.MemoryId.Value, deleted.AuthorAccountId, deleted.Sequence)),
+
+        // The others stay inside the module.
+        _ => ValueTask.CompletedTask,
+    };
 
     public Task<Memory?> FindAsync(MemoryId id, CancellationToken cancellationToken) =>
         Database.Memories.FirstOrDefaultAsync(memory => memory.Id == id, cancellationToken);

@@ -32,6 +32,38 @@ public sealed class ArchiveDatabase : PostgresDatabase
 
     public AsyncServiceScope CreateScope() => _host!.Services.CreateAsyncScope();
 
+    /// <summary>How many events about this id wait in the worker's queue: nothing consumes it here.</summary>
+    public async Task<long> QueuedEventsAsync(string eventName, Guid id)
+    {
+        await using var messaging = await OpenAsAsync(MessagingRole);
+        await using var command = new Npgsql.NpgsqlCommand(
+            $"""
+            SELECT count(*) FROM {MemorioMessaging.QueueSchema}.wolverine_queue_{MemorioMessaging.Queue}
+            WHERE message_type LIKE @type AND position(convert_to(@id, 'UTF8') in body) > 0
+            """,
+            messaging);
+        command.Parameters.AddWithValue("type", "%" + eventName + "%");
+        command.Parameters.AddWithValue("id", id.ToString());
+        return (long)(await command.ExecuteScalarAsync(TestContext.Current.CancellationToken))!;
+    }
+
+    /// <summary>Polls until it holds or a minute (QS7) passes.</summary>
+    public static async Task<bool> EventuallyAsync(Func<Task<bool>> condition)
+    {
+        var deadline = DateTime.UtcNow + TimeSpan.FromMinutes(1);
+        while (DateTime.UtcNow < deadline)
+        {
+            if (await condition())
+            {
+                return true;
+            }
+
+            await Task.Delay(200, TestContext.Current.CancellationToken);
+        }
+
+        return await condition();
+    }
+
     /// <summary>Stores a memory of the account with the given number of photos.</summary>
     internal async Task<Memory> AddMemoryAsync(Guid accountId, int photos = 0)
     {
