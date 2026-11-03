@@ -274,6 +274,18 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Cancels the deletion of the account while its window lasts.",
+        "operationId": "CancelAccountDeletion",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
       }
     }
   },

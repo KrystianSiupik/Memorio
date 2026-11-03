@@ -36,4 +36,8 @@ abstract class AccountClient {
   /// Whether a window for deleting the account is open, and until when.
   @GET('/v1/account/deletion')
   Future<AccountDeletionResponse> getAccountDeletion();
+
+  /// Cancels the deletion of the account while its window lasts.
+  @DELETE('/v1/account/deletion')
+  Future<void> cancelAccountDeletion();
 }

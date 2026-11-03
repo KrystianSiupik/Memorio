@@ -59,6 +59,24 @@ internal sealed class AccountDeletion : AggregateRoot<AccountId>
         }
     }
 
+    /// <summary>Only before the window ends: at its end the account goes, even when the deadline is still on its way.</summary>
+    public Result Cancel(DateTimeOffset now)
+    {
+        if (State == DeletionState.Cancelled)
+        {
+            return Result.Success();
+        }
+
+        if (State == DeletionState.Completed || now >= WindowEndsAt)
+        {
+            return AccountErrors.DeletionAlreadyDecided;
+        }
+
+        State = DeletionState.Cancelled;
+        Raise(new DeletionCancelled(Guid.CreateVersion7(), now, Id, Sequence));
+        return Result.Success();
+    }
+
     /// <summary>
     /// The end of the window: only the window it was meant for (<paramref name="sequence"/>), only when
     /// still open and only after its end. Everything else keeps the result already decided.
