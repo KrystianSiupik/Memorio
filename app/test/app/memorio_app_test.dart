@@ -10,7 +10,7 @@ void main() {
     await pumpMemorioApp(tester, session: signedIn);
 
     expect(find.byType(NavigationBar), findsOneWidget);
-    expect(find.text('Please update Memorio'), findsNothing);
+    expect(find.text('Zaktualizuj Memorio'), findsNothing);
   });
 
   testWidgets('an app the backend no longer serves shows the update screen', (tester) async {
@@ -20,8 +20,8 @@ void main() {
       http: FakeHttpAdapter((_) => (426, {'code': 'App.UpdateRequired', 'minimumVersion': '1.2.0'})),
     );
 
-    expect(find.text('Please update Memorio'), findsOneWidget);
-    expect(find.textContaining('Version 1.2.0 or newer'), findsOneWidget);
+    expect(find.text('Zaktualizuj Memorio'), findsOneWidget);
+    expect(find.textContaining('wersję 1.2.0'), findsOneWidget);
   });
 
   testWidgets('the app starts when the backend cannot be reached', (tester) async {

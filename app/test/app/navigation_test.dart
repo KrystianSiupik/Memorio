@@ -13,20 +13,20 @@ void main() {
       await pumpMemorioApp(tester, session: signedIn);
 
       final bar = find.byType(NavigationBar);
-      for (final label in ['Map', 'Albums', 'Shared with me', 'Account']) {
+      for (final label in ['Mapa', 'Albumy', 'Udostępnione', 'Konto']) {
         expect(find.descendant(of: bar, matching: find.text(label)), findsOneWidget);
       }
-      expect(find.widgetWithText(AppBar, 'Map'), findsOneWidget);
+      expect(find.widgetWithText(AppBar, 'Mapa'), findsOneWidget);
     });
 
     testWidgets('each tab opens its screen', (tester) async {
       await pumpMemorioApp(tester, session: signedIn);
 
       const titles = {
-        'Albums': 'Albums',
-        'Shared with me': 'Shared with me',
-        'Account': 'Konto i prywatność',
-        'Map': 'Map',
+        'Albumy': 'Albumy',
+        'Udostępnione': 'Udostępnione mi',
+        'Konto': 'Konto i prywatność',
+        'Mapa': 'Mapa',
       };
       for (final MapEntry(key: label, value: title) in titles.entries) {
         await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(label)));

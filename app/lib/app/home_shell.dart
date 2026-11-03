@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/l10n/l10n.dart';
 import '../core/offline/offline.dart';
 
 /// S02: the signed-in shell with the tabs Map · Albums · Shared with me · Account.
@@ -29,19 +30,27 @@ class HomeShell extends ConsumerWidget {
         // Tapping the current tab again returns to its first screen.
         onDestinationSelected: (index) =>
             navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.public_outlined), selectedIcon: Icon(Icons.public), label: 'Map'),
+        destinations: [
+          NavigationDestination(
+            icon: Icon(Icons.public_outlined),
+            selectedIcon: Icon(Icons.public),
+            label: context.l10n.tabMap,
+          ),
           NavigationDestination(
             icon: Icon(Icons.photo_album_outlined),
             selectedIcon: Icon(Icons.photo_album),
-            label: 'Albums',
+            label: context.l10n.tabAlbums,
           ),
           NavigationDestination(
             icon: Icon(Icons.people_outline),
             selectedIcon: Icon(Icons.people),
-            label: 'Shared with me',
+            label: context.l10n.tabShared,
           ),
-          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Account'),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: context.l10n.tabAccount,
+          ),
         ],
       ),
     );
@@ -66,10 +75,7 @@ class OfflineBanner extends StatelessWidget {
               Icon(Icons.cloud_off, color: colors.onSecondaryContainer),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  'You are offline. New memories and photos are saved and sent when you are back online.',
-                  style: TextStyle(color: colors.onSecondaryContainer),
-                ),
+                child: Text(context.l10n.offlineSaved, style: TextStyle(color: colors.onSecondaryContainer)),
               ),
             ],
           ),

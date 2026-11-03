@@ -786,3 +786,9 @@ Alertu na ten log nie dodałem. **Stan testów:** `AccountDeletionSweepJobIdempo
 | D-232 | MEM-E2-ARCHIWUM-13 (P5) **nie jest zrobiony**: zależy od zdarzenia E33 z MEM-E10-ARCHIWUM-02 (import zdjęć, E10), którego nie ma | handler bez źródła zdarzenia byłby martwym kodem |
 
 **Stan testów:** `Modules.Archive.Tests` na PostgreSQL z outboxem, w tym równoległe przywracanie i kasowanie. Pula, magazyn i harmonogram w tych testach to atrapy. Prawdziwy Quartz nie był uruchamiany.
+
+## Ekrany E2 · Polskie teksty przez tłumaczenia Fluttera (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-233 | Teksty aplikacji są w `lib/core/l10n/app_pl.arb`, generowane przez `flutter gen-l10n` (`flutter_localizations`), dostęp przez `context.l10n`. Na razie tylko polski, także w zakładkach, S01, S24 i ekranie aktualizacji. Wygenerowany kod jest w repozytorium, jak klient API | decyzja PO z 2026-11-03, zamyka D-212; kolejny język to kolejny plik `.arb` |
