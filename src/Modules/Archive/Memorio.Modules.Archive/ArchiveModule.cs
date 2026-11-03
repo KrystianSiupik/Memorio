@@ -10,6 +10,7 @@ using Memorio.Modules.Archive.Application.Commands.CreateMemory;
 using Memorio.Modules.Archive.Application.Commands.DeleteAccountContent;
 using Memorio.Modules.Archive.Application.Policies;
 using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
+using Memorio.Modules.Archive.Application.Queries.MemoryMap;
 using Memorio.Modules.Archive.Application.Queries.Trash;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Archive.Domain.Memories;
@@ -52,6 +53,7 @@ public sealed class ArchiveModule : IModule
         services.AddScoped<IMemories, Memories>();
         services.AddScoped<DeleteAccountContentHandler>();
         services.AddScoped<CreateMemoryHandler>();
+        services.AddScoped<IMemoryMapQuery, MemoryMapQuery>();
         services.AddScoped<DeleteMemoryWhenTrashWindowPassed>();
 
         // IDeadlines exists in the worker only, the one host running these (D-157): built on demand, so the

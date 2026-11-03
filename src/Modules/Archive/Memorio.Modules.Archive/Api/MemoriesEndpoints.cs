@@ -7,6 +7,7 @@ using Memorio.Modules.Archive.Application.Commands.TrashMemory;
 using Memorio.Modules.Archive.Application.Commands.ApproveDescription;
 using Memorio.Modules.Archive.Application.Commands.CreateMemory;
 using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
+using Memorio.Modules.Archive.Application.Queries.MemoryMap;
 using Memorio.Modules.Archive.Application.Queries.Trash;
 using Memorio.Modules.Archive.Domain.Memories;
 using Microsoft.AspNetCore.Builder;
@@ -26,6 +27,9 @@ internal static class MemoriesEndpoints
         memories.MapPost("/", CreateAsync)
             .WithName("CreateMemory")
             .WithSummary("Records a memory; the id comes from the client, so a retry changes nothing.");
+        memories.MapGet("/map", GetMapAsync)
+            .WithName("GetMemoryMap")
+            .WithSummary("One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap.");
         memories.MapPost("/{id:guid}/restore", RestoreAsync)
             .WithName("RestoreMemory")
             .WithSummary("Takes the person's content back from the trash while its 30 days last.");
@@ -165,6 +169,40 @@ internal static class MemoriesEndpoints
         var restored = await handler.HandleAsync(new RestoreMemory(new MemoryId(id), CurrentAccount.IdOf(principal)), cancellationToken);
         return restored.IsFailure ? Problems.From(restored.Error) : TypedResults.NoContent();
     }
+
+    private static async Task<Results<Ok<IReadOnlyList<MemoryPointResponse>>, ProblemHttpResult>> GetMapAsync(
+        string? from,
+        string? to,
+        ClaimsPrincipal principal,
+        IMemoryMapQuery query,
+        CancellationToken cancellationToken)
+    {
+        if (!TryParseDate(from, out var first) || !TryParseDate(to, out var last))
+        {
+            return Problems.From(MemoryErrors.InvalidDate);
+        }
+
+        var points = await query.GetAsync(CurrentAccount.IdOf(principal), first, last, cancellationToken);
+        return TypedResults.Ok<IReadOnlyList<MemoryPointResponse>>(
+            [.. points.Select(point => new MemoryPointResponse(point.Id, point.Latitude, point.Longitude))]);
+    }
+
+    private static bool TryParseDate(string? value, out DateOnly? date)
+    {
+        date = null;
+        if (string.IsNullOrEmpty(value))
+        {
+            return true;
+        }
+
+        if (!DateOnly.TryParseExact(value, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var parsed))
+        {
+            return false;
+        }
+
+        date = parsed;
+        return true;
+    }
 }
 
 /// <param name="Text">The description.</param>
@@ -194,6 +232,8 @@ internal sealed record RequestDataDeletionRequest(bool Confirmed);
 
 /// <param name="DaysLeft">Whole days, rounded up.</param>
 internal sealed record TrashedMemoryResponse(Guid Id, string PlaceName, string DateFrom, string? Description, int Photos, DateTimeOffset TrashedAt, int DaysLeft);
+
+internal sealed record MemoryPointResponse(Guid Id, double Latitude, double Longitude);
 
 internal sealed record StartUploadRequest(string? ContentType);
 
