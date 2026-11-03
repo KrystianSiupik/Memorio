@@ -601,3 +601,12 @@ Pytania otwarte (KONTO-01): **HS-008, PO + prawnik:** kod zakłada samą deklara
 | D-197 | `POST /v1/account/terms-acceptance` z wersją; przyjmowana tylko wersja aktualna (`TermsOfService.CurrentVersion` = `2026-11`, stała w kodzie), inna daje 400 `Account.TermsVersionNotCurrent`. Wersja i czas w `AspNetUsers` (dwie kolumny dopuszczające null, migracja tylko dodaje), ponowna akceptacja tej samej wersji zachowuje pierwszy czas. `GET /v1/account/me` zwraca `acceptedTermsVersion` i `currentTermsVersion` | zapisujemy, którą treść osoba przyjęła; zmiana wersji wymaga nowej akceptacji |
 
 Założenie do sprawdzenia: **regulaminu jeszcze nie ma**, a `2026-11` to etykieta robocza. Wymuszenie akceptacji przed pierwszą treścią należy do tworzenia wspomnienia (MEM-E2-ARCHIWUM-01). **Stan testów:** handler i test na PostgreSQL przechodzą, testy aplikacji po regeneracji klienta też.
+
+## MEM-E1-ARCHIWUM-02 i MEM-E1-ALBUM-01 · Porty odczytu dla Konta (2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-198 | Moduły Archive i Album dostają już teraz **prawdziwe tabele w minimalnym kształcie** (`archive.memories`, `archive.photos`, `album.albums`, `album.album_participants`) z połączeniami `Archive__ConnectionString` i `Album__ConnectionString` (po 5 w puli). Porty czytają je Dapperem (D-126, pakiet Dapper 2.1.66). E2 i E3 dokładają kolumny migracjami rozszerzającymi | E1 wymaga skasowania treści i policzenia albumów, a E2 i E3 są później. Port zwracający na sztywno zera byłby atrapą, której testy niczego nie dowodzą. **Ryzyko do sprawdzenia:** kształt tabel wyprzedza tickety E2 i E3; dotąd brak komend tworzących te dane, więc w działającym systemie liczniki są zerowe |
+| D-199 | `IAccountContentReader` zwraca liczby wspomnień i zdjęć autora, `IAccountAlbumsReader`: albumy własne, własne bez następcy i cudze, w których osoba uczestniczy. Bycie następcą albumu nie liczy się jako uczestnictwo, właściciel na liście uczestników liczy się raz. Agregat nazywa się `SharedAlbum`, bo typ `Album` zderzałby się z przestrzenią nazw modułu | porty niosą tylko skutek, bez przyczyny (ADR 0001) |
+
+**Stan testów:** porty sprawdzone na PostgreSQL rolami modułów (przez `AccountContentReaderTests` i `AccountAlbumsReaderTests`), budżet połączeń przechodzi: 110 przy limicie 180.

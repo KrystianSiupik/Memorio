@@ -34,6 +34,7 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
         ["Account:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_account",
         // Not contacted either (tests/Modules/Memorio.Modules.Plans.Tests covers the ledger on a real database).
         ["Plans:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_plans",
+        ["Archive:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_archive",
         ["Database:MigrateOnStartup"] = "false",
     };
 
