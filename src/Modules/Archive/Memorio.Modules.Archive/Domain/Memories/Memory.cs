@@ -11,6 +11,8 @@ internal sealed class Memory : AggregateRoot<MemoryId>
 {
     public const int MaximumDescriptionLength = 20_000;
 
+    public static readonly TimeSpan TrashWindow = TimeSpan.FromDays(30);
+
     private readonly List<Photo> _photos = [];
 
     private Memory(MemoryId id, Guid authorAccountId, DateTimeOffset createdAt)
@@ -39,6 +41,17 @@ internal sealed class Memory : AggregateRoot<MemoryId>
     public DateOnly DateTo { get; private set; }
 
     public IReadOnlyCollection<Photo> Photos => _photos.AsReadOnly();
+
+    public MemoryState State { get; private set; } = MemoryState.Active;
+
+    public TrashReason? TrashReason { get; private set; }
+
+    public DateTimeOffset? TrashedAt { get; private set; }
+
+    public DateTimeOffset? WindowEndsAt { get; private set; }
+
+    /// <summary>Grows with every move to or from the trash; ties a deadline to its window (D-013).</summary>
+    public int Sequence { get; private set; } = 1;
 
     public string? Description { get; private set; }
 
@@ -80,6 +93,22 @@ internal sealed class Memory : AggregateRoot<MemoryId>
         DescriptionAiPromptVersion = aiOrigin?.PromptVersion;
         Raise(new DescriptionApproved(Guid.CreateVersion7(), now, Id));
         return Result.Success();
+    }
+
+    /// <summary>E20: 30 days in the trash. Asking again changes nothing.</summary>
+    public void MoveToTrash(DateTimeOffset now)
+    {
+        if (State == MemoryState.Trashed)
+        {
+            return;
+        }
+
+        State = MemoryState.Trashed;
+        TrashReason = Memories.TrashReason.Person;
+        TrashedAt = now;
+        WindowEndsAt = now + TrashWindow;
+        Sequence++;
+        Raise(new MemoryMovedToTrash(Guid.CreateVersion7(), now, Id, AuthorAccountId, Sequence, WindowEndsAt.Value));
     }
 
     public bool HasPhoto(Guid photoId) => _photos.Exists(photo => photo.Id == photoId);

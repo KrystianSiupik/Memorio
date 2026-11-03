@@ -22,6 +22,11 @@ internal sealed class AddPhotoHandler(IMemories memories, IObjectStorage storage
             return MemoryErrors.NoAccess;
         }
 
+        if (memory.State != MemoryState.Active)
+        {
+            return MemoryErrors.AlreadyDecided;
+        }
+
         if (memory.HasPhoto(command.PhotoId))
         {
             return Result.Success();

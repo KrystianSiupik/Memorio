@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Memorio.Modularity;
 using Memorio.Modules.Archive.Application.Commands.AddPhoto;
+using Memorio.Modules.Archive.Application.Commands.TrashMemory;
 using Memorio.Modules.Archive.Application.Commands.ApproveDescription;
 using Memorio.Modules.Archive.Application.Commands.CreateMemory;
 using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
@@ -22,6 +23,9 @@ internal static class MemoriesEndpoints
         memories.MapPost("/", CreateAsync)
             .WithName("CreateMemory")
             .WithSummary("Records a memory; the id comes from the client, so a retry changes nothing.");
+        memories.MapDelete("/{id:guid}", TrashAsync)
+            .WithName("TrashMemory")
+            .WithSummary("Moves the person's content to the trash for 30 days.");
         memories.MapGet("/{id:guid}", GetDetailsAsync)
             .WithName("GetMemory")
             .WithSummary("Everything about one memory the person may see.");
@@ -107,6 +111,16 @@ internal static class MemoriesEndpoints
                 memory.Description,
                 memory.DescriptionIsAi,
                 [.. memory.Photos.Select(photo => new MemoryPhotoResponse(photo.Id, photo.Url))]));
+    }
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> TrashAsync(
+        Guid id,
+        ClaimsPrincipal principal,
+        TrashMemoryHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var trashed = await handler.HandleAsync(new TrashMemory(new MemoryId(id), CurrentAccount.IdOf(principal)), cancellationToken);
+        return trashed.IsFailure ? Problems.From(trashed.Error) : TypedResults.NoContent();
     }
 }
 

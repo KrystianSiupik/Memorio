@@ -17,6 +17,11 @@ internal sealed class ApproveDescriptionHandler(IMemories memories, IAiDraftRead
             return MemoryErrors.NoAccess;
         }
 
+        if (memory.State != MemoryState.Active)
+        {
+            return MemoryErrors.AlreadyDecided;
+        }
+
         MemoryAiOrigin? origin = null;
         if (command.AiDraftId is { } draftId)
         {
