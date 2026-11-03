@@ -14,17 +14,6 @@ namespace Memorio.Modules.Places.Infrastructure.Persistence.Migrations
             migrationBuilder.EnsureSchema(
                 name: "places");
 
-            // Filled by the OpenStreetMap import, which replaces it (D-131); here so suggestions work without one.
-            migrationBuilder.Sql("""
-                CREATE TABLE IF NOT EXISTS places.osm_places (
-                    osm_type char(1) NOT NULL,
-                    osm_id bigint NOT NULL,
-                    name text NOT NULL,
-                    kind text NOT NULL,
-                    tags jsonb NOT NULL,
-                    geom geometry(Point, 4326) NOT NULL)
-                """);
-
             migrationBuilder.CreateTable(
                 name: "own_places",
                 schema: "places",

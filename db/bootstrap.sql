@@ -77,3 +77,14 @@ BEGIN
     END LOOP;
 END
 $$;
+
+-- Filled by the OpenStreetMap import, which replaces it (D-131); here so place suggestions work without one.
+CREATE TABLE IF NOT EXISTS places.osm_places (
+    osm_type char(1) NOT NULL,
+    osm_id bigint NOT NULL,
+    name text NOT NULL,
+    kind text NOT NULL,
+    tags jsonb NOT NULL,
+    geom public.geometry(Point, 4326) NOT NULL
+);
+ALTER TABLE places.osm_places OWNER TO memorio_places;
