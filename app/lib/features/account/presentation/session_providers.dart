@@ -22,7 +22,12 @@ final accountRepositoryProvider = Provider<AccountRepository>(
 );
 
 /// What S24 shows. Kept for the whole session: without a connection the screen reads the last answer.
+/// Follows the signed-in account, so the next person never sees the numbers of the previous one.
 final accountOverviewProvider = FutureProvider<AccountOverview>((ref) async {
+  final accountId = ref.watch(sessionProvider.select((session) => session.value?.accountId));
+  if (accountId == null) {
+    throw const AccountForbidden();
+  }
   final loaded = await ref.watch(accountRepositoryProvider).loadOverview();
   return switch (loaded) {
     Ok(:final value) => value,

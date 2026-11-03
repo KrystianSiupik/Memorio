@@ -57,6 +57,13 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     _run(account.cancelDeletion);
   }
 
+  Future<void> _signOut() async {
+    await ref.read(authRepositoryProvider).signOut();
+    if (mounted) {
+      ref.invalidate(sessionProvider);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final overview = ref.watch(accountOverviewProvider);
@@ -64,7 +71,11 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     final loaded = overview.value;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Konto i prywatność')),
+      appBar: AppBar(
+        title: const Text('Konto i prywatność'),
+        // In the bar: available also when the data did not load, and without a connection.
+        actions: [IconButton(tooltip: 'Wyloguj', icon: const Icon(Icons.logout), onPressed: _busy ? null : _signOut)],
+      ),
       body: Column(
         children: [
           if (offline)

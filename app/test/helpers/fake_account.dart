@@ -93,7 +93,7 @@ class FakeAuthRepository implements AuthRepository {
   }) => throw UnimplementedError();
 
   @override
-  Future<void> signOut() async {}
+  Future<void> signOut() async => sessions?.session = null;
 }
 
 class MutableSessionRepository implements SessionRepository {

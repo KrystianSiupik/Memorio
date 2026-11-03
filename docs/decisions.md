@@ -721,3 +721,19 @@ Kryterium ukończenia epiku pozostaje nieodhaczone: wymaga testu na urządzeniu 
 Testy aplikacji: `flutter analyze` czysty, `flutter test` 95/95 przed ostatnim scaleniem. Host API i worker nie były uruchomione jako prawdziwe procesy, więc prawdziwy Quartz z zadaniem `Account.DeletionWindow` i ekrany z prawdziwym backendem pozostają niesprawdzone.
 
 **Stan testów po dokończeniu (2026-11-03):** testy brakujące w przerwanym przebiegu uruchomione po kolei, Release: `Modules.Account` 76/76, `Messaging` 10/10, `Modules.Access` 13/13, `Modules.Plans` 10/10, `Api` 46/46 (z poprawionym `/ready`). Limit czasu w `AccountDeletionImpactTests` się nie powtórzył, ale jego przyczyna nie została potwierdzona. **Znany problem wrócił:** pierwszy przebieg `Api.Tests` zaraz po pełnym buildzie miał porażki, bo hosty nie zbudowały się w limicie 5 minut (m.in. `The_host_starts_with_every_module_registered`); drugi przebieg, bez przebudowy, przeszedł w 27 s. To ten sam objaw co przy PLAT-07 (ok. 1,8 GB wolnej pamięci przed przebiegiem). Przyczyny nie znam, a skoro host czeka aż 5 minut, nie wykluczam zakleszczenia przy starcie zamiast samej powolności. Do zbadania, jeśli wystąpi też w CI.
+
+## Sprzątanie zaległych okien usunięcia konta (MEM-E1-KONTO-07, bez osobnego ticketu, na polecenie PO, 2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-215 | Zadanie cykliczne `Account.DeletionSweep`, codziennie o 03:00 UTC: okna wciąż `Pending` po swoim końcu idą tą samą drogą co termin (P1, C4, `sequence` z wiersza), każde konto w osobnym zakresie. Porażka jednego konta nie zatrzymuje pozostałych, a na końcu oblewa odpalenie, żeby zadziałały ponowienia i metryka `given_up`. Każde znalezione okno to ostrzeżenie w logu z samym identyfikatorem. Częściowy indeks na `window_ends_at` dla `state = 'Pending'` | zamyka ryzyko z D-207: porzucony termin albo zdarzenie w dead letters nie zostawia konta po 30 dniach. Opóźnienie w najgorszym razie to ok. doba |
+
+Alertu na ten log nie dodałem. **Stan testów:** `AccountDeletionSweepJobIdempotencyTests` na PostgreSQL, `AccountDeletionSweepJobTests` bez bazy. Prawdziwy Quartz z tym harmonogramem nie był uruchamiany.
+
+## Wylogowanie na S24 (MEM-E1-PLAT-02, bez osobnego ticketu, na polecenie PO, 2026-11-03)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-216 | Ikona „Wyloguj” na pasku S24, dostępna także bez sieci i gdy dane się nie wczytały: czyści tokeny na urządzeniu i wraca do S01. `accountOverviewProvider` śledzi konto w sesji, więc kolejna osoba nie zobaczy liczb poprzedniej | zamyka brak z D-214; dane w providerze przeżywały zmianę osoby |
+
+**Znane ograniczenia:** wylogowanie jest tylko lokalne: backend nie unieważnia tokenów, więc skopiowany token odświeżający działa do wygaśnięcia (14 dni). **Do pilnowania w E2:** kolejka offline nie jest przypisana do konta; gdy pojawią się w niej operacje, wylogowanie musi je obsłużyć. **Stan testów:** testy komponentu na atrapach. Na urządzeniu i w przeglądarce nieuruchomione.
