@@ -33,6 +33,8 @@ internal static class MemoryErrors
 
     public static readonly Error ConfirmationRequired = Error.Validation("Archive.ConfirmationRequired", "Deleting for good needs a confirmation.");
 
+    public static readonly Error PlanRequired = Error.Conflict("Archive.PlanRequired", "What was trimmed comes back only with a paid plan.");
+
     public static readonly Error IdTaken = Error.Conflict("Archive.IdTaken", "This id belongs to another memory.");
 
     /// <summary>The same answer for a memory that does not exist and one of somebody else: no way to tell them apart.</summary>
