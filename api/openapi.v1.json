@@ -26,6 +26,37 @@
         }
       }
     },
+    "/v1/ai/drafts": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "Writes a draft of a description with the AI; the id comes from the client, so a retry gets the same draft.",
+        "operationId": "RequestAiDraft",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestAiDraftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiDraftResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/account/me": {
       "get": {
         "tags": [
@@ -40,6 +71,424 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/memories": {
+      "post": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "Records a memory; the id comes from the client, so a retry changes nothing.",
+        "operationId": "CreateMemory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedMemoryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/memories/map": {
+      "get": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap.",
+        "operationId": "GetMemoryMap",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MemoryPointResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/memories/{id}/restore": {
+      "post": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "Takes the person\u0027s content back from the trash while its 30 days last.",
+        "operationId": "RestoreMemory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/memories/trash": {
+      "get": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "The person\u0027s own content in the trash, while its 30 days last.",
+        "operationId": "GetTrash",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrashedMemoryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/memories/{id}/permanent-deletion": {
+      "post": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "The author\u0027s formal request: the memory goes for good at once, without the trash.",
+        "operationId": "RequestDataDeletion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestDataDeletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/memories/{id}": {
+      "delete": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "Moves the person\u0027s content to the trash for 30 days.",
+        "operationId": "TrashMemory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "Everything about one memory the person may see.",
+        "operationId": "GetMemory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemoryDetailsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/memories/{id}/description": {
+      "put": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "The author approves the description of a memory, naming the AI draft it started from, if any.",
+        "operationId": "ApproveDescription",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveDescriptionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/memories/uploads": {
+      "post": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "An address to send one photo to, valid for 5 minutes.",
+        "operationId": "StartPhotoUpload",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/memories/{id}/photos": {
+      "post": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "Adds an uploaded photo to a memory; the photo id comes from the client, so a retry changes nothing.",
+        "operationId": "AddPhoto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPhotoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/places/suggestions": {
+      "get": {
+        "tags": [
+          "Places"
+        ],
+        "summary": "Places whose name starts with the text: the person\u0027s own first, then OpenStreetMap.",
+        "operationId": "GetPlaceSuggestions",
+        "parameters": [
+          {
+            "name": "text",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlaceResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/places/choice": {
+      "post": {
+        "tags": [
+          "Places"
+        ],
+        "summary": "Checks the place a person chose from the suggestions and answers with it.",
+        "operationId": "ChoosePlace",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChoosePlaceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/places/own": {
+      "post": {
+        "tags": [
+          "Places"
+        ],
+        "summary": "Adds a place of the signed-in person\u0027s own; the id comes from the client, so a retry changes nothing.",
+        "operationId": "AddOwnPlace",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddOwnPlaceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaceResponse"
                 }
               }
             }
@@ -432,6 +881,104 @@
           }
         }
       },
+      "AddOwnPlaceRequest": {
+        "required": [
+          "id",
+          "name",
+          "latitude",
+          "longitude"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d\u002B)?(?:[eE][\u002B-]?\\d\u002B)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d\u002B)?(?:[eE][\u002B-]?\\d\u002B)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "AddPhotoRequest": {
+        "required": [
+          "photoId",
+          "uploadKey"
+        ],
+        "type": "object",
+        "properties": {
+          "photoId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uploadKey": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "AiDraftResponse": {
+        "required": [
+          "id",
+          "text",
+          "isAiGenerated"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string"
+          },
+          "isAiGenerated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApproveDescriptionRequest": {
+        "required": [
+          "text",
+          "aiDraftId"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "aiDraftId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
       "AppVersionPolicyResponse": {
         "required": [
           "minimumVersion"
@@ -440,6 +987,72 @@
         "properties": {
           "minimumVersion": {
             "type": "string"
+          }
+        }
+      },
+      "ChoosePlaceRequest": {
+        "required": [
+          "placeReference"
+        ],
+        "type": "object",
+        "properties": {
+          "placeReference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CreatedMemoryResponse": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "CreateMemoryRequest": {
+        "required": [
+          "id",
+          "placeReference",
+          "datePrecision",
+          "dateFrom",
+          "dateTo"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "placeReference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "datePrecision": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dateFrom": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dateTo": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -479,6 +1092,158 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "MemoryDetailsResponse": {
+        "required": [
+          "id",
+          "placeName",
+          "latitude",
+          "longitude",
+          "datePrecision",
+          "dateFrom",
+          "dateTo",
+          "isMine",
+          "description",
+          "descriptionIsAi",
+          "photos"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "placeName": {
+            "type": "string"
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d\u002B)?(?:[eE][\u002B-]?\\d\u002B)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d\u002B)?(?:[eE][\u002B-]?\\d\u002B)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "datePrecision": {
+            "type": "string"
+          },
+          "dateFrom": {
+            "type": "string"
+          },
+          "dateTo": {
+            "type": "string"
+          },
+          "isMine": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "descriptionIsAi": {
+            "type": "boolean"
+          },
+          "photos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemoryPhotoResponse"
+            }
+          }
+        }
+      },
+      "MemoryPhotoResponse": {
+        "required": [
+          "id",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "MemoryPointResponse": {
+        "required": [
+          "id",
+          "latitude",
+          "longitude"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d\u002B)?(?:[eE][\u002B-]?\\d\u002B)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d\u002B)?(?:[eE][\u002B-]?\\d\u002B)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "PlaceResponse": {
+        "required": [
+          "placeReference",
+          "name",
+          "latitude",
+          "longitude",
+          "isOwn"
+        ],
+        "type": "object",
+        "properties": {
+          "placeReference": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d\u002B)?(?:[eE][\u002B-]?\\d\u002B)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d\u002B)?(?:[eE][\u002B-]?\\d\u002B)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "isOwn": {
+            "type": "boolean"
           }
         }
       },
@@ -528,6 +1293,144 @@
             "type": "boolean"
           }
         }
+      },
+      "RequestAiDraftRequest": {
+        "required": [
+          "id",
+          "material",
+          "consentsToAi",
+          "peopleNames",
+          "placeNames"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "material": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "consentsToAi": {
+            "type": "boolean"
+          },
+          "peopleNames": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "placeNames": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RequestDataDeletionRequest": {
+        "required": [
+          "confirmed"
+        ],
+        "type": "object",
+        "properties": {
+          "confirmed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "StartUploadRequest": {
+        "required": [
+          "contentType"
+        ],
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "TrashedMemoryResponse": {
+        "required": [
+          "id",
+          "placeName",
+          "dateFrom",
+          "description",
+          "photos",
+          "trashedAt",
+          "daysLeft"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "placeName": {
+            "type": "string"
+          },
+          "dateFrom": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "photos": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "trashedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "daysLeft": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "UploadResponse": {
+        "required": [
+          "key",
+          "url",
+          "contentType"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "contentType": {
+            "type": "string"
+          }
+        }
       }
     }
   },
@@ -536,7 +1439,16 @@
       "name": "App"
     },
     {
+      "name": "AI"
+    },
+    {
       "name": "Account"
+    },
+    {
+      "name": "Memories"
+    },
+    {
+      "name": "Places"
     },
     {
       "name": "Auth"
