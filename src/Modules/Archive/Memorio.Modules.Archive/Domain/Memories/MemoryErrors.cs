@@ -29,6 +29,8 @@ internal static class MemoryErrors
 
     public static readonly Error DraftNotFound = Error.Validation("Archive.DraftNotFound", "This is not a draft of this person.");
 
+    public static readonly Error TrashWindowOpen = Error.Conflict("Archive.TrashWindowOpen", "The trash window of this memory has not ended yet.");
+
     public static readonly Error IdTaken = Error.Conflict("Archive.IdTaken", "This id belongs to another memory.");
 
     /// <summary>The same answer for a memory that does not exist and one of somebody else: no way to tell them apart.</summary>

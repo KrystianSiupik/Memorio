@@ -6,6 +6,7 @@ using Memorio.Hosting.Messaging;
 using Memorio.Modules.Account.Application.Ports;
 using Memorio.Modules.Album;
 using Memorio.Modules.Archive;
+using Memorio.Modules.Limits;
 using Memorio.SharedKernel.Scheduling;
 using Memorio.SharedKernel.Storage;
 using Memorio.Testing;
@@ -168,6 +169,7 @@ public sealed class AccountHost : PostgresDatabase
         module.AddServices(builder.Services, builder.Configuration);
         new ArchiveModule().AddServices(builder.Services, builder.Configuration);
         new AlbumModule().AddServices(builder.Services, builder.Configuration);
+        new LimitsModule().AddServices(builder.Services, builder.Configuration);
         builder.Services.RemoveAll<IExternalIdentityVerifier>();
         builder.Services.AddSingleton<IExternalIdentityVerifier>(new FakeGoogle());
 
@@ -192,6 +194,7 @@ public sealed class AccountHost : PostgresDatabase
         new AccountModule().AddServices(worker.Services, worker.Configuration);
         new ArchiveModule().AddServices(worker.Services, worker.Configuration);
         new AlbumModule().AddServices(worker.Services, worker.Configuration);
+        new LimitsModule().AddServices(worker.Services, worker.Configuration);
         _worker = worker.Build();
         await _worker.StartAsync();
     }
@@ -202,6 +205,7 @@ public sealed class AccountHost : PostgresDatabase
         configuration["Account:ConnectionString"] = ConnectionStringFor("memorio_account");
         configuration["Archive:ConnectionString"] = ConnectionStringFor("memorio_archive");
         configuration["Album:ConnectionString"] = ConnectionStringFor("memorio_album");
+        configuration["Limits:ConnectionString"] = ConnectionStringFor("memorio_limits");
     }
 
     protected override async Task OnDisposingAsync()
