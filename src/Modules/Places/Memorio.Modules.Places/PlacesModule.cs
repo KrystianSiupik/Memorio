@@ -1,6 +1,8 @@
 using Memorio.Modularity;
 using Memorio.Modules.Places.Api;
+using Memorio.Modules.Places.Application.Commands.AddOwnPlace;
 using Memorio.Modules.Places.Application.Commands.ChoosePlace;
+using Memorio.Modules.Places.Domain.Places;
 using Memorio.Modules.Places.Application.Queries.PlaceLookup;
 using Memorio.Modules.Places.Application.Queries.PlaceSuggestions;
 using Memorio.Modules.Places.Infrastructure.Queries;
@@ -37,6 +39,8 @@ public sealed class PlacesModule : IModule
         services.AddScoped<IPlaceSuggestionsQuery, PlaceSuggestionsQuery>();
         services.AddScoped<IPlaceLookup, PlaceLookup>();
         services.AddScoped<ChoosePlaceHandler>();
+        services.AddScoped<IOwnPlaces, OwnPlaces>();
+        services.AddScoped<AddOwnPlaceHandler>();
 
         services.AddHealthChecks().AddCheck<PlacesDatabaseHealthCheck>(PlacesDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))
