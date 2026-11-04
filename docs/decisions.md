@@ -913,3 +913,19 @@ Wszystkie 49 ticketów E3 ma wynik w `version/0.1` lokalnie, na polecenie PO: �
 | | **Znane ograniczenia:** rozmiar wspomnienia w puli albumu jest ustalony przy dodaniu. Zdjęcie dodane później z S05, a nie z albumu, liczy się autorowi | na razie akceptowalne, bo ktoś za nie płaci |
 
 **Stan testów:** Limity 23/23, Archiwum 93/93, Album 53/53, z prawdziwymi rezerwacjami w `Limits.Tests`. W `Archive.Tests` pula to atrapa, więc całość przeniesienia razem nie była uruchomiona na prawdziwej puli.
+
+## Wysyłka wiadomości (MEM-E3-POWIADOMIENIA-01 do -10, 2026-11-04)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-265 | **Decyzja PO:** dostawcą jest na razie Scaleway Transactional Email, a w przyszłości może AWS. Wysyłka idzie zwykłym SMTP (MailKit, `Notifications__Smtp__*`), a nie przez API dostawcy, więc zmiana na innego, także Amazon SES, to zmiana konfiguracji. Bez `Notifications__Smtp__Host` wiadomości tylko trafiają do logu, tak jak dotąd lokalnie | zamyka D-251. Warunki Scaleway ze stron dostawcy: 300 wiadomości miesięcznie za darmo, potem 0,25 € za 1000, usługa w UE |
+| D-266 | Wiadomość zawiera tylko rodzaj sprawy i nazwę albumu, bez wspomnień, zdjęć i imion. Adres trwale odrzucony przez dostawcę (5xx na odbiorcy) jest zapisany w logu bez adresu i nie jest ponawiany. Brak odpowiedzi dostawcy oblewa wysyłkę, więc zdarzenie jest ponawiane | D-038, D-162; ponawianie złego adresu kończyłoby się martwymi wiadomościami |
+
+**Stan testów:** Powiadomienia 22/22, z prawdziwą rozmową SMTP z lokalnym serwerem testowym bez TLS i logowania; architektura 49/49.
+
+**Nie sprawdzono:** Scaleway naprawdę (nie ma konta ani domeny), TLS i logowania, dostarczalności do skrzynek, wysyłki z uruchomionego workera, treści umowy powierzenia. Dopisanie Scaleway do „Podwykonawców” (MEM-E11-PLAT-08) i rejestru czynności (MEM-E11-PLAT-02) czeka na E11.
+
+**Ryzyka przed startem:**
+- Nie ma limitu zaproszeń na osobę: limit miejsc dotyczy jednego albumu, a albumów można tworzyć dowolnie dużo, z dowolną nazwą trafiającą do wiadomości. Ktoś mógłby tak wysyłać niechciane wiadomości i psuć reputację domeny.
+- Osoba bez konta nie wyłączy zaproszeń bez założenia konta, zob. `docs/pytania-do-prawnika.md`, pytanie 8.
+- Wiadomość nie mówi, kto zaprasza; widać to dopiero na S14.

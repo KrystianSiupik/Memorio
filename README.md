@@ -41,6 +41,7 @@ or missing variable stops the host and the log names the variable, never its val
 | `Album__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_album` (albums, participants) |
 | `Limits__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_limits` (pools and their operations) |
 | `Notifications__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_notifications` (messages sent, blocked addresses) |
+| `Notifications__Smtp__Host`, `__Port`, `__Security`, `__Username`, `__Password`, `__From`, `__FromName`, `__AppUrl` | worker | optional: outgoing mail over SMTP (default port 587, `StartTls`); `From` is required with a host. Without a host messages are only logged, nothing is delivered |
 | `Places__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_places` (own places, OpenStreetMap places) |
 | `AiNarration__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_ai_narration` (AI drafts) |
 | `Database__MigrateOnStartup` | API, worker | optional, default `true`: apply the modules' migrations at start |
