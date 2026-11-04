@@ -885,3 +885,13 @@ Sześć ekranów w jednej gałęzi, bo mają wspólną warstwę danych. To znowu
 **Stan testów:** aplikacja z testami S09 do S14 i mapowaniem odpowiedzi API; wynik końcowy w podsumowaniu E3. Test przeszedł też przez błąd, którego analizator nie widzi: klucze ekranów zawierały znak z generatora.
 
 **Nie sprawdzono:** ekranów połączonych z prawdziwym API, urządzeń, wybierania zdjęć z galerii.
+
+## Podsumowanie E3 (2026-11-04)
+
+Wszystkie 49 ticketów E3 ma wynik w `version/0.1` lokalnie, na polecenie PO: „rób E3”. Część tylko częściowo, zob. statusy w epiku. PO jeszcze tego nie sprawdzał. Kryterium epiku pozostaje niezaznaczone, bo wymaga CI i testu na urządzeniu.
+
+**Testy po ostatnim scaleniu:** aplikacja 217/217, Album 53/53, Powiadomienia 11/11, Archiwum 90/90, Dostęp 14/14, Limity 20/20, Konto 79/79, API 46/46, architektura 49/49, baza 75/75. Moduły Plans, Places i AiNarration oraz `Memorio.Messaging.Tests` i `Memorio.Scheduling.Tests` nie były uruchamiane po tej zmianie.
+
+**Zawieszanie testów:** pierwsze uruchomienie po buildzie stanęło też w `Account.Tests` (po 400 s), w tym samym miejscu co w `Album.Tests`: zaraz po skrypcie startowym bazy. Drugie uruchomienie bez przebudowy przeszło w 72 s. Wygląda to na zjawisko lokalne, ale nie ma potwierdzonej przyczyny.
+
+**Do decyzji PO przed startem:** D-245 (osoby w darmowym albumie), D-246 (pula albumu), D-248 (zdjęcia w cudzych wspomnieniach, podwójne liczenie miejsca), D-249 (treści osoby usuniętej bez aktywnej zgody), D-251 (dostawca e-mail), D-253 (adres e-mail widoczny dla osób w albumie).
