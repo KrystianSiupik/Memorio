@@ -38,6 +38,59 @@ public sealed class AlbumPoolTests(LimitsDatabase database)
     }
 
     [Fact]
+    public async Task A_key_given_back_counts_anew_and_can_move_to_another_pool()
+    {
+        var (person, album) = (Guid.CreateVersion7(), Guid.CreateVersion7());
+        var key = Guid.CreateVersion7();
+        await using var scope = database.CreateScope();
+        var personal = scope.ServiceProvider.GetRequiredService<ISpacePool>();
+        var shared = scope.ServiceProvider.GetRequiredService<IAlbumPool>();
+
+        Assert.True(await personal.TryReserveAsync(person, key, 100, Cancellation));
+        await personal.ReleaseAsync(key, Cancellation);
+        Assert.True(await shared.TryReserveAsync(album, key, 100, Cancellation));
+
+        Assert.Equal(0, (await shared.GetStateAsync(person, Cancellation)).UsedBytes);
+        Assert.Equal(100, (await shared.GetStateAsync(album, Cancellation)).UsedBytes);
+
+        await shared.ReleaseAsync(key, Cancellation);
+        Assert.Equal(0, (await shared.GetStateAsync(album, Cancellation)).UsedBytes);
+    }
+
+    [Fact]
+    public async Task A_key_given_back_that_does_not_fit_anymore_is_refused_and_stays_given_back()
+    {
+        var pool = await database.AccountWithLimitAsync(100);
+        var key = Guid.CreateVersion7();
+        await using var scope = database.CreateScope();
+        var shared = scope.ServiceProvider.GetRequiredService<IAlbumPool>();
+        Assert.True(await shared.TryReserveAsync(pool, key, 80, Cancellation));
+        await shared.ReleaseAsync(key, Cancellation);
+        Assert.True(await shared.TryReserveAsync(pool, Guid.CreateVersion7(), 50, Cancellation));
+
+        Assert.False(await shared.TryReserveAsync(pool, key, 80, Cancellation));
+
+        await shared.ReleaseAsync(key, Cancellation);
+        Assert.Equal(50, (await shared.GetStateAsync(pool, Cancellation)).UsedBytes);
+    }
+
+    [Fact]
+    public async Task Coming_back_counts_over_the_limit_once_and_nothing_new_fits_then()
+    {
+        var person = await database.AccountWithLimitAsync(100);
+        var key = Guid.CreateVersion7();
+        await using var scope = database.CreateScope();
+        var personal = scope.ServiceProvider.GetRequiredService<ISpacePool>();
+        var state = scope.ServiceProvider.GetRequiredService<IAlbumPool>();
+
+        await personal.ReserveOverLimitAsync(person, key, 150, Cancellation);
+        await personal.ReserveOverLimitAsync(person, key, 150, Cancellation);
+
+        Assert.Equal(150, (await state.GetStateAsync(person, Cancellation)).UsedBytes);
+        Assert.False(await personal.TryReserveAsync(person, Guid.CreateVersion7(), 1, Cancellation));
+    }
+
+    [Fact]
     public async Task What_does_not_fit_is_refused_and_free_space_is_never_negative()
     {
         var album = await database.AccountWithLimitAsync(100);

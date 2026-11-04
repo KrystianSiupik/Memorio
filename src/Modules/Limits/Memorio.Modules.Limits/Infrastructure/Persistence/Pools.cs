@@ -6,20 +6,38 @@ namespace Memorio.Modules.Limits.Infrastructure.Persistence;
 /// <summary>Conditional updates (D-016) with the ledger of operations under a unique key, in one transaction (D-015).</summary>
 internal sealed class Pools(LimitsDbContext database) : IPools
 {
-    public async Task<bool> ReserveAsync(Guid accountId, Guid operationKey, long bytes, DateTimeOffset at, CancellationToken cancellationToken)
+    public Task<bool> ReserveAsync(Guid accountId, Guid operationKey, long bytes, DateTimeOffset at, CancellationToken cancellationToken) =>
+        ChargeAsync(accountId, operationKey, bytes, at, withinLimit: true, cancellationToken);
+
+    public Task ReserveOverLimitAsync(Guid accountId, Guid operationKey, long bytes, DateTimeOffset at, CancellationToken cancellationToken) =>
+        ChargeAsync(accountId, operationKey, bytes, at, withinLimit: false, cancellationToken);
+
+    private async Task<bool> ChargeAsync(Guid accountId, Guid operationKey, long bytes, DateTimeOffset at, bool withinLimit, CancellationToken cancellationToken)
     {
         await using var transaction = await database.Database.BeginTransactionAsync(cancellationToken);
         await EnsurePoolAsync(accountId, cancellationToken);
 
+        // An active key changes nothing; one given back counts anew, also in another pool (D-264).
         var isNew = await database.Database.ExecuteSqlAsync(
             $"""
             INSERT INTO limits.pool_operations (operation_key, account_id, bytes, reserved_at)
             VALUES ({operationKey}, {accountId}, {bytes}, {at})
-            ON CONFLICT (operation_key) DO NOTHING
+            ON CONFLICT (operation_key) DO UPDATE
+            SET account_id = EXCLUDED.account_id, bytes = EXCLUDED.bytes, reserved_at = EXCLUDED.reserved_at, released_at = NULL
+            WHERE limits.pool_operations.released_at IS NOT NULL
             """,
             cancellationToken) == 1;
         if (!isNew)
         {
+            await transaction.CommitAsync(cancellationToken);
+            return true;
+        }
+
+        if (!withinLimit)
+        {
+            await database.Database.ExecuteSqlAsync(
+                $"UPDATE limits.account_pools SET used_bytes = used_bytes + {bytes} WHERE account_id = {accountId}",
+                cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return true;
         }
