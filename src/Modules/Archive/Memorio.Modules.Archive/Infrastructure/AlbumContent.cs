@@ -33,11 +33,18 @@ internal sealed class AlbumContent(ArchiveDbContext database, IMemories memories
         return rows.ToDictionary(row => row.Id, row => new AlbumMemorySummary(row.PlaceName, row.DateFrom, row.Photos));
     }
 
+    /// <summary>D-264: an album pays for the memory now, so the author's space comes back.</summary>
     public async Task LinkAsync(Guid memoryId, Guid albumId, CancellationToken cancellationToken)
     {
         await database.Database.ExecuteSqlAsync(
             $"INSERT INTO archive.memory_albums (memory_id, album_id) VALUES ({memoryId}, {albumId}) ON CONFLICT DO NOTHING",
             cancellationToken);
+
+        var memory = await memories.FindAsync(new MemoryId(memoryId), cancellationToken);
+        foreach (var photo in memory?.Photos.Where(photo => photo.AlbumId is null) ?? [])
+        {
+            await personalPool.ReleaseAsync(photo.Id, cancellationToken);
+        }
     }
 
     public async Task UnlinkAsync(Guid memoryId, Guid albumId, CancellationToken cancellationToken)
@@ -52,13 +59,21 @@ internal sealed class AlbumContent(ArchiveDbContext database, IMemories memories
             return;
         }
 
-        foreach (var photo in memory.Photos.Where(photo => photo.AlbumId == albumId))
+        var inAnotherAlbum = await database.Set<MemoryAlbum>().AnyAsync(link => link.MemoryId == memoryId, cancellationToken);
+        foreach (var photo in memory.Photos)
         {
-            await albumPool.ReleaseAsync(photo.Id, cancellationToken);
+            var paidByThisAlbum = photo.AlbumId == albumId;
+            if (paidByThisAlbum)
+            {
+                await albumPool.ReleaseAsync(photo.Id, cancellationToken);
+                photo.LeaveAlbumPool();
+            }
 
-            // Over the author's limit the photo stays: taking it along must not lose it, and nothing new fits then.
-            await personalPool.TryReserveAsync(memory.AuthorAccountId, PoolKeys.For(photo.Id, memory.AuthorAccountId), photo.SizeBytes, cancellationToken);
-            photo.LeaveAlbumPool();
+            // D-264: while another album holds the memory it pays for the rest; the last one gives everything back.
+            if (photo.SizeBytes > 0 && photo.AlbumId is null && (paidByThisAlbum || !inAnotherAlbum))
+            {
+                await personalPool.ReserveOverLimitAsync(memory.AuthorAccountId, photo.Id, photo.SizeBytes, cancellationToken);
+            }
         }
 
         await memories.SaveAsync(cancellationToken);

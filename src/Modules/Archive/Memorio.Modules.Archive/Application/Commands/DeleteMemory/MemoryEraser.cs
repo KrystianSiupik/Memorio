@@ -16,9 +16,6 @@ internal sealed class MemoryEraser(IMemories memories, ISpacePool pool, IObjectS
         foreach (var photo in memory.Photos)
         {
             await pool.ReleaseAsync(photo.Id, cancellationToken);
-
-            // A photo that came back from an album's pool is reserved under this key (D-248).
-            await pool.ReleaseAsync(PoolKeys.For(photo.Id, memory.AuthorAccountId), cancellationToken);
             await storage.DeleteAsync(new StorageKey(photo.StorageKey), cancellationToken);
         }
 

@@ -1,7 +1,6 @@
 using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
 using Memorio.Modules.Archive.Application.Queries.MemoryMap;
 using Memorio.Modules.Archive.Contracts;
-using Memorio.Modules.Limits.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Memorio.Modules.Archive.Tests;
@@ -82,8 +81,82 @@ public sealed class AlbumContentTests(ArchiveDatabase database)
             await scope.ServiceProvider.GetRequiredService<IAlbumContent>().UnlinkAsync(memory.Id.Value, album, Cancellation);
         }
 
-        Assert.False(database.Neighbours.Reserved.ContainsKey(photo));
-        Assert.Equal(50, database.Neighbours.Reserved[PoolKeys.For(photo, author)]);
+        Assert.Equal(author, database.Neighbours.PayerOf(photo));
+        Assert.Equal(50, database.Neighbours.Reserved[photo]);
+    }
+
+    [Fact]
+    public async Task The_authors_space_comes_back_while_an_album_pays_and_returns_with_the_last_one()
+    {
+        var author = Guid.CreateVersion7();
+        var (first, second) = (Guid.CreateVersion7(), Guid.CreateVersion7());
+        var memory = await database.AddMemoryAsync(author);
+        var photo = await AddPersonalPhotoAsync(memory.Id, author);
+        Assert.Equal(author, database.Neighbours.PayerOf(photo));
+
+        await WithContentAsync(content => content.LinkAsync(memory.Id.Value, first, Cancellation));
+        Assert.Null(database.Neighbours.PayerOf(photo));
+
+        await WithContentAsync(content => content.LinkAsync(memory.Id.Value, second, Cancellation));
+        await WithContentAsync(content => content.UnlinkAsync(memory.Id.Value, first, Cancellation));
+        Assert.Null(database.Neighbours.PayerOf(photo));
+
+        await WithContentAsync(content => content.UnlinkAsync(memory.Id.Value, second, Cancellation));
+        Assert.Equal(author, database.Neighbours.PayerOf(photo));
+
+        await WithContentAsync(content => content.UnlinkAsync(memory.Id.Value, second, Cancellation));
+        Assert.Equal(author, database.Neighbours.PayerOf(photo));
+    }
+
+    [Fact]
+    public async Task Taking_a_memory_along_counts_even_over_the_authors_limit()
+    {
+        var author = Guid.CreateVersion7();
+        var album = Guid.CreateVersion7();
+        var memory = await database.AddMemoryAsync(author);
+        var photo = await AddPersonalPhotoAsync(memory.Id, author);
+        await WithContentAsync(content => content.LinkAsync(memory.Id.Value, album, Cancellation));
+        database.Neighbours.WithFullPool(author);
+
+        await WithContentAsync(content => content.UnlinkAsync(memory.Id.Value, album, Cancellation));
+
+        Assert.Equal(author, database.Neighbours.PayerOf(photo));
+    }
+
+    [Fact]
+    public async Task A_photo_paid_by_one_album_goes_to_the_author_when_only_that_album_lets_go()
+    {
+        var author = Guid.CreateVersion7();
+        var (paying, other) = (Guid.CreateVersion7(), Guid.CreateVersion7());
+        var memory = await database.AddMemoryAsync(author);
+        var photo = Guid.CreateVersion7();
+        await WithContentAsync(async content =>
+        {
+            await content.LinkAsync(memory.Id.Value, paying, Cancellation);
+            await content.LinkAsync(memory.Id.Value, other, Cancellation);
+            await content.AddPhotoAsync(new AlbumPhoto(paying, memory.Id.Value, author, photo, database.Storage.AddUpload(50).Value), Cancellation);
+        });
+        Assert.Equal(paying, database.Neighbours.PayerOf(photo));
+
+        await WithContentAsync(content => content.UnlinkAsync(memory.Id.Value, paying, Cancellation));
+
+        Assert.Equal(author, database.Neighbours.PayerOf(photo));
+    }
+
+    private async Task<Guid> AddPersonalPhotoAsync(Domain.Memories.MemoryId memory, Guid author)
+    {
+        var photo = Guid.CreateVersion7();
+        await using var scope = database.CreateScope();
+        var added = await scope.ServiceProvider.GetRequiredService<Application.Commands.AddPhoto.AddPhotoHandler>()
+            .HandleAsync(new Application.Commands.AddPhoto.AddPhoto(memory, author, photo, database.Storage.AddUpload(50).Value), Cancellation);
+        Assert.True(added.IsSuccess);
+        return photo;
+    }
+
+    private async Task WithContentAsync(Func<IAlbumContent, Task> action)
+    {
+        await using var scope = database.CreateScope();
+        await action(scope.ServiceProvider.GetRequiredService<IAlbumContent>());
     }
 
     [Fact]

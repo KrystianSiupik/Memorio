@@ -903,3 +903,13 @@ Wszystkie 49 ticketów E3 ma wynik w `version/0.1` lokalnie, na polecenie PO: �
 | D-261 | Album bez płatnego planu ma **5 osób**, razem z właścicielem i zaproszonymi. Zastępuje założenie 10 osób z D-245. Dopóki E7 nie odróżnia planów, limit dotyczy każdego albumu; plan albumu ma 10 (D-080). Album, który ma już więcej osób, zostaje, ale nie przyjmie nowych zaproszeń | decyzja PO |
 | D-262 | Treści osoby usuniętej z albumu **na razie zostają**, jak w D-249. Pytanie jest w `docs/pytania-do-prawnika.md` | decyzja PO, do opinii prawnika |
 | D-263 | Osoby w albumie widzą swoje adresy e-mail, jak w D-253 | decyzja PO. Pytanie o sposób poinformowania o tym jest w `docs/pytania-do-prawnika.md` |
+
+## Miejsce wspomnienia w albumie (MEM-E3-ARCHIWUM-01, MEM-E3-ALBUM-05, 2026-11-04)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-264 | **Decyzja PO, zmienia D-248 w części o miejscu:** po dodaniu do albumu wspomnienie liczy się tylko w puli albumu, a miejsce autora wraca. Gdy ostatni album je wypuści, wraca na konto autora, także ponad limit (nic nowego się wtedy nie zmieści, ale nic nie ginie). W dwóch albumach liczy się w każdym z nich. Zdjęcia nadal dodaje tylko autor (D-248 bez zmian) | plan albumu opłaca wspólne miejsce |
+| | **Naprawiony błąd:** klucz rezerwacji raz zwolniony nie liczył się już nigdy, więc wspomnienie zabrane i dodane ponownie nie zajmowało miejsca. Zwolniony klucz liczy się teraz od nowa, także w innej puli | wyszło przy projektowaniu przenoszenia |
+| | **Znane ograniczenia:** rozmiar wspomnienia w puli albumu jest ustalony przy dodaniu. Zdjęcie dodane później z S05, a nie z albumu, liczy się autorowi | na razie akceptowalne, bo ktoś za nie płaci |
+
+**Stan testów:** Limity 23/23, Archiwum 93/93, Album 53/53, z prawdziwymi rezerwacjami w `Limits.Tests`. W `Archive.Tests` pula to atrapa, więc całość przeniesienia razem nie była uruchomiona na prawdziwej puli.

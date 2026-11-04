@@ -37,6 +37,17 @@ public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool, IAl
     private readonly ConcurrentDictionary<Guid, bool> _withoutTerms = new();
     private readonly ConcurrentDictionary<Guid, bool> _fullPools = new();
     private readonly ConcurrentDictionary<Guid, long> _reserved = new();
+    private readonly ConcurrentDictionary<Guid, Guid> _payers = new();
+
+    /// <summary>Which pool pays for an operation still reserved.</summary>
+    public Guid? PayerOf(Guid operationKey) => _reserved.ContainsKey(operationKey) ? _payers[operationKey] : null;
+
+    public Task ReserveOverLimitAsync(Guid accountId, Guid operationKey, long bytes, CancellationToken cancellationToken)
+    {
+        _reserved[operationKey] = bytes;
+        _payers[operationKey] = accountId;
+        return Task.CompletedTask;
+    }
 
     /// <summary>Space reserved and not given back, by operation.</summary>
     public IReadOnlyDictionary<Guid, long> Reserved => _reserved;
@@ -51,6 +62,7 @@ public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool, IAl
         }
 
         _reserved[operationKey] = bytes;
+        _payers[operationKey] = accountId;
         return Task.FromResult(true);
     }
 

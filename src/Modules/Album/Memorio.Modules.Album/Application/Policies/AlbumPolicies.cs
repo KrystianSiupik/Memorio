@@ -51,12 +51,13 @@ internal sealed class WithdrawContributionsWhenAccountDeleted(IAlbums albums, Co
 }
 
 /// <summary>A memory gone for good leaves its albums, and its space comes back to them.</summary>
-internal sealed class ForgetContentWhenDeleted(IAlbums albums, IAlbumPool pool) : IIntegrationEventPolicy<ContentDeleted>
+internal sealed class ForgetContentWhenDeleted(IAlbums albums, IAlbumContent content, IAlbumPool pool) : IIntegrationEventPolicy<ContentDeleted>
 {
     public async Task HandleAsync(ContentDeleted integrationEvent, CancellationToken cancellationToken)
     {
         foreach (var memory in await albums.FindPlacesOfMemoryAsync(integrationEvent.MemoryId, cancellationToken))
         {
+            await content.UnlinkAsync(memory.MemoryId, memory.AlbumId.Value, cancellationToken);
             await pool.ReleaseAsync(PoolKeys.For(memory.AlbumId.Value, memory.MemoryId), cancellationToken);
             albums.Remove(memory);
         }
