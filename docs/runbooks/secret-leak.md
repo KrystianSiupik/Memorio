@@ -35,6 +35,7 @@ All commands run on the application server as root in `/opt/memorio/deploy`.
 | `POSTGRES_PASSWORD` | `memorio_admin`, the owner | `./secrets/rotate.sh database memorio_admin` |
 | `PG_PASSWORD_MEMORIO_MESSAGING` | outbox and inbox of both hosts | `./secrets/rotate.sh database memorio_messaging` |
 | `PG_PASSWORD_MEMORIO_SCHEDULER` | Quartz in the worker | `./secrets/rotate.sh database memorio_scheduler` |
+| `Notifications__Smtp__Password` | sending mail from the worker | new API key at the provider, delete the old one, change it in `app.env`, restart the worker |
 | `PG_PASSWORD_MEMORIO_ACCESS`, `PG_PASSWORD_MEMORIO_ACCOUNT`, `PG_PASSWORD_MEMORIO_AI_NARRATION`, `PG_PASSWORD_MEMORIO_ALBUM`, `PG_PASSWORD_MEMORIO_ARCHIVE`, `PG_PASSWORD_MEMORIO_LIMITS`, `PG_PASSWORD_MEMORIO_MODERATION`, `PG_PASSWORD_MEMORIO_NOTIFICATIONS`, `PG_PASSWORD_MEMORIO_PLACE_PROFILES`, `PG_PASSWORD_MEMORIO_PLACES`, `PG_PASSWORD_MEMORIO_PLANS`, `PG_PASSWORD_MEMORIO_PROVENANCE`, `PG_PASSWORD_MEMORIO_PUBLISHING`, `PG_PASSWORD_MEMORIO_SUCCESSION` | the module's role (its schema only, ADR 0004) | `./secrets/rotate.sh database memorio_<module>` |
 
 `rotate.sh database` sets a new random password in `postgres.env` and in the role's connection string in

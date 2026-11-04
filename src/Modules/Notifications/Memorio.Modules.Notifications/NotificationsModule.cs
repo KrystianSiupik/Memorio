@@ -25,6 +25,7 @@ public sealed class NotificationsModule : IModule
         services.AddOptions<NotificationsOptions>()
             .Bind(configuration.GetSection(NotificationsOptions.Section))
             .Validate(options => !string.IsNullOrWhiteSpace(options.ConnectionString), "Notifications__ConnectionString is required.")
+            .Validate(options => string.IsNullOrWhiteSpace(options.Smtp.Host) || !string.IsNullOrWhiteSpace(options.Smtp.From), "Notifications__Smtp__From is required with a host.")
             .ValidateOnStart();
 
         // A missing value fails the validation above at startup; the placeholder only lets the host be built.
@@ -40,6 +41,11 @@ public sealed class NotificationsModule : IModule
         services.AddScoped<IInvitationBlocks, InvitationBlocks>();
         services.AddScoped<BlockInvitationsHandler>();
         services.AddScoped<SendOnce>();
+        if (!string.IsNullOrWhiteSpace(configuration.GetSection(NotificationsOptions.Section).Get<NotificationsOptions>()?.Smtp.Host))
+        {
+            services.TryAddScoped<INotificationSender, SmtpNotificationSender>();
+        }
+
         services.TryAddScoped<INotificationSender, LoggingNotificationSender>();
         services.AddScoped<SendInvitation>();
         services.AddScoped<SendInvitationReminder>();
