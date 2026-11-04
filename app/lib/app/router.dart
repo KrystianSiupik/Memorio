@@ -52,7 +52,52 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          _tab(AlbumsRoute.path, const AlbumsPage()),
+          _tab(
+            AlbumsRoute.path,
+            Builder(
+              builder: (context) => AlbumsPage(
+                onOpenAlbum: (id) => AlbumRoute(id).go(context),
+                onOpenInvitation: (id) => InvitationRoute(id).go(context),
+                onOpenConsents: () => const MyConsentsRoute().go(context),
+                onOpenEntrusted: () => const EntrustedRoute().go(context),
+              ),
+            ),
+            routes: [
+              GoRoute(path: MyConsentsRoute.path, builder: (context, state) => const AlbumConsentsPage()),
+              GoRoute(path: EntrustedRoute.path, builder: (context, state) => const AlbumEntrustedPage()),
+              GoRoute(
+                path: InvitationRoute.path,
+                builder: (context, state) => AlbumInvitationPage(
+                  invitationId: state.pathParameters['id']!,
+                  onAccepted: (albumId) => AlbumRoute(albumId).go(context),
+                  onDone: () => const AlbumsRoute().go(context),
+                ),
+              ),
+              GoRoute(
+                path: AlbumRoute.path,
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return AlbumPage(
+                    albumId: id,
+                    onOpenMemory: (memoryId) => MemoryRoute(memoryId).go(context),
+                    onManage: () => AlbumManageRoute(id).go(context),
+                    onConsents: () => AlbumConsentsRoute(id).go(context),
+                    onLeft: () => const AlbumsRoute().go(context),
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: AlbumManageRoute.path,
+                    builder: (context, state) => AlbumManagePage(albumId: state.pathParameters['id']!),
+                  ),
+                  GoRoute(
+                    path: AlbumConsentsRoute.path,
+                    builder: (context, state) => AlbumConsentsPage(albumId: state.pathParameters['id']),
+                  ),
+                ],
+              ),
+            ],
+          ),
           _tab(SharedWithMeRoute.path, const SharedWithMePage()),
           _tab(AccountRoute.path, const AccountPage()),
         ],

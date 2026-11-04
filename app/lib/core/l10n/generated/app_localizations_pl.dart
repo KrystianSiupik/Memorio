@@ -214,6 +214,215 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get albumMine => 'Moje albumy';
+
+  @override
+  String get albumShared => 'Udostępnione mi';
+
+  @override
+  String get albumInvitations => 'Zaproszenia';
+
+  @override
+  String get albumNewName => 'Nazwa nowego albumu';
+
+  @override
+  String get albumCreate => 'Utwórz album';
+
+  @override
+  String get albumsEmpty => 'Nie masz jeszcze albumów';
+
+  @override
+  String get albumSharedEmpty => 'Nikt nie udostępnił Ci albumu';
+
+  @override
+  String albumMembersCount(Object members, Object memories) {
+    return 'Osoby: $members, wspomnienia: $memories';
+  }
+
+  @override
+  String get albumNameRequired => 'Podaj nazwę albumu.';
+
+  @override
+  String get albumNoAccess => 'Nie masz już dostępu do tego albumu.';
+
+  @override
+  String get albumNoFreeSeats => 'W planie tego albumu nie ma wolnego miejsca.';
+
+  @override
+  String get albumAddressBlocked => 'Ten adres nie przyjmuje zaproszeń.';
+
+  @override
+  String get albumInvitationGone => 'Zaproszenie wygasło albo zostało wycofane.';
+
+  @override
+  String get albumPoolFull => 'Pula albumu jest pełna. Właściciel dostał powiadomienie.';
+
+  @override
+  String get albumOwnerCannotLeave => 'Właściciel nie może opuścić albumu.';
+
+  @override
+  String get albumMemories => 'Wspomnienia';
+
+  @override
+  String get albumEmpty => 'Album jest pusty';
+
+  @override
+  String get albumMembers => 'Skład';
+
+  @override
+  String get albumOwnerRole => 'właściciel';
+
+  @override
+  String get albumParticipantRole => 'uczestnik';
+
+  @override
+  String albumMyContributions(Object memories, Object photos) {
+    return 'Moje wkłady: wspomnienia $memories, zdjęcia $photos';
+  }
+
+  @override
+  String albumPoolLeft(Object left, Object total) {
+    return 'Zostało w puli: $left z $total';
+  }
+
+  @override
+  String get albumNoOwnerState => 'Ten album ma właściciela.';
+
+  @override
+  String get albumAddMemory => 'Dodaj moje wspomnienie';
+
+  @override
+  String get albumNoMemoriesToAdd => 'Nie masz jeszcze wspomnień do dodania.';
+
+  @override
+  String get albumAddPhotos => 'Dodaj zdjęcia';
+
+  @override
+  String get albumTag => 'Oznacz uczestnika';
+
+  @override
+  String get albumRemoveMyTag => 'Usuń moje oznaczenie';
+
+  @override
+  String get albumLeave => 'Opuść album';
+
+  @override
+  String get albumLeaveKeep => 'Zostaw moje wkłady w albumie';
+
+  @override
+  String get albumLeaveTake => 'Zabierz moje wkłady';
+
+  @override
+  String get albumLeaveConfirm => 'Potwierdzam wyjście z albumu';
+
+  @override
+  String get albumManage => 'Zarządzanie albumem';
+
+  @override
+  String get albumConsents => 'Moje zgody i powierzenia';
+
+  @override
+  String albumSeats(Object free, Object invited, Object taken) {
+    return 'Miejsca: zajęte $taken, zaproszone $invited, wolne $free';
+  }
+
+  @override
+  String get albumInviteEmail => 'E-mail zapraszanego';
+
+  @override
+  String get albumInvite => 'Zaproś';
+
+  @override
+  String get albumInviteInvalid => 'To nie wygląda na adres e-mail.';
+
+  @override
+  String get albumInvited => 'Zaproszeni';
+
+  @override
+  String get albumWithdrawInvitation => 'Wycofaj';
+
+  @override
+  String get albumRemoveParticipant => 'Usuń uczestnika';
+
+  @override
+  String get albumSuccessor => 'Następca';
+
+  @override
+  String get albumNoSuccessor => 'Nie wskazano następcy';
+
+  @override
+  String get albumNameSuccessor => 'Wskaż następcę';
+
+  @override
+  String get albumCurator => 'Kurator';
+
+  @override
+  String get albumNoCurator => 'Nie powierzono treści kuratorowi';
+
+  @override
+  String get albumEntrust => 'Powierz kuratorowi';
+
+  @override
+  String get albumRevokeEntrustment => 'Odwołaj powierzenie';
+
+  @override
+  String get albumKept => 'Moje wkłady pozostawione po wyjściu';
+
+  @override
+  String get albumKeptEmpty => 'Nie masz wkładów pozostawionych po wyjściu';
+
+  @override
+  String albumKeptItem(Object album, Object memories) {
+    return '$album: wspomnienia $memories';
+  }
+
+  @override
+  String get albumKeptNotChosen => 'Usunięto Cię z albumu. Wybierz, czy treści mają zostać.';
+
+  @override
+  String get albumKeptConfirm => 'Wiem, że treści znikną z albumu';
+
+  @override
+  String get albumRevokeKept => 'Odwołaj zgodę „zostaw”';
+
+  @override
+  String get albumEntrusted => 'Powierzone treści';
+
+  @override
+  String get albumEntrustedEmpty => 'Nikt nie powierzył Ci treści';
+
+  @override
+  String get albumArrange => 'Uporządkuj';
+
+  @override
+  String get albumMoveUp => 'Wyżej';
+
+  @override
+  String get albumMoveDown => 'Niżej';
+
+  @override
+  String get albumInvitationTitle => 'Zaproszenie do albumu';
+
+  @override
+  String albumInvitedBy(Object person) {
+    return 'Kto zaprasza: $person';
+  }
+
+  @override
+  String albumInvitationAlbum(Object name) {
+    return 'Album: $name';
+  }
+
+  @override
+  String get albumAccept => 'Przyjmij';
+
+  @override
+  String get albumDecline => 'Odrzuć';
+
+  @override
+  String get albumBlockInvitations => 'Nie chcę zaproszeń z GEO';
+
+  @override
   String get mapEmptyFiltered => 'Brak wspomnień w tych datach';
 
   @override

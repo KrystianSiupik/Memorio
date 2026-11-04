@@ -8,6 +8,7 @@ using Memorio.Modules.Archive.Application.Commands.ApproveDescription;
 using Memorio.Modules.Archive.Application.Commands.CreateMemory;
 using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
 using Memorio.Modules.Archive.Application.Queries.MemoryMap;
+using Memorio.Modules.Archive.Application.Queries.MyMemories;
 using Memorio.Modules.Archive.Application.Queries.Trash;
 using Memorio.Modules.Archive.Domain.Memories;
 using Microsoft.AspNetCore.Builder;
@@ -30,6 +31,9 @@ internal static class MemoriesEndpoints
         memories.MapGet("/map", GetMapAsync)
             .WithName("GetMemoryMap")
             .WithSummary("One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap.");
+        memories.MapGet("/mine", GetMineAsync)
+            .WithName("ListMyMemories")
+            .WithSummary("The person's own active memories, newest first.");
         memories.MapPost("/{id:guid}/restore", RestoreAsync)
             .WithName("RestoreMemory")
             .WithSummary("Takes the person's content back from the trash while its 30 days last.");
@@ -160,6 +164,15 @@ internal static class MemoriesEndpoints
             [.. trashed.Select(item => new TrashedMemoryResponse(item.Id, item.PlaceName, item.DateFrom, item.Description, item.Photos, item.TrashedAt, item.DaysLeft))]);
     }
 
+    private static async Task<Ok<IReadOnlyList<MyMemoryResponse>>> GetMineAsync(
+        ClaimsPrincipal principal,
+        IMyMemoriesQuery query,
+        CancellationToken cancellationToken)
+    {
+        var mine = await query.GetAsync(CurrentAccount.IdOf(principal), cancellationToken);
+        return TypedResults.Ok<IReadOnlyList<MyMemoryResponse>>([.. mine.Select(item => new MyMemoryResponse(item.Id, item.PlaceName, item.DateFrom))]);
+    }
+
     private static async Task<Results<NoContent, ProblemHttpResult>> RestoreAsync(
         Guid id,
         ClaimsPrincipal principal,
@@ -232,6 +245,8 @@ internal sealed record RequestDataDeletionRequest(bool Confirmed);
 
 /// <param name="DaysLeft">Whole days, rounded up.</param>
 internal sealed record TrashedMemoryResponse(Guid Id, string PlaceName, string DateFrom, string? Description, int Photos, DateTimeOffset TrashedAt, int DaysLeft);
+
+internal sealed record MyMemoryResponse(Guid Id, string PlaceName, string DateFrom);
 
 internal sealed record MemoryPointResponse(Guid Id, double Latitude, double Longitude);
 

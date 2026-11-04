@@ -222,6 +222,30 @@
         }
       }
     },
+    "/v1/memories/mine": {
+      "get": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "The person\u0027s own active memories, newest first.",
+        "operationId": "ListMyMemories",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyMemoryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/memories/{id}/restore": {
       "post": {
         "tags": [
@@ -2396,6 +2420,26 @@
               "string"
             ],
             "format": "double"
+          }
+        }
+      },
+      "MyMemoryResponse": {
+        "required": [
+          "id",
+          "placeName",
+          "dateFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "placeName": {
+            "type": "string"
+          },
+          "dateFrom": {
+            "type": "string"
           }
         }
       },

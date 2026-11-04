@@ -868,3 +868,20 @@ Dotyczy MEM-E3-ALBUM-01 do -26, -SUKCESJA-01, -POWIADOMIENIA-01 do -10, -ARCHIWU
 **Prawdziwe uruchomienie API i workera** na lokalnej bazie, zwykłym HTTP: album, zaproszenie, miejsca, przyjęcie, wspomnienie w albumie widoczne dla drugiej osoby (szczegóły, zdjęcie i mapa), oznaczenie, następca, blokada adresu, wyjście z utratą dostępu przy następnym odczycie, kasowanie wspomnienia usuwające je z albumu. Wszystko przeszło, brak martwych wiadomości, a worker zaplanował `Album.InvitationReminder`. Nie sprawdzono: pełnej puli, odpalenia terminu po 7 dniach na prawdziwym harmonogramie, usuwania konta w tym scenariuszu.
 
 **Spostrzeżenie o zawieszaniu testów:** pierwsze uruchomienie po buildzie zawiesiło się też w `Album.Tests`, czyli nie jest to tylko `Api.Tests`, ale nie dzieje się za każdym razem. Pojawiło się przy pamięci poniżej 1 GB; związek nie jest dowiedziony.
+
+## Ekrany E3: S09 do S14 (MEM-E3-PLAT-01 do -06, 2026-11-04)
+
+Sześć ekranów w jednej gałęzi, bo mają wspólną warstwę danych. To znowu odstępstwo od zasady jednej gałęzi na ticket.
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-255 | **Akcji zależnych od innych epików nie ma na ekranach:** S10 „Zablokuj użytkownika” (E4, C64), S11 „Udostępnij linkiem”, „Unieważnij link”, „Odbierz dostęp” i oglądający przez link (E4), S12 zgoda na AI (E6). Pole „Album bez właściciela” na S10 ma na razie stały tekst „Ten album ma właściciela” (E9) | backend tych akcji nie istnieje, a wyłączony przycisk bez działania niczego by nie dał. Kryteria S10, S11 i S12 są przez to spełnione **częściowo** |
+| D-256 | Doszedł `GET /v1/memories/mine`, spoza ticketów: „Dodaj moje wspomnienie” potrzebuje listy z nazwami, a mapa zwraca tylko identyfikatory i współrzędne | bez tego wybór wspomnienia na S10 nie jest możliwy |
+| D-257 | S12 otwarty z listy pokazuje wkłady pozostawione po wyjściu, bo z albumu, w którym już się nie jest, nie da się na niego wejść. Otwarty z albumu pokazuje też kuratora. Odwołanie „zostaw” wymaga zaznaczenia potwierdzenia na ekranie, jak w D-214 | wkłady po wyjściu nie mają innego wejścia |
+| D-258 | „Nie chcę zaproszeń z GEO” na S14 blokuje adres **i** odrzuca to zaproszenie | inaczej miejsce czekałoby na odpowiedź, której nie będzie |
+| D-259 | Dane offline to ostatnia odpowiedź w pamięci, jak D-214 i D-238: po restarcie bez sieci ekran pokazuje błąd z „Ponów”. Akcje albumów nie idą przez kolejkę offline, są wyłączone | kryteria S09 do S14 wymagają tylko odczytu bez sieci |
+| D-260 | Stuknięcie wspomnienia na S10 otwiera S05 w zakładce mapy, więc powrót prowadzi na mapę, nie do albumu | S05 jest zagnieżdżony pod mapą (E2). **Niewygodne, do poprawy przy przeglądzie nawigacji** |
+
+**Stan testów:** aplikacja z testami S09 do S14 i mapowaniem odpowiedzi API; wynik końcowy w podsumowaniu E3. Test przeszedł też przez błąd, którego analizator nie widzi: klucze ekranów zawierały znak z generatora.
+
+**Nie sprawdzono:** ekranów połączonych z prawdziwym API, urządzeń, wybierania zdjęć z galerii.

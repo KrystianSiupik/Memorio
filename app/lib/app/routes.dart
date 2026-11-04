@@ -81,6 +81,73 @@ final class AlbumsRoute extends TabRoute {
 }
 
 /// S16: shared with me.
+final class AlbumRoute extends AppRoute {
+  const AlbumRoute(this.id);
+
+  static const path = 'album/:id';
+
+  final String id;
+
+  @override
+  String get location => '${AlbumsRoute.path}/album/$id';
+}
+
+/// S11: only its owner gets a way in.
+final class AlbumManageRoute extends AppRoute {
+  const AlbumManageRoute(this.id);
+
+  static const path = 'manage';
+
+  final String id;
+
+  @override
+  String get location => '${const AlbumRoute('').location}$id/$path';
+}
+
+/// S12 from inside an album: its curator too.
+final class AlbumConsentsRoute extends AppRoute {
+  const AlbumConsentsRoute(this.id);
+
+  static const path = 'consents';
+
+  final String id;
+
+  @override
+  String get location => '${const AlbumRoute('').location}$id/$path';
+}
+
+/// S12 from the list: what stayed in albums the person left.
+final class MyConsentsRoute extends AppRoute {
+  const MyConsentsRoute();
+
+  static const path = 'my-consents';
+
+  @override
+  String get location => '${AlbumsRoute.path}/$path';
+}
+
+/// S13.
+final class EntrustedRoute extends AppRoute {
+  const EntrustedRoute();
+
+  static const path = 'entrusted';
+
+  @override
+  String get location => '${AlbumsRoute.path}/$path';
+}
+
+/// S14.
+final class InvitationRoute extends AppRoute {
+  const InvitationRoute(this.id);
+
+  static const path = 'invitation/:id';
+
+  final String id;
+
+  @override
+  String get location => '${AlbumsRoute.path}/invitation/$id';
+}
+
 final class SharedWithMeRoute extends TabRoute {
   const SharedWithMeRoute();
 

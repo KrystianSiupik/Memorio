@@ -11,6 +11,7 @@ import '../models/create_memory_request.dart';
 import '../models/created_memory_response.dart';
 import '../models/memory_details_response.dart';
 import '../models/memory_point_response.dart';
+import '../models/my_memory_response.dart';
 import '../models/request_data_deletion_request.dart';
 import '../models/start_upload_request.dart';
 import '../models/trashed_memory_response.dart';
@@ -29,6 +30,10 @@ abstract class MemoriesClient {
   /// One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap.
   @GET('/v1/memories/map')
   Future<List<MemoryPointResponse>> getMemoryMap({@Query('from') String? from, @Query('to') String? to});
+
+  /// The person's own active memories, newest first.
+  @GET('/v1/memories/mine')
+  Future<List<MyMemoryResponse>> listMyMemories();
 
   /// Takes the person's content back from the trash while its 30 days last.
   @POST('/v1/memories/{id}/restore')

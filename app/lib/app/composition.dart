@@ -5,6 +5,7 @@ import '../core/api/api.dart';
 import '../core/auth/token_store.dart';
 import '../core/offline/offline.dart';
 import '../features/account/account.dart';
+import '../features/albums/albums.dart';
 import '../features/map/map.dart';
 import '../features/memories/memories.dart';
 
@@ -23,6 +24,16 @@ List<Override> appOverrides({required String appVersion}) => [
     return HttpMemoriesRepository(memories: api.memories, ai: api.ai, uploads: Dio());
   }),
   placesRepositoryProvider.overrideWith((ref) => HttpPlacesRepository(places: ref.watch(apiClientProvider).places)),
+  albumsRepositoryProvider.overrideWith((ref) {
+    final api = ref.watch(apiClientProvider);
+    return HttpAlbumsRepository(
+      albums: api.albums,
+      access: api.access,
+      notifications: api.notifications,
+      memories: api.memories,
+      uploads: Dio(),
+    );
+  }),
   photoPickerProvider.overrideWithValue(const ImagePhotoPicker()),
   operationSendersProvider.overrideWith(
     (ref) => memorySenders(ref.watch(memoriesRepositoryProvider), ref.watch(placesRepositoryProvider)),
