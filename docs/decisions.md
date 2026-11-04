@@ -895,3 +895,11 @@ Wszystkie 49 ticketów E3 ma wynik w `version/0.1` lokalnie, na polecenie PO: �
 **Zawieszanie testów:** pierwsze uruchomienie po buildzie stanęło też w `Account.Tests` (po 400 s), w tym samym miejscu co w `Album.Tests`: zaraz po skrypcie startowym bazy. Drugie uruchomienie bez przebudowy przeszło w 72 s. Wygląda to na zjawisko lokalne, ale nie ma potwierdzonej przyczyny.
 
 **Do decyzji PO przed startem:** D-245 (osoby w darmowym albumie), D-246 (pula albumu), D-248 (zdjęcia w cudzych wspomnieniach, podwójne liczenie miejsca), D-249 (treści osoby usuniętej bez aktywnej zgody), D-251 (dostawca e-mail), D-253 (adres e-mail widoczny dla osób w albumie).
+
+## Decyzje PO po E3 (2026-11-04)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-261 | Album bez płatnego planu ma **5 osób**, razem z właścicielem i zaproszonymi. Zastępuje założenie 10 osób z D-245. Dopóki E7 nie odróżnia planów, limit dotyczy każdego albumu; plan albumu ma 10 (D-080). Album, który ma już więcej osób, zostaje, ale nie przyjmie nowych zaproszeń | decyzja PO |
+| D-262 | Treści osoby usuniętej z albumu **na razie zostają**, jak w D-249. Pytanie jest w `docs/pytania-do-prawnika.md` | decyzja PO, do opinii prawnika |
+| D-263 | Osoby w albumie widzą swoje adresy e-mail, jak w D-253 | decyzja PO. Pytanie o sposób poinformowania o tym jest w `docs/pytania-do-prawnika.md` |
