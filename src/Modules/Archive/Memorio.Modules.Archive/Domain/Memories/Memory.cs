@@ -5,7 +5,7 @@ namespace Memorio.Modules.Archive.Domain.Memories;
 
 /// <summary>
 /// What a person recorded: where, when and what. The place is a snapshot taken when choosing it, so the
-/// map needs no other module. One author for now; contributions of others come with albums (E3, HS-019).
+/// map needs no other module. One author: an album only points at it, and only the author adds to it (D-248).
 /// </summary>
 internal sealed class Memory : AggregateRoot<MemoryId>
 {
@@ -113,9 +113,9 @@ internal sealed class Memory : AggregateRoot<MemoryId>
 
     public bool HasPhoto(Guid photoId) => _photos.Exists(photo => photo.Id == photoId);
 
-    public void AddPhoto(Guid photoId, string storageKey, long sizeBytes, DateTimeOffset now)
+    public void AddPhoto(Guid photoId, string storageKey, long sizeBytes, DateTimeOffset now, Guid? albumId = null)
     {
-        _photos.Add(Photo.Create(photoId, storageKey, sizeBytes));
+        _photos.Add(Photo.Create(photoId, storageKey, sizeBytes, albumId));
         Raise(new PhotoAdded(Guid.CreateVersion7(), now, Id, photoId));
     }
 

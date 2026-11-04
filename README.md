@@ -40,6 +40,7 @@ or missing variable stops the host and the log names the variable, never its val
 | `Archive__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_archive` (memories, photos) |
 | `Album__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_album` (albums, participants) |
 | `Limits__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_limits` (pools and their operations) |
+| `Notifications__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_notifications` (messages sent, blocked addresses) |
 | `Places__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_places` (own places, OpenStreetMap places) |
 | `AiNarration__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_ai_narration` (AI drafts) |
 | `Database__MigrateOnStartup` | API, worker | optional, default `true`: apply the modules' migrations at start |

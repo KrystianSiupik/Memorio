@@ -97,6 +97,8 @@ public sealed class ArchiveDatabase : PostgresDatabase
         builder.Services.AddSingleton<IPlaceReader>(Neighbours);
         builder.Services.AddSingleton<ITermsReader>(Neighbours);
         builder.Services.AddSingleton<ISpacePool>(Neighbours);
+        builder.Services.AddSingleton<IAlbumPool>(Neighbours);
+        builder.Services.AddSingleton<Memorio.Modules.Access.Contracts.IAccessReader>(Neighbours);
         builder.Services.AddSingleton<IAiDraftReader>(Neighbours);
         builder.Services.AddSingleton<IDeadlines>(Deadlines);
         _host = builder.Build();

@@ -57,9 +57,19 @@ internal sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> option
                 photo.Property(item => item.Id).HasColumnName("id").ValueGeneratedNever();
                 photo.Property(item => item.StorageKey).HasColumnName("storage_key").HasMaxLength(512);
                 photo.Property(item => item.SizeBytes).HasColumnName("size_bytes").HasDefaultValue(0L);
+                photo.Property(item => item.AlbumId).HasColumnName("album_id");
                 photo.HasIndex("memory_id").HasDatabaseName("ix_photos_memory_id");
             });
             memory.Navigation(item => item.Photos).UsePropertyAccessMode(PropertyAccessMode.Field);
+        });
+
+        builder.Entity<MemoryAlbum>(link =>
+        {
+            link.ToTable("memory_albums");
+            link.HasKey(item => new { item.MemoryId, item.AlbumId });
+            link.Property(item => item.MemoryId).HasColumnName("memory_id");
+            link.Property(item => item.AlbumId).HasColumnName("album_id");
+            link.HasIndex(item => item.AlbumId).HasDatabaseName("ix_memory_albums_album_id");
         });
     }
 }

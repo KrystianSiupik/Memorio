@@ -206,6 +206,7 @@ public sealed class AccountHost : PostgresDatabase
         configuration["Archive:ConnectionString"] = ConnectionStringFor("memorio_archive");
         configuration["Album:ConnectionString"] = ConnectionStringFor("memorio_album");
         configuration["Limits:ConnectionString"] = ConnectionStringFor("memorio_limits");
+        configuration["Notifications:ConnectionString"] = ConnectionStringFor("memorio_notifications");
     }
 
     protected override async Task OnDisposingAsync()

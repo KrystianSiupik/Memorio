@@ -26,6 +26,30 @@
         }
       }
     },
+    "/v1/shared-with-me": {
+      "get": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "Albums the person may read without being in them. Empty until links exist (E4).",
+        "operationId": "GetSharedWithMe",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SharedAlbumResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/ai/drafts": {
       "post": {
         "tags": [
@@ -74,6 +98,55 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/successor": {
+      "put": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The owner names someone in the album as its successor.",
+        "operationId": "NameSuccessor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NameSuccessorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/invitation-block": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "The person\u0027s own address takes no more invitations.",
+        "operationId": "BlockInvitations",
+        "responses": {
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -382,6 +455,657 @@
           },
           "required": true
         },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Creates an album; the id comes from the client, so a retry changes nothing.",
+        "operationId": "CreateAlbum",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAlbumRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The albums the person owns or takes part in.",
+        "operationId": "ListAlbums",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AlbumListItemResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/kept-contributions": {
+      "get": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "What stayed in albums the person is no longer in.",
+        "operationId": "ListKeptContributions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KeptContributionResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/entrusted": {
+      "get": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Memories entrusted to the person as a curator.",
+        "operationId": "ListEntrusted",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntrustedMemoryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}": {
+      "get": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The album with its memories, members, the person\u0027s own contributions and the pool.",
+        "operationId": "GetAlbum",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlbumResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/seats": {
+      "get": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "For the owner: seats taken, invited and free.",
+        "operationId": "GetAlbumSeats",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlbumSeatsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/invitations": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Invites an address; the same address again refreshes its invitation and takes no second seat.",
+        "operationId": "InviteToAlbum",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/invitations/{invitationId}": {
+      "delete": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The owner takes an invitation back; the seat is free at once.",
+        "operationId": "WithdrawInvitation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "invitationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/participants/{accountId}": {
+      "delete": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The owner removes a person; what they brought stays until they choose.",
+        "operationId": "RemoveParticipant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/leave": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Leaves the album, keeping what the person brought in it or taking it along.",
+        "operationId": "LeaveAlbum",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeaveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/memories": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The author brings their memory; the album\u0027s pool pays for it.",
+        "operationId": "AddMemoryToAlbum",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddMemoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/memories/{memoryId}/photos": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The author adds an uploaded photo to their memory in the album; the album\u0027s pool pays for it.",
+        "operationId": "AddPhotoInAlbum",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "memoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddAlbumPhotoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/memories/{memoryId}/tags/{accountId}": {
+      "put": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Tags someone in this album in the memory.",
+        "operationId": "TagParticipant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "memoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/memories/{memoryId}/tags/me": {
+      "delete": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Removes the person\u0027s own tag.",
+        "operationId": "RemoveOwnTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "memoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/contributions/withdrawal": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Takes back what stayed in the album after the person left or was removed.",
+        "operationId": "RevokeKeptContributions",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/curator": {
+      "put": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Lets someone in the album put the person\u0027s contributions in order.",
+        "operationId": "EntrustToCurator",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntrustRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Ends the entrustment; asking again changes nothing.",
+        "operationId": "RevokeEntrustment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/arrangement": {
+      "put": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The curator orders the memories entrusted to them.",
+        "operationId": "ArrangeEntrusted",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArrangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/invitations": {
+      "get": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Invitations waiting for the person\u0027s address: who invites and to what, no content.",
+        "operationId": "ListInvitations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InvitationResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/invitations/{id}/acceptance": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Joins the album.",
+        "operationId": "AcceptInvitation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnsweredInvitationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/invitations/{id}/refusal": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Refuses; the seat is free at once.",
+        "operationId": "DeclineInvitation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "responses": {
           "204": {
             "description": "No Content"
@@ -881,6 +1605,37 @@
           }
         }
       },
+      "AddAlbumPhotoRequest": {
+        "required": [
+          "photoId",
+          "uploadKey"
+        ],
+        "type": "object",
+        "properties": {
+          "photoId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uploadKey": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "AddMemoryRequest": {
+        "required": [
+          "memoryId"
+        ],
+        "type": "object",
+        "properties": {
+          "memoryId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "AddOwnPlaceRequest": {
         "required": [
           "id",
@@ -957,6 +1712,275 @@
           }
         }
       },
+      "AlbumInvitedResponse": {
+        "required": [
+          "id",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "AlbumListItemResponse": {
+        "required": [
+          "id",
+          "name",
+          "isOwner",
+          "members",
+          "memories"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isOwner": {
+            "type": "boolean"
+          },
+          "members": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "memories": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "AlbumMemberResponse": {
+        "required": [
+          "accountId",
+          "email",
+          "isOwner"
+        ],
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isOwner": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AlbumMemoryResponse": {
+        "required": [
+          "id",
+          "authorAccountId",
+          "authorEmail",
+          "isMine",
+          "placeName",
+          "dateFrom",
+          "photos",
+          "taggedAccountIds"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "authorAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "authorEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isMine": {
+            "type": "boolean"
+          },
+          "placeName": {
+            "type": "string"
+          },
+          "dateFrom": {
+            "type": "string"
+          },
+          "photos": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "taggedAccountIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "AlbumResponse": {
+        "required": [
+          "id",
+          "name",
+          "isOwner",
+          "successorAccountId",
+          "members",
+          "memories",
+          "myMemories",
+          "myPhotos",
+          "freeBytes",
+          "limitBytes",
+          "myCuratorAccountId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isOwner": {
+            "type": "boolean"
+          },
+          "successorAccountId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AlbumMemberResponse"
+            }
+          },
+          "memories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AlbumMemoryResponse"
+            }
+          },
+          "myMemories": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "myPhotos": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "freeBytes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "limitBytes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "myCuratorAccountId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
+      "AlbumSeatsResponse": {
+        "required": [
+          "taken",
+          "invited",
+          "free",
+          "invitations"
+        ],
+        "type": "object",
+        "properties": {
+          "taken": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "invited": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "free": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "invitations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AlbumInvitedResponse"
+            }
+          }
+        }
+      },
+      "AnsweredInvitationResponse": {
+        "required": [
+          "albumId"
+        ],
+        "type": "object",
+        "properties": {
+          "albumId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "ApproveDescriptionRequest": {
         "required": [
           "text",
@@ -990,6 +2014,24 @@
           }
         }
       },
+      "ArrangeRequest": {
+        "required": [
+          "memoryIds"
+        ],
+        "type": "object",
+        "properties": {
+          "memoryIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
       "ChoosePlaceRequest": {
         "required": [
           "placeReference"
@@ -997,6 +2039,25 @@
         "type": "object",
         "properties": {
           "placeReference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CreateAlbumRequest": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
             "type": [
               "null",
               "string"
@@ -1056,6 +2117,47 @@
           }
         }
       },
+      "EntrustedMemoryResponse": {
+        "required": [
+          "albumId",
+          "albumName",
+          "memoryId",
+          "placeName",
+          "dateFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "albumId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "albumName": {
+            "type": "string"
+          },
+          "memoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "placeName": {
+            "type": "string"
+          },
+          "dateFrom": {
+            "type": "string"
+          }
+        }
+      },
+      "EntrustRequest": {
+        "required": [
+          "curatorAccountId"
+        ],
+        "type": "object",
+        "properties": {
+          "curatorAccountId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "ExternalSignInRequest": {
         "required": [
           "idToken",
@@ -1070,6 +2172,93 @@
             ]
           },
           "declaresMinimumAge": {
+            "type": "boolean"
+          }
+        }
+      },
+      "InvitationResponse": {
+        "required": [
+          "id",
+          "albumId",
+          "albumName",
+          "invitedBy"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "albumId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "albumName": {
+            "type": "string"
+          },
+          "invitedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "InviteRequest": {
+        "required": [
+          "id",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "KeptContributionResponse": {
+        "required": [
+          "albumId",
+          "albumName",
+          "chosenByAuthor",
+          "memories"
+        ],
+        "type": "object",
+        "properties": {
+          "albumId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "albumName": {
+            "type": "string"
+          },
+          "chosenByAuthor": {
+            "type": "boolean"
+          },
+          "memories": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "LeaveRequest": {
+        "required": [
+          "keepContributions"
+        ],
+        "type": "object",
+        "properties": {
+          "keepContributions": {
             "type": "boolean"
           }
         }
@@ -1207,6 +2396,18 @@
               "string"
             ],
             "format": "double"
+          }
+        }
+      },
+      "NameSuccessorRequest": {
+        "required": [
+          "accountId"
+        ],
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -1348,6 +2549,22 @@
           }
         }
       },
+      "SharedAlbumResponse": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "StartUploadRequest": {
         "required": [
           "contentType"
@@ -1439,10 +2656,19 @@
       "name": "App"
     },
     {
+      "name": "Access"
+    },
+    {
       "name": "AI"
     },
     {
       "name": "Account"
+    },
+    {
+      "name": "Albums"
+    },
+    {
+      "name": "Notifications"
     },
     {
       "name": "Memories"

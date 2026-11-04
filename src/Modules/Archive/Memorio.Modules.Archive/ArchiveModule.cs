@@ -50,6 +50,7 @@ public sealed class ArchiveModule : IModule
         services.TryAddSingleton(TimeProvider.System);
         services.AddDbContextWithWolverineIntegration<ArchiveDbContext>(database => database.UseArchiveDatabase(connectionString));
         services.AddScoped<IAccountContentReader, AccountContentReader>();
+        services.AddScoped<IAlbumContent, AlbumContent>();
         services.AddScoped<IMemories, Memories>();
         services.AddScoped<DeleteAccountContentHandler>();
         services.AddScoped<CreateMemoryHandler>();
@@ -73,7 +74,7 @@ public sealed class ArchiveModule : IModule
         services.AddScoped<ApproveDescriptionHandler>();
         services.AddScoped<AddPhotoHandler>();
         services.AddScoped<StartUploadHandler>();
-        services.AddScoped<IIntegrationEventPolicy<AccountDeleted>, DeleteContentWhenAccountDeleted>();
+        services.AddScoped<DeleteContentWhenAccountDeleted>();
 
         services.AddHealthChecks().AddCheck<ArchiveDatabaseHealthCheck>(ArchiveDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))

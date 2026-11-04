@@ -14,6 +14,11 @@ internal sealed class Photo
 
     public long SizeBytes { get; private set; }
 
-    public static Photo Create(Guid id, string storageKey, long sizeBytes) =>
-        new() { Id = id, StorageKey = storageKey, SizeBytes = sizeBytes };
+    /// <summary>The album whose pool pays for this photo; null means the author's.</summary>
+    public Guid? AlbumId { get; private set; }
+
+    public static Photo Create(Guid id, string storageKey, long sizeBytes, Guid? albumId = null) =>
+        new() { Id = id, StorageKey = storageKey, SizeBytes = sizeBytes, AlbumId = albumId };
+
+    public void LeaveAlbumPool() => AlbumId = null;
 }

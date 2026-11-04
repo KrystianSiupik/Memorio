@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using Memorio.Modules.Access.Api;
+
 namespace Memorio.Modules.Access;
 
 /// <summary>Module Access. Key question: May this person see this content now?</summary>
@@ -17,7 +19,5 @@ public sealed class AccessModule : IModule
         services.AddScoped<IAccessReader, AccessReader>();
     }
 
-    public void MapEndpoints(IEndpointRouteBuilder endpoints)
-    {
-    }
+    public void MapEndpoints(IEndpointRouteBuilder endpoints) => endpoints.MapSharedWithMeEndpoints();
 }

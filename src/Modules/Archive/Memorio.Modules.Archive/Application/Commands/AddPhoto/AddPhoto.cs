@@ -6,13 +6,14 @@ using Memorio.SharedKernel.Storage;
 namespace Memorio.Modules.Archive.Application.Commands.AddPhoto;
 
 /// <summary>C13: an uploaded file becomes a photo of a memory. The photo id comes from the client: sending it again changes nothing.</summary>
-internal sealed record AddPhoto(MemoryId MemoryId, Guid AccountId, Guid PhotoId, string? UploadKey);
+/// <param name="AlbumId">The album whose pool pays for the photo; otherwise the author's.</param>
+internal sealed record AddPhoto(MemoryId MemoryId, Guid AccountId, Guid PhotoId, string? UploadKey, Guid? AlbumId = null);
 
 /// <summary>
 /// The space is reserved when the photo is stored, with the photo id as its key (D-015). When the pool is
 /// full or storing fails, the file goes and the space comes back, so nothing stays half done.
 /// </summary>
-internal sealed class AddPhotoHandler(IMemories memories, IObjectStorage storage, ISpacePool pool, TimeProvider clock)
+internal sealed class AddPhotoHandler(IMemories memories, IObjectStorage storage, ISpacePool pool, IAlbumPool albumPool, TimeProvider clock)
 {
     public async Task<Result> HandleAsync(AddPhoto command, CancellationToken cancellationToken)
     {
@@ -44,13 +45,16 @@ internal sealed class AddPhotoHandler(IMemories memories, IObjectStorage storage
             return MemoryErrors.UploadMissing;
         }
 
-        if (!await pool.TryReserveAsync(command.AccountId, command.PhotoId, stored.Size, cancellationToken))
+        var fits = command.AlbumId is { } albumId
+            ? await albumPool.TryReserveAsync(albumId, command.PhotoId, stored.Size, cancellationToken)
+            : await pool.TryReserveAsync(command.AccountId, command.PhotoId, stored.Size, cancellationToken);
+        if (!fits)
         {
             await storage.DeleteAsync(destination, cancellationToken);
             return MemoryErrors.SpaceLimitExceeded;
         }
 
-        memory.AddPhoto(command.PhotoId, destination.Value, stored.Size, clock.GetUtcNow());
+        memory.AddPhoto(command.PhotoId, destination.Value, stored.Size, clock.GetUtcNow(), command.AlbumId);
         if (await memories.SaveAsync(cancellationToken))
         {
             return Result.Success();
