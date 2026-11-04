@@ -1,6 +1,7 @@
 using Memorio.Modularity;
 using Memorio.Modules.Plans.Application.Commands.RecordEntitlement;
 using Memorio.Modules.Plans.Application.Entitlements;
+using Memorio.Modules.Plans.Contracts;
 using Memorio.Modules.Plans.Domain.Entitlements;
 using Memorio.Modules.Plans.Infrastructure;
 using Memorio.Modules.Plans.Infrastructure.Persistence;
@@ -35,6 +36,7 @@ public sealed class PlansModule : IModule
         services.AddScoped<IEntitlementLedger, EntitlementLedger>();
         services.AddScoped<RecordEntitlementHandler>();
         services.AddScoped<PlanEntitlements>();
+        services.AddScoped<IAlbumSeatLimit, AlbumSeatLimit>();
 
         services.AddHealthChecks().AddCheck<PlansDatabaseHealthCheck>(PlansDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))

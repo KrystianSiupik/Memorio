@@ -838,3 +838,12 @@ Wszystkie tickety E2 poza MEM-E2-ARCHIWUM-13 (czeka na E10, D-232) są w `versio
 - `Api.Tests` zawiesza się w pierwszym przebiegu po buildzie (przyczyna nieznana), co może dotyczyć CI.
 
 **Do decyzji PO:** domyślny limit AI to 0 (D-217 do D-232), więc „Poproś AI o szkic” odpowiada każdemu „limit wyczerpany” (potwierdzone w uruchomieniu: 409 `AiNarration.LimitReached`), dopóki plany nie dadzą limitu. Pozostałe: D-235, D-241 i lista w sekcji S03.
+
+## E3: założenia przed startem (2026-11-04)
+
+E3 zależy od rzeczy, których jeszcze nie ma: planu albumu (E7), reguł dostępu (E4) i nierozstrzygniętych pytań. PO: „rób E3”. Niżej odwracalne założenia, do sprawdzenia przez PO.
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-245 | Każdy album ma limit **10 osób** (`IAlbumSeatLimit`), liczba z planu albumu w D-080, do czasu cyklu planów z E7 | D-080 nie podaje limitu dla albumu bez planu, a bez płatności każdy album jest darmowy. **Do decyzji PO:** ile osób w darmowym albumie |
+| D-246 | Pula albumu to ten sam agregat AG2 co pula konta, pod identyfikatorem albumu (`limits.account_pools.account_id`). Domyślnie 2 GB, tak jak konto, do czasu `MEM-E7-LIMITY-01`; D-080 przewiduje 150 GB dla planu albumu | te same warunkowe zapisy i księga operacji, bez nowej tabeli. Nazwa kolumny `account_id` jest teraz niedokładna |

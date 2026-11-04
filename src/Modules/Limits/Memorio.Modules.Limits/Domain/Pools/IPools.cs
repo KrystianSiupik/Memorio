@@ -11,6 +11,9 @@ internal interface IPools
     /// <summary>False when this month's allowance is used up. The same key again changes nothing and answers true.</summary>
     Task<bool> ConsumeAiAsync(Guid accountId, Guid operationKey, DateTimeOffset at, CancellationToken cancellationToken);
 
+    /// <summary>A pool not used yet has nothing used and the default limit.</summary>
+    Task<(long UsedBytes, long LimitBytes)> GetUsageAsync(Guid poolId, CancellationToken cancellationToken);
+
     /// <summary>Only a newer limit overwrites (D-016). A lower limit may leave the pool over it: nothing new fits then.</summary>
     Task<bool> SetLimitAsync(Guid accountId, long limitBytes, int aiLimit, long sequence, CancellationToken cancellationToken);
 }
