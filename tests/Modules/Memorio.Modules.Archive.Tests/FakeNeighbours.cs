@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Memorio.Modules.Access.Contracts;
 using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.AiNarration.Contracts;
 using Memorio.Modules.Limits.Contracts;
@@ -7,7 +8,7 @@ using Memorio.Modules.Places.Contracts;
 namespace Memorio.Modules.Archive.Tests;
 
 /// <summary>The other modules Archive asks: every place exists but "missing", everybody accepted the terms unless told otherwise.</summary>
-public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool, IAiDraftReader
+public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool, IAlbumPool, IAiDraftReader, IAccessReader
 {
     private readonly ConcurrentDictionary<(Guid Draft, Guid Account), AiDraftInfo> _drafts = new();
 
@@ -17,6 +18,21 @@ public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool, IAi
         Task.FromResult(_drafts.GetValueOrDefault((draftId, accountId)));
 
     public const string MissingPlace = "osm:N:404";
+
+    private readonly ConcurrentDictionary<(Guid Person, Guid Album), bool> _visible = new();
+
+    public void Sees(Guid personId, Guid albumId) => _visible[(personId, albumId)] = true;
+
+    public void NoLongerSees(Guid personId, Guid albumId) => _visible.TryRemove((personId, albumId), out _);
+
+    public Task<bool> CanSeeAlbumAsync(Guid personId, Guid albumId, CancellationToken cancellationToken) =>
+        Task.FromResult(_visible.ContainsKey((personId, albumId)));
+
+    public Task<IReadOnlyCollection<Guid>> VisibleAlbumsAsync(Guid personId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyCollection<Guid>>([.. _visible.Keys.Where(key => key.Person == personId).Select(key => key.Album)]);
+
+    public Task<AlbumPoolState> GetStateAsync(Guid albumId, CancellationToken cancellationToken) =>
+        Task.FromResult(new AlbumPoolState(0, long.MaxValue));
 
     private readonly ConcurrentDictionary<Guid, bool> _withoutTerms = new();
     private readonly ConcurrentDictionary<Guid, bool> _fullPools = new();

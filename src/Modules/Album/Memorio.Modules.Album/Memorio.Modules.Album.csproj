@@ -3,6 +3,7 @@
     <PackageReference Include="Dapper" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="WolverineFx.EntityFrameworkCore" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Memorio.Modules.Album.Tests" />
@@ -11,5 +12,11 @@
     <ProjectReference Include="../../../BuildingBlocks/Memorio.SharedKernel/Memorio.SharedKernel.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Memorio.Modularity/Memorio.Modularity.csproj" />
     <ProjectReference Include="../Memorio.Modules.Album.Contracts/Memorio.Modules.Album.Contracts.csproj" />
+    <ProjectReference Include="../../Access/Memorio.Modules.Access.Contracts/Memorio.Modules.Access.Contracts.csproj" />
+    <ProjectReference Include="../../Account/Memorio.Modules.Account.Contracts/Memorio.Modules.Account.Contracts.csproj" />
+    <ProjectReference Include="../../Archive/Memorio.Modules.Archive.Contracts/Memorio.Modules.Archive.Contracts.csproj" />
+    <ProjectReference Include="../../Limits/Memorio.Modules.Limits.Contracts/Memorio.Modules.Limits.Contracts.csproj" />
+    <ProjectReference Include="../../Notifications/Memorio.Modules.Notifications.Contracts/Memorio.Modules.Notifications.Contracts.csproj" />
+    <ProjectReference Include="../../Plans/Memorio.Modules.Plans.Contracts/Memorio.Modules.Plans.Contracts.csproj" />
   </ItemGroup>
 </Project>

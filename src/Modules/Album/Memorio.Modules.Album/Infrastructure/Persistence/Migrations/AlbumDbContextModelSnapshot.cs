@@ -23,15 +23,136 @@ namespace Memorio.Modules.Album.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.AlbumMemory", b =>
+                {
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("album_id");
+
+                    b.Property<Guid>("MemoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("memory_id");
+
+                    b.Property<DateTimeOffset>("AddedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("added_at");
+
+                    b.Property<Guid>("AuthorAccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("author_account_id");
+
+                    b.Property<int?>("Position")
+                        .HasColumnType("integer")
+                        .HasColumnName("position");
+
+                    b.HasKey("AlbumId", "MemoryId");
+
+                    b.HasIndex("AuthorAccountId")
+                        .HasDatabaseName("ix_album_memories_author_account_id");
+
+                    b.HasIndex("MemoryId")
+                        .HasDatabaseName("ix_album_memories_memory_id");
+
+                    b.ToTable("album_memories", "album");
+                });
+
+            modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.AppliedAccountEvent", b =>
+                {
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<long>("Sequence")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sequence");
+
+                    b.HasKey("AccountId");
+
+                    b.ToTable("applied_account_events", "album");
+                });
+
+            modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.Entrustment", b =>
+                {
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("album_id");
+
+                    b.Property<Guid>("AuthorAccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("author_account_id");
+
+                    b.Property<Guid>("CuratorAccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("curator_account_id");
+
+                    b.Property<DateTimeOffset>("EntrustedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("entrusted_at");
+
+                    b.HasKey("AlbumId", "AuthorAccountId");
+
+                    b.HasIndex("CuratorAccountId")
+                        .HasDatabaseName("ix_album_entrustments_curator_account_id");
+
+                    b.ToTable("album_entrustments", "album");
+                });
+
+            modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.KeptContribution", b =>
+                {
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("album_id");
+
+                    b.Property<Guid>("AuthorAccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("author_account_id");
+
+                    b.Property<bool>("ChosenByAuthor")
+                        .HasColumnType("boolean")
+                        .HasColumnName("chosen_by_author");
+
+                    b.Property<DateTimeOffset>("KeptAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("kept_at");
+
+                    b.HasKey("AlbumId", "AuthorAccountId");
+
+                    b.HasIndex("AuthorAccountId")
+                        .HasDatabaseName("ix_album_kept_contributions_author_account_id");
+
+                    b.ToTable("album_kept_contributions", "album");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.SharedAlbum", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValue(new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)))
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasDefaultValue("")
+                        .HasColumnName("name");
+
                     b.Property<Guid>("OwnerAccountId")
                         .HasColumnType("uuid")
                         .HasColumnName("owner_account_id");
+
+                    b.Property<int>("Sequence")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("sequence");
 
                     b.Property<Guid?>("SuccessorAccountId")
                         .HasColumnType("uuid")
@@ -45,17 +166,104 @@ namespace Memorio.Modules.Album.Infrastructure.Persistence.Migrations
                     b.ToTable("albums", "album");
                 });
 
+            modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.AlbumMemory", b =>
+                {
+                    b.OwnsMany("Memorio.Modules.Album.Domain.Albums.MemoryTag", "Tags", b1 =>
+                        {
+                            b1.Property<Guid>("album_id")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("memory_id")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("AccountId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("account_id");
+
+                            b1.Property<DateTimeOffset>("TaggedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("tagged_at");
+
+                            b1.Property<Guid>("TaggedByAccountId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("tagged_by_account_id");
+
+                            b1.HasKey("album_id", "memory_id", "AccountId");
+
+                            b1.ToTable("album_memory_tags", "album");
+
+                            b1.WithOwner()
+                                .HasForeignKey("album_id", "memory_id");
+                        });
+
+                    b.Navigation("Tags");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.SharedAlbum", b =>
                 {
+                    b.OwnsMany("Memorio.Modules.Album.Domain.Albums.AlbumInvitation", "Invitations", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<string>("Email")
+                                .IsRequired()
+                                .HasMaxLength(256)
+                                .HasColumnType("character varying(256)")
+                                .HasColumnName("email");
+
+                            b1.Property<DateTimeOffset>("InvitedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("invited_at");
+
+                            b1.Property<Guid>("InvitedByAccountId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("invited_by_account_id");
+
+                            b1.Property<DateTimeOffset?>("ReminderDueAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("reminder_due_at");
+
+                            b1.Property<string>("State")
+                                .IsRequired()
+                                .HasMaxLength(16)
+                                .HasColumnType("character varying(16)")
+                                .HasColumnName("state");
+
+                            b1.Property<Guid>("album_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("Email")
+                                .HasDatabaseName("ix_album_invitations_email");
+
+                            b1.HasIndex("album_id", "Email")
+                                .IsUnique()
+                                .HasDatabaseName("ux_album_invitations_pending")
+                                .HasFilter("state = 'Pending'");
+
+                            b1.ToTable("album_invitations", "album");
+
+                            b1.WithOwner()
+                                .HasForeignKey("album_id");
+                        });
+
                     b.OwnsMany("Memorio.Modules.Album.Domain.Albums.AlbumParticipant", "Participants", b1 =>
                         {
                             b1.Property<Guid>("album_id")
                                 .HasColumnType("uuid");
 
                             b1.Property<Guid>("AccountId")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid")
                                 .HasColumnName("account_id");
+
+                            b1.Property<DateTimeOffset>("JoinedAt")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("timestamp with time zone")
+                                .HasDefaultValue(new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)))
+                                .HasColumnName("joined_at");
 
                             b1.HasKey("album_id", "AccountId");
 
@@ -67,6 +275,8 @@ namespace Memorio.Modules.Album.Infrastructure.Persistence.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("album_id");
                         });
+
+                    b.Navigation("Invitations");
 
                     b.Navigation("Participants");
                 });

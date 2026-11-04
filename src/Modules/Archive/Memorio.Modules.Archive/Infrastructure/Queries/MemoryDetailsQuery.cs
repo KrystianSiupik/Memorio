@@ -1,4 +1,5 @@
 using Dapper;
+using Memorio.Modules.Access.Contracts;
 using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
 using Memorio.Modules.Archive.Infrastructure.Persistence;
 using Memorio.SharedKernel.Storage;
@@ -7,17 +8,19 @@ using Microsoft.EntityFrameworkCore;
 namespace Memorio.Modules.Archive.Infrastructure.Queries;
 
 /// <summary>
-/// Only the author's own memory for now; albums and their access rules come with E3 and E4 (ADR 0011).
+/// The author's own memory, or one in an album the person may see now (ADR 0011).
 /// Photos as addresses signed for this read, valid for 5 minutes.
 /// </summary>
-internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStorage storage) : IMemoryDetailsQuery
+internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStorage storage, IAccessReader access) : IMemoryDetailsQuery
 {
     private const string MemorySql = """
         SELECT id AS "Id", place_name AS "PlaceName", latitude AS "Latitude", longitude AS "Longitude", date_precision AS "DatePrecision",
                date_from::text AS "DateFrom", date_to::text AS "DateTo", author_account_id AS "AuthorAccountId", description AS "Description",
                description_ai_model IS NOT NULL AS "DescriptionIsAi"
         FROM archive.memories
-        WHERE id = @memoryId AND author_account_id = @accountId AND state = 'Active'
+        WHERE id = @memoryId AND state = 'Active'
+          AND (author_account_id = @accountId
+               OR EXISTS (SELECT 1 FROM archive.memory_albums link WHERE link.memory_id = @memoryId AND link.album_id = ANY(@visibleAlbums)))
         """;
 
     private const string PhotosSql = """
@@ -27,8 +30,9 @@ internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStora
     public async Task<MemoryDetails?> GetAsync(Guid memoryId, Guid accountId, CancellationToken cancellationToken)
     {
         var connection = database.Database.GetDbConnection();
+        var visibleAlbums = (await access.VisibleAlbumsAsync(accountId, cancellationToken)).ToArray();
         var row = await connection.QuerySingleOrDefaultAsync<MemoryRow>(
-            new CommandDefinition(MemorySql, new { memoryId, accountId }, cancellationToken: cancellationToken));
+            new CommandDefinition(MemorySql, new { memoryId, accountId, visibleAlbums }, cancellationToken: cancellationToken));
         if (row is null)
         {
             return null;

@@ -1,5 +1,14 @@
 using Memorio.Modularity;
+using Memorio.Modules.Album.Api;
+using Memorio.Modules.Album.Application.Commands.Contributions;
+using Memorio.Modules.Album.Application.Commands.CreateAlbum;
+using Memorio.Modules.Album.Application.Commands.Invitations;
+using Memorio.Modules.Album.Application.Policies;
+using Memorio.Modules.Album.Application.Queries;
 using Memorio.Modules.Album.Contracts;
+using Memorio.Modules.Album.Domain.Albums;
+using Memorio.Modules.Album.Infrastructure.Scheduling;
+using Memorio.SharedKernel.Scheduling;
 using Memorio.Modules.Album.Infrastructure;
 using Memorio.Modules.Album.Infrastructure.Persistence;
 using Memorio.Modules.Album.Infrastructure.Queries;
@@ -7,6 +16,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Wolverine.EntityFrameworkCore;
 
 namespace Memorio.Modules.Album;
 
@@ -30,8 +40,38 @@ public sealed class AlbumModule : IModule
         }
 
         services.TryAddSingleton(TimeProvider.System);
-        services.AddDbContext<AlbumDbContext>(database => database.UseAlbumDatabase(connectionString));
+        services.AddDbContextWithWolverineIntegration<AlbumDbContext>(database => database.UseAlbumDatabase(connectionString));
         services.AddScoped<IAccountAlbumsReader, AccountAlbumsReader>();
+        services.AddScoped<IAlbums, Albums>();
+        services.AddScoped<IAlbumQueries, AlbumQueries>();
+        services.AddScoped<IAlbumMembership, AlbumMembership>();
+        services.AddScoped<IAlbumNames, AlbumNames>();
+        services.AddScoped<IAlbumMessaging, AlbumMessaging>();
+        services.AddScoped<IAlbumSuccession, AlbumSuccession>();
+        services.AddScoped<CreateAlbumHandler>();
+        services.AddScoped<InviteToAlbumHandler>();
+        services.AddScoped<AnswerInvitationHandler>();
+        services.AddScoped<WithdrawInvitationHandler>();
+        services.AddScoped<ContributionWithdrawal>();
+        services.AddScoped<AddMemoryToAlbumHandler>();
+        services.AddScoped<AddPhotoInAlbumHandler>();
+        services.AddScoped<LeaveAlbumHandler>();
+        services.AddScoped<RemoveParticipantHandler>();
+        services.AddScoped<RevokeKeptContributionsHandler>();
+        services.AddScoped<EntrustToCuratorHandler>();
+        services.AddScoped<RevokeEntrustmentHandler>();
+        services.AddScoped<ArrangeEntrustedHandler>();
+        services.AddScoped<TagParticipantHandler>();
+        services.AddScoped<RemoveOwnTagHandler>();
+        services.AddScoped<RecordInvitationWeekPassed>();
+        services.AddScoped<WithdrawContributionsWhenAccountDeleted>();
+        services.AddScoped<ForgetContentWhenDeleted>();
+
+        // IDeadlines exists in the worker only, the one host running these (D-157): built on demand, so the
+        // API, which never asks for them, still passes the container's validation in development.
+        services.AddScoped(provider =>
+            new InvitationReminderDeadline(provider.GetRequiredService<IAlbums>(), provider.GetRequiredService<IDeadlines>()));
+        services.AddScheduledJob<InvitationReminderJob>(InvitationReminderDeadline.JobName);
 
         services.AddHealthChecks().AddCheck<AlbumDatabaseHealthCheck>(AlbumDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))
@@ -40,7 +80,5 @@ public sealed class AlbumModule : IModule
         }
     }
 
-    public void MapEndpoints(IEndpointRouteBuilder endpoints)
-    {
-    }
+    public void MapEndpoints(IEndpointRouteBuilder endpoints) => endpoints.MapAlbumsEndpoints();
 }

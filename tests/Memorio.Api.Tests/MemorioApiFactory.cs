@@ -37,6 +37,7 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
         ["AiNarration:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_ai_narration",
         ["Places:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_places",
         ["Limits:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_limits",
+        ["Notifications:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_notifications",
         ["Album:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_album",
         ["Archive:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_archive",
         ["Database:MigrateOnStartup"] = "false",
@@ -85,7 +86,7 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
             services.Configure<HealthCheckServiceOptions>(options =>
             {
                 foreach (var check in options.Registrations
-                    .Where(check => check.Name is MemorioMessaging.HealthCheckName or ObjectStorage.HealthCheckName or "account-database" or "plans-database" or "archive-database" or "album-database" or "ai-narration-database" or "places-database" or "limits-database")
+                    .Where(check => check.Name is MemorioMessaging.HealthCheckName or ObjectStorage.HealthCheckName or "account-database" or "plans-database" or "archive-database" or "album-database" or "ai-narration-database" or "places-database" or "limits-database" or "notifications-database")
                     .ToList())
                 {
                     options.Registrations.Remove(check);

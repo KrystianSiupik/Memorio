@@ -156,6 +156,24 @@ namespace Memorio.Modules.Archive.Infrastructure.Persistence.Migrations
                     b.ToTable("memories", "archive");
                 });
 
+            modelBuilder.Entity("Memorio.Modules.Archive.Domain.Memories.MemoryAlbum", b =>
+                {
+                    b.Property<Guid>("MemoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("memory_id");
+
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("album_id");
+
+                    b.HasKey("MemoryId", "AlbumId");
+
+                    b.HasIndex("AlbumId")
+                        .HasDatabaseName("ix_memory_albums_album_id");
+
+                    b.ToTable("memory_albums", "archive");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Archive.Domain.Memories.Memory", b =>
                 {
                     b.OwnsMany("Memorio.Modules.Archive.Domain.Memories.Photo", "Photos", b1 =>
@@ -163,6 +181,10 @@ namespace Memorio.Modules.Archive.Infrastructure.Persistence.Migrations
                             b1.Property<Guid>("Id")
                                 .HasColumnType("uuid")
                                 .HasColumnName("id");
+
+                            b1.Property<Guid?>("AlbumId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("album_id");
 
                             b1.Property<long>("SizeBytes")
                                 .ValueGeneratedOnAdd()

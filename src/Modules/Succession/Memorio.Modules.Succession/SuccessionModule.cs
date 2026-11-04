@@ -1,4 +1,6 @@
 using Memorio.Modularity;
+using Memorio.Modules.Succession.Api;
+using Memorio.Modules.Succession.Application.Commands.NameSuccessor;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,11 +12,8 @@ public sealed class SuccessionModule : IModule
 {
     public string Name => "Succession";
 
-    public void AddServices(IServiceCollection services, IConfiguration configuration)
-    {
-    }
+    public void AddServices(IServiceCollection services, IConfiguration configuration) =>
+        services.AddScoped<NameSuccessorHandler>();
 
-    public void MapEndpoints(IEndpointRouteBuilder endpoints)
-    {
-    }
+    public void MapEndpoints(IEndpointRouteBuilder endpoints) => endpoints.MapSuccessionEndpoints();
 }

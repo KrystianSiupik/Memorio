@@ -5,8 +5,11 @@
 import 'package:dio/dio.dart';
 
 import 'clients/app_client.dart';
+import 'clients/access_client.dart';
 import 'clients/ai_client.dart';
 import 'clients/account_client.dart';
+import 'clients/albums_client.dart';
+import 'clients/notifications_client.dart';
 import 'clients/memories_client.dart';
 import 'clients/places_client.dart';
 import 'clients/auth_client.dart';
@@ -21,17 +24,26 @@ class MemorioApiClient {
   static String get version => 'v1';
 
   AppClient? _app;
+  AccessClient? _access;
   AiClient? _ai;
   AccountClient? _account;
+  AlbumsClient? _albums;
+  NotificationsClient? _notifications;
   MemoriesClient? _memories;
   PlacesClient? _places;
   AuthClient? _auth;
 
   AppClient get app => _app ??= AppClient(_dio, baseUrl: _baseUrl);
 
+  AccessClient get access => _access ??= AccessClient(_dio, baseUrl: _baseUrl);
+
   AiClient get ai => _ai ??= AiClient(_dio, baseUrl: _baseUrl);
 
   AccountClient get account => _account ??= AccountClient(_dio, baseUrl: _baseUrl);
+
+  AlbumsClient get albums => _albums ??= AlbumsClient(_dio, baseUrl: _baseUrl);
+
+  NotificationsClient get notifications => _notifications ??= NotificationsClient(_dio, baseUrl: _baseUrl);
 
   MemoriesClient get memories => _memories ??= MemoriesClient(_dio, baseUrl: _baseUrl);
 
