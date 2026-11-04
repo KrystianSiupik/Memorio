@@ -9,10 +9,12 @@ import 'package:memorio/core/auth/token_store.dart';
 import 'package:memorio/core/offline/local_database.dart';
 import 'package:memorio/core/offline/offline.dart';
 import 'package:memorio/features/account/account.dart';
+import 'package:memorio/features/albums/albums.dart';
 import 'package:memorio/features/memories/memories.dart';
 import 'package:memorio/features/map/map.dart';
 
 import 'fake_account.dart';
+import 'fake_albums.dart';
 import 'fake_http.dart';
 import 'fake_memories.dart';
 import 'fake_places.dart';
@@ -39,6 +41,7 @@ Future<ProviderContainer> pumpMemorioApp(
   AccountRepository? account,
   MemoriesRepository? memories,
   PlacesRepository? places,
+  AlbumsRepository? albums,
   FakeHttpAdapter? http,
   Stream<bool>? online,
   Stream<List<PendingOperation>>? pending,
@@ -56,6 +59,7 @@ Future<ProviderContainer> pumpMemorioApp(
       accountRepositoryProvider.overrideWithValue(account ?? FakeAccountRepository()),
       memoriesRepositoryProvider.overrideWithValue(memories ?? FakeMemoriesRepository()),
       placesRepositoryProvider.overrideWithValue(places ?? FakePlacesRepository()),
+      albumsRepositoryProvider.overrideWithValue(albums ?? FakeAlbumsRepository()),
       photoPickerProvider.overrideWithValue(FakePhotoPicker()),
       localDatabaseProvider.overrideWithValue(database),
       isOnlineProvider.overrideWith((ref) => online ?? Stream.value(true)),

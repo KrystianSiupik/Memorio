@@ -48,6 +48,7 @@ export 'models/login_request.dart';
 export 'models/memory_details_response.dart';
 export 'models/memory_photo_response.dart';
 export 'models/memory_point_response.dart';
+export 'models/my_memory_response.dart';
 export 'models/name_successor_request.dart';
 export 'models/place_response.dart';
 export 'models/refresh_request.dart';

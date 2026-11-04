@@ -463,6 +463,396 @@ abstract class AppLocalizations {
   /// **'Czeka na wysłanie: {count}'**
   String mapPendingUpload(Object count);
 
+  /// No description provided for @albumMine.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moje albumy'**
+  String get albumMine;
+
+  /// No description provided for @albumShared.
+  ///
+  /// In pl, this message translates to:
+  /// **'Udostępnione mi'**
+  String get albumShared;
+
+  /// No description provided for @albumInvitations.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zaproszenia'**
+  String get albumInvitations;
+
+  /// No description provided for @albumNewName.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nazwa nowego albumu'**
+  String get albumNewName;
+
+  /// No description provided for @albumCreate.
+  ///
+  /// In pl, this message translates to:
+  /// **'Utwórz album'**
+  String get albumCreate;
+
+  /// No description provided for @albumsEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie masz jeszcze albumów'**
+  String get albumsEmpty;
+
+  /// No description provided for @albumSharedEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nikt nie udostępnił Ci albumu'**
+  String get albumSharedEmpty;
+
+  /// No description provided for @albumMembersCount.
+  ///
+  /// In pl, this message translates to:
+  /// **'Osoby: {members}, wspomnienia: {memories}'**
+  String albumMembersCount(Object members, Object memories);
+
+  /// No description provided for @albumNameRequired.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podaj nazwę albumu.'**
+  String get albumNameRequired;
+
+  /// No description provided for @albumNoAccess.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie masz już dostępu do tego albumu.'**
+  String get albumNoAccess;
+
+  /// No description provided for @albumNoFreeSeats.
+  ///
+  /// In pl, this message translates to:
+  /// **'W planie tego albumu nie ma wolnego miejsca.'**
+  String get albumNoFreeSeats;
+
+  /// No description provided for @albumAddressBlocked.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ten adres nie przyjmuje zaproszeń.'**
+  String get albumAddressBlocked;
+
+  /// No description provided for @albumInvitationGone.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zaproszenie wygasło albo zostało wycofane.'**
+  String get albumInvitationGone;
+
+  /// No description provided for @albumPoolFull.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pula albumu jest pełna. Właściciel dostał powiadomienie.'**
+  String get albumPoolFull;
+
+  /// No description provided for @albumOwnerCannotLeave.
+  ///
+  /// In pl, this message translates to:
+  /// **'Właściciel nie może opuścić albumu.'**
+  String get albumOwnerCannotLeave;
+
+  /// No description provided for @albumMemories.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wspomnienia'**
+  String get albumMemories;
+
+  /// No description provided for @albumEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Album jest pusty'**
+  String get albumEmpty;
+
+  /// No description provided for @albumMembers.
+  ///
+  /// In pl, this message translates to:
+  /// **'Skład'**
+  String get albumMembers;
+
+  /// No description provided for @albumOwnerRole.
+  ///
+  /// In pl, this message translates to:
+  /// **'właściciel'**
+  String get albumOwnerRole;
+
+  /// No description provided for @albumParticipantRole.
+  ///
+  /// In pl, this message translates to:
+  /// **'uczestnik'**
+  String get albumParticipantRole;
+
+  /// No description provided for @albumMyContributions.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moje wkłady: wspomnienia {memories}, zdjęcia {photos}'**
+  String albumMyContributions(Object memories, Object photos);
+
+  /// No description provided for @albumPoolLeft.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zostało w puli: {left} z {total}'**
+  String albumPoolLeft(Object left, Object total);
+
+  /// No description provided for @albumNoOwnerState.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ten album ma właściciela.'**
+  String get albumNoOwnerState;
+
+  /// No description provided for @albumAddMemory.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dodaj moje wspomnienie'**
+  String get albumAddMemory;
+
+  /// No description provided for @albumNoMemoriesToAdd.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie masz jeszcze wspomnień do dodania.'**
+  String get albumNoMemoriesToAdd;
+
+  /// No description provided for @albumAddPhotos.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dodaj zdjęcia'**
+  String get albumAddPhotos;
+
+  /// No description provided for @albumTag.
+  ///
+  /// In pl, this message translates to:
+  /// **'Oznacz uczestnika'**
+  String get albumTag;
+
+  /// No description provided for @albumRemoveMyTag.
+  ///
+  /// In pl, this message translates to:
+  /// **'Usuń moje oznaczenie'**
+  String get albumRemoveMyTag;
+
+  /// No description provided for @albumLeave.
+  ///
+  /// In pl, this message translates to:
+  /// **'Opuść album'**
+  String get albumLeave;
+
+  /// No description provided for @albumLeaveKeep.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zostaw moje wkłady w albumie'**
+  String get albumLeaveKeep;
+
+  /// No description provided for @albumLeaveTake.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zabierz moje wkłady'**
+  String get albumLeaveTake;
+
+  /// No description provided for @albumLeaveConfirm.
+  ///
+  /// In pl, this message translates to:
+  /// **'Potwierdzam wyjście z albumu'**
+  String get albumLeaveConfirm;
+
+  /// No description provided for @albumManage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zarządzanie albumem'**
+  String get albumManage;
+
+  /// No description provided for @albumConsents.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moje zgody i powierzenia'**
+  String get albumConsents;
+
+  /// No description provided for @albumSeats.
+  ///
+  /// In pl, this message translates to:
+  /// **'Miejsca: zajęte {taken}, zaproszone {invited}, wolne {free}'**
+  String albumSeats(Object free, Object invited, Object taken);
+
+  /// No description provided for @albumInviteEmail.
+  ///
+  /// In pl, this message translates to:
+  /// **'E-mail zapraszanego'**
+  String get albumInviteEmail;
+
+  /// No description provided for @albumInvite.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zaproś'**
+  String get albumInvite;
+
+  /// No description provided for @albumInviteInvalid.
+  ///
+  /// In pl, this message translates to:
+  /// **'To nie wygląda na adres e-mail.'**
+  String get albumInviteInvalid;
+
+  /// No description provided for @albumInvited.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zaproszeni'**
+  String get albumInvited;
+
+  /// No description provided for @albumWithdrawInvitation.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wycofaj'**
+  String get albumWithdrawInvitation;
+
+  /// No description provided for @albumRemoveParticipant.
+  ///
+  /// In pl, this message translates to:
+  /// **'Usuń uczestnika'**
+  String get albumRemoveParticipant;
+
+  /// No description provided for @albumSuccessor.
+  ///
+  /// In pl, this message translates to:
+  /// **'Następca'**
+  String get albumSuccessor;
+
+  /// No description provided for @albumNoSuccessor.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie wskazano następcy'**
+  String get albumNoSuccessor;
+
+  /// No description provided for @albumNameSuccessor.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wskaż następcę'**
+  String get albumNameSuccessor;
+
+  /// No description provided for @albumCurator.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kurator'**
+  String get albumCurator;
+
+  /// No description provided for @albumNoCurator.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie powierzono treści kuratorowi'**
+  String get albumNoCurator;
+
+  /// No description provided for @albumEntrust.
+  ///
+  /// In pl, this message translates to:
+  /// **'Powierz kuratorowi'**
+  String get albumEntrust;
+
+  /// No description provided for @albumRevokeEntrustment.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odwołaj powierzenie'**
+  String get albumRevokeEntrustment;
+
+  /// No description provided for @albumKept.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moje wkłady pozostawione po wyjściu'**
+  String get albumKept;
+
+  /// No description provided for @albumKeptEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie masz wkładów pozostawionych po wyjściu'**
+  String get albumKeptEmpty;
+
+  /// No description provided for @albumKeptItem.
+  ///
+  /// In pl, this message translates to:
+  /// **'{album}: wspomnienia {memories}'**
+  String albumKeptItem(Object album, Object memories);
+
+  /// No description provided for @albumKeptNotChosen.
+  ///
+  /// In pl, this message translates to:
+  /// **'Usunięto Cię z albumu. Wybierz, czy treści mają zostać.'**
+  String get albumKeptNotChosen;
+
+  /// No description provided for @albumKeptConfirm.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wiem, że treści znikną z albumu'**
+  String get albumKeptConfirm;
+
+  /// No description provided for @albumRevokeKept.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odwołaj zgodę „zostaw”'**
+  String get albumRevokeKept;
+
+  /// No description provided for @albumEntrusted.
+  ///
+  /// In pl, this message translates to:
+  /// **'Powierzone treści'**
+  String get albumEntrusted;
+
+  /// No description provided for @albumEntrustedEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nikt nie powierzył Ci treści'**
+  String get albumEntrustedEmpty;
+
+  /// No description provided for @albumArrange.
+  ///
+  /// In pl, this message translates to:
+  /// **'Uporządkuj'**
+  String get albumArrange;
+
+  /// No description provided for @albumMoveUp.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyżej'**
+  String get albumMoveUp;
+
+  /// No description provided for @albumMoveDown.
+  ///
+  /// In pl, this message translates to:
+  /// **'Niżej'**
+  String get albumMoveDown;
+
+  /// No description provided for @albumInvitationTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zaproszenie do albumu'**
+  String get albumInvitationTitle;
+
+  /// No description provided for @albumInvitedBy.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kto zaprasza: {person}'**
+  String albumInvitedBy(Object person);
+
+  /// No description provided for @albumInvitationAlbum.
+  ///
+  /// In pl, this message translates to:
+  /// **'Album: {name}'**
+  String albumInvitationAlbum(Object name);
+
+  /// No description provided for @albumAccept.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przyjmij'**
+  String get albumAccept;
+
+  /// No description provided for @albumDecline.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odrzuć'**
+  String get albumDecline;
+
+  /// No description provided for @albumBlockInvitations.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie chcę zaproszeń z GEO'**
+  String get albumBlockInvitations;
+
   /// No description provided for @mapEmptyFiltered.
   ///
   /// In pl, this message translates to:
