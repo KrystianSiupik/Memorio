@@ -99,6 +99,12 @@ internal sealed class Pools(LimitsDbContext database) : IPools
         return true;
     }
 
+    public async Task<(long UsedBytes, long LimitBytes)> GetUsageAsync(Guid poolId, CancellationToken cancellationToken)
+    {
+        var pool = await database.Set<AccountPool>().AsNoTracking().FirstOrDefaultAsync(item => item.AccountId == poolId, cancellationToken);
+        return pool is null ? (0, AccountPool.DefaultLimitBytes) : (pool.UsedBytes, pool.LimitBytes);
+    }
+
     public async Task<bool> SetLimitAsync(Guid accountId, long limitBytes, int aiLimit, long sequence, CancellationToken cancellationToken)
     {
         await EnsurePoolAsync(accountId, cancellationToken);
