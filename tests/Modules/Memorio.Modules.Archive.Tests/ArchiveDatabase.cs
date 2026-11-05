@@ -68,14 +68,19 @@ public sealed class ArchiveDatabase : PostgresDatabase
     }
 
     /// <summary>Stores a memory of the account with the given number of photos.</summary>
-    internal async Task<Memory> AddMemoryAsync(Guid accountId, int photos = 0)
+    internal async Task<Memory> AddMemoryAsync(Guid accountId, int photos = 0, DateOnly? dateFrom = null, long photoBytes = 0)
     {
-        var date = MemoryDate.Create("Day", "2026-07-01", null, new DateOnly(2026, 11, 3)).Value;
+        var date = MemoryDate.Create("Day", (dateFrom ?? new DateOnly(2026, 7, 1)).ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), null, new DateOnly(2026, 11, 3)).Value;
         var memory = Memory.Create(
             new MemoryId(Guid.CreateVersion7()), accountId, new MemoryPlace("osm:N:1", "Giewont", 49.25, 19.93), date, DateTimeOffset.UtcNow);
         for (var photo = 0; photo < photos; photo++)
         {
             memory.AddPhoto(Guid.CreateVersion7(), $"photos/{Guid.NewGuid():N}/original.jpg", 100, DateTimeOffset.UtcNow);
+        }
+
+        if (photoBytes > 0)
+        {
+            memory.AddPhoto(Guid.CreateVersion7(), $"photos/{Guid.NewGuid():N}/original.jpg", photoBytes, DateTimeOffset.UtcNow);
         }
 
         await using var scope = CreateScope();

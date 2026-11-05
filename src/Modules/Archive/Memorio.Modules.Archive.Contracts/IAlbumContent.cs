@@ -15,6 +15,9 @@ public interface IAlbumContent
     /// <summary>The memory no longer is in the album; photos its pool paid for go back to the author's. Safe to call again.</summary>
     Task UnlinkAsync(Guid memoryId, Guid albumId, CancellationToken cancellationToken);
 
+    /// <summary>What the trim of this album could take, oldest first (S19). Memories that are also in another album stay out (D-284).</summary>
+    Task<IReadOnlyList<AlbumTrimMaterial>> TrimMaterialAsync(Guid albumId, CancellationToken cancellationToken);
+
     /// <summary>C56: stores the photo with the album's pool paying for it (MEM-E3-ARCHIWUM-01).</summary>
     Task<AlbumPhotoOutcome> AddPhotoAsync(AlbumPhoto photo, CancellationToken cancellationToken);
 }
@@ -22,6 +25,8 @@ public interface IAlbumContent
 public sealed record AlbumMemoryFacts(Guid AuthorAccountId, long SizeBytes);
 
 public sealed record AlbumMemorySummary(string PlaceName, string DateFrom, int Photos);
+
+public sealed record AlbumTrimMaterial(Guid MemoryId, string PlaceName, string DateFrom, long SizeBytes);
 
 public sealed record AlbumPhoto(Guid AlbumId, Guid MemoryId, Guid AccountId, Guid PhotoId, string? UploadKey);
 

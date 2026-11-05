@@ -21,6 +21,17 @@ internal interface IMemories
 
     void Add(AppliedAccountEvent applied);
 
+    Task<AppliedPlanEvent?> FindAppliedPlanEventAsync(Guid resourceId, CancellationToken cancellationToken);
+
+    /// <summary>Remembers the sequence until the next save (D-013).</summary>
+    void RecordApplied(AppliedPlanEvent? applied, Guid resourceId, int sequence);
+
+    /// <summary>What was trimmed for this account or album and is still in the trash.</summary>
+    Task<IReadOnlyList<Memory>> FindTrimmedForAsync(Guid resourceId, CancellationToken cancellationToken);
+
+    /// <summary>Goes out with the next save, in its transaction.</summary>
+    Task AnnounceAsync(ArchiveTrimmed trimmed);
+
     /// <summary>
     /// Stores the changes with the events of the changed memories, in one transaction. False when another
     /// decision about a memory got there first: nothing was stored.

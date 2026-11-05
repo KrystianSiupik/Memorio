@@ -12,6 +12,8 @@ internal sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> option
 
     public DbSet<AppliedAccountEvent> AppliedAccountEvents => Set<AppliedAccountEvent>();
 
+    public DbSet<AppliedPlanEvent> AppliedPlanEvents => Set<AppliedPlanEvent>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.HasDefaultSchema(Schema);
@@ -21,6 +23,14 @@ internal sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> option
             applied.ToTable("applied_account_events");
             applied.HasKey(item => item.AccountId);
             applied.Property(item => item.AccountId).HasColumnName("account_id").ValueGeneratedNever();
+            applied.Property(item => item.Sequence).HasColumnName("sequence");
+        });
+
+        builder.Entity<AppliedPlanEvent>(applied =>
+        {
+            applied.ToTable("applied_plan_events");
+            applied.HasKey(item => item.ResourceId);
+            applied.Property(item => item.ResourceId).HasColumnName("resource_id").ValueGeneratedNever();
             applied.Property(item => item.Sequence).HasColumnName("sequence");
         });
 
@@ -45,6 +55,8 @@ internal sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> option
             memory.Property(item => item.Sequence).HasColumnName("sequence").HasDefaultValue(1).HasSentinel(0).IsConcurrencyToken();
             memory.Property(item => item.TrashReason).HasColumnName("trash_reason").HasConversion<string>().HasMaxLength(20);
             memory.Property(item => item.TrashedAt).HasColumnName("trashed_at");
+            memory.Property(item => item.TrimmedFor).HasColumnName("trimmed_for");
+            memory.HasIndex(item => item.TrimmedFor).HasDatabaseName("ix_memories_trimmed_for").HasFilter("trimmed_for IS NOT NULL");
             memory.Property(item => item.WindowEndsAt).HasColumnName("window_ends_at");
             memory.HasIndex(item => item.WindowEndsAt).HasDatabaseName("ix_memories_trash_window_ends_at").HasFilter("state = 'Trashed'");
             memory.Ignore(item => item.DomainEvents);

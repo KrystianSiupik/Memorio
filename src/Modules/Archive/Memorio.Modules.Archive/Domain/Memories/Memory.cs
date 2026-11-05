@@ -50,6 +50,9 @@ internal sealed class Memory : AggregateRoot<MemoryId>
 
     public DateTimeOffset? WindowEndsAt { get; private set; }
 
+    /// <summary>The account or album whose plan's trim put it in the trash; its next payment brings it back (HS-022).</summary>
+    public Guid? TrimmedFor { get; private set; }
+
     /// <summary>Grows with every move to or from the trash; ties a deadline to its window (D-013).</summary>
     public int Sequence { get; private set; } = 1;
 
@@ -137,6 +140,7 @@ internal sealed class Memory : AggregateRoot<MemoryId>
 
         State = MemoryState.Active;
         TrashReason = null;
+        TrimmedFor = null;
         TrashedAt = null;
         WindowEndsAt = null;
         Sequence++;
@@ -144,11 +148,12 @@ internal sealed class Memory : AggregateRoot<MemoryId>
         return Result.Success();
     }
 
-    /// <summary>The trim of an archive over its limit moves material here (HS-022); called by MEM-E7-ARCHIWUM-01.</summary>
-    public void MoveToTrashByTrimming(DateTimeOffset now)
+    /// <summary>The trim of an archive over its limit moves material here (HS-022).</summary>
+    public void MoveToTrashByTrimming(DateTimeOffset now, Guid trimmedFor)
     {
         MoveToTrash(now);
         TrashReason = Memories.TrashReason.Trimmed;
+        TrimmedFor = trimmedFor;
     }
 
     /// <summary>The end of the trash window: only the window it was meant for, only when still open and only after its end.</summary>

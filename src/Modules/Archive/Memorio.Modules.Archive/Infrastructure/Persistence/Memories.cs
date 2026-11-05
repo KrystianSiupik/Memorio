@@ -47,6 +47,27 @@ internal sealed class Memories(IDbContextOutbox<ArchiveDbContext> outbox) : IMem
 
     public void Add(AppliedAccountEvent applied) => Database.AppliedAccountEvents.Add(applied);
 
+    public Task<AppliedPlanEvent?> FindAppliedPlanEventAsync(Guid resourceId, CancellationToken cancellationToken) =>
+        Database.AppliedPlanEvents.FirstOrDefaultAsync(applied => applied.ResourceId == resourceId, cancellationToken);
+
+    public void RecordApplied(AppliedPlanEvent? applied, Guid resourceId, int sequence)
+    {
+        if (applied is null)
+        {
+            Database.AppliedPlanEvents.Add(new AppliedPlanEvent(resourceId, sequence));
+        }
+        else
+        {
+            applied.MoveTo(sequence);
+        }
+    }
+
+    public async Task<IReadOnlyList<Memory>> FindTrimmedForAsync(Guid resourceId, CancellationToken cancellationToken) =>
+        await Database.Memories.Where(memory => memory.TrimmedFor == resourceId && memory.State == MemoryState.Trashed).ToListAsync(cancellationToken);
+
+    public async Task AnnounceAsync(ArchiveTrimmed trimmed) =>
+        await outbox.PublishAsync(new ArchiveTrimmedEvent(trimmed.EventId, trimmed.OccurredAt, trimmed.ResourceId, trimmed.IsAlbum, trimmed.MemoriesTrimmed, trimmed.Sequence));
+
     public async Task<bool> SaveAsync(CancellationToken cancellationToken)
     {
         foreach (var memory in Database.ChangeTracker.Entries<Memory>().Select(entry => entry.Entity).ToList())
