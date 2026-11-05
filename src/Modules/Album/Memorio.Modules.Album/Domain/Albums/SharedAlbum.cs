@@ -11,6 +11,12 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
 {
     public const int MaximumNameLength = 120;
 
+    /// <summary>The owner of an album without one: no account has this id, so nobody is its owner (D-293).</summary>
+    public static readonly Guid NoOwner = Guid.Empty;
+
+    /// <summary>What a participant has to pay in (D-004).</summary>
+    public static readonly TimeSpan ReservationTime = TimeSpan.FromMinutes(30);
+
     private readonly List<AlbumParticipant> _participants = [];
     private readonly List<AlbumInvitation> _invitations = [];
 
@@ -26,6 +32,13 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
     public Guid? SuccessorAccountId { get; private set; }
 
     public string Name { get; private set; } = "";
+
+    /// <summary>When the album lost its owner; set together with <see cref="NoOwner"/> as the owner (D-001).</summary>
+    public DateTimeOffset? OwnerlessSince { get; private set; }
+
+    public Guid? ReservedByAccountId { get; private set; }
+
+    public DateTimeOffset? ReservedUntil { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
 
@@ -56,6 +69,10 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
     public void AddParticipant(Guid accountId) => _participants.Add(new AlbumParticipant(accountId));
 
     public bool IsOwner(Guid accountId) => OwnerAccountId == accountId;
+
+    public bool IsOwnerless => OwnerAccountId == NoOwner;
+
+    public bool HasActiveReservation(DateTimeOffset now) => ReservedUntil > now;
 
     public bool HasMember(Guid accountId) => IsOwner(accountId) || _participants.Exists(participant => participant.AccountId == accountId);
 
@@ -178,6 +195,12 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
         }
 
         ForgetSuccessor(accountId);
+        if (ReservedByAccountId == accountId)
+        {
+            ReservedByAccountId = null;
+            ReservedUntil = null;
+        }
+
         Sequence++;
         Raise(new ParticipantLeft(Guid.CreateVersion7(), now, Id, accountId, Sequence));
         return Result.Success();
@@ -224,6 +247,106 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
         Sequence++;
         Raise(new SuccessorNamed(Guid.CreateVersion7(), now, Id, accountId, Sequence));
         return Result.Success();
+    }
+
+    /// <summary>C153 and E162: only the effect, whatever the cause was (D-001). Asking again changes nothing.</summary>
+    public void ReleaseOwner(DateTimeOffset now)
+    {
+        if (IsOwnerless)
+        {
+            return;
+        }
+
+        OwnerAccountId = NoOwner;
+        SuccessorAccountId = null;
+        OwnerlessSince = now;
+        Sequence++;
+        Raise(new AlbumWithoutOwner(Guid.CreateVersion7(), now, Id, Sequence));
+    }
+
+    /// <summary>
+    /// C122: the album, its pool and the role go to the successor (S2:B3). The owner's contributions stay in it. A successor
+    /// who left in the meantime cannot take it: then it is as after a refusal. Already done, or decided otherwise: nothing.
+    /// </summary>
+    public void TransferOwnership(Guid fromAccountId, Guid toAccountId, DateTimeOffset now)
+    {
+        if (!IsOwner(fromAccountId))
+        {
+            return;
+        }
+
+        if (!_participants.Exists(participant => participant.AccountId == toAccountId))
+        {
+            ReleaseOwner(now);
+            return;
+        }
+
+        BecomeOwner(toAccountId);
+        Sequence++;
+        Raise(new AlbumOwnerChanged(Guid.CreateVersion7(), now, Id, toAccountId, Sequence));
+    }
+
+    /// <summary>C155: one reservation at a time, first come first served; asking again keeps one's own.</summary>
+    public Result ReserveTakeover(Guid accountId, DateTimeOffset now)
+    {
+        if (!IsOwnerless)
+        {
+            return AlbumErrors.HasOwner;
+        }
+
+        if (!_participants.Exists(participant => participant.AccountId == accountId))
+        {
+            return AlbumErrors.NoAccess;
+        }
+
+        if (HasActiveReservation(now))
+        {
+            return ReservedByAccountId == accountId ? Result.Success() : AlbumErrors.TakeoverReserved;
+        }
+
+        ReservedByAccountId = accountId;
+        ReservedUntil = now + ReservationTime;
+        Sequence++;
+        Raise(new TakeoverReserved(Guid.CreateVersion7(), now, Id, accountId, ReservedUntil.Value, Sequence));
+        return Result.Success();
+    }
+
+    /// <summary>C157: only a reservation whose time really ended.</summary>
+    public void ExpireReservation(DateTimeOffset now)
+    {
+        if (ReservedUntil is null || now < ReservedUntil)
+        {
+            return;
+        }
+
+        ReservedByAccountId = null;
+        ReservedUntil = null;
+        Sequence++;
+    }
+
+    /// <summary>C156: whoever holds the reservation and paid. Without a reservation still running: E168, nothing changes.</summary>
+    public Result TakeOver(DateTimeOffset now)
+    {
+        if (!IsOwnerless || !HasActiveReservation(now))
+        {
+            return AlbumErrors.TakeoverExpired;
+        }
+
+        var newOwner = ReservedByAccountId!.Value;
+        BecomeOwner(newOwner);
+        Sequence++;
+        Raise(new AlbumTakenOver(Guid.CreateVersion7(), now, Id, newOwner, Sequence));
+        return Result.Success();
+    }
+
+    private void BecomeOwner(Guid accountId)
+    {
+        _participants.RemoveAll(participant => participant.AccountId == accountId);
+        OwnerAccountId = accountId;
+        SuccessorAccountId = null;
+        OwnerlessSince = null;
+        ReservedByAccountId = null;
+        ReservedUntil = null;
     }
 
     public void RecordMemoryAdded(Guid memoryId, Guid authorAccountId, DateTimeOffset now) =>

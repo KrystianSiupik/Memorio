@@ -39,6 +39,15 @@ internal static class AlbumErrors
     /// <summary>E95: the plan ended; everyone reads, nothing new comes in (S2:B1).</summary>
     public static readonly Error ReadOnly = Error.Conflict("Album.ReadOnly", "The plan of this album ended: nothing can be added until it is paid again.");
 
+    /// <summary>E166.</summary>
+    public static readonly Error HasOwner = Error.Conflict("Album.HasOwner", "This album has an owner.");
+
+    /// <summary>E166.</summary>
+    public static readonly Error TakeoverReserved = Error.Conflict("Album.TakeoverReserved", "Someone is taking this album over right now.");
+
+    /// <summary>E168.</summary>
+    public static readonly Error TakeoverExpired = Error.Conflict("Album.TakeoverExpired", "The reservation has ended.");
+
     public static readonly Error IdTaken = Error.Conflict("Album.IdTaken", "This id belongs to another album.");
 
     /// <summary>Somebody got there first.</summary>

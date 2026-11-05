@@ -25,3 +25,15 @@ public sealed record ParticipantRemovedEvent(Guid EventId, DateTimeOffset Occurr
 
 /// <summary>E175: the person was tagged in a memory of the album.</summary>
 public sealed record ParticipantTaggedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, Guid MemoryId, Guid AccountId, int Sequence) : IIntegrationEvent;
+
+/// <summary>E162: the album has no owner. Only the effect, whatever the cause (D-001).</summary>
+public sealed record AlbumWithoutOwnerEvent(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, int Sequence) : IIntegrationEvent;
+
+/// <summary>The successor took the album over.</summary>
+public sealed record AlbumOwnerChangedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, Guid OwnerAccountId, int Sequence) : IIntegrationEvent;
+
+/// <summary>E165: someone holds the album until this time.</summary>
+public sealed record TakeoverReservedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, DateTimeOffset ReservedUntil, int Sequence) : IIntegrationEvent;
+
+/// <summary>E167: a participant paid and is the owner now (D-004).</summary>
+public sealed record AlbumTakenOverEvent(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, Guid OwnerAccountId, int Sequence) : IIntegrationEvent;

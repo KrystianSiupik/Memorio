@@ -36,6 +36,8 @@ internal interface IAlbums
 
     void Remove(KeptContribution kept);
 
+    Task<IReadOnlyList<SharedAlbum>> FindOwnedByAsync(Guid accountId, CancellationToken cancellationToken);
+
     /// <summary>Albums of other owners the person is in or brought something to.</summary>
     Task<IReadOnlyList<AlbumId>> FindOtherPeoplesAlbumsAsync(Guid accountId, CancellationToken cancellationToken);
 

@@ -57,6 +57,10 @@ internal sealed class AlbumDbContext(DbContextOptions<AlbumDbContext> options) :
             album.Property(item => item.Name).HasColumnName("name").HasMaxLength(SharedAlbum.MaximumNameLength).HasDefaultValue("");
             album.Property(item => item.CreatedAt).HasColumnName("created_at").HasDefaultValue(DateTimeOffset.UnixEpoch);
             album.Property(item => item.Sequence).HasColumnName("sequence").HasDefaultValue(1).IsConcurrencyToken();
+            album.Property(item => item.OwnerlessSince).HasColumnName("ownerless_since");
+            album.Property(item => item.ReservedByAccountId).HasColumnName("reserved_by_account_id");
+            album.Property(item => item.ReservedUntil).HasColumnName("reserved_until");
+            album.Ignore(item => item.IsOwnerless);
             album.Ignore(item => item.DomainEvents);
             album.HasIndex(item => item.OwnerAccountId).HasDatabaseName("ix_albums_owner_account_id");
             album.OwnsMany(item => item.Participants, participant =>

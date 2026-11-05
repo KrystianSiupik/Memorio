@@ -5,7 +5,7 @@ public interface IAlbumMembership
 {
     Task<bool> IsMemberAsync(Guid accountId, Guid albumId, CancellationToken cancellationToken);
 
-    /// <summary>Null when there is no such album.</summary>
+    /// <summary>Null when there is no such album, or it has no owner.</summary>
     Task<Guid?> OwnerOfAsync(Guid albumId, CancellationToken cancellationToken);
 
     /// <summary>The albums the person owns or takes part in.</summary>
@@ -36,7 +36,21 @@ public sealed record PendingInvitation(Guid AlbumId, string Email, Guid InvitedB
 public interface IAlbumSuccession
 {
     Task<SuccessorOutcome> NameAsync(Guid albumId, Guid ownerAccountId, Guid successorAccountId, CancellationToken cancellationToken);
+
+    /// <summary>The albums the person owns, each with its successor at this moment (D-020).</summary>
+    Task<IReadOnlyList<OwnedAlbum>> OwnedByAsync(Guid accountId, CancellationToken cancellationToken);
+
+    /// <summary>C122: the album goes to the successor. Safe to call again; if it is not this owner's any more, nothing happens.</summary>
+    Task TransferAsync(Guid albumId, Guid fromAccountId, Guid toAccountId, CancellationToken cancellationToken);
+
+    /// <summary>C153: the album is without an owner. Safe to call again; if it is not this owner's any more, nothing happens.</summary>
+    Task ReleaseOwnerAsync(Guid albumId, Guid ownerAccountId, CancellationToken cancellationToken);
+
+    /// <summary>How many memories of this author are in the album (R17).</summary>
+    Task<int> MemoriesOfAsync(Guid albumId, Guid authorAccountId, CancellationToken cancellationToken);
 }
+
+public sealed record OwnedAlbum(Guid AlbumId, Guid? SuccessorAccountId);
 
 public enum SuccessorOutcome
 {

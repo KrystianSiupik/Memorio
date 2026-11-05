@@ -200,9 +200,9 @@ public sealed class PlanCycleStepTests(PlansDatabase database)
 
         await using var scope = database.CreateScope();
         var activate = scope.ServiceProvider.GetRequiredService<ActivateAfterTakeoverHandler>();
-        Assert.True((await scope.ServiceProvider.GetRequiredService<MarkAlbumOwnerlessHandler>().HandleAsync(album.Id, Cancellation)).IsSuccess);
-        Assert.True((await activate.HandleAsync(album.Id, Cancellation)).IsSuccess);
+        Assert.True((await scope.ServiceProvider.GetRequiredService<MarkAlbumOwnerlessHandler>().HandleAsync(album.Id, 1, Cancellation)).IsSuccess);
+        Assert.True((await activate.HandleAsync(album.Id, 2, Cancellation)).IsSuccess);
         Assert.False((await FindAsync(album))!.IsOwnerless);
-        Assert.Equal(PlanCycleErrors.NotPaid, (await activate.HandleAsync(Guid.CreateVersion7(), Cancellation)).Error);
+        Assert.Equal(PlanCycleErrors.NotPaid, (await activate.HandleAsync(Guid.CreateVersion7(), 2, Cancellation)).Error);
     }
 }

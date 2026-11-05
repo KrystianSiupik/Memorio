@@ -107,10 +107,10 @@ internal sealed class KeepMaterialHandler(IPlanCycles cycles, TimeProvider clock
             cancellationToken);
 }
 
-/// <summary>C165: E9 calls it when an album was taken over (P41, D-004).</summary>
+/// <summary>C165 (D-004).</summary>
 internal sealed class ActivateAfterTakeoverHandler(IPlanCycles cycles, PlanEntitlements entitlements, TimeProvider clock)
 {
-    public async Task<Result> HandleAsync(Guid albumId, CancellationToken cancellationToken)
+    public async Task<Result> HandleAsync(Guid albumId, int albumSequence, CancellationToken cancellationToken)
     {
         var resource = new EntitledResource(EntitledResourceKind.Album, albumId);
         return await CycleDecision.UntilStoredAsync(
@@ -125,22 +125,32 @@ internal sealed class ActivateAfterTakeoverHandler(IPlanCycles cycles, PlanEntit
                 }
 
                 cycle.ApplyEntitlement(await entitlements.EntitledUntilAsync(resource, cancellationToken), now);
-                return cycle.ActivateAfterTakeover(now);
+                return cycle.ActivateAfterTakeover(albumSequence, now);
             },
             cancellationToken);
     }
 }
 
-/// <summary>P36: E9 calls it when an album lost its owner (D-001); the plan then runs to the end of what is paid.</summary>
-internal sealed class MarkAlbumOwnerlessHandler(IPlanCycles cycles)
+/// <summary>The C91 of P36: an album without an owner, also one that never had a paid plan and so has no cycle yet.</summary>
+internal sealed class MarkAlbumOwnerlessHandler(IPlanCycles cycles, TimeProvider clock)
 {
-    public async Task<Result> HandleAsync(Guid albumId, CancellationToken cancellationToken) =>
-        await CycleDecision.UntilStoredAsync(
+    public async Task<Result> HandleAsync(Guid albumId, int albumSequence, CancellationToken cancellationToken)
+    {
+        var resource = new EntitledResource(EntitledResourceKind.Album, albumId);
+        return await CycleDecision.UntilStoredAsync(
             cycles,
             async () =>
             {
-                (await cycles.FindAsync(new EntitledResource(EntitledResourceKind.Album, albumId), cancellationToken))?.MarkOwnerless();
+                var cycle = await cycles.FindAsync(resource, cancellationToken);
+                if (cycle is null)
+                {
+                    cycle = PlanCycle.Start(resource);
+                    cycles.Add(cycle);
+                }
+
+                cycle.MarkOwnerless(albumSequence, clock.GetUtcNow());
                 return Result.Success();
             },
             cancellationToken);
+    }
 }

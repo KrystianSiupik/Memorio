@@ -5,6 +5,7 @@ using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Album.Application.Commands.Contributions;
 using Memorio.Modules.Album.Application.Commands.CreateAlbum;
 using Memorio.Modules.Album.Application.Commands.Invitations;
+using Memorio.Modules.Album.Application.Commands.Takeover;
 using Memorio.Modules.Album.Application.Queries;
 using Memorio.Modules.Album.Domain.Albums;
 using Memorio.Modules.Album.Contracts;
@@ -32,6 +33,8 @@ internal static class AlbumsEndpoints
         albums.MapGet("/entrusted", EntrustedAsync).WithName("ListEntrusted").WithSummary("Memories entrusted to the person as a curator.");
         albums.MapGet("/{id:guid}", GetAsync).WithName("GetAlbum").WithSummary("The album with its memories, members, the person's own contributions and the pool.");
         albums.MapGet("/{id:guid}/trim-material", TrimMaterialAsync).WithName("GetAlbumTrimMaterial").WithSummary("For the owner: what a trim of the album could take, oldest first, with sizes.");
+        albums.MapGet("/{id:guid}/takeover", TakeoverAsync).WithName("GetAlbumTakeover").WithSummary("For someone in an album without an owner: whether it can be taken over, and who holds it until when.");
+        albums.MapPost("/{id:guid}/takeover-reservation", ReserveTakeoverAsync).WithName("ReserveAlbumTakeover").WithSummary("Holds an album without an owner for 30 minutes, to pay for its plan; asking again keeps one's own.");
         albums.MapGet("/{id:guid}/seats", SeatsAsync).WithName("GetAlbumSeats").WithSummary("For the owner: seats taken, invited and free.");
         albums.MapPost("/{id:guid}/invitations", InviteAsync).WithName("InviteToAlbum").WithSummary("Invites an address; the same address again refreshes its invitation and takes no second seat.");
         albums.MapDelete("/{id:guid}/invitations/{invitationId:guid}", WithdrawInvitationAsync).WithName("WithdrawInvitation").WithSummary("The owner takes an invitation back; the seat is free at once.");
@@ -111,7 +114,8 @@ internal static class AlbumsEndpoints
             state.FreeBytes,
             state.LimitBytes,
             entrustment?.CuratorAccountId,
-            await plan.IsReadOnlyAsync(id, cancellationToken)));
+            await plan.IsReadOnlyAsync(id, cancellationToken),
+            album.OwnerAccountId == SharedAlbum.NoOwner));
     }
 
     private static async Task<Results<Ok<AlbumSeatsResponse>, ProblemHttpResult>> SeatsAsync(Guid id, ClaimsPrincipal principal, IAlbumQueries queries, IAlbumSeatLimit limit, CancellationToken cancellationToken)
@@ -141,6 +145,25 @@ internal static class AlbumsEndpoints
         return TypedResults.Ok<IReadOnlyList<AlbumTrimMaterialResponse>>(
             [.. items.Select(item => new AlbumTrimMaterialResponse(item.MemoryId, item.PlaceName, item.DateFrom, item.SizeBytes))]);
     }
+
+    private static async Task<Results<Ok<AlbumTakeoverResponse>, ProblemHttpResult>> TakeoverAsync(Guid id, ClaimsPrincipal principal, IAlbumMembership membership, IAlbumQueries queries, TimeProvider clock, CancellationToken cancellationToken)
+    {
+        var accountId = CurrentAccount.IdOf(principal);
+        if (!await membership.IsMemberAsync(accountId, id, cancellationToken) || await queries.TakeoverStateAsync(id, cancellationToken) is not { } state)
+        {
+            return Problems.From(AlbumErrors.NoAccess);
+        }
+
+        var reserved = state.ReservedUntil > clock.GetUtcNow();
+        return TypedResults.Ok(new AlbumTakeoverResponse(
+            state.IsOwnerless,
+            state.IsOwnerless && !reserved,
+            reserved && state.ReservedByAccountId == accountId,
+            reserved ? state.ReservedUntil : null));
+    }
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> ReserveTakeoverAsync(Guid id, ClaimsPrincipal principal, ReserveTakeoverHandler handler, CancellationToken cancellationToken) =>
+        Answer(await handler.HandleAsync(new ReserveTakeover(new AlbumId(id), CurrentAccount.IdOf(principal)), cancellationToken));
 
     private static async Task<Results<NoContent, ProblemHttpResult>> InviteAsync(Guid id, InviteRequest request, ClaimsPrincipal principal, InviteToAlbumHandler handler, CancellationToken cancellationToken) =>
         Answer(await handler.HandleAsync(new InviteToAlbum(new AlbumId(id), CurrentAccount.IdOf(principal), request.Id, request.Email), cancellationToken));
@@ -263,9 +286,12 @@ internal sealed record AlbumResponse(
     long FreeBytes,
     long LimitBytes,
     Guid? MyCuratorAccountId,
-    bool IsReadOnly);
+    bool IsReadOnly,
+    bool IsOwnerless);
 
 internal sealed record AlbumTrimMaterialResponse(Guid MemoryId, string PlaceName, string DateFrom, long SizeBytes);
+
+internal sealed record AlbumTakeoverResponse(bool IsOwnerless, bool CanReserve, bool ReservedByMe, DateTimeOffset? ReservedUntil);
 
 internal sealed record AlbumMemberResponse(Guid AccountId, string? Email, bool IsOwner);
 

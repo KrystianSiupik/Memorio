@@ -51,6 +51,10 @@ namespace Memorio.Modules.Plans.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid[]")
                         .HasColumnName("kept_memory_ids");
 
+                    b.Property<int>("LastAlbumSequence")
+                        .HasColumnType("integer")
+                        .HasColumnName("last_album_sequence");
+
                     b.Property<DateTimeOffset?>("LedgerCheckedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("ledger_checked_at");

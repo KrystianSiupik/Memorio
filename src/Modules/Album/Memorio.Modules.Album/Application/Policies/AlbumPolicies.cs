@@ -35,6 +35,15 @@ internal sealed class WithdrawContributionsWhenAccountDeleted(IAlbums albums, Co
             album.Leave(integrationEvent.AccountId, now);
         }
 
+        // P37: the person agreed to this when deleting the account. With a successor, Succession makes the offer.
+        foreach (var owned in await albums.FindOwnedByAsync(integrationEvent.AccountId, cancellationToken))
+        {
+            if (owned.SuccessorAccountId is null)
+            {
+                owned.ReleaseOwner(now);
+            }
+        }
+
         await albums.ForgetInvitationQuotaAsync(integrationEvent.AccountId, cancellationToken);
         await albums.ForgetTrimmedAsync(null, integrationEvent.AccountId, cancellationToken);
 

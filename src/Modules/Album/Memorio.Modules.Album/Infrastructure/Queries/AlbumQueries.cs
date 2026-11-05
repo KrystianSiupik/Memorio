@@ -1,5 +1,6 @@
 using Dapper;
 using Memorio.Modules.Album.Application.Queries;
+using Memorio.Modules.Album.Domain.Albums;
 using Memorio.Modules.Album.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,7 @@ internal sealed class AlbumQueries(AlbumDbContext database) : IAlbumQueries
 {
     private const string MyAlbumsSql = """
         SELECT album.id AS "Id", album.name AS "Name", album.owner_account_id AS "OwnerAccountId",
-               1 + (SELECT count(*)::int FROM album.album_participants participant
+               (CASE WHEN album.owner_account_id = @noOwner THEN 0 ELSE 1 END) + (SELECT count(*)::int FROM album.album_participants participant
                     WHERE participant.album_id = album.id AND participant.account_id <> album.owner_account_id) AS "Members",
                (SELECT count(*)::int FROM album.album_memories memory WHERE memory.album_id = album.id) AS "Memories"
         FROM album.albums album
@@ -24,7 +25,7 @@ internal sealed class AlbumQueries(AlbumDbContext database) : IAlbumQueries
         """;
 
     private const string MembersSql = """
-        SELECT owner_account_id AS "AccountId", true AS "IsOwner" FROM album.albums WHERE id = @albumId
+        SELECT owner_account_id AS "AccountId", true AS "IsOwner" FROM album.albums WHERE id = @albumId AND owner_account_id <> @noOwner
         UNION ALL
         SELECT participant.account_id, false FROM album.album_participants participant
         JOIN album.albums album ON album.id = participant.album_id
@@ -82,7 +83,21 @@ internal sealed class AlbumQueries(AlbumDbContext database) : IAlbumQueries
         """;
 
     public async Task<IReadOnlyList<AlbumListItem>> MyAlbumsAsync(Guid accountId, CancellationToken cancellationToken) =>
-        [.. await Connection.QueryAsync<AlbumListItem>(new CommandDefinition(MyAlbumsSql, new { accountId }, cancellationToken: cancellationToken))];
+        [.. await Connection.QueryAsync<AlbumListItem>(new CommandDefinition(MyAlbumsSql, new { accountId, noOwner = SharedAlbum.NoOwner }, cancellationToken: cancellationToken))];
+
+    public async Task<TakeoverState?> TakeoverStateAsync(Guid albumId, CancellationToken cancellationToken)
+    {
+        var row = await Connection.QuerySingleOrDefaultAsync<TakeoverRow>(new CommandDefinition(
+            """
+            SELECT owner_account_id = @noOwner AS "IsOwnerless", reserved_by_account_id AS "ReservedByAccountId", reserved_until AS "ReservedUntil"
+            FROM album.albums WHERE id = @albumId
+            """,
+            new { albumId, noOwner = SharedAlbum.NoOwner },
+            cancellationToken: cancellationToken));
+        return row is null
+            ? null
+            : new TakeoverState(row.IsOwnerless, row.ReservedByAccountId, row.ReservedUntil is { } until ? new DateTimeOffset(DateTime.SpecifyKind(until, DateTimeKind.Utc)) : null);
+    }
 
     public async Task<AlbumView?> ViewAsync(Guid albumId, CancellationToken cancellationToken)
     {
@@ -92,7 +107,7 @@ internal sealed class AlbumQueries(AlbumDbContext database) : IAlbumQueries
             return null;
         }
 
-        var members = await Connection.QueryAsync<AlbumMemberRow>(new CommandDefinition(MembersSql, new { albumId }, cancellationToken: cancellationToken));
+        var members = await Connection.QueryAsync<AlbumMemberRow>(new CommandDefinition(MembersSql, new { albumId, noOwner = SharedAlbum.NoOwner }, cancellationToken: cancellationToken));
         var memories = await Connection.QueryAsync<AlbumMemoryRow>(new CommandDefinition(MemoriesSql, new { albumId }, cancellationToken: cancellationToken));
         return new AlbumView(album.Id, album.Name, album.OwnerAccountId, album.SuccessorAccountId, [.. members], [.. memories]);
     }
@@ -124,4 +139,14 @@ internal sealed class AlbumQueries(AlbumDbContext database) : IAlbumQueries
     private System.Data.Common.DbConnection Connection => database.Database.GetDbConnection();
 
     private sealed record AlbumRow(Guid Id, string Name, Guid OwnerAccountId, Guid? SuccessorAccountId);
+
+    // Dapper reads timestamptz as DateTime.
+    private sealed class TakeoverRow
+    {
+        public bool IsOwnerless { get; set; }
+
+        public Guid? ReservedByAccountId { get; set; }
+
+        public DateTime? ReservedUntil { get; set; }
+    }
 }
