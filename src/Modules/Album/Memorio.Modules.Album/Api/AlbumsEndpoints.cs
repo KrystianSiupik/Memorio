@@ -84,21 +84,25 @@ internal static class AlbumsEndpoints
         var state = await pool.GetStateAsync(id, cancellationToken);
         var visible = album.Memories.Where(memory => summaries.ContainsKey(memory.MemoryId)).ToList();
         var entrustment = await queries.MyEntrustmentAsync(id, accountId, cancellationToken);
+
+        // Someone reading through a link sees the content, not who is in the album or their addresses (D-271).
+        var isMember = album.Members.Any(member => member.AccountId == accountId);
         return TypedResults.Ok(new AlbumResponse(
             album.Id,
             album.Name,
             album.OwnerAccountId == accountId,
-            album.SuccessorAccountId,
-            [.. album.Members.Select(member => new AlbumMemberResponse(member.AccountId, emails.GetValueOrDefault(member.AccountId), member.IsOwner))],
+            isMember,
+            isMember ? album.SuccessorAccountId : null,
+            isMember ? [.. album.Members.Select(member => new AlbumMemberResponse(member.AccountId, emails.GetValueOrDefault(member.AccountId), member.IsOwner))] : [],
             [.. visible.Select(memory => new AlbumMemoryResponse(
                 memory.MemoryId,
-                memory.AuthorAccountId,
-                emails.GetValueOrDefault(memory.AuthorAccountId),
+                isMember ? memory.AuthorAccountId : null,
+                isMember ? emails.GetValueOrDefault(memory.AuthorAccountId) : null,
                 memory.AuthorAccountId == accountId,
                 summaries[memory.MemoryId].PlaceName,
                 summaries[memory.MemoryId].DateFrom,
                 summaries[memory.MemoryId].Photos,
-                memory.TaggedAccountIds))],
+                isMember ? memory.TaggedAccountIds : []))],
             visible.Count(memory => memory.AuthorAccountId == accountId),
             visible.Where(memory => memory.AuthorAccountId == accountId).Sum(memory => summaries[memory.MemoryId].Photos),
             state.FreeBytes,
@@ -226,6 +230,7 @@ internal sealed record ArrangeRequest(IReadOnlyList<Guid>? MemoryIds);
 
 internal sealed record AlbumListItemResponse(Guid Id, string Name, bool IsOwner, int Members, int Memories);
 
+/// <param name="IsMember">False for someone reading through a link: no people, no addresses, no actions.</param>
 /// <param name="MyMemories">How many memories the person brought.</param>
 /// <param name="MyPhotos">How many photos are in them.</param>
 /// <param name="MyCuratorAccountId">Who the person entrusted their contributions to, if anyone.</param>
@@ -233,6 +238,7 @@ internal sealed record AlbumResponse(
     Guid Id,
     string Name,
     bool IsOwner,
+    bool IsMember,
     Guid? SuccessorAccountId,
     IReadOnlyList<AlbumMemberResponse> Members,
     IReadOnlyList<AlbumMemoryResponse> Memories,
@@ -244,7 +250,7 @@ internal sealed record AlbumResponse(
 
 internal sealed record AlbumMemberResponse(Guid AccountId, string? Email, bool IsOwner);
 
-internal sealed record AlbumMemoryResponse(Guid Id, Guid AuthorAccountId, string? AuthorEmail, bool IsMine, string PlaceName, string DateFrom, int Photos, IReadOnlyList<Guid> TaggedAccountIds);
+internal sealed record AlbumMemoryResponse(Guid Id, Guid? AuthorAccountId, string? AuthorEmail, bool IsMine, string PlaceName, string DateFrom, int Photos, IReadOnlyList<Guid> TaggedAccountIds);
 
 internal sealed record AlbumSeatsResponse(int Taken, int Invited, int Free, IReadOnlyList<AlbumInvitedResponse> Invitations);
 

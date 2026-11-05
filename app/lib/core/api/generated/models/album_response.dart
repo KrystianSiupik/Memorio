@@ -15,6 +15,7 @@ class AlbumResponse {
     required this.id,
     required this.name,
     required this.isOwner,
+    required this.isMember,
     required this.successorAccountId,
     required this.members,
     required this.memories,
@@ -30,6 +31,7 @@ class AlbumResponse {
   final String id;
   final String name;
   final bool isOwner;
+  final bool isMember;
   final String? successorAccountId;
   final List<AlbumMemberResponse> members;
   final List<AlbumMemoryResponse> memories;

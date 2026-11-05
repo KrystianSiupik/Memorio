@@ -63,6 +63,13 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ),
             routes: [
+              GoRoute(
+                path: AlbumLinkRoute.path,
+                builder: (context, state) => AlbumLinkPage(
+                  token: state.pathParameters['token']!,
+                  onEntered: (albumId) => AlbumRoute(albumId).go(context),
+                ),
+              ),
               GoRoute(path: MyConsentsRoute.path, builder: (context, state) => const AlbumConsentsPage()),
               GoRoute(path: EntrustedRoute.path, builder: (context, state) => const AlbumEntrustedPage()),
               GoRoute(
@@ -98,7 +105,10 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          _tab(SharedWithMeRoute.path, const SharedWithMePage()),
+          _tab(
+            SharedWithMeRoute.path,
+            Builder(builder: (context) => SharedWithMePage(onOpenAlbum: (id) => AlbumRoute(id).go(context))),
+          ),
           _tab(AccountRoute.path, const AccountPage()),
         ],
       ),
@@ -132,7 +142,16 @@ String? redirectFor({required AsyncValue<Session?> session, required Uri uri}) {
 
   final signedIn = session.value != null;
   if (!signedIn) {
-    return location == SignInRoute.path ? null : SignInRoute.path;
+    if (location == SignInRoute.path) {
+      return null;
+    }
+
+    // A link to an album is what the person came for (S15): back to it after signing in. Other places are not
+    // kept, so the next person signing in on this device does not land where the previous one was.
+    final wanted = location == startPath ? requested : uri.toString();
+    return wanted != null && wanted.startsWith('${AlbumsRoute.path}/link/')
+        ? Uri(path: SignInRoute.path, queryParameters: {'from': wanted}).toString()
+        : SignInRoute.path;
   }
   if (location == startPath || location == SignInRoute.path) {
     return requested != null && requested != startPath && requested != SignInRoute.path ? requested : MapRoute.path;

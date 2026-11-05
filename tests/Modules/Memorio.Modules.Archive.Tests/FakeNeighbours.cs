@@ -23,7 +23,23 @@ public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool, IAl
 
     public void Sees(Guid personId, Guid albumId) => _visible[(personId, albumId)] = true;
 
-    public void NoLongerSees(Guid personId, Guid albumId) => _visible.TryRemove((personId, albumId), out _);
+    public void NoLongerSees(Guid personId, Guid albumId)
+    {
+        _visible.TryRemove((personId, albumId), out _);
+        _takingPart.TryRemove((personId, albumId), out _);
+    }
+
+    private readonly ConcurrentDictionary<(Guid Person, Guid Album), bool> _takingPart = new();
+
+    /// <summary>In the album, not only reading it through a link.</summary>
+    public void TakesPart(Guid personId, Guid albumId)
+    {
+        _visible[(personId, albumId)] = true;
+        _takingPart[(personId, albumId)] = true;
+    }
+
+    public Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyCollection<Guid>>([.. _takingPart.Keys.Where(key => key.Person == personId).Select(key => key.Album)]);
 
     public Task<bool> CanSeeAlbumAsync(Guid personId, Guid albumId, CancellationToken cancellationToken) =>
         Task.FromResult(_visible.ContainsKey((personId, albumId)));

@@ -1137,6 +1137,323 @@
         }
       }
     },
+    "/v1/albums/{id}/link": {
+      "post": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "The owner gets the link; a working link stays the same.",
+        "operationId": "ShareAlbumByLink",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlbumLinkResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "For the owner: the working link, if there is one.",
+        "operationId": "GetAlbumLink",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlbumLinkResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "Nobody new comes in; those let in keep their access.",
+        "operationId": "RevokeAlbumLink",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/viewers": {
+      "get": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "For people in the album: who reads it through the link, by name.",
+        "operationId": "GetAlbumViewers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AlbumViewerResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/viewers/{accountId}": {
+      "delete": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "The owner takes the access of someone let in; they may come back through a working link.",
+        "operationId": "RevokeAlbumAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/blocks/{accountId}": {
+      "put": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "The person may not come in by a link or an invitation, and loses access at once.",
+        "operationId": "BlockUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "The owner takes a block back; it gives no access by itself.",
+        "operationId": "UnblockUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/blocks": {
+      "get": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "For the owner: who is blocked in this album.",
+        "operationId": "GetAlbumBlocks",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BlockedPersonResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/album-links/{token}": {
+      "get": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "Which album a working link leads to.",
+        "operationId": "PreviewAlbumLink",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlbumLinkPreviewResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/album-links/{token}/entry": {
+      "post": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "Comes in through the link, by name.",
+        "operationId": "EnterAlbumByLink",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnteredAlbumResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/places/suggestions": {
       "get": {
         "tags": [
@@ -1752,6 +2069,36 @@
           }
         }
       },
+      "AlbumLinkPreviewResponse": {
+        "required": [
+          "albumId",
+          "albumName"
+        ],
+        "type": "object",
+        "properties": {
+          "albumId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "albumName": {
+            "type": "string"
+          }
+        }
+      },
+      "AlbumLinkResponse": {
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "AlbumListItemResponse": {
         "required": [
           "id",
@@ -1831,7 +2178,10 @@
             "format": "uuid"
           },
           "authorAccountId": {
-            "type": "string",
+            "type": [
+              "null",
+              "string"
+            ],
             "format": "uuid"
           },
           "authorEmail": {
@@ -1871,6 +2221,7 @@
           "id",
           "name",
           "isOwner",
+          "isMember",
           "successorAccountId",
           "members",
           "memories",
@@ -1890,6 +2241,9 @@
             "type": "string"
           },
           "isOwner": {
+            "type": "boolean"
+          },
+          "isMember": {
             "type": "boolean"
           },
           "successorAccountId": {
@@ -1993,6 +2347,30 @@
           }
         }
       },
+      "AlbumViewerResponse": {
+        "required": [
+          "accountId",
+          "email",
+          "enteredAt"
+        ],
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "enteredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "AnsweredInvitationResponse": {
         "required": [
           "albumId"
@@ -2053,6 +2431,25 @@
               "type": "string",
               "format": "uuid"
             }
+          }
+        }
+      },
+      "BlockedPersonResponse": {
+        "required": [
+          "accountId",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -2138,6 +2535,18 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "EnteredAlbumResponse": {
+        "required": [
+          "albumId"
+        ],
+        "type": "object",
+        "properties": {
+          "albumId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },

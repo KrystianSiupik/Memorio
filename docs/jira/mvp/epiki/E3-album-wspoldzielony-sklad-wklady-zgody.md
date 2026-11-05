@@ -43,7 +43,7 @@
 | [MEM-E3-ALBUM-16](../MEM-E3-ALBUM-16-zapytanie-miejsca-w-planie-zajete-zaproszone-wolne.md) | Zapytanie: Miejsca w planie: zajęte / zaproszone / wolne (R5) | album / infrastruktura (query handler) | 1–3 | zrobiony |
 | [MEM-E3-LIMITY-02](../MEM-E3-LIMITY-02-read-port-stan-puli-albumu-r6.md) | Read port: Stan puli albumu (R6) | limity / kontrakt | 1–3 | zrobiony |
 | [MEM-E3-ALBUM-17](../MEM-E3-ALBUM-17-zapytanie-album-wspomnienia-sklad-i-moje-wklady-r1.md) | Zapytanie: Album: wspomnienia, skład i moje wkłady (R13) | album / infrastruktura (query handler) | 1–3 | zrobiony |
-| [MEM-E3-DOSTEP-01](../MEM-E3-DOSTEP-01-zapytanie-udostepnione-mi-albumy-z-odczytem-r14.md) | Zapytanie: Udostępnione mi (albumy z odczytem) (R14) | dostep / infrastruktura (query handler) | 1–3 | zrobiony częściowo: pusty do czasu linków z E4 (D-254) |
+| [MEM-E3-DOSTEP-01](../MEM-E3-DOSTEP-01-zapytanie-udostepnione-mi-albumy-z-odczytem-r14.md) | Zapytanie: Udostępnione mi (albumy z odczytem) (R14) | dostep / infrastruktura (query handler) | 1–3 | zrobiony |
 | [MEM-E3-ALBUM-18](../MEM-E3-ALBUM-18-zapytanie-zaproszenie-kto-zaprasza-nazwa-albumu-be.md) | Zapytanie: Zaproszenie (kto zaprasza, nazwa albumu — bez treści) (R19) | album / infrastruktura (query handler) | 1–3 | zrobiony |
 | [MEM-E3-LIMITY-03](../MEM-E3-LIMITY-03-write-port-limity-dla-album-zarezerwuj-przestrzen-.md) | Write port limity → dla album: zarezerwuj przestrzeń w puli albumu | limity / kontrakt | 1–2 | zrobiony |
 | [MEM-E3-ARCHIWUM-01](../MEM-E3-ARCHIWUM-01-write-port-archiwum-dla-album-zapisz-tresc-z-numer.md) | Write port archiwum → dla album: zapisz treść z numerem puli albumu | archiwum / kontrakt | 1–2 | zrobiony |
@@ -62,8 +62,8 @@
 | [MEM-E3-ALBUM-26](../MEM-E3-ALBUM-26-zdarzenie-integracyjne-uczestnik-oznaczony-we-wspo.md) | Zdarzenie integracyjne „Uczestnik oznaczony we wspomnieniu” (E175) w kontrakcie modułu album | album / kontrakt | 1–2 | zrobiony |
 | [MEM-E3-POWIADOMIENIA-10](../MEM-E3-POWIADOMIENIA-10-polityka-p45-zawsze-gdy-uczestnik-oznaczony-wtedy-.md) | Polityka P45: Zawsze gdy uczestnik oznaczony, wtedy powiadom go (może usunąć oznaczenie) | powiadomienia / aplikacja (handler zdarzenia) | 1–3 | zrobiony; prawdziwa wysyłka czeka na konto Scaleway (D-265) |
 | [MEM-E3-PLAT-01](../MEM-E3-PLAT-01-ekran-s09-albumy-lista-i-nowy-album.md) | Ekran S09 „Albumy (lista) i nowy album” | - / UI | 2–4 | zrobiony (bez testu na urządzeniu) |
-| [MEM-E3-PLAT-02](../MEM-E3-PLAT-02-ekran-s10-album.md) | Ekran S10 „Album” | - / UI | 4–6 | zrobiony częściowo: bez blokady i stanu przejęcia; bez testu na urządzeniu (D-255) |
-| [MEM-E3-PLAT-03](../MEM-E3-PLAT-03-ekran-s11-zarzadzanie-albumem-wlasciciel.md) | Ekran S11 „Zarządzanie albumem (właściciel)” | - / UI | 4–6 | zrobiony częściowo: bez linków z E4; bez testu na urządzeniu (D-255) |
+| [MEM-E3-PLAT-02](../MEM-E3-PLAT-02-ekran-s10-album.md) | Ekran S10 „Album” | - / UI | 4–6 | zrobiony częściowo: bez stanu przejęcia z E9; bez testu na urządzeniu (D-255) |
+| [MEM-E3-PLAT-03](../MEM-E3-PLAT-03-ekran-s11-zarzadzanie-albumem-wlasciciel.md) | Ekran S11 „Zarządzanie albumem (właściciel)” | - / UI | 4–6 | zrobiony (bez testu na urządzeniu) |
 | [MEM-E3-PLAT-04](../MEM-E3-PLAT-04-ekran-s12-moje-zgody-i-powierzenia-w-albumie.md) | Ekran S12 „Moje zgody i powierzenia w albumie” | - / UI | 2–4 | zrobiony częściowo: bez zgody na AI z E6; bez testu na urządzeniu (D-255) |
 | [MEM-E3-PLAT-05](../MEM-E3-PLAT-05-ekran-s13-powierzone-tresci-kurator.md) | Ekran S13 „Powierzone treści (kurator)” | - / UI | 2–4 | zrobiony (bez testu na urządzeniu) |
 | [MEM-E3-PLAT-06](../MEM-E3-PLAT-06-ekran-s14-zaproszenie-do-albumu.md) | Ekran S14 „Zaproszenie do albumu” | - / UI | 2–4 | zrobiony (bez testu na urządzeniu) |

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Memorio.Modules.Access.Contracts;
 using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Limits.Contracts;
@@ -9,8 +10,15 @@ using Memorio.SharedKernel.Scheduling;
 namespace Memorio.Modules.Album.Tests;
 
 /// <summary>The other modules Album asks.</summary>
-public sealed class FakeAlbumNeighbours : IAlbumSeatLimit, IInvitationBlocks, IAccountDirectory, IAlbumContent, IAlbumPool
+public sealed class FakeAlbumNeighbours : IAlbumSeatLimit, IInvitationBlocks, IAccountDirectory, IAlbumContent, IAlbumPool, IBlockList
 {
+    private readonly ConcurrentDictionary<(Guid Album, Guid Account), bool> _blockedPeople = new();
+
+    public void BlockedIn(Guid albumId, Guid accountId) => _blockedPeople[(albumId, accountId)] = true;
+
+    public Task<bool> IsBlockedAsync(Guid albumId, Guid accountId, CancellationToken cancellationToken) =>
+        Task.FromResult(_blockedPeople.ContainsKey((albumId, accountId)));
+
     private readonly ConcurrentDictionary<Guid, int> _seats = new();
     private readonly ConcurrentDictionary<string, bool> _blocked = new();
     private readonly ConcurrentDictionary<Guid, string> _emails = new();

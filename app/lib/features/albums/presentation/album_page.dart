@@ -100,6 +100,54 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
     }
   }
 
+  Future<void> _block(BuildContext context, AlbumDetails album) async {
+    final l10n = context.l10n;
+    final viewers = await ref.read(albumViewersProvider(widget.albumId).future);
+    if (!context.mounted) {
+      return;
+    }
+    final me = ref.read(sessionProvider).value?.accountId;
+
+    // Only the owner blocks someone in the album (D-270).
+    final people = <(String, String)>[
+      for (final viewer in viewers) (viewer.accountId, viewer.label),
+      if (album.isOwner)
+        for (final member in album.members.where((member) => !member.isOwner && member.accountId != me))
+          (member.accountId, member.label),
+    ];
+    final chosen = await showModalBottomSheet<(String, String)>(
+      context: context,
+      builder: (sheet) => people.isEmpty
+          ? Padding(padding: const EdgeInsets.all(24), child: Text(l10n.albumBlockNobody))
+          : ListView(
+              shrinkWrap: true,
+              children: [
+                for (final person in people)
+                  ListTile(title: Text(person.$2), onTap: () => Navigator.of(sheet).pop(person)),
+              ],
+            ),
+    );
+    if (chosen == null || !context.mounted) {
+      return;
+    }
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: Text(l10n.albumBlockConfirmTitle),
+        content: Text(l10n.albumBlockConfirmBody(chosen.$2)),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(dialog).pop(false), child: Text(l10n.cancel)),
+          FilledButton(onPressed: () => Navigator.of(dialog).pop(true), child: Text(l10n.albumBlockConfirm)),
+        ],
+      ),
+    );
+    if (confirmed == true && await act(() => albums.block(widget.albumId, chosen.$1))) {
+      _refresh();
+      ref.invalidate(albumViewersProvider(widget.albumId));
+      ref.invalidate(albumBlockedProvider(widget.albumId));
+    }
+  }
+
   Future<void> _leave() async {
     if (await act(() => albums.leave(widget.albumId, keepContributions: _keep))) {
       ref.invalidate(albumsProvider);
@@ -125,7 +173,7 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
               icon: const Icon(Icons.settings_outlined),
               onPressed: widget.onManage,
             ),
-          if (details.hasValue)
+          if (details.value?.isMember ?? false)
             IconButton(
               tooltip: l10n.albumConsents,
               icon: const Icon(Icons.verified_user_outlined),
@@ -143,18 +191,24 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
               builder: (album) => ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  Text(l10n.albumMyContributions(album.myMemories, album.myPhotos), key: const Key('s10-mine')),
-                  Text(
-                    l10n.albumPoolLeft(bytesText(album.freeBytes), bytesText(album.limitBytes)),
-                    key: const Key('s10-pool'),
-                  ),
-                  Text(l10n.albumNoOwnerState),
+                  if (!album.isMember)
+                    Text(l10n.albumReadOnlyViewer, key: const Key('s10-viewer'))
+                  else ...[
+                    Text(l10n.albumMyContributions(album.myMemories, album.myPhotos), key: const Key('s10-mine')),
+                    Text(
+                      l10n.albumPoolLeft(bytesText(album.freeBytes), bytesText(album.limitBytes)),
+                      key: const Key('s10-pool'),
+                    ),
+                    Text(l10n.albumNoOwnerState),
+                  ],
                   ...failureBlock(context),
-                  const SizedBox(height: 8),
-                  FilledButton(
-                    onPressed: offline || busy ? null : () => _addMemory(context),
-                    child: Text(l10n.albumAddMemory),
-                  ),
+                  if (album.isMember) ...[
+                    const SizedBox(height: 8),
+                    FilledButton(
+                      onPressed: offline || busy ? null : () => _addMemory(context),
+                      child: Text(l10n.albumAddMemory),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   Text(l10n.albumMemories, style: Theme.of(context).textTheme.titleMedium),
                   if (album.memories.isEmpty)
@@ -176,36 +230,43 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
                             ),
                             onTap: () => widget.onOpenMemory(memory.id),
                           ),
-                          Wrap(
-                            spacing: 8,
-                            children: [
-                              if (memory.isMine)
+                          if (album.isMember)
+                            Wrap(
+                              spacing: 8,
+                              children: [
+                                if (memory.isMine)
+                                  TextButton(
+                                    onPressed: offline || busy || album.poolIsFull ? null : () => _addPhotos(memory.id),
+                                    child: Text(l10n.albumAddPhotos),
+                                  ),
                                 TextButton(
-                                  onPressed: offline || busy || album.poolIsFull ? null : () => _addPhotos(memory.id),
-                                  child: Text(l10n.albumAddPhotos),
+                                  onPressed: offline || busy ? null : () => _tag(context, album, memory),
+                                  child: Text(l10n.albumTag),
                                 ),
-                              TextButton(
-                                onPressed: offline || busy ? null : () => _tag(context, album, memory),
-                                child: Text(l10n.albumTag),
-                              ),
-                              if (memory.taggedAccountIds.contains(me))
-                                TextButton(
-                                  onPressed: offline || busy ? null : () => _removeMyTag(memory.id),
-                                  child: Text(l10n.albumRemoveMyTag),
-                                ),
-                            ],
-                          ),
+                                if (memory.taggedAccountIds.contains(me))
+                                  TextButton(
+                                    onPressed: offline || busy ? null : () => _removeMyTag(memory.id),
+                                    child: Text(l10n.albumRemoveMyTag),
+                                  ),
+                              ],
+                            ),
                         ],
                       ),
                     ),
-                  const SizedBox(height: 16),
-                  Text(l10n.albumMembers, style: Theme.of(context).textTheme.titleMedium),
-                  for (final member in album.members)
-                    ListTile(
-                      title: Text(member.label),
-                      subtitle: Text(member.isOwner ? l10n.albumOwnerRole : l10n.albumParticipantRole),
+                  if (album.isMember) ...[
+                    const SizedBox(height: 16),
+                    Text(l10n.albumMembers, style: Theme.of(context).textTheme.titleMedium),
+                    for (final member in album.members)
+                      ListTile(
+                        title: Text(member.label),
+                        subtitle: Text(member.isOwner ? l10n.albumOwnerRole : l10n.albumParticipantRole),
+                      ),
+                    OutlinedButton(
+                      onPressed: offline || busy ? null : () => _block(context, album),
+                      child: Text(l10n.albumBlock),
                     ),
-                  if (!album.isOwner) ...[
+                  ],
+                  if (album.isMember && !album.isOwner) ...[
                     const SizedBox(height: 16),
                     Text(l10n.albumLeave, style: Theme.of(context).textTheme.titleMedium),
                     RadioGroup<bool>(

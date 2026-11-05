@@ -134,6 +134,9 @@ internal sealed class ProbeAccessReader(AccessDatabase database) : IAccessReader
         return (bool)(await command.ExecuteScalarAsync(cancellationToken))!;
     }
 
+    public Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken) =>
+        VisibleAlbumsAsync(personId, cancellationToken);
+
     public async Task<IReadOnlyCollection<Guid>> VisibleAlbumsAsync(Guid personId, CancellationToken cancellationToken)
     {
         await using var command = database.Access.CreateCommand("SELECT album_id FROM access.probe_grants WHERE person_id = $1");
@@ -164,6 +167,9 @@ internal sealed class CachingAccessReader(IAccessReader inner) : IAccessReader
 
         return canSee;
     }
+
+    public Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken) =>
+        VisibleAlbumsAsync(personId, cancellationToken);
 
     public async Task<IReadOnlyCollection<Guid>> VisibleAlbumsAsync(Guid personId, CancellationToken cancellationToken)
     {

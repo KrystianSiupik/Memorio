@@ -10,6 +10,7 @@ AlbumResponse _$AlbumResponseFromJson(Map<String, dynamic> json) => AlbumRespons
   id: json['id'] as String,
   name: json['name'] as String,
   isOwner: json['isOwner'] as bool,
+  isMember: json['isMember'] as bool,
   successorAccountId: json['successorAccountId'] as String?,
   members: (json['members'] as List<dynamic>)
       .map((e) => AlbumMemberResponse.fromJson(e as Map<String, dynamic>))
@@ -28,6 +29,7 @@ Map<String, dynamic> _$AlbumResponseToJson(AlbumResponse instance) => <String, d
   'id': instance.id,
   'name': instance.name,
   'isOwner': instance.isOwner,
+  'isMember': instance.isMember,
   'successorAccountId': instance.successorAccountId,
   'members': instance.members,
   'memories': instance.memories,

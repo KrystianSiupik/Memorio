@@ -4,6 +4,7 @@ using Memorio.SharedKernel.Domain;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Wolverine.EntityFrameworkCore;
+using Wolverine.Runtime;
 
 namespace Memorio.Modules.Album.Infrastructure.Persistence;
 
@@ -92,11 +93,19 @@ internal sealed class Albums(IDbContextOutbox<AlbumDbContext> outbox) : IAlbums
 
         try
         {
-            await outbox.SaveChangesAndFlushMessagesAsync(cancellationToken);
+            // Every save flushes (D-278): by default what a second save in a scope publishes is dropped.
+            await outbox.SaveChangesAndFlushMessagesAsync(MultiFlushMode.AllowMultiples, cancellationToken);
         }
         catch (DbUpdateException exception) when (exception is DbUpdateConcurrencyException
             || exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
         {
+            // The refused transaction must not stay open: PostgreSQL would refuse everything after a failed statement.
+            if (Database.Database.CurrentTransaction is { } transaction)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                await transaction.DisposeAsync();
+            }
+
             Database.ChangeTracker.Clear();
             return false;
         }

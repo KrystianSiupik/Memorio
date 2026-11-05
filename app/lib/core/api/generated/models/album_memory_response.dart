@@ -22,7 +22,7 @@ class AlbumMemoryResponse {
   factory AlbumMemoryResponse.fromJson(Map<String, Object?> json) => _$AlbumMemoryResponseFromJson(json);
 
   final String id;
-  final String authorAccountId;
+  final String? authorAccountId;
   final String? authorEmail;
   final bool isMine;
   final String placeName;

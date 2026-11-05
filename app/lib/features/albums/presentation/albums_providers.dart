@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -58,10 +59,39 @@ final albumSeatsProvider = FutureProvider.family<AlbumSeats, String>(
   retry: noAutomaticRetry,
 );
 
+final albumViewersProvider = FutureProvider.family<List<AlbumViewer>, String>(
+  (ref, id) => _load(ref, (albums) => albums.loadViewers(id)),
+  retry: noAutomaticRetry,
+);
+final albumBlockedProvider = FutureProvider.family<List<AlbumViewer>, String>(
+  (ref, id) => _load(ref, (albums) => albums.loadBlocked(id)),
+  retry: noAutomaticRetry,
+);
+final albumLinkProvider = FutureProvider.family<String?, String>(
+  (ref, id) => _load(ref, (albums) => albums.loadLink(id)),
+  retry: noAutomaticRetry,
+);
+final albumLinkPreviewProvider = FutureProvider.family<AlbumLinkPreview, String>(
+  (ref, token) => _load(ref, (albums) => albums.previewLink(token)),
+  retry: noAutomaticRetry,
+);
+
+/// The address of the app, set at build time: --dart-define=APP_URL=https://...; in a browser its own.
+const _appUrl = String.fromEnvironment('APP_URL');
+
+/// What the owner sends to people. Without a known address, only the path (D-273).
+String albumLinkAddress(String token) {
+  final base = _appUrl.isNotEmpty ? _appUrl : (kIsWeb ? Uri.base.origin : '');
+  return '$base/albums/link/$token';
+}
+
 /// A failure in words, the same on every screen of this feature.
 String albumFailureText(AppLocalizations l10n, Object? failure) => switch (failure) {
   AlbumOffline() => l10n.authOffline,
   AlbumNoAccess() => l10n.albumNoAccess,
+  AlbumBlocked() => l10n.albumBlocked,
+  AlbumLinkGone() => l10n.albumLinkGone,
+  AlbumOnlyOwnerBlocks() => l10n.albumOnlyOwnerBlocks,
   AlbumAlreadyDecided() => l10n.alreadyDecided,
   AlbumNoFreeSeats() => l10n.albumNoFreeSeats,
   AlbumInvitationLimit() => l10n.albumInvitationLimit,
@@ -159,7 +189,8 @@ class AlbumAsyncBody<T> extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            if (value.error is! AlbumNoAccess) TextButton(onPressed: onRetry, child: Text(l10n.retry)),
+            if (value.error is! AlbumNoAccess && value.error is! AlbumBlocked && value.error is! AlbumLinkGone)
+              TextButton(onPressed: onRetry, child: Text(l10n.retry)),
           ],
         ),
       );

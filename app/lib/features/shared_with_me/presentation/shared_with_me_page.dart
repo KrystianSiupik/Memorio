@@ -1,16 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/l10n.dart';
+import '../../../core/offline/offline.dart';
+import '../../albums/albums.dart';
 
-/// S16 Shared with me. Placeholder until its screen ticket.
-class SharedWithMePage extends StatelessWidget {
-  const SharedWithMePage({super.key});
+/// S16 Shared with me: albums the person reads without being in them.
+class SharedWithMePage extends ConsumerWidget {
+  const SharedWithMePage({super.key, required this.onOpenAlbum});
+
+  final void Function(String albumId) onOpenAlbum;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final shared = ref.watch(sharedAlbumsProvider);
+    final offline = ref.watch(isOnlineProvider).value == false;
+
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.sharedTitle)),
-      body: Center(child: Text(context.l10n.sharedTitle)),
+      appBar: AppBar(title: Text(l10n.sharedTitle)),
+      body: Column(
+        children: [
+          if (offline)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(l10n.noConnection, key: const Key('s16-offline')),
+            ),
+          Expanded(
+            child: AlbumAsyncBody(
+              value: shared,
+              onRetry: () => ref.invalidate(sharedAlbumsProvider),
+              builder: (albums) => albums.isEmpty
+                  ? Center(child: Text(l10n.sharedEmpty))
+                  : ListView(
+                      children: [
+                        for (final album in albums)
+                          ListTile(
+                            leading: const Icon(Icons.photo_album_outlined),
+                            title: Text(album.name),
+                            onTap: () => onOpenAlbum(album.id),
+                          ),
+                      ],
+                    ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

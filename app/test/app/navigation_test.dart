@@ -79,6 +79,10 @@ void main() {
     test('sends signed-out users to sign-in, also after a failed restore', () {
       expect(redirect(signedOut, '/map'), SignInRoute.path);
       expect(redirect(signedOut, startPath), SignInRoute.path);
+      expect(redirect(signedOut, '/albums/link/abc'), '/sign-in?from=%2Falbums%2Flink%2Fabc');
+      expect(redirect(signedOut, '/?from=%2Falbums%2Flink%2Fabc'), '/sign-in?from=%2Falbums%2Flink%2Fabc');
+      expect(redirect(signedOut, '/?from=%2Faccount'), SignInRoute.path);
+      expect(redirect(signedOut, '/sign-in?from=%2Falbums%2Flink%2Fabc'), isNull);
       expect(redirect(signedOut, SignInRoute.path), isNull);
       expect(redirect(AsyncError<Session?>(Exception('storage'), StackTrace.empty), '/map'), SignInRoute.path);
     });
@@ -86,6 +90,7 @@ void main() {
     test('sends signed-in users to the requested location or the map', () {
       expect(redirect(signedInValue, '/?from=%2Falbums'), '/albums');
       expect(redirect(signedInValue, startPath), MapRoute.path);
+      expect(redirect(signedInValue, '/sign-in?from=%2Falbums%2Flink%2Fabc'), '/albums/link/abc');
       expect(redirect(signedInValue, SignInRoute.path), MapRoute.path);
       expect(redirect(signedInValue, '/?from=%2Fsign-in'), MapRoute.path);
       expect(redirect(signedInValue, '/shared'), isNull);

@@ -5,6 +5,9 @@ public interface IAlbumMembership
 {
     Task<bool> IsMemberAsync(Guid accountId, Guid albumId, CancellationToken cancellationToken);
 
+    /// <summary>Null when there is no such album.</summary>
+    Task<Guid?> OwnerOfAsync(Guid albumId, CancellationToken cancellationToken);
+
     /// <summary>The albums the person owns or takes part in.</summary>
     Task<IReadOnlyCollection<Guid>> AlbumsOfAsync(Guid accountId, CancellationToken cancellationToken);
 }

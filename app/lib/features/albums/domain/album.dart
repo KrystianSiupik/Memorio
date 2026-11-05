@@ -59,6 +59,7 @@ class AlbumDetails {
     required this.id,
     required this.name,
     required this.isOwner,
+    required this.isMember,
     required this.successorAccountId,
     required this.members,
     required this.memories,
@@ -72,6 +73,9 @@ class AlbumDetails {
   final String id;
   final String name;
   final bool isOwner;
+
+  /// False for someone reading through a link: no people, no addresses, no actions (D-271).
+  final bool isMember;
   final String? successorAccountId;
   final List<AlbumMember> members;
   final List<AlbumMemory> memories;
@@ -150,4 +154,22 @@ class OwnMemory {
   final String id;
   final String placeName;
   final String dateFrom;
+}
+
+/// Someone reading the album through its link (R10).
+class AlbumViewer {
+  const AlbumViewer({required this.accountId, required this.email});
+
+  final String accountId;
+  final String? email;
+
+  String get label => email ?? accountId;
+}
+
+/// What a link leads to (S15).
+class AlbumLinkPreview {
+  const AlbumLinkPreview({required this.albumId, required this.albumName});
+
+  final String albumId;
+  final String albumName;
 }
