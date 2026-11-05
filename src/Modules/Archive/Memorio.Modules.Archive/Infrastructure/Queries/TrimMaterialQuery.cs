@@ -24,7 +24,6 @@ internal sealed class TrimMaterialQuery(ArchiveDbContext database) : ITrimMateri
 
         JOIN archive.memory_albums mine ON mine.memory_id = memory.id AND mine.album_id = @id
         WHERE memory.state = 'Active'
-          AND NOT EXISTS (SELECT 1 FROM archive.memory_albums other WHERE other.memory_id = memory.id AND other.album_id <> @id)
         ORDER BY memory.date_from, memory.id
         """;
 

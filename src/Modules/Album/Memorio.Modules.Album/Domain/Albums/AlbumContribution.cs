@@ -104,6 +104,40 @@ internal sealed class InvitationQuota
     public int Used { get; private set; }
 }
 
+/// <summary>A memory the trim took out of an album (D-290); it comes back when the plan is paid again within 30 days.</summary>
+internal sealed class TrimmedAlbumMemory
+{
+    private TrimmedAlbumMemory()
+    {
+    }
+
+    public AlbumId AlbumId { get; private set; }
+
+    public Guid MemoryId { get; private set; }
+
+    public Guid AuthorAccountId { get; private set; }
+
+    public DateTimeOffset TrimmedAt { get; private set; }
+
+    /// <summary>False while Archive and the pool still have to let it go.</summary>
+    public bool HasLeft { get; private set; }
+
+    public static TrimmedAlbumMemory Create(AlbumId albumId, Guid memoryId, Guid authorAccountId, DateTimeOffset now) =>
+        new() { AlbumId = albumId, MemoryId = memoryId, AuthorAccountId = authorAccountId, TrimmedAt = now };
+
+    public void MarkLeft() => HasLeft = true;
+}
+
+/// <summary>The last plan event about an album applied here; an older one changes nothing (D-013).</summary>
+internal sealed class AppliedPlanEvent(AlbumId albumId, int sequence)
+{
+    public AlbumId AlbumId { get; private set; } = albumId;
+
+    public int Sequence { get; private set; } = sequence;
+
+    public void MoveTo(int sequence) => Sequence = Math.Max(Sequence, sequence);
+}
+
 /// <summary>The last event about a deleted account applied here; an older one changes nothing (D-013).</summary>
 internal sealed class AppliedAccountEvent(Guid accountId, long sequence)
 {

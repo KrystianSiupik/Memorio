@@ -43,6 +43,19 @@ internal interface IAlbums
 
     void Add(AppliedAccountEvent applied);
 
+    Task<AppliedPlanEvent?> FindAppliedPlanEventAsync(AlbumId albumId, CancellationToken cancellationToken);
+
+    void RecordApplied(AppliedPlanEvent? applied, AlbumId albumId, int sequence);
+
+    Task<IReadOnlyList<TrimmedAlbumMemory>> FindTrimmedAsync(AlbumId albumId, CancellationToken cancellationToken);
+
+    void Add(TrimmedAlbumMemory trimmed);
+
+    void Remove(TrimmedAlbumMemory trimmed);
+
+    /// <summary>A memory or account that is gone leaves no trace here.</summary>
+    Task ForgetTrimmedAsync(Guid? memoryId, Guid? authorAccountId, CancellationToken cancellationToken);
+
     /// <summary>Stores the changes with the events of the changed albums, in one transaction. False when another decision got there first.</summary>
     Task<bool> SaveAsync(CancellationToken cancellationToken);
 }

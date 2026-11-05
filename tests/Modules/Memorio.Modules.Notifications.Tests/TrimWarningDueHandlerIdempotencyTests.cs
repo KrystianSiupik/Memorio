@@ -128,7 +128,8 @@ public sealed class TrimWarningDueHandlerIdempotencyTests(NotificationsDatabase 
 
         Assert.Contains("7 dni", subject);
         Assert.Contains("album „Rodzina”", body);
-        Assert.Contains("kosza na 30 dni", body);
+        Assert.Contains("wyjęte z albumu", body);
+        Assert.Contains("zachowają swoje wspomnienia", body);
         Assert.Contains("odnowić plan", body);
     }
 }

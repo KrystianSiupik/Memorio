@@ -93,7 +93,10 @@ class _PlanPageState extends ConsumerState<PlanPage> {
                   ],
                   if (state.trimAt case final DateTime trimAt when !state.isHeld)
                     Text(
-                      l10n.planTrimAt(planDayText(trimAt), bytesText(state.freeLimitBytes)),
+                      (widget.albumId == null ? l10n.planTrimAt : l10n.planAlbumTrimAt)(
+                        planDayText(trimAt),
+                        bytesText(state.freeLimitBytes),
+                      ),
                       key: const Key('s18-trim'),
                     ),
                   if (state.isHeld) Text(l10n.planHeld, key: const Key('s18-held')),

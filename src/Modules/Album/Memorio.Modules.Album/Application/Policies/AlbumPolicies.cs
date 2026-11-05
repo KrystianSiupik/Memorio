@@ -36,6 +36,7 @@ internal sealed class WithdrawContributionsWhenAccountDeleted(IAlbums albums, Co
         }
 
         await albums.ForgetInvitationQuotaAsync(integrationEvent.AccountId, cancellationToken);
+        await albums.ForgetTrimmedAsync(null, integrationEvent.AccountId, cancellationToken);
 
         if (applied is null)
         {
@@ -78,6 +79,7 @@ internal sealed class ForgetContentWhenDeleted(IAlbums albums, IAlbumContent con
 {
     public async Task HandleAsync(ContentDeleted integrationEvent, CancellationToken cancellationToken)
     {
+        await albums.ForgetTrimmedAsync(integrationEvent.MemoryId, null, cancellationToken);
         foreach (var memory in await albums.FindPlacesOfMemoryAsync(integrationEvent.MemoryId, cancellationToken))
         {
             await content.UnlinkAsync(memory.MemoryId, memory.AlbumId.Value, cancellationToken);

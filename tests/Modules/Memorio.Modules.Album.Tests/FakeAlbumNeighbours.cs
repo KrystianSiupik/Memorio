@@ -84,7 +84,30 @@ public sealed class FakeAlbumNeighbours : IAlbumSeatLimit, IInvitationBlocks, IA
 
     public Task UnlinkAsync(Guid memoryId, Guid albumId, CancellationToken cancellationToken)
     {
+        if (_failNextUnlink.TryRemove(memoryId, out _))
+        {
+            throw new InvalidOperationException("Archive does not answer.");
+        }
+
         _links.TryRemove((memoryId, albumId), out _);
+        return Task.CompletedTask;
+    }
+
+    private readonly ConcurrentDictionary<Guid, IReadOnlyList<Guid>> _trimmedAway = new();
+    private readonly ConcurrentDictionary<Guid, bool> _failNextUnlink = new();
+
+    public void TrimsAway(Guid albumId, params Guid[] memories) => _trimmedAway[albumId] = memories;
+
+    public void FailNextUnlink(Guid memoryId) => _failNextUnlink[memoryId] = true;
+
+    public void PoolFull(Guid albumId) => _fullPools[albumId] = true;
+
+    public Task<IReadOnlyList<Guid>> ChooseToTrimAsync(Guid albumId, IReadOnlyCollection<Guid> keptMemoryIds, long limitBytes, CancellationToken cancellationToken) =>
+        Task.FromResult(_trimmedAway.GetValueOrDefault(albumId) ?? []);
+
+    public Task ReserveOverLimitAsync(Guid albumId, Guid operationKey, long bytes, CancellationToken cancellationToken)
+    {
+        _reserved[operationKey] = bytes;
         return Task.CompletedTask;
     }
 

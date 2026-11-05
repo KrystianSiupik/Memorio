@@ -84,27 +84,26 @@ public sealed class TrimOrderedHandlerIdempotencyTests(ArchiveDatabase database)
     }
 
     [Fact]
-    public async Task An_album_loses_only_what_is_in_no_other_album()
+    public async Task An_order_about_an_album_trashes_nothing_and_says_what_would_go()
     {
         var album = Guid.CreateVersion7();
-        var alone = await database.AddMemoryAsync(Guid.CreateVersion7(), photoBytes: 100);
-        var shared = await database.AddMemoryAsync(Guid.CreateVersion7(), photoBytes: 100);
-        var elsewhere = await database.AddMemoryAsync(Guid.CreateVersion7(), photoBytes: 100);
+        var older = await database.AddMemoryAsync(Guid.CreateVersion7(), dateFrom: new DateOnly(1990, 1, 1), photoBytes: 100);
+        var newer = await database.AddMemoryAsync(Guid.CreateVersion7(), dateFrom: new DateOnly(2020, 1, 1), photoBytes: 100);
         await using var scope = database.CreateScope();
         var content = scope.ServiceProvider.GetRequiredService<IAlbumContent>();
-        await content.LinkAsync(alone.Id.Value, album, Cancellation);
-        await content.LinkAsync(shared.Id.Value, album, Cancellation);
-        await content.LinkAsync(shared.Id.Value, Guid.CreateVersion7(), Cancellation);
+        await content.LinkAsync(older.Id.Value, album, Cancellation);
+        await content.LinkAsync(newer.Id.Value, album, Cancellation);
+        await content.LinkAsync(newer.Id.Value, Guid.CreateVersion7(), Cancellation);
 
         var material = await content.TrimMaterialAsync(album, Cancellation);
-        Assert.Equal(alone.Id.Value, Assert.Single(material).MemoryId);
-        Assert.Equal(100, material[0].SizeBytes);
+        Assert.Equal([older.Id.Value, newer.Id.Value], material.Select(item => item.MemoryId));
+        Assert.Equal([newer.Id.Value], await content.ChooseToTrimAsync(album, [], 100, Cancellation));
+        Assert.Equal([older.Id.Value], await content.ChooseToTrimAsync(album, [newer.Id.Value], 100, Cancellation));
 
         await DeliverAsync(Order(album, 0, isAlbum: true));
 
-        Assert.Equal(MemoryState.Trashed, (await database.FindAsync(alone.Id))!.State);
-        Assert.Equal(MemoryState.Active, (await database.FindAsync(shared.Id))!.State);
-        Assert.Equal(MemoryState.Active, (await database.FindAsync(elsewhere.Id))!.State);
+        Assert.Equal(MemoryState.Active, (await database.FindAsync(older.Id))!.State);
+        Assert.Equal(MemoryState.Active, (await database.FindAsync(newer.Id))!.State);
     }
 
     [Fact]

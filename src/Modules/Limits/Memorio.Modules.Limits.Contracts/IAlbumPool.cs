@@ -6,6 +6,9 @@ public interface IAlbumPool
     /// <summary>False when it does not fit. The same key again changes nothing and answers true.</summary>
     Task<bool> TryReserveAsync(Guid albumId, Guid operationKey, long bytes, CancellationToken cancellationToken);
 
+    /// <summary>Content that was in the album already comes back (D-290): it counts even over the limit. The same key again changes nothing.</summary>
+    Task ReserveOverLimitAsync(Guid albumId, Guid operationKey, long bytes, CancellationToken cancellationToken);
+
     /// <summary>The space of this content comes back; safe to call again.</summary>
     Task ReleaseAsync(Guid operationKey, CancellationToken cancellationToken);
 

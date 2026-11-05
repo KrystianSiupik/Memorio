@@ -77,6 +77,22 @@ public sealed class PlanReadOnlyHandlerIdempotencyTests(LimitsDatabase database)
     }
 
     [Fact]
+    public async Task What_comes_back_to_an_album_counts_over_the_limit_once()
+    {
+        var pool = Guid.CreateVersion7();
+        var key = Guid.CreateVersion7();
+        await using var scope = database.CreateScope();
+        var services = scope.ServiceProvider;
+        await services.GetRequiredService<SetLimitFromPlan>().HandleAsync(new PlanReadOnlyEvent(Guid.CreateVersion7(), DateTimeOffset.UtcNow, pool, true, 0, 0, 2), Cancellation);
+        var albums = services.GetRequiredService<IAlbumPool>();
+
+        await albums.ReserveOverLimitAsync(pool, key, 500, Cancellation);
+        await albums.ReserveOverLimitAsync(pool, key, 500, Cancellation);
+
+        Assert.Equal(500, (await albums.GetStateAsync(pool, Cancellation)).UsedBytes);
+    }
+
+    [Fact]
     public async Task The_command_says_when_it_changed_nothing()
     {
         var pool = Guid.CreateVersion7();

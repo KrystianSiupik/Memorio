@@ -15,7 +15,10 @@ public interface IAlbumContent
     /// <summary>The memory no longer is in the album; photos its pool paid for go back to the author's. Safe to call again.</summary>
     Task UnlinkAsync(Guid memoryId, Guid albumId, CancellationToken cancellationToken);
 
-    /// <summary>What the trim of this album could take, oldest first (S19). Memories that are also in another album stay out (D-284).</summary>
+    /// <summary>What goes when this album comes down to the limit: the owner's choice stays first, then the oldest (D-284).</summary>
+    Task<IReadOnlyList<Guid>> ChooseToTrimAsync(Guid albumId, IReadOnlyCollection<Guid> keptMemoryIds, long limitBytes, CancellationToken cancellationToken);
+
+    /// <summary>What the trim of this album could take, oldest first (S19).</summary>
     Task<IReadOnlyList<AlbumTrimMaterial>> TrimMaterialAsync(Guid albumId, CancellationToken cancellationToken);
 
     /// <summary>C56: stores the photo with the album's pool paying for it (MEM-E3-ARCHIWUM-01).</summary>

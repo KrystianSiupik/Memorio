@@ -8,14 +8,16 @@ namespace Memorio.Modules.Archive.Application.Policies;
 internal sealed class TrimWhenOrdered(TrimArchiveHandler trim) : IIntegrationEventPolicy<TrimOrderedEvent>
 {
     public Task HandleAsync(TrimOrderedEvent integrationEvent, CancellationToken cancellationToken) =>
-        trim.HandleAsync(
-            new TrimArchive(integrationEvent.ResourceId, integrationEvent.IsAlbum, integrationEvent.LimitBytes, integrationEvent.KeptMemoryIds, integrationEvent.Sequence),
-            cancellationToken);
+        integrationEvent.IsAlbum
+            ? Task.CompletedTask
+            : trim.HandleAsync(new TrimArchive(integrationEvent.ResourceId, integrationEvent.LimitBytes, integrationEvent.KeptMemoryIds, integrationEvent.Sequence), cancellationToken);
 }
 
 /// <summary>P44: whenever a plan is active again, what was trimmed comes back while its 30 days last.</summary>
 internal sealed class RestoreTrimmedWhenPlanActive(RestoreTrimmedHandler restore) : IIntegrationEventPolicy<PlanActivatedEvent>
 {
     public Task HandleAsync(PlanActivatedEvent integrationEvent, CancellationToken cancellationToken) =>
-        restore.HandleAsync(new RestoreTrimmed(integrationEvent.ResourceId, integrationEvent.Sequence), cancellationToken);
+        integrationEvent.IsAlbum
+            ? Task.CompletedTask
+            : restore.HandleAsync(new RestoreTrimmed(integrationEvent.ResourceId, integrationEvent.Sequence), cancellationToken);
 }

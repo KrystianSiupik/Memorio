@@ -1507,6 +1507,12 @@ abstract class AppLocalizations {
   /// **'{date}: to, co przekracza {limit}, trafi do kosza na 30 dni.'**
   String planTrimAt(String date, String limit);
 
+  /// No description provided for @planAlbumTrimAt.
+  ///
+  /// In pl, this message translates to:
+  /// **'{date}: to, co przekracza {limit}, zostanie wyjęte z albumu. Autorzy zachowają swoje wspomnienia na własnych kontach.'**
+  String planAlbumTrimAt(String date, String limit);
+
   /// No description provided for @planHeld.
   ///
   /// In pl, this message translates to:

@@ -66,6 +66,8 @@ public sealed class AlbumModule : IModule
         services.AddScoped<RecordInvitationWeekPassed>();
         services.AddScoped<WithdrawContributionsWhenAccountDeleted>();
         services.AddScoped<ForgetContentWhenDeleted>();
+        services.AddScoped<TrimAlbumWhenOrdered>();
+        services.AddScoped<RestoreTrimmedWhenPlanActive>();
         services.AddScoped<RemoveBlockedParticipant>();
 
         // IDeadlines exists in the worker only, the one host running these (D-157): built on demand, so the

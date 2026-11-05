@@ -18,9 +18,34 @@ internal sealed class AlbumDbContext(DbContextOptions<AlbumDbContext> options) :
 
     public DbSet<AppliedAccountEvent> AppliedAccountEvents => Set<AppliedAccountEvent>();
 
+    public DbSet<AppliedPlanEvent> AppliedPlanEvents => Set<AppliedPlanEvent>();
+
+    public DbSet<TrimmedAlbumMemory> TrimmedMemories => Set<TrimmedAlbumMemory>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.HasDefaultSchema(Schema);
+
+        builder.Entity<AppliedPlanEvent>(applied =>
+        {
+            applied.ToTable("applied_plan_events");
+            applied.HasKey(item => item.AlbumId);
+            applied.Property(item => item.AlbumId).HasColumnName("album_id").HasConversion(id => id.Value, value => new AlbumId(value)).ValueGeneratedNever();
+            applied.Property(item => item.Sequence).HasColumnName("sequence");
+        });
+
+        builder.Entity<TrimmedAlbumMemory>(trimmed =>
+        {
+            trimmed.ToTable("trimmed_memories");
+            trimmed.HasKey(item => new { item.AlbumId, item.MemoryId });
+            trimmed.Property(item => item.AlbumId).HasColumnName("album_id").HasConversion(id => id.Value, value => new AlbumId(value));
+            trimmed.Property(item => item.MemoryId).HasColumnName("memory_id");
+            trimmed.Property(item => item.AuthorAccountId).HasColumnName("author_account_id");
+            trimmed.Property(item => item.TrimmedAt).HasColumnName("trimmed_at");
+            trimmed.Property(item => item.HasLeft).HasColumnName("has_left");
+            trimmed.HasIndex(item => item.MemoryId).HasDatabaseName("ix_trimmed_memories_memory_id");
+            trimmed.HasIndex(item => item.AuthorAccountId).HasDatabaseName("ix_trimmed_memories_author_account_id");
+        });
 
         builder.Entity<SharedAlbum>(album =>
         {

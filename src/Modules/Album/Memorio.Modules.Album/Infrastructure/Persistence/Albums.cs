@@ -81,6 +81,33 @@ internal sealed class Albums(IDbContextOutbox<AlbumDbContext> outbox) : IAlbums
 
     public void Add(AppliedAccountEvent applied) => Database.AppliedAccountEvents.Add(applied);
 
+    public Task<AppliedPlanEvent?> FindAppliedPlanEventAsync(AlbumId albumId, CancellationToken cancellationToken) =>
+        Database.AppliedPlanEvents.FirstOrDefaultAsync(applied => applied.AlbumId == albumId, cancellationToken);
+
+    public void RecordApplied(AppliedPlanEvent? applied, AlbumId albumId, int sequence)
+    {
+        if (applied is null)
+        {
+            Database.AppliedPlanEvents.Add(new AppliedPlanEvent(albumId, sequence));
+        }
+        else
+        {
+            applied.MoveTo(sequence);
+        }
+    }
+
+    public async Task<IReadOnlyList<TrimmedAlbumMemory>> FindTrimmedAsync(AlbumId albumId, CancellationToken cancellationToken) =>
+        await Database.TrimmedMemories.Where(trimmed => trimmed.AlbumId == albumId).ToListAsync(cancellationToken);
+
+    public void Add(TrimmedAlbumMemory trimmed) => Database.TrimmedMemories.Add(trimmed);
+
+    public void Remove(TrimmedAlbumMemory trimmed) => Database.TrimmedMemories.Remove(trimmed);
+
+    public Task ForgetTrimmedAsync(Guid? memoryId, Guid? authorAccountId, CancellationToken cancellationToken) =>
+        Database.Database.ExecuteSqlAsync(
+            $"DELETE FROM album.trimmed_memories WHERE memory_id = {memoryId} OR author_account_id = {authorAccountId}",
+            cancellationToken);
+
     public async Task<bool> SaveAsync(CancellationToken cancellationToken)
     {
         foreach (var album in Database.ChangeTracker.Entries<SharedAlbum>().Select(entry => entry.Entity).ToList())
