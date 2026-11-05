@@ -64,6 +64,7 @@ String albumFailureText(AppLocalizations l10n, Object? failure) => switch (failu
   AlbumNoAccess() => l10n.albumNoAccess,
   AlbumAlreadyDecided() => l10n.alreadyDecided,
   AlbumNoFreeSeats() => l10n.albumNoFreeSeats,
+  AlbumInvitationLimit() => l10n.albumInvitationLimit,
   AlbumAddressBlocked() => l10n.albumAddressBlocked,
   AlbumInvitationGone() => l10n.albumInvitationGone,
   AlbumPoolFull() => l10n.albumPoolFull,

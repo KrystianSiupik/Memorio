@@ -249,6 +249,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get albumNoFreeSeats => 'W planie tego albumu nie ma wolnego miejsca.';
 
   @override
+  String get albumInvitationLimit => 'Dzisiejszy limit 10 zaproszeń został wykorzystany. Spróbuj jutro.';
+
+  @override
   String get albumAddressBlocked => 'Ten adres nie przyjmuje zaproszeń.';
 
   @override

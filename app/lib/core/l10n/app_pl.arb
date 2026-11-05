@@ -73,6 +73,7 @@
   "albumNameRequired": "Podaj nazwę albumu.",
   "albumNoAccess": "Nie masz już dostępu do tego albumu.",
   "albumNoFreeSeats": "W planie tego albumu nie ma wolnego miejsca.",
+  "albumInvitationLimit": "Dzisiejszy limit 10 zaproszeń został wykorzystany. Spróbuj jutro.",
   "albumAddressBlocked": "Ten adres nie przyjmuje zaproszeń.",
   "albumInvitationGone": "Zaproszenie wygasło albo zostało wycofane.",
   "albumPoolFull": "Pula albumu jest pełna. Właściciel dostał powiadomienie.",

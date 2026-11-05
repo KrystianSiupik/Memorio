@@ -45,7 +45,8 @@ internal sealed class AlbumMessaging(AlbumDbContext database) : IAlbumMessaging
     public Task<PendingInvitation?> FindPendingInvitationAsync(Guid invitationId, CancellationToken cancellationToken) =>
         database.Database.GetDbConnection().QuerySingleOrDefaultAsync<PendingInvitation>(new CommandDefinition(
             """
-            SELECT album_id AS "AlbumId", email AS "Email" FROM album.album_invitations WHERE id = @invitationId AND state = 'Pending'
+            SELECT album_id AS "AlbumId", email AS "Email", invited_by_account_id AS "InvitedByAccountId"
+            FROM album.album_invitations WHERE id = @invitationId AND state = 'Pending'
             """,
             new { invitationId },
             cancellationToken: cancellationToken));

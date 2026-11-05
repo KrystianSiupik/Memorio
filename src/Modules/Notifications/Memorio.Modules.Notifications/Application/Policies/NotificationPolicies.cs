@@ -7,7 +7,7 @@ using Memorio.SharedKernel.Messaging;
 namespace Memorio.Modules.Notifications.Application.Policies;
 
 /// <summary>E42: the invitation itself. The block is checked again at sending, the cost of the race is one message (D-012).</summary>
-internal sealed class SendInvitation(IAlbumMessaging albums, IInvitationBlocks blocks, SendOnce send) : IIntegrationEventPolicy<InvitationSentEvent>
+internal sealed class SendInvitation(IAlbumMessaging albums, IInvitationBlocks blocks, IAccountDirectory directory, SendOnce send) : IIntegrationEventPolicy<InvitationSentEvent>
 {
     public async Task HandleAsync(InvitationSentEvent integrationEvent, CancellationToken cancellationToken)
     {
@@ -17,12 +17,12 @@ internal sealed class SendInvitation(IAlbumMessaging albums, IInvitationBlocks b
             return;
         }
 
-        await send.SendAsync($"invitation:{integrationEvent.InvitationId}", integrationEvent.Sequence, invitation.Email, NotificationKind.Invitation, integrationEvent.AlbumId, cancellationToken);
+        await send.SendAsync($"invitation:{integrationEvent.InvitationId}", integrationEvent.Sequence, invitation.Email, NotificationKind.Invitation, integrationEvent.AlbumId, cancellationToken, await directory.EmailOfAsync(invitation.InvitedByAccountId, cancellationToken));
     }
 }
 
 /// <summary>P6 and C43: one reminder after 7 days without an answer.</summary>
-internal sealed class SendInvitationReminder(IAlbumMessaging albums, IInvitationBlocks blocks, SendOnce send) : IIntegrationEventPolicy<InvitationWeekPassedEvent>
+internal sealed class SendInvitationReminder(IAlbumMessaging albums, IInvitationBlocks blocks, IAccountDirectory directory, SendOnce send) : IIntegrationEventPolicy<InvitationWeekPassedEvent>
 {
     public async Task HandleAsync(InvitationWeekPassedEvent integrationEvent, CancellationToken cancellationToken)
     {
@@ -32,7 +32,7 @@ internal sealed class SendInvitationReminder(IAlbumMessaging albums, IInvitation
             return;
         }
 
-        await send.SendAsync($"reminder:{integrationEvent.InvitationId}", integrationEvent.Sequence, invitation.Email, NotificationKind.InvitationReminder, integrationEvent.AlbumId, cancellationToken);
+        await send.SendAsync($"reminder:{integrationEvent.InvitationId}", integrationEvent.Sequence, invitation.Email, NotificationKind.InvitationReminder, integrationEvent.AlbumId, cancellationToken, await directory.EmailOfAsync(invitation.InvitedByAccountId, cancellationToken));
     }
 }
 

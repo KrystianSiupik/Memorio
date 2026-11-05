@@ -286,6 +286,7 @@ void main() {
 
     const refusals = <AlbumFailure, String>{
       AlbumNoFreeSeats(): 'W planie tego albumu nie ma wolnego miejsca.',
+      AlbumInvitationLimit(): 'Dzisiejszy limit 10 zaproszeń został wykorzystany. Spróbuj jutro.',
       AlbumAddressBlocked(): 'Ten adres nie przyjmuje zaproszeń.',
       AlbumAlreadyDecided(): 'To już rozstrzygnięte. Odśwież i sprawdź aktualny stan.',
     };

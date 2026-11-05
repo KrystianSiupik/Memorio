@@ -270,6 +270,7 @@ class HttpAlbumsRepository implements AlbumsRepository {
     final code = body is Map ? body['code'] : null;
     return switch (code) {
       'Album.NoFreeSeats' => const AlbumNoFreeSeats(),
+      'Album.InvitationLimitReached' => const AlbumInvitationLimit(),
       'Album.AddressBlocked' => const AlbumAddressBlocked(),
       'Album.InvitationGone' => const AlbumInvitationGone(),
       'Album.PoolFull' || 'Archive.SpaceLimitExceeded' => const AlbumPoolFull(),

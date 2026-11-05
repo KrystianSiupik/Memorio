@@ -929,3 +929,14 @@ Wszystkie 49 ticketów E3 ma wynik w `version/0.1` lokalnie, na polecenie PO: �
 - Nie ma limitu zaproszeń na osobę: limit miejsc dotyczy jednego albumu, a albumów można tworzyć dowolnie dużo, z dowolną nazwą trafiającą do wiadomości. Ktoś mógłby tak wysyłać niechciane wiadomości i psuć reputację domeny.
 - Osoba bez konta nie wyłączy zaproszeń bez założenia konta, zob. `docs/pytania-do-prawnika.md`, pytanie 8.
 - Wiadomość nie mówi, kto zaprasza; widać to dopiero na S14.
+
+## Limit zaproszeń i zapraszający w wiadomości (MEM-E3-ALBUM-02, MEM-E3-POWIADOMIENIA-01, 2026-11-05)
+
+Zrobione w jednej gałęzi, bo obie zmiany dotyczą tej samej wiadomości z zaproszeniem. Odstępstwo od zasady jednej gałęzi na ticket.
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-267 | **Decyzja PO:** limit 10 zaproszeń. PO nie powiedział „na dzień”; przyjęte z propozycji: **10 na dobę UTC na konto, we wszystkich albumach razem**. Ponowne zaproszenie tego samego adresu też się liczy, bo wysyła maila. Odmowa (brak miejsca, zablokowany adres) się nie liczy. Po przekroczeniu 409 `Album.InvitationLimitReached`. Licznik to warunkowy zapis w `album.invitation_quotas`, więc równoległe zaproszenia nie przekroczą limitu. **Znane:** zapis w albumie, który przegra po 3 próbach, zużywa jedno zaproszenie mimo braku wysyłki | zamyka ryzyko wysyłania niechcianych wiadomości z D-265 |
+| D-268 | **Decyzja PO, zmienia D-266:** zaproszenie i przypomnienie podają, kto zaprasza. Konto nie ma nazwy, więc jest to **adres e-mail zapraszającego**, ujawniany osobie, której adres wpisał, także bez konta. Inne wiadomości nie podają nikogo | taki mail trudniej wziąć za spam. Pytanie do prawnika 8 uzupełnione |
+
+**Stan testów:** Album 58/58 (w tym 15 równoległych zaproszeń), Powiadomienia 23/23, aplikacja 219/219, baza 75/75, architektura 49/49, API 46/46. **Nie sprawdzono:** prawdziwej wysyłki, bo nadal nie ma konta Scaleway.

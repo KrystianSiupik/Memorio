@@ -97,6 +97,25 @@ namespace Memorio.Modules.Album.Infrastructure.Persistence.Migrations
                     b.ToTable("album_entrustments", "album");
                 });
 
+            modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.InvitationQuota", b =>
+                {
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<DateOnly>("Day")
+                        .HasColumnType("date")
+                        .HasColumnName("day");
+
+                    b.Property<int>("Used")
+                        .HasColumnType("integer")
+                        .HasColumnName("used");
+
+                    b.HasKey("AccountId", "Day");
+
+                    b.ToTable("invitation_quotas", "album");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.KeptContribution", b =>
                 {
                     b.Property<Guid>("AlbumId")

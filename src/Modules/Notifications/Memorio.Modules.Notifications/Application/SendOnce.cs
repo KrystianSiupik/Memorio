@@ -10,7 +10,7 @@ namespace Memorio.Modules.Notifications.Application;
 /// </summary>
 internal sealed class SendOnce(INotificationLedger ledger, INotificationSender sender, TimeProvider clock)
 {
-    public async Task SendAsync(string subject, long sequence, string email, NotificationKind kind, Guid albumId, CancellationToken cancellationToken)
+    public async Task SendAsync(string subject, long sequence, string email, NotificationKind kind, Guid albumId, CancellationToken cancellationToken, string? invitedBy = null)
     {
         var sent = await ledger.FindAsync(subject, cancellationToken);
         if (sent is null)
@@ -29,7 +29,7 @@ internal sealed class SendOnce(INotificationLedger ledger, INotificationSender s
             await ledger.SaveAsync(cancellationToken);
         }
 
-        await sender.SendAsync(email, kind, albumId, cancellationToken);
+        await sender.SendAsync(email, kind, albumId, invitedBy, cancellationToken);
         sent.MarkSent(clock.GetUtcNow());
         await ledger.SaveAsync(cancellationToken);
     }
