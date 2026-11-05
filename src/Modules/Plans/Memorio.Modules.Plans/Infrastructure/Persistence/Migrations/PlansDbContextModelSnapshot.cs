@@ -23,6 +23,86 @@ namespace Memorio.Modules.Plans.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Memorio.Modules.Plans.Domain.Cycle.PlanCycle", b =>
+                {
+                    b.Property<string>("ResourceKind")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("resource_kind");
+
+                    b.Property<Guid>("ResourceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("resource_id");
+
+                    b.Property<DateTimeOffset?>("EntitledUntil")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("entitled_until");
+
+                    b.Property<DateTimeOffset?>("HeldSince")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("held_since");
+
+                    b.Property<bool>("IsOwnerless")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_ownerless");
+
+                    b.PrimitiveCollection<Guid[]>("KeptMemoryIds")
+                        .IsRequired()
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("kept_memory_ids");
+
+                    b.Property<DateTimeOffset?>("LedgerCheckedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ledger_checked_at");
+
+                    b.Property<string>("Mode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("mode");
+
+                    b.Property<DateTimeOffset?>("ReadOnlySince")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("read_only_since");
+
+                    b.Property<int>("Sequence")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence");
+
+                    b.Property<DateTimeOffset?>("TrimAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("trim_at");
+
+                    b.Property<DateTimeOffset?>("TrimmedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("trimmed_at");
+
+                    b.Property<int>("WarningRound")
+                        .HasColumnType("integer")
+                        .HasColumnName("warning_round");
+
+                    b.PrimitiveCollection<int[]>("WarningsDelivered")
+                        .IsRequired()
+                        .HasColumnType("integer[]")
+                        .HasColumnName("warnings_delivered");
+
+                    b.PrimitiveCollection<int[]>("WarningsDue")
+                        .IsRequired()
+                        .HasColumnType("integer[]")
+                        .HasColumnName("warnings_due");
+
+                    b.HasKey("ResourceKind", "ResourceId");
+
+                    b.HasIndex("Mode", "EntitledUntil")
+                        .HasDatabaseName("ix_plan_cycles_mode_entitled_until");
+
+                    b.HasIndex("Mode", "TrimAt")
+                        .HasDatabaseName("ix_plan_cycles_mode_trim_at");
+
+                    b.ToTable("plan_cycles", "plans");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Plans.Domain.Entitlements.EntitlementEntry", b =>
                 {
                     b.Property<string>("Source")

@@ -1,14 +1,24 @@
 using Memorio.Modularity;
+using Memorio.Modules.Plans.Api;
+using Memorio.Modules.Plans.Application.Commands.Cycle;
 using Memorio.Modules.Plans.Application.Commands.RecordEntitlement;
 using Memorio.Modules.Plans.Application.Entitlements;
+using Memorio.Modules.Plans.Application.Policies;
+using Memorio.Modules.Plans.Application.Ports;
+using Memorio.Modules.Plans.Application.Queries;
 using Memorio.Modules.Plans.Contracts;
+using Memorio.Modules.Plans.Domain.Cycle;
 using Memorio.Modules.Plans.Domain.Entitlements;
 using Memorio.Modules.Plans.Infrastructure;
 using Memorio.Modules.Plans.Infrastructure.Persistence;
+using Memorio.Modules.Plans.Infrastructure.Queries;
+using Memorio.Modules.Plans.Infrastructure.Scheduling;
+using Memorio.Modules.Plans.Infrastructure.Sources;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Wolverine.EntityFrameworkCore;
 
 namespace Memorio.Modules.Plans;
 
@@ -32,11 +42,21 @@ public sealed class PlansModule : IModule
         }
 
         services.TryAddSingleton(TimeProvider.System);
-        services.AddDbContext<PlansDbContext>(database => database.UsePlansDatabase(connectionString));
+        services.AddDbContextWithWolverineIntegration<PlansDbContext>(database => database.UsePlansDatabase(connectionString));
         services.AddScoped<IEntitlementLedger, EntitlementLedger>();
         services.AddScoped<RecordEntitlementHandler>();
         services.AddScoped<PlanEntitlements>();
         services.AddScoped<IAlbumSeatLimit, AlbumSeatLimit>();
+        services.AddScoped<IPlanCycles, PlanCycles>();
+        services.AddScoped<IPlanStateQuery, PlanStateQuery>();
+        services.TryAddScoped<ISubscriptionSource, NoSubscriptionSource>();
+        services.AddScoped<AdvanceCycleHandler>();
+        services.AddScoped<RefreshSubscriptionHandler>();
+        services.AddScoped<KeepMaterialHandler>();
+        services.AddScoped<ActivateAfterTakeoverHandler>();
+        services.AddScoped<MarkAlbumOwnerlessHandler>();
+        services.AddScoped<CloseCycleWhenAccountDeleted>();
+        services.AddScheduledJob<PlanCycleJob>(PlanCycleJob.JobName, PlanCycleJob.Cron);
 
         services.AddHealthChecks().AddCheck<PlansDatabaseHealthCheck>(PlansDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))
@@ -45,7 +65,5 @@ public sealed class PlansModule : IModule
         }
     }
 
-    public void MapEndpoints(IEndpointRouteBuilder endpoints)
-    {
-    }
+    public void MapEndpoints(IEndpointRouteBuilder endpoints) => endpoints.MapPlanEndpoints();
 }

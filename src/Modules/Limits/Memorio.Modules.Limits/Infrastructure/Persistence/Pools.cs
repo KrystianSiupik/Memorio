@@ -1,3 +1,4 @@
+using Memorio.Modules.Limits.Contracts;
 using Memorio.Modules.Limits.Domain.Pools;
 using Microsoft.EntityFrameworkCore;
 
@@ -121,6 +122,15 @@ internal sealed class Pools(LimitsDbContext database) : IPools
     {
         var pool = await database.Set<AccountPool>().AsNoTracking().FirstOrDefaultAsync(item => item.AccountId == poolId, cancellationToken);
         return pool is null ? (0, AccountPool.DefaultLimitBytes) : (pool.UsedBytes, pool.LimitBytes);
+    }
+
+    public async Task<PoolStanding> GetStandingAsync(Guid poolId, DateTimeOffset at, CancellationToken cancellationToken)
+    {
+        var period = new DateOnly(at.UtcDateTime.Year, at.UtcDateTime.Month, 1);
+        var pool = await database.Set<AccountPool>().AsNoTracking().FirstOrDefaultAsync(item => item.AccountId == poolId, cancellationToken);
+        return pool is null
+            ? new PoolStanding(0, AccountPool.DefaultLimitBytes, 0, 0)
+            : new PoolStanding(pool.UsedBytes, pool.LimitBytes, pool.AiPeriod == period ? pool.AiUsed : 0, pool.AiLimit);
     }
 
     public async Task<bool> SetLimitAsync(Guid accountId, long limitBytes, int aiLimit, long sequence, CancellationToken cancellationToken)
