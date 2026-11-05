@@ -50,7 +50,7 @@ public sealed class RestoreMemoryTests(ArchiveDatabase database)
     public void Trimmed_material_comes_back_only_with_a_paid_plan_and_only_during_the_window()
     {
         var memory = NewMemory();
-        memory.MoveToTrashByTrimming(Now);
+        memory.MoveToTrashByTrimming(Now, Guid.CreateVersion7());
 
         Assert.Equal(MemoryErrors.PlanRequired, memory.Restore(Now.AddDays(1), planPaid: false).Error);
         Assert.Equal(MemoryErrors.AlreadyDecided, memory.Restore(Now.AddDays(30), planPaid: true).Error);

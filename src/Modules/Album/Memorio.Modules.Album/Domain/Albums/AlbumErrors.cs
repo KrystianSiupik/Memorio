@@ -36,6 +36,9 @@ internal static class AlbumErrors
 
     public static readonly Error UploadMissing = Error.NotFound("Album.UploadMissing", "The upload does not exist; it may have expired.");
 
+    /// <summary>E95: the plan ended; everyone reads, nothing new comes in (S2:B1).</summary>
+    public static readonly Error ReadOnly = Error.Conflict("Album.ReadOnly", "The plan of this album ended: nothing can be added until it is paid again.");
+
     public static readonly Error IdTaken = Error.Conflict("Album.IdTaken", "This id belongs to another album.");
 
     /// <summary>Somebody got there first.</summary>

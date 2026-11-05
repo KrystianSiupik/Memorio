@@ -10,6 +10,7 @@ using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
 using Memorio.Modules.Archive.Application.Queries.MemoryMap;
 using Memorio.Modules.Archive.Application.Queries.MyMemories;
 using Memorio.Modules.Archive.Application.Queries.Trash;
+using Memorio.Modules.Archive.Application.Queries.TrimMaterial;
 using Memorio.Modules.Archive.Domain.Memories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -34,6 +35,9 @@ internal static class MemoriesEndpoints
         memories.MapGet("/mine", GetMineAsync)
             .WithName("ListMyMemories")
             .WithSummary("The person's own active memories, newest first.");
+        memories.MapGet("/trim-material", GetTrimMaterialAsync)
+            .WithName("GetTrimMaterial")
+            .WithSummary("What a trim of the person's archive could take, oldest first, with sizes.");
         memories.MapPost("/{id:guid}/restore", RestoreAsync)
             .WithName("RestoreMemory")
             .WithSummary("Takes the person's content back from the trash while its 30 days last.");
@@ -164,6 +168,16 @@ internal static class MemoriesEndpoints
             [.. trashed.Select(item => new TrashedMemoryResponse(item.Id, item.PlaceName, item.DateFrom, item.Description, item.Photos, item.TrashedAt, item.DaysLeft))]);
     }
 
+    private static async Task<Ok<IReadOnlyList<TrimMaterialResponse>>> GetTrimMaterialAsync(
+        ClaimsPrincipal principal,
+        ITrimMaterialQuery query,
+        CancellationToken cancellationToken)
+    {
+        var items = await query.OfAccountAsync(CurrentAccount.IdOf(principal), cancellationToken);
+        return TypedResults.Ok<IReadOnlyList<TrimMaterialResponse>>(
+            [.. items.Select(item => new TrimMaterialResponse(item.MemoryId, item.PlaceName, item.DateFrom, item.SizeBytes))]);
+    }
+
     private static async Task<Ok<IReadOnlyList<MyMemoryResponse>>> GetMineAsync(
         ClaimsPrincipal principal,
         IMyMemoriesQuery query,
@@ -268,3 +282,5 @@ internal sealed record AddPhotoRequest(Guid PhotoId, string? UploadKey);
 internal sealed record CreateMemoryRequest(Guid Id, string? PlaceReference, string? DatePrecision, string? DateFrom, string? DateTo);
 
 internal sealed record CreatedMemoryResponse(Guid Id);
+
+internal sealed record TrimMaterialResponse(Guid MemoryId, string PlaceName, string DateFrom, long SizeBytes);

@@ -40,6 +40,11 @@ internal sealed class InviteToAlbumHandler(
             return AlbumErrors.AddressBlocked;
         }
 
+        if (await seats.IsReadOnlyAsync(command.AlbumId.Value, cancellationToken))
+        {
+            return AlbumErrors.ReadOnly;
+        }
+
         var seatLimit = await seats.SeatsOfAsync(command.AlbumId.Value, cancellationToken);
 
         // Counted once, and only for an invitation the album accepts: a refusal sends nothing.

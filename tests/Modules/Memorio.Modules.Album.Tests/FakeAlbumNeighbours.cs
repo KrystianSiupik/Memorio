@@ -88,6 +88,9 @@ public sealed class FakeAlbumNeighbours : IAlbumSeatLimit, IInvitationBlocks, IA
         return Task.CompletedTask;
     }
 
+    public Task<IReadOnlyList<AlbumTrimMaterial>> TrimMaterialAsync(Guid albumId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<AlbumTrimMaterial>>([]);
+
     public Task<AlbumPhotoOutcome> AddPhotoAsync(AlbumPhoto photo, CancellationToken cancellationToken) =>
         Task.FromResult(_photoOutcomes.GetValueOrDefault(photo.MemoryId, AlbumPhotoOutcome.Added));
 

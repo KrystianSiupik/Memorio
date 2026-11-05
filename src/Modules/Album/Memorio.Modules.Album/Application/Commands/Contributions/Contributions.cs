@@ -1,6 +1,7 @@
 using Memorio.Modules.Album.Domain.Albums;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Limits.Contracts;
+using Memorio.Modules.Plans.Contracts;
 using Memorio.SharedKernel.Results;
 
 namespace Memorio.Modules.Album.Application.Commands.Contributions;
@@ -8,7 +9,7 @@ namespace Memorio.Modules.Album.Application.Commands.Contributions;
 /// <summary>C47: an author brings their own memory; the album's pool pays for it from now on.</summary>
 internal sealed record AddMemoryToAlbum(AlbumId AlbumId, Guid AccountId, Guid MemoryId);
 
-internal sealed class AddMemoryToAlbumHandler(IAlbums albums, IAlbumContent content, IAlbumPool pool, TimeProvider clock)
+internal sealed class AddMemoryToAlbumHandler(IAlbums albums, IAlbumContent content, IAlbumPool pool, IAlbumSeatLimit plan, TimeProvider clock)
 {
     public async Task<Result> HandleAsync(AddMemoryToAlbum command, CancellationToken cancellationToken)
     {
@@ -27,6 +28,11 @@ internal sealed class AddMemoryToAlbumHandler(IAlbums albums, IAlbumContent cont
         if (await albums.FindMemoryAsync(command.AlbumId, command.MemoryId, cancellationToken) is not null)
         {
             return Result.Success();
+        }
+
+        if (await plan.IsReadOnlyAsync(command.AlbumId.Value, cancellationToken))
+        {
+            return AlbumErrors.ReadOnly;
         }
 
         var now = clock.GetUtcNow();
@@ -56,7 +62,7 @@ internal sealed class AddMemoryToAlbumHandler(IAlbums albums, IAlbumContent cont
 /// <summary>C56: the author adds a photo to their memory in the album; the album's pool pays (D-248).</summary>
 internal sealed record AddPhotoInAlbum(AlbumId AlbumId, Guid AccountId, Guid MemoryId, Guid PhotoId, string? UploadKey);
 
-internal sealed class AddPhotoInAlbumHandler(IAlbums albums, IAlbumContent content, TimeProvider clock)
+internal sealed class AddPhotoInAlbumHandler(IAlbums albums, IAlbumContent content, IAlbumSeatLimit plan, TimeProvider clock)
 {
     public async Task<Result> HandleAsync(AddPhotoInAlbum command, CancellationToken cancellationToken)
     {
@@ -65,6 +71,11 @@ internal sealed class AddPhotoInAlbumHandler(IAlbums albums, IAlbumContent conte
         if (album is null || !album.HasMember(command.AccountId) || memory?.AuthorAccountId != command.AccountId)
         {
             return AlbumErrors.NoAccess;
+        }
+
+        if (await plan.IsReadOnlyAsync(command.AlbumId.Value, cancellationToken))
+        {
+            return AlbumErrors.ReadOnly;
         }
 
         var outcome = await content.AddPhotoAsync(

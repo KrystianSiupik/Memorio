@@ -1,6 +1,8 @@
 using Memorio.Modularity;
 using Memorio.Modules.Limits.Application.Commands.ReleaseUnits;
 using Memorio.Modules.Limits.Application.Commands.ReserveUnits;
+using Memorio.Modules.Limits.Application.Commands.SetPoolLimit;
+using Memorio.Modules.Limits.Application.Policies;
 using Memorio.Modules.Limits.Contracts;
 using Memorio.Modules.Limits.Domain.Pools;
 using Memorio.Modules.Limits.Infrastructure;
@@ -36,6 +38,8 @@ public sealed class LimitsModule : IModule
         services.AddScoped<IPools, Pools>();
         services.AddScoped<ReserveUnitsHandler>();
         services.AddScoped<ReleaseUnitsHandler>();
+        services.AddScoped<SetPoolLimitHandler>();
+        services.AddScoped<SetLimitFromPlan>();
         services.AddScoped<ISpacePool, SpacePool>();
         services.AddScoped<IAiAllowance, AiAllowance>();
         services.AddScoped<IAlbumPool, AlbumPool>();

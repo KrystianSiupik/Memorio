@@ -7,6 +7,7 @@ using Memorio.Modules.Album.Application.Commands.CreateAlbum;
 using Memorio.Modules.Album.Application.Commands.Invitations;
 using Memorio.Modules.Album.Application.Queries;
 using Memorio.Modules.Album.Domain.Albums;
+using Memorio.Modules.Album.Contracts;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Limits.Contracts;
 using Memorio.Modules.Plans.Contracts;
@@ -30,6 +31,7 @@ internal static class AlbumsEndpoints
         albums.MapGet("/kept-contributions", KeptAsync).WithName("ListKeptContributions").WithSummary("What stayed in albums the person is no longer in.");
         albums.MapGet("/entrusted", EntrustedAsync).WithName("ListEntrusted").WithSummary("Memories entrusted to the person as a curator.");
         albums.MapGet("/{id:guid}", GetAsync).WithName("GetAlbum").WithSummary("The album with its memories, members, the person's own contributions and the pool.");
+        albums.MapGet("/{id:guid}/trim-material", TrimMaterialAsync).WithName("GetAlbumTrimMaterial").WithSummary("For the owner: what a trim of the album could take, oldest first, with sizes.");
         albums.MapGet("/{id:guid}/seats", SeatsAsync).WithName("GetAlbumSeats").WithSummary("For the owner: seats taken, invited and free.");
         albums.MapPost("/{id:guid}/invitations", InviteAsync).WithName("InviteToAlbum").WithSummary("Invites an address; the same address again refreshes its invitation and takes no second seat.");
         albums.MapDelete("/{id:guid}/invitations/{invitationId:guid}", WithdrawInvitationAsync).WithName("WithdrawInvitation").WithSummary("The owner takes an invitation back; the seat is free at once.");
@@ -69,6 +71,7 @@ internal static class AlbumsEndpoints
         IAlbumContent content,
         IAlbumPool pool,
         IAccountDirectory directory,
+        IAlbumSeatLimit plan,
         CancellationToken cancellationToken)
     {
         var accountId = CurrentAccount.IdOf(principal);
@@ -107,7 +110,8 @@ internal static class AlbumsEndpoints
             visible.Where(memory => memory.AuthorAccountId == accountId).Sum(memory => summaries[memory.MemoryId].Photos),
             state.FreeBytes,
             state.LimitBytes,
-            entrustment?.CuratorAccountId));
+            entrustment?.CuratorAccountId,
+            await plan.IsReadOnlyAsync(id, cancellationToken)));
     }
 
     private static async Task<Results<Ok<AlbumSeatsResponse>, ProblemHttpResult>> SeatsAsync(Guid id, ClaimsPrincipal principal, IAlbumQueries queries, IAlbumSeatLimit limit, CancellationToken cancellationToken)
@@ -124,6 +128,18 @@ internal static class AlbumsEndpoints
             seats.Invited.Count,
             Math.Max(0, total - taken - seats.Invited.Count),
             [.. seats.Invited.Select(invited => new AlbumInvitedResponse(invited.Id, invited.Email))]));
+    }
+
+    private static async Task<Results<Ok<IReadOnlyList<AlbumTrimMaterialResponse>>, ProblemHttpResult>> TrimMaterialAsync(Guid id, ClaimsPrincipal principal, IAlbumMembership membership, IAlbumContent content, CancellationToken cancellationToken)
+    {
+        if (await membership.OwnerOfAsync(id, cancellationToken) != CurrentAccount.IdOf(principal))
+        {
+            return Problems.From(AlbumErrors.NoAccess);
+        }
+
+        var items = await content.TrimMaterialAsync(id, cancellationToken);
+        return TypedResults.Ok<IReadOnlyList<AlbumTrimMaterialResponse>>(
+            [.. items.Select(item => new AlbumTrimMaterialResponse(item.MemoryId, item.PlaceName, item.DateFrom, item.SizeBytes))]);
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> InviteAsync(Guid id, InviteRequest request, ClaimsPrincipal principal, InviteToAlbumHandler handler, CancellationToken cancellationToken) =>
@@ -246,7 +262,10 @@ internal sealed record AlbumResponse(
     int MyPhotos,
     long FreeBytes,
     long LimitBytes,
-    Guid? MyCuratorAccountId);
+    Guid? MyCuratorAccountId,
+    bool IsReadOnly);
+
+internal sealed record AlbumTrimMaterialResponse(Guid MemoryId, string PlaceName, string DateFrom, long SizeBytes);
 
 internal sealed record AlbumMemberResponse(Guid AccountId, string? Email, bool IsOwner);
 

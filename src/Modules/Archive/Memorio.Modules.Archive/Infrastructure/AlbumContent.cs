@@ -1,5 +1,6 @@
 using Dapper;
 using Memorio.Modules.Archive.Application.Commands.AddPhoto;
+using Memorio.Modules.Archive.Application.Queries.TrimMaterial;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Archive.Domain.Memories;
 using Memorio.Modules.Archive.Infrastructure.Persistence;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Memorio.Modules.Archive.Infrastructure;
 
-internal sealed class AlbumContent(ArchiveDbContext database, IMemories memories, ISpacePool personalPool, IAlbumPool albumPool, AddPhotoHandler addPhoto)
+internal sealed class AlbumContent(ArchiveDbContext database, IMemories memories, ISpacePool personalPool, IAlbumPool albumPool, AddPhotoHandler addPhoto, ITrimMaterialQuery material)
     : IAlbumContent
 {
     public async Task<AlbumMemoryFacts?> DescribeAsync(Guid memoryId, CancellationToken cancellationToken)
@@ -32,6 +33,9 @@ internal sealed class AlbumContent(ArchiveDbContext database, IMemories memories
             cancellationToken: cancellationToken));
         return rows.ToDictionary(row => row.Id, row => new AlbumMemorySummary(row.PlaceName, row.DateFrom, row.Photos));
     }
+
+    public async Task<IReadOnlyList<AlbumTrimMaterial>> TrimMaterialAsync(Guid albumId, CancellationToken cancellationToken) =>
+        [.. (await material.OfAlbumAsync(albumId, cancellationToken)).Select(item => new AlbumTrimMaterial(item.MemoryId, item.PlaceName, item.DateFrom, item.SizeBytes))];
 
     /// <summary>D-264: an album pays for the memory now, so the author's space comes back.</summary>
     public async Task LinkAsync(Guid memoryId, Guid albumId, CancellationToken cancellationToken)

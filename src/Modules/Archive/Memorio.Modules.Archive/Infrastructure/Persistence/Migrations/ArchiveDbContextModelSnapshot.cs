@@ -38,6 +38,21 @@ namespace Memorio.Modules.Archive.Infrastructure.Persistence.Migrations
                     b.ToTable("applied_account_events", "archive");
                 });
 
+            modelBuilder.Entity("Memorio.Modules.Archive.Domain.Memories.AppliedPlanEvent", b =>
+                {
+                    b.Property<Guid>("ResourceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("resource_id");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence");
+
+                    b.HasKey("ResourceId");
+
+                    b.ToTable("applied_plan_events", "archive");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Archive.Domain.Memories.Memory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -140,6 +155,10 @@ namespace Memorio.Modules.Archive.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("trashed_at");
 
+                    b.Property<Guid?>("TrimmedFor")
+                        .HasColumnType("uuid")
+                        .HasColumnName("trimmed_for");
+
                     b.Property<DateTimeOffset?>("WindowEndsAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("window_ends_at");
@@ -148,6 +167,10 @@ namespace Memorio.Modules.Archive.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("AuthorAccountId")
                         .HasDatabaseName("ix_memories_author_account_id");
+
+                    b.HasIndex("TrimmedFor")
+                        .HasDatabaseName("ix_memories_trimmed_for")
+                        .HasFilter("trimmed_for IS NOT NULL");
 
                     b.HasIndex("WindowEndsAt")
                         .HasDatabaseName("ix_memories_trash_window_ends_at")
