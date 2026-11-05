@@ -214,6 +214,82 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get albumLink => 'Link do albumu';
+
+  @override
+  String get albumLinkNone => 'Album nie ma działającego linku';
+
+  @override
+  String get albumShareByLink => 'Udostępnij linkiem';
+
+  @override
+  String get albumRevokeLink => 'Unieważnij link (nikt nowy nie wejdzie)';
+
+  @override
+  String get albumCopyLink => 'Kopiuj link';
+
+  @override
+  String get albumLinkCopied => 'Skopiowano link';
+
+  @override
+  String get albumViewers => 'Oglądający przez link';
+
+  @override
+  String get albumViewersEmpty => 'Nikt jeszcze nie wszedł przez link';
+
+  @override
+  String get albumRevokeAccess => 'Odbierz dostęp';
+
+  @override
+  String get albumBlock => 'Zablokuj użytkownika';
+
+  @override
+  String get albumBlockNobody => 'Nie ma tu nikogo, kogo możesz zablokować.';
+
+  @override
+  String get albumBlockConfirmTitle => 'Zablokować tę osobę?';
+
+  @override
+  String albumBlockConfirmBody(Object person) {
+    return '$person od razu straci dostęp i nie wejdzie już ani linkiem, ani przez zaproszenie. Tego nie da się cofnąć w aplikacji.';
+  }
+
+  @override
+  String get albumBlockConfirm => 'Zablokuj';
+
+  @override
+  String get cancel => 'Anuluj';
+
+  @override
+  String get albumBlocked => 'Nie masz dostępu do tego albumu.';
+
+  @override
+  String get albumLinkGone => 'Ten link już nie działa.';
+
+  @override
+  String get albumOnlyOwnerBlocks => 'Osobę w albumie może zablokować tylko właściciel.';
+
+  @override
+  String get albumEntryTitle => 'Wejście do albumu przez link';
+
+  @override
+  String albumEntryAlbum(Object name) {
+    return 'Album: $name';
+  }
+
+  @override
+  String get albumEntryOpen => 'Otwórz album';
+
+  @override
+  String get albumEntryNamed => 'Twój adres e-mail pojawi się na liście oglądających ten album.';
+
+  @override
+  String get albumReadOnlyViewer => 'Oglądasz ten album przez link.';
+
+  @override
+  String get sharedEmpty => 'Nikt jeszcze nie udostępnił Ci albumu';
+
+  @override
   String get albumMine => 'Moje albumy';
 
   @override

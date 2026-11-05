@@ -463,6 +463,150 @@ abstract class AppLocalizations {
   /// **'Czeka na wysłanie: {count}'**
   String mapPendingUpload(Object count);
 
+  /// No description provided for @albumLink.
+  ///
+  /// In pl, this message translates to:
+  /// **'Link do albumu'**
+  String get albumLink;
+
+  /// No description provided for @albumLinkNone.
+  ///
+  /// In pl, this message translates to:
+  /// **'Album nie ma działającego linku'**
+  String get albumLinkNone;
+
+  /// No description provided for @albumShareByLink.
+  ///
+  /// In pl, this message translates to:
+  /// **'Udostępnij linkiem'**
+  String get albumShareByLink;
+
+  /// No description provided for @albumRevokeLink.
+  ///
+  /// In pl, this message translates to:
+  /// **'Unieważnij link (nikt nowy nie wejdzie)'**
+  String get albumRevokeLink;
+
+  /// No description provided for @albumCopyLink.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kopiuj link'**
+  String get albumCopyLink;
+
+  /// No description provided for @albumLinkCopied.
+  ///
+  /// In pl, this message translates to:
+  /// **'Skopiowano link'**
+  String get albumLinkCopied;
+
+  /// No description provided for @albumViewers.
+  ///
+  /// In pl, this message translates to:
+  /// **'Oglądający przez link'**
+  String get albumViewers;
+
+  /// No description provided for @albumViewersEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nikt jeszcze nie wszedł przez link'**
+  String get albumViewersEmpty;
+
+  /// No description provided for @albumRevokeAccess.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odbierz dostęp'**
+  String get albumRevokeAccess;
+
+  /// No description provided for @albumBlock.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zablokuj użytkownika'**
+  String get albumBlock;
+
+  /// No description provided for @albumBlockNobody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie ma tu nikogo, kogo możesz zablokować.'**
+  String get albumBlockNobody;
+
+  /// No description provided for @albumBlockConfirmTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zablokować tę osobę?'**
+  String get albumBlockConfirmTitle;
+
+  /// No description provided for @albumBlockConfirmBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'{person} od razu straci dostęp i nie wejdzie już ani linkiem, ani przez zaproszenie. Tego nie da się cofnąć w aplikacji.'**
+  String albumBlockConfirmBody(Object person);
+
+  /// No description provided for @albumBlockConfirm.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zablokuj'**
+  String get albumBlockConfirm;
+
+  /// No description provided for @cancel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Anuluj'**
+  String get cancel;
+
+  /// No description provided for @albumBlocked.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie masz dostępu do tego albumu.'**
+  String get albumBlocked;
+
+  /// No description provided for @albumLinkGone.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ten link już nie działa.'**
+  String get albumLinkGone;
+
+  /// No description provided for @albumOnlyOwnerBlocks.
+  ///
+  /// In pl, this message translates to:
+  /// **'Osobę w albumie może zablokować tylko właściciel.'**
+  String get albumOnlyOwnerBlocks;
+
+  /// No description provided for @albumEntryTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wejście do albumu przez link'**
+  String get albumEntryTitle;
+
+  /// No description provided for @albumEntryAlbum.
+  ///
+  /// In pl, this message translates to:
+  /// **'Album: {name}'**
+  String albumEntryAlbum(Object name);
+
+  /// No description provided for @albumEntryOpen.
+  ///
+  /// In pl, this message translates to:
+  /// **'Otwórz album'**
+  String get albumEntryOpen;
+
+  /// No description provided for @albumEntryNamed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Twój adres e-mail pojawi się na liście oglądających ten album.'**
+  String get albumEntryNamed;
+
+  /// No description provided for @albumReadOnlyViewer.
+  ///
+  /// In pl, this message translates to:
+  /// **'Oglądasz ten album przez link.'**
+  String get albumReadOnlyViewer;
+
+  /// No description provided for @sharedEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nikt jeszcze nie udostępnił Ci albumu'**
+  String get sharedEmpty;
+
   /// No description provided for @albumMine.
   ///
   /// In pl, this message translates to:

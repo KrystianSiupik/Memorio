@@ -12,6 +12,20 @@ final class AlbumNoAccess extends AlbumFailure {
   const AlbumNoAccess();
 }
 
+/// The person may not come into this album in any way.
+final class AlbumBlocked extends AlbumFailure {
+  const AlbumBlocked();
+}
+
+/// The link was revoked, or never existed.
+final class AlbumLinkGone extends AlbumFailure {
+  const AlbumLinkGone();
+}
+
+final class AlbumOnlyOwnerBlocks extends AlbumFailure {
+  const AlbumOnlyOwnerBlocks();
+}
+
 final class AlbumAlreadyDecided extends AlbumFailure {
   const AlbumAlreadyDecided();
 }

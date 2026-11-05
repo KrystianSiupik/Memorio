@@ -8,7 +8,7 @@ part of 'album_memory_response.dart';
 
 AlbumMemoryResponse _$AlbumMemoryResponseFromJson(Map<String, dynamic> json) => AlbumMemoryResponse(
   id: json['id'] as String,
-  authorAccountId: json['authorAccountId'] as String,
+  authorAccountId: json['authorAccountId'] as String?,
   authorEmail: json['authorEmail'] as String?,
   isMine: json['isMine'] as bool,
   placeName: json['placeName'] as String,

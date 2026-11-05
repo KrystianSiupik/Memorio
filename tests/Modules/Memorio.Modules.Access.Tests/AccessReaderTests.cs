@@ -1,71 +1,71 @@
+using Memorio.Modules.Access.Application.Commands;
 using Memorio.Modules.Access.Contracts;
-using Memorio.Modules.Album.Contracts;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Memorio.Modules.Access.Tests;
 
-/// <summary>The one rule so far: being in the album, as Album says at this moment (ADR 0011, D-250).</summary>
-public sealed class AccessReaderTests
+/// <summary>The rules on a real database: being in the album, a place on the list, and a block over both (ADR 0011).</summary>
+public sealed class AccessReaderTests(AccessDatabase database)
 {
     private static CancellationToken Cancellation => TestContext.Current.CancellationToken;
 
     [Fact]
     public async Task Nobody_sees_anything_until_a_rule_grants_it()
     {
-        var reader = ReaderOver(new Members());
-        await using var scope = reader;
+        await using var scope = database.CreateScope();
+        var reader = scope.ServiceProvider.GetRequiredService<IAccessReader>();
+        var (album, _) = database.Neighbours.NewAlbum();
 
-        Assert.False(await scope.Reader.CanSeeAlbumAsync(Guid.NewGuid(), Guid.NewGuid(), Cancellation));
-        Assert.Empty(await scope.Reader.VisibleAlbumsAsync(Guid.NewGuid(), Cancellation));
+        Assert.False(await reader.CanSeeAlbumAsync(Guid.CreateVersion7(), album, Cancellation));
+        Assert.Empty(await reader.VisibleAlbumsAsync(Guid.CreateVersion7(), Cancellation));
     }
 
     [Fact]
-    public async Task A_member_sees_the_album_and_loses_it_at_the_very_next_query()
+    public async Task A_participant_sees_the_album_and_loses_it_at_the_very_next_query()
     {
-        var members = new Members();
-        var person = Guid.NewGuid();
-        var album = Guid.NewGuid();
-        members.Albums.Add((person, album));
-        var reader = ReaderOver(members);
-        await using var scope = reader;
+        var (album, _) = database.Neighbours.NewAlbum();
+        var person = database.Neighbours.NewParticipant(album);
+        await using var scope = database.CreateScope();
+        var reader = scope.ServiceProvider.GetRequiredService<IAccessReader>();
 
-        Assert.True(await scope.Reader.CanSeeAlbumAsync(person, album, Cancellation));
-        Assert.Equal([album], await scope.Reader.VisibleAlbumsAsync(person, Cancellation));
-        Assert.False(await scope.Reader.CanSeeAlbumAsync(Guid.NewGuid(), album, Cancellation));
+        Assert.True(await reader.CanSeeAlbumAsync(person, album, Cancellation));
+        Assert.Equal([album], await reader.VisibleAlbumsAsync(person, Cancellation));
 
-        members.Albums.Clear();
+        database.Neighbours.Leaves(album, person);
 
-        Assert.False(await scope.Reader.CanSeeAlbumAsync(person, album, Cancellation));
+        Assert.False(await reader.CanSeeAlbumAsync(person, album, Cancellation));
     }
 
-    private static ReaderScope ReaderOver(Members members)
+    [Fact]
+    public async Task Someone_let_in_through_a_link_sees_it_and_a_block_takes_it_away_at_once()
     {
-        var services = new ServiceCollection();
-        new AccessModule().AddServices(services, new ConfigurationBuilder().Build());
-        services.AddSingleton<IAlbumMembership>(members);
-        var provider = services.BuildServiceProvider();
-        var scope = provider.CreateAsyncScope();
-        return new ReaderScope(provider, scope, scope.ServiceProvider.GetRequiredService<IAccessReader>());
+        var (album, owner) = database.Neighbours.NewAlbum();
+        var person = Guid.CreateVersion7();
+        await using var scope = database.CreateScope();
+        var token = (await scope.ServiceProvider.GetRequiredService<ShareByLinkHandler>().HandleAsync(album, owner, Cancellation)).Value;
+        await scope.ServiceProvider.GetRequiredService<EnterByLinkHandler>().HandleAsync(token, person, Cancellation);
+        var reader = scope.ServiceProvider.GetRequiredService<IAccessReader>();
+        Assert.True(await reader.CanSeeAlbumAsync(person, album, Cancellation));
+        Assert.Contains(album, await reader.VisibleAlbumsAsync(person, Cancellation));
+
+        await scope.ServiceProvider.GetRequiredService<BlockUserHandler>().HandleAsync(album, owner, person, Cancellation);
+
+        Assert.False(await reader.CanSeeAlbumAsync(person, album, Cancellation));
+        Assert.DoesNotContain(album, await reader.VisibleAlbumsAsync(person, Cancellation));
     }
 
-    private sealed record ReaderScope(ServiceProvider Provider, AsyncServiceScope Scope, IAccessReader Reader) : IAsyncDisposable
+    [Fact]
+    public async Task A_block_wins_over_being_in_the_album_before_Album_has_removed_the_person()
     {
-        public async ValueTask DisposeAsync()
-        {
-            await Scope.DisposeAsync();
-            await Provider.DisposeAsync();
-        }
-    }
+        var (album, owner) = database.Neighbours.NewAlbum();
+        var person = database.Neighbours.NewParticipant(album);
+        await using var scope = database.CreateScope();
 
-    private sealed class Members : IAlbumMembership
-    {
-        public List<(Guid Person, Guid Album)> Albums { get; } = [];
+        await scope.ServiceProvider.GetRequiredService<BlockUserHandler>().HandleAsync(album, owner, person, Cancellation);
 
-        public Task<bool> IsMemberAsync(Guid accountId, Guid albumId, CancellationToken cancellationToken) =>
-            Task.FromResult(Albums.Contains((accountId, albumId)));
-
-        public Task<IReadOnlyCollection<Guid>> AlbumsOfAsync(Guid accountId, CancellationToken cancellationToken) =>
-            Task.FromResult<IReadOnlyCollection<Guid>>([.. Albums.Where(item => item.Person == accountId).Select(item => item.Album)]);
+        var reader = scope.ServiceProvider.GetRequiredService<IAccessReader>();
+        Assert.False(await reader.CanSeeAlbumAsync(person, album, Cancellation));
+        Assert.DoesNotContain(album, await reader.VisibleAlbumsAsync(person, Cancellation));
+        Assert.True(await scope.ServiceProvider.GetRequiredService<IBlockList>().IsBlockedAsync(album, person, Cancellation));
     }
 }

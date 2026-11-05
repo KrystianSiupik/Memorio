@@ -1,3 +1,4 @@
+using Memorio.Modules.Access.Contracts;
 using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Album.Application.Commands.Contributions;
 using Memorio.Modules.Album.Contracts;
@@ -48,6 +49,26 @@ internal sealed class WithdrawContributionsWhenAccountDeleted(IAlbums albums, Co
         if (!await albums.SaveAsync(cancellationToken))
         {
             throw new InvalidOperationException("Another decision about these albums got there first; the retry reads them again.");
+        }
+    }
+}
+
+/// <summary>E67: someone blocked by the owner loses the seat, and what they brought stays until they choose, as after C53 (D-270).</summary>
+internal sealed class RemoveBlockedParticipant(IAlbums albums, RemoveParticipantHandler remove) : IIntegrationEventPolicy<UserBlockedEvent>
+{
+    public async Task HandleAsync(UserBlockedEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        var id = new AlbumId(integrationEvent.AlbumId);
+        var album = await albums.FindAsync(id, cancellationToken);
+        if (album is null || album.IsOwner(integrationEvent.AccountId) || !album.HasMember(integrationEvent.AccountId))
+        {
+            return;
+        }
+
+        var removed = await remove.HandleAsync(new RemoveParticipant(id, album.OwnerAccountId, integrationEvent.AccountId), cancellationToken);
+        if (removed.IsFailure && removed.Error != AlbumErrors.AlreadyDecided)
+        {
+            throw new InvalidOperationException($"The blocked person could not be removed: {removed.Error.Code}");
         }
     }
 }

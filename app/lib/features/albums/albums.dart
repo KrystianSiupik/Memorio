@@ -5,14 +5,19 @@ export 'domain/albums_repository.dart';
 export 'presentation/album_consents_page.dart';
 export 'presentation/album_entrusted_page.dart';
 export 'presentation/album_invitation_page.dart';
+export 'presentation/album_link_page.dart';
 export 'presentation/album_manage_page.dart';
 export 'presentation/album_page.dart';
 export 'presentation/albums_page.dart';
 export 'presentation/albums_providers.dart'
     show
-        albumsRepositoryProvider,
-        albumsProvider,
+        AlbumAsyncBody,
         albumDetailsProvider,
-        invitationsProvider,
+        albumLinkProvider,
+        albumViewersProvider,
+        albumsProvider,
+        albumsRepositoryProvider,
         entrustedProvider,
-        keptContributionsProvider;
+        invitationsProvider,
+        keptContributionsProvider,
+        sharedAlbumsProvider;

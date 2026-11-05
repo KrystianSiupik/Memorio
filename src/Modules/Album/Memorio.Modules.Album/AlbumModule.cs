@@ -66,6 +66,7 @@ public sealed class AlbumModule : IModule
         services.AddScoped<RecordInvitationWeekPassed>();
         services.AddScoped<WithdrawContributionsWhenAccountDeleted>();
         services.AddScoped<ForgetContentWhenDeleted>();
+        services.AddScoped<RemoveBlockedParticipant>();
 
         // IDeadlines exists in the worker only, the one host running these (D-157): built on demand, so the
         // API, which never asks for them, still passes the container's validation in development.

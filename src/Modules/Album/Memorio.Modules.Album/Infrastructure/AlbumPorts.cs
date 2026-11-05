@@ -23,6 +23,10 @@ internal sealed class AlbumMembership(AlbumDbContext database) : IAlbumMembershi
         database.Database.GetDbConnection().ExecuteScalarAsync<bool>(
             new CommandDefinition(MemberSql, new { accountId, albumId }, cancellationToken: cancellationToken));
 
+    public Task<Guid?> OwnerOfAsync(Guid albumId, CancellationToken cancellationToken) =>
+        database.Database.GetDbConnection().ExecuteScalarAsync<Guid?>(
+            new CommandDefinition("SELECT owner_account_id FROM album.albums WHERE id = @albumId", new { albumId }, cancellationToken: cancellationToken));
+
     public async Task<IReadOnlyCollection<Guid>> AlbumsOfAsync(Guid accountId, CancellationToken cancellationToken) =>
         [.. await database.Database.GetDbConnection().QueryAsync<Guid>(
             new CommandDefinition(AlbumsSql, new { accountId }, cancellationToken: cancellationToken))];

@@ -12,6 +12,9 @@ class FakeAlbumsRepository implements AlbumsRepository {
   List<KeptContribution> kept = [];
   List<EntrustedMemory> entrusted = [];
   List<OwnMemory> own = [];
+  String? link;
+  List<AlbumViewer> viewers = [];
+  AlbumLinkPreview? preview = const AlbumLinkPreview(albumId: 'album-1', albumName: 'Rodzina');
 
   AlbumFailure? loadFailure;
   AlbumFailure? actionFailure;
@@ -56,6 +59,44 @@ class FakeAlbumsRepository implements AlbumsRepository {
 
   @override
   Future<Result<List<OwnMemory>, AlbumFailure>> loadOwnMemories() async => _load(own);
+  @override
+  Future<Result<String?, AlbumFailure>> loadLink(String albumId) async => _load(link);
+
+  @override
+  Future<Result<String, AlbumFailure>> shareByLink(String albumId) async {
+    actions.add('share');
+    final failure = actionFailure;
+    if (failure != null) {
+      return Err(failure);
+    }
+    link = 'token-1';
+    return const Ok('token-1');
+  }
+
+  @override
+  Future<Result<void, AlbumFailure>> revokeLink(String albumId) {
+    link = null;
+    return _act('revokeLink');
+  }
+
+  @override
+  Future<Result<List<AlbumViewer>, AlbumFailure>> loadViewers(String albumId) async => _load(viewers);
+
+  @override
+  Future<Result<void, AlbumFailure>> revokeAccess(String albumId, String accountId) => _act('revokeAccess:$accountId');
+
+  @override
+  Future<Result<void, AlbumFailure>> block(String albumId, String accountId) => _act('blockUser:$accountId');
+
+  @override
+  Future<Result<AlbumLinkPreview, AlbumFailure>> previewLink(String token) async => _load(preview!);
+
+  @override
+  Future<Result<String, AlbumFailure>> enterByLink(String token) async {
+    actions.add('enter:$token');
+    final failure = actionFailure;
+    return failure == null ? const Ok('album-1') : Err(failure);
+  }
 
   @override
   Future<Result<void, AlbumFailure>> create(String id, String name) => _act('create:$name:$id');
@@ -132,6 +173,7 @@ const myMemory = AlbumMemory(
 
 AlbumDetails albumDetails({
   bool isOwner = false,
+  bool isMember = true,
   List<AlbumMemory> memories = const [myMemory],
   int freeBytes = 1024 * 1024 * 1024,
   String? successor,
@@ -140,8 +182,9 @@ AlbumDetails albumDetails({
   id: 'album-1',
   name: 'Rodzina',
   isOwner: isOwner,
+  isMember: isMember,
   successorAccountId: successor,
-  members: const [owner, me, otherMember],
+  members: isMember ? const [owner, me, otherMember] : const [],
   memories: memories,
   myMemories: 1,
   myPhotos: 2,

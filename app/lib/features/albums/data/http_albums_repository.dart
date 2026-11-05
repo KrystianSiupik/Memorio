@@ -75,6 +75,7 @@ class HttpAlbumsRepository implements AlbumsRepository {
       id: album.id,
       name: album.name,
       isOwner: album.isOwner,
+      isMember: album.isMember,
       successorAccountId: album.successorAccountId,
       members: [
         for (final member in album.members)
@@ -145,6 +146,40 @@ class HttpAlbumsRepository implements AlbumsRepository {
     final items = await memories.listMyMemories();
     return [for (final item in items) OwnMemory(id: item.id, placeName: item.placeName, dateFrom: item.dateFrom)];
   });
+  @override
+  Future<Result<String?, AlbumFailure>> loadLink(String albumId) =>
+      _attempt(() async => (await access.getAlbumLink(id: albumId)).token);
+
+  @override
+  Future<Result<String, AlbumFailure>> shareByLink(String albumId) =>
+      _attempt(() async => (await access.shareAlbumByLink(id: albumId)).token!);
+
+  @override
+  Future<Result<void, AlbumFailure>> revokeLink(String albumId) => _attempt(() => access.revokeAlbumLink(id: albumId));
+
+  @override
+  Future<Result<List<AlbumViewer>, AlbumFailure>> loadViewers(String albumId) => _attempt(() async {
+    final items = await access.getAlbumViewers(id: albumId);
+    return [for (final item in items) AlbumViewer(accountId: item.accountId, email: item.email)];
+  });
+
+  @override
+  Future<Result<void, AlbumFailure>> revokeAccess(String albumId, String accountId) =>
+      _attempt(() => access.revokeAlbumAccess(id: albumId, accountId: accountId));
+
+  @override
+  Future<Result<void, AlbumFailure>> block(String albumId, String accountId) =>
+      _attempt(() => access.blockUser(id: albumId, accountId: accountId));
+
+  @override
+  Future<Result<AlbumLinkPreview, AlbumFailure>> previewLink(String token) => _attempt(() async {
+    final preview = await access.previewAlbumLink(token: token);
+    return AlbumLinkPreview(albumId: preview.albumId, albumName: preview.albumName);
+  });
+
+  @override
+  Future<Result<String, AlbumFailure>> enterByLink(String token) =>
+      _attempt(() async => (await access.enterAlbumByLink(token: token)).albumId);
 
   @override
   Future<Result<void, AlbumFailure>> create(String id, String name) => _attempt(
@@ -269,13 +304,16 @@ class HttpAlbumsRepository implements AlbumsRepository {
     final body = response.data;
     final code = body is Map ? body['code'] : null;
     return switch (code) {
+      'Access.Blocked' => const AlbumBlocked(),
+      'Access.LinkRevoked' => const AlbumLinkGone(),
+      'Access.OnlyOwnerBlocksParticipant' => const AlbumOnlyOwnerBlocks(),
       'Album.NoFreeSeats' => const AlbumNoFreeSeats(),
       'Album.InvitationLimitReached' => const AlbumInvitationLimit(),
       'Album.AddressBlocked' => const AlbumAddressBlocked(),
       'Album.InvitationGone' => const AlbumInvitationGone(),
       'Album.PoolFull' || 'Archive.SpaceLimitExceeded' => const AlbumPoolFull(),
       'Album.OwnerCannotLeave' => const AlbumOwnerCannotLeave(),
-      'Album.AlreadyDecided' || 'Succession.AlreadyDecided' => const AlbumAlreadyDecided(),
+      'Album.AlreadyDecided' || 'Succession.AlreadyDecided' || 'Access.AlreadyDecided' => const AlbumAlreadyDecided(),
       _ => switch (response.statusCode) {
         403 || 404 => const AlbumNoAccess(),
         400 => const AlbumInvalidInput(),

@@ -29,6 +29,7 @@ void main() {
           'id': 'a1',
           'name': 'Rodzina',
           'isOwner': false,
+          'isMember': true,
           'successorAccountId': null,
           'members': [
             {'accountId': 'o1', 'email': 'o@example.invalid', 'isOwner': true},
@@ -99,6 +100,10 @@ void main() {
 
   group('failures by what the backend answered', () {
     final cases = <String, (int, Object?, Type)>{
+      'blocked person': (403, {'code': 'Access.Blocked'}, AlbumBlocked),
+      'link gone': (409, {'code': 'Access.LinkRevoked'}, AlbumLinkGone),
+      'only the owner': (403, {'code': 'Access.OnlyOwnerBlocksParticipant'}, AlbumOnlyOwnerBlocks),
+      'access decided': (409, {'code': 'Access.AlreadyDecided'}, AlbumAlreadyDecided),
       'no seat': (409, {'code': 'Album.NoFreeSeats'}, AlbumNoFreeSeats),
       'invitation limit': (409, {'code': 'Album.InvitationLimitReached'}, AlbumInvitationLimit),
       'blocked': (409, {'code': 'Album.AddressBlocked'}, AlbumAddressBlocked),

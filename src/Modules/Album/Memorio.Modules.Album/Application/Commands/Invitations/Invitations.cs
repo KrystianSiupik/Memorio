@@ -1,3 +1,4 @@
+using Memorio.Modules.Access.Contracts;
 using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Album.Domain.Albums;
 using Memorio.Modules.Notifications.Contracts;
@@ -75,7 +76,7 @@ internal sealed class InviteToAlbumHandler(
 /// <summary>C44 and C45: only the person the invitation was sent to answers it.</summary>
 internal sealed record AnswerInvitation(Guid InvitationId, Guid AccountId, bool Accepted);
 
-internal sealed class AnswerInvitationHandler(IAlbums albums, IAccountDirectory directory, TimeProvider clock)
+internal sealed class AnswerInvitationHandler(IAlbums albums, IAccountDirectory directory, IBlockList blocks, TimeProvider clock)
 {
     public async Task<Result<AlbumId>> HandleAsync(AnswerInvitation command, CancellationToken cancellationToken)
     {
@@ -92,6 +93,11 @@ internal sealed class AnswerInvitationHandler(IAlbums albums, IAccountDirectory 
                 }
 
                 albumId = album.Id;
+                if (command.Accepted && await blocks.IsBlockedAsync(album.Id.Value, command.AccountId, cancellationToken))
+                {
+                    return AlbumErrors.NoAccess;
+                }
+
                 return command.Accepted
                     ? album.Accept(command.InvitationId, command.AccountId, clock.GetUtcNow())
                     : album.Decline(command.InvitationId, clock.GetUtcNow());

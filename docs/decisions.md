@@ -940,3 +940,19 @@ Zrobione w jednej gałęzi, bo obie zmiany dotyczą tej samej wiadomości z zapr
 | D-268 | **Decyzja PO, zmienia D-266:** zaproszenie i przypomnienie podają, kto zaprasza. Konto nie ma nazwy, więc jest to **adres e-mail zapraszającego**, ujawniany osobie, której adres wpisał, także bez konta. Inne wiadomości nie podają nikogo | taki mail trudniej wziąć za spam. Pytanie do prawnika 8 uzupełnione |
 
 **Stan testów:** Album 58/58 (w tym 15 równoległych zaproszeń), Powiadomienia 23/23, aplikacja 219/219, baza 75/75, architektura 49/49, API 46/46. **Nie sprawdzono:** prawdziwej wysyłki, bo nadal nie ma konta Scaleway.
+
+## E4: link, oglądający i blokady (MEM-E4-DOSTEP-01 do -11, MEM-E4-PLAT-01, -02, 2026-11-05)
+
+Na polecenie PO: „zaczynaj E4”. Backend i ekrany w jednej gałęzi: to jeden agregat AG3. Odstępstwo od zasady jednej gałęzi na ticket.
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-269 | AG3 to `AlbumAudience`: link, lista oglądających i blokady jednego albumu, chronione tokenem `sequence` z ponowieniem, a nie blokadą pesymistyczną z ticketu | ten sam mechanizm co D-247. Testy: równoległe wejścia z unieważnieniem, wejście z blokadą |
+| D-270 | Blokada obowiązuje w jednym albumie (D-009). Uczestnik blokuje tylko oglądającego przez link, a osobę w albumie **tylko właściciel**; właściciela nie można zablokować. Blokada działa przy następnym odczycie, a osoba w albumie traci potem miejsce przez zdarzenie E67, jej treści zostają jak po usunięciu (D-262). **Nie ma odblokowania:** nie ma go w ticketach | ticket mówi „uczestnik blokuje”, ale wyrzucanie się nawzajem przez uczestników obchodziłoby właściciela. **Do oceny PO, także brak odblokowania** |
+| D-271 | Oglądający przez link widzi wspomnienia i zdjęcia, ale **nie widzi osób w albumie ani ich adresów**, bo D-263 dotyczy osób w albumie. Właściciel i uczestnicy widzą adresy oglądających („imienna lista”, R10); S15 mówi o tym przed wejściem. Wspomnienia z albumu oglądanego przez link trafiają też na mapę tej osoby | D-263, R10 |
+| D-272 | **P29 i P30 (DOSTEP-09, -10) nie są potrzebne**, jak w D-250. **P31 (DOSTEP-11) nie jest zrobiona:** czeka na zdarzenie E126 z MEM-E9-SUKCESJA-11. Komenda C65 (DOSTEP-06) jest gotowa jako port `IReadGrants`, jeszcze bez wywołującego | handler bez źródła zdarzenia byłby martwym kodem, jak D-232 |
+| D-273 | Link zawiera losowy token (32 bajty) trzymany jawnie w bazie, żeby właściciel mógł go skopiować ponownie. Sam token nie wystarcza: wejście wymaga konta i zapisuje na listę. **Adres w aplikacji mobilnej to na razie sama ścieżka**, bo nie ma domeny aplikacji (`APP_URL`), a otwieranie linków na telefonie nie jest skonfigurowane | prostota; **przed startem potrzebna domena i konfiguracja linków na urządzeniach** |
+| D-274 | **Naprawiona luka:** niezalogowany z linkiem trafiał na logowanie, a link przepadał. Teraz wraca do niego po zalogowaniu. Inne miejsca nie są pamiętane, żeby kolejna osoba na tym urządzeniu nie trafiła tam, gdzie była poprzednia | kryterium S15, znalezione testem |
+| D-275 | Konto usunięte znika z list oglądających i blokad (poza ticketami) | RODO, jak E1 |
+
+**Stan testów na tej gałęzi:** aplikacja 243/243, API 46/46, architektura; `dotnet build` przechodzi. **Testy na bazie NIE były uruchomione** (Dostęp, Album, baza, zasady migracji w `Database.Tests`), bo silnik Dockera przestał odpowiadać, a nie restartuję go, bo działa w nim kontener innego projektu. Dlatego ta gałąź **nie jest scalona**.

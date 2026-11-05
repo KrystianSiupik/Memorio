@@ -20,6 +20,24 @@ abstract interface class AlbumsRepository {
 
   Future<Result<List<OwnMemory>, AlbumFailure>> loadOwnMemories();
 
+  /// The token of the working link, or null.
+  Future<Result<String?, AlbumFailure>> loadLink(String albumId);
+
+  Future<Result<String, AlbumFailure>> shareByLink(String albumId);
+
+  Future<Result<void, AlbumFailure>> revokeLink(String albumId);
+
+  Future<Result<List<AlbumViewer>, AlbumFailure>> loadViewers(String albumId);
+
+  Future<Result<void, AlbumFailure>> revokeAccess(String albumId, String accountId);
+
+  Future<Result<void, AlbumFailure>> block(String albumId, String accountId);
+
+  Future<Result<AlbumLinkPreview, AlbumFailure>> previewLink(String token);
+
+  /// The album it let the person into.
+  Future<Result<String, AlbumFailure>> enterByLink(String token);
+
   Future<Result<void, AlbumFailure>> create(String id, String name);
 
   Future<Result<void, AlbumFailure>> invite(String albumId, String invitationId, String email);

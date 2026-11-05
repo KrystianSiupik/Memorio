@@ -80,6 +80,7 @@ public sealed class AlbumDatabase : PostgresDatabase
         builder.Configuration["Database:MigrateOnStartup"] = "false";
         builder.Services.AddMemorioMessaging(builder.Configuration, MessagingHost.Api, []);
         new AlbumModule().AddServices(builder.Services, builder.Configuration);
+        builder.Services.AddSingleton<Memorio.Modules.Access.Contracts.IBlockList>(Neighbours);
         builder.Services.AddSingleton<IAlbumSeatLimit>(Neighbours);
         builder.Services.AddSingleton<IInvitationBlocks>(Neighbours);
         builder.Services.AddSingleton<IAccountDirectory>(Neighbours);

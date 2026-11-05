@@ -92,6 +92,18 @@ final class AlbumRoute extends AppRoute {
   String get location => '${AlbumsRoute.path}/album/$id';
 }
 
+/// S15: what a link to an album opens.
+final class AlbumLinkRoute extends AppRoute {
+  const AlbumLinkRoute(this.token);
+
+  static const path = 'link/:token';
+
+  final String token;
+
+  @override
+  String get location => '${AlbumsRoute.path}/link/$token';
+}
+
 /// S11: only its owner gets a way in.
 final class AlbumManageRoute extends AppRoute {
   const AlbumManageRoute(this.id);

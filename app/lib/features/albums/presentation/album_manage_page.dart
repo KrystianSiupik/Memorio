@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/l10n/l10n.dart';
+import '../../../core/result.dart';
+import '../domain/album.dart';
 import 'albums_providers.dart';
 
 /// S11 Managing an album, for its owner: seats, invitations, who is in it and the successor. What is typed
@@ -50,6 +53,39 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
     }
   }
 
+  Future<void> _share() async {
+    final shared = await albums.shareByLink(widget.albumId);
+    if (!mounted) {
+      return;
+    }
+    switch (shared) {
+      case Ok():
+        setState(() => failure = null);
+        ref.invalidate(albumLinkProvider(widget.albumId));
+      case Err(failure: final refused):
+        setState(() => failure = refused);
+    }
+  }
+
+  Future<void> _revokeLink() async {
+    if (await act(() => albums.revokeLink(widget.albumId))) {
+      ref.invalidate(albumLinkProvider(widget.albumId));
+    }
+  }
+
+  Future<void> _revokeAccess(String accountId) async {
+    if (await act(() => albums.revokeAccess(widget.albumId, accountId))) {
+      ref.invalidate(albumViewersProvider(widget.albumId));
+    }
+  }
+
+  Future<void> _copy(String address) async {
+    await Clipboard.setData(ClipboardData(text: address));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.albumLinkCopied)));
+    }
+  }
+
   Future<void> _then(Future<bool> action) async {
     if (await action) {
       _refresh();
@@ -61,7 +97,8 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
     final l10n = context.l10n;
     final seats = ref.watch(albumSeatsProvider(widget.albumId));
     final album = ref.watch(albumDetailsProvider(widget.albumId)).value;
-
+    final link = ref.watch(albumLinkProvider(widget.albumId)).value;
+    final viewers = ref.watch(albumViewersProvider(widget.albumId)).value ?? const <AlbumViewer>[];
     return Scaffold(
       appBar: AppBar(title: Text(l10n.albumManage)),
       body: Column(
@@ -133,6 +170,28 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
                     if (album.successorAccountId == null)
                       Text(l10n.albumNoSuccessor, key: const Key('s11-no-successor')),
                   ],
+                  const SizedBox(height: 16),
+                  Text(l10n.albumLink, style: Theme.of(context).textTheme.titleMedium),
+                  if (link == null) ...[
+                    Text(l10n.albumLinkNone, key: const Key('s11-no-link')),
+                    OutlinedButton(onPressed: offline || busy ? null : _share, child: Text(l10n.albumShareByLink)),
+                  ] else ...[
+                    SelectableText(albumLinkAddress(link), key: const Key('s11-link')),
+                    TextButton(onPressed: () => _copy(albumLinkAddress(link)), child: Text(l10n.albumCopyLink)),
+                    OutlinedButton(onPressed: offline || busy ? null : _revokeLink, child: Text(l10n.albumRevokeLink)),
+                  ],
+                  const SizedBox(height: 16),
+                  Text(l10n.albumViewers, style: Theme.of(context).textTheme.titleMedium),
+                  if (viewers.isEmpty) Text(l10n.albumViewersEmpty),
+                  for (final viewer in viewers)
+                    ListTile(
+                      key: Key('s11-viewer-${viewer.accountId}'),
+                      title: Text(viewer.label),
+                      trailing: TextButton(
+                        onPressed: offline || busy ? null : () => _revokeAccess(viewer.accountId),
+                        child: Text(l10n.albumRevokeAccess),
+                      ),
+                    ),
                 ],
               ),
             ),
