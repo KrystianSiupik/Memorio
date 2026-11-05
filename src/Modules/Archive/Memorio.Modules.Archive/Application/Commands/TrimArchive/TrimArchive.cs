@@ -1,11 +1,10 @@
-using System.Globalization;
 using Memorio.Modules.Archive.Application.Queries.TrimMaterial;
 using Memorio.Modules.Archive.Domain.Memories;
 
 namespace Memorio.Modules.Archive.Application.Commands.TrimArchive;
 
-/// <summary>C24, on the order of Plans (S5 A7).</summary>
-internal sealed record TrimArchive(Guid ResourceId, bool IsAlbum, long LimitBytes, IReadOnlyCollection<Guid> KeptMemoryIds, int Sequence);
+/// <summary>C24 for an account, on the order of Plans (S5 A7); an album keeps to itself and its authors keep their memories (D-290).</summary>
+internal sealed record TrimArchive(Guid ResourceId, long LimitBytes, IReadOnlyCollection<Guid> KeptMemoryIds, int Sequence);
 
 /// <summary>
 /// The excess goes to the trash for 30 days, not away (HS-022). One transaction with its event and the sequence applied,
@@ -21,11 +20,8 @@ internal sealed class TrimArchiveHandler(IMemories memories, ITrimMaterialQuery 
             return;
         }
 
-        var items = command.IsAlbum
-            ? await material.OfAlbumAsync(command.ResourceId, cancellationToken)
-            : await material.OfAccountAsync(command.ResourceId, cancellationToken);
-        var candidates = items.Select(item => new TrimCandidate(item.MemoryId, DateOnly.Parse(item.DateFrom, CultureInfo.InvariantCulture), item.SizeBytes));
-        var toTrim = TrimSelection.ToTrim(candidates, command.KeptMemoryIds, command.LimitBytes);
+        var items = await material.OfAccountAsync(command.ResourceId, cancellationToken);
+        var toTrim = TrimSelection.ToTrim(items.Select(item => item.ToCandidate()), command.KeptMemoryIds, command.LimitBytes);
 
         var now = clock.GetUtcNow();
         foreach (var id in toTrim)
@@ -35,7 +31,7 @@ internal sealed class TrimArchiveHandler(IMemories memories, ITrimMaterialQuery 
         }
 
         memories.RecordApplied(applied, command.ResourceId, command.Sequence);
-        await memories.AnnounceAsync(new ArchiveTrimmed(Guid.CreateVersion7(), now, command.ResourceId, command.IsAlbum, toTrim.Count, command.Sequence));
+        await memories.AnnounceAsync(new ArchiveTrimmed(Guid.CreateVersion7(), now, command.ResourceId, false, toTrim.Count, command.Sequence));
         if (!await memories.SaveAsync(cancellationToken))
         {
             throw new InvalidOperationException("Another decision about these memories got there first; the retry reads them again.");

@@ -241,6 +241,8 @@
   "@planReadOnlySince": {"placeholders": {"date": {"type": "String"}}},
   "planTrimAt": "{date}: to, co przekracza {limit}, trafi do kosza na 30 dni.",
   "@planTrimAt": {"placeholders": {"date": {"type": "String"}, "limit": {"type": "String"}}},
+  "planAlbumTrimAt": "{date}: to, co przekracza {limit}, zostanie wyjęte z albumu. Autorzy zachowają swoje wspomnienia na własnych kontach.",
+  "@planAlbumTrimAt": {"placeholders": {"date": {"type": "String"}, "limit": {"type": "String"}}},
   "planHeld": "Przycięcie wstrzymane: ostrzeżenie do kogoś nie dotarło. Nic nie zostanie przycięte, dopóki nie dotrze.",
   "planNothingLost": "Nic nie zniknie do tej daty. Możesz wszystko oglądać, a po opłaceniu planu wszystko wróci do pełnych funkcji bez żadnego działania.",
   "planChoose": "Wybierz, co zostanie",

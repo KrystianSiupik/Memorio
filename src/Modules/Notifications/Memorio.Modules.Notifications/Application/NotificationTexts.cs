@@ -28,7 +28,7 @@ internal static class NotificationTexts
                 $"Oznaczono Cię we wspomnieniu: {album}.\n\nJeśli nie chcesz tego oznaczenia, możesz je usunąć jednym kliknięciem w albumie."),
             NotificationKind.TrimWarningAlbum => (
                 $"Album w GEO zostanie przycięty za {OneLine(detail ?? "")}",
-                $"Plan albumu wygasł: {album}.\n\nZa {OneLine(detail ?? "")} to, co przekracza darmowy limit, trafi do kosza na 30 dni, a potem zniknie. Właściciel może wybrać, co zostanie, albo odnowić plan: wtedy nic nie zniknie."),
+                $"Plan albumu wygasł: {album}.\n\nZa {OneLine(detail ?? "")} to, co przekracza darmowy limit, zostanie wyjęte z albumu. Autorzy zachowają swoje wspomnienia na własnych kontach. Właściciel może wybrać, co zostanie w albumie, albo odnowić plan: wtedy album zostanie bez zmian."),
             NotificationKind.TrimWarningAccount => (
                 $"Twoje archiwum w GEO zostanie przycięte za {OneLine(detail ?? "")}",
                 $"Twój plan wygasł.\n\nZa {OneLine(detail ?? "")} to, co przekracza darmowy limit, trafi do kosza na 30 dni, a potem zniknie. Możesz wybrać, co zostanie, albo odnowić plan: wtedy nic nie zniknie."),

@@ -71,6 +71,21 @@ namespace Memorio.Modules.Album.Infrastructure.Persistence.Migrations
                     b.ToTable("applied_account_events", "album");
                 });
 
+            modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.AppliedPlanEvent", b =>
+                {
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("album_id");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence");
+
+                    b.HasKey("AlbumId");
+
+                    b.ToTable("applied_plan_events", "album");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.Entrustment", b =>
                 {
                     b.Property<Guid>("AlbumId")
@@ -183,6 +198,39 @@ namespace Memorio.Modules.Album.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ix_albums_owner_account_id");
 
                     b.ToTable("albums", "album");
+                });
+
+            modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.TrimmedAlbumMemory", b =>
+                {
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("album_id");
+
+                    b.Property<Guid>("MemoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("memory_id");
+
+                    b.Property<Guid>("AuthorAccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("author_account_id");
+
+                    b.Property<bool>("HasLeft")
+                        .HasColumnType("boolean")
+                        .HasColumnName("has_left");
+
+                    b.Property<DateTimeOffset>("TrimmedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("trimmed_at");
+
+                    b.HasKey("AlbumId", "MemoryId");
+
+                    b.HasIndex("AuthorAccountId")
+                        .HasDatabaseName("ix_trimmed_memories_author_account_id");
+
+                    b.HasIndex("MemoryId")
+                        .HasDatabaseName("ix_trimmed_memories_memory_id");
+
+                    b.ToTable("trimmed_memories", "album");
                 });
 
             modelBuilder.Entity("Memorio.Modules.Album.Domain.Albums.AlbumMemory", b =>

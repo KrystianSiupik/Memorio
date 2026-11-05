@@ -6,10 +6,13 @@ using Memorio.Modules.Limits.Domain.Pools;
 namespace Memorio.Modules.Limits.Infrastructure;
 
 /// <summary>An album's pool is the same AG2 under the album's id: ids are UUIDs, so it never meets an account's.</summary>
-internal sealed class AlbumPool(ReserveUnitsHandler reserve, ReleaseUnitsHandler release, IPools pools) : IAlbumPool
+internal sealed class AlbumPool(ReserveUnitsHandler reserve, ReleaseUnitsHandler release, IPools pools, TimeProvider clock) : IAlbumPool
 {
     public async Task<bool> TryReserveAsync(Guid albumId, Guid operationKey, long bytes, CancellationToken cancellationToken) =>
         (await reserve.HandleAsync(new ReserveUnits(albumId, operationKey, bytes), cancellationToken)).IsSuccess;
+
+    public Task ReserveOverLimitAsync(Guid albumId, Guid operationKey, long bytes, CancellationToken cancellationToken) =>
+        pools.ReserveOverLimitAsync(albumId, operationKey, bytes, clock.GetUtcNow(), cancellationToken);
 
     public Task ReleaseAsync(Guid operationKey, CancellationToken cancellationToken) =>
         release.HandleAsync(new ReleaseUnits(operationKey), cancellationToken);

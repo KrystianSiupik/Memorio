@@ -20,7 +20,7 @@
 |---|---|---|---|---|
 | [MEM-E7-PLANY-01](../MEM-E7-PLANY-01-nadaj-uprawnienia-planu-c90.md) | Nadaj uprawnienia planu (C90) | plany / domena + aplikacja | 3–4 | zrobiony |
 | [MEM-E7-PLANY-02](../MEM-E7-PLANY-02-przelacz-w-tryb-tylko-do-odczytu-c91.md) | Przełącz w tryb tylko do odczytu (C91) | plany / domena + aplikacja | 3–4 | zrobiony |
-| [MEM-E7-PLANY-03](../MEM-E7-PLANY-03-odswiez-stan-subskrypcji-u-posrednika-c96.md) | Odśwież stan subskrypcji u pośrednika (C96) | plany / aplikacja | 2–4 | zrobiony częściowo: czyta księgę, bez prawdziwego źródła płatności (D-281) |
+| [MEM-E7-PLANY-03](../MEM-E7-PLANY-03-odswiez-stan-subskrypcji-u-posrednika-c96.md) | Odśwież stan subskrypcji u pośrednika (C96) | plany / aplikacja | 2–4 | zrobiony częściowo: czyta księgę, adapter RevenueCat czeka na konto (D-291) |
 | [MEM-E7-POWIADOMIENIA-01](../MEM-E7-POWIADOMIENIA-01-wyslij-ostrzezenie-przed-przycieciem-c92.md) | Wyślij ostrzeżenie przed przycięciem (C92) | powiadomienia / aplikacja | 2–4 | zrobiony |
 | [MEM-E7-PLANY-04](../MEM-E7-PLANY-04-wstrzymaj-przyciecie-archiwum-c93.md) | Wstrzymaj przycięcie archiwum (C93) | plany / domena + aplikacja | 3–4 | zrobiony |
 | [MEM-E7-PLANY-05](../MEM-E7-PLANY-05-wskaz-material-do-zachowania-c94.md) | Wskaż materiał do zachowania (C94) | plany / domena + aplikacja | 3–4 | zrobiony |
@@ -54,7 +54,7 @@
 | [MEM-E7-PLANY-24](../MEM-E7-PLANY-24-zdarzenie-integracyjne-plan-albumu-bez-wlasciciela.md) | Zdarzenie integracyjne „Plan albumu bez właściciela opłacony przez uczestnika” (E171) w kontrakcie modułu plany | plany / kontrakt | 1–2 | zrobiony częściowo: bez odbiorcy do E9 (D-289) |
 | [MEM-E7-PLANY-25](../MEM-E7-PLANY-25-polityka-p41-zawsze-gdy-album-przejety-przez-uczes.md) | Polityka P41: Zawsze gdy album przejęty przez uczestnika, wtedy aktywuj plan albumu | plany / aplikacja (handler zdarzenia) | 1–3 | zrobiony częściowo: handler bez zdarzenia E167 do E9 (D-289) |
 | [MEM-E7-ARCHIWUM-05](../MEM-E7-ARCHIWUM-05-polityka-p44-zawsze-gdy-plan-znowu-aktywny-w-ciagu.md) | Polityka P44: Zawsze gdy plan znowu aktywny w ciągu 30 dni od przycięcia, wtedy przywróć przycięty materiał z kosza | archiwum / aplikacja (handler zdarzenia) | 1–3 | zrobiony |
-| [MEM-E7-PLAT-01](../MEM-E7-PLAT-01-ekran-s18-plan-i-subskrypcja.md) | Ekran S18 „Plan i subskrypcja” | - / UI | 2–4 | zrobiony częściowo: bez zakupu, bez testu na urządzeniu (D-281) |
+| [MEM-E7-PLAT-01](../MEM-E7-PLAT-01-ekran-s18-plan-i-subskrypcja.md) | Ekran S18 „Plan i subskrypcja” | - / UI | 2–4 | zrobiony częściowo: bez zakupu do czasu RevenueCat, bez testu na urządzeniu (D-291) |
 | [MEM-E7-PLAT-02](../MEM-E7-PLAT-02-ekran-s18-plan-i-subskrypcja-akcje-dolacz-do-planu.md) | Ekran S18 „Plan i subskrypcja”: akcje „Dołącz do planu rodzinnego” | - / UI | 1–2 | niezrobiony: czeka na decyzję HS-012 (PO) |
 | [MEM-E7-PLAT-03](../MEM-E7-PLAT-03-ekran-s19-wybierz-co-zostanie-po-przycieciu.md) | Ekran S19 „Wybierz, co zostanie po przycięciu” | - / UI | 2–4 | zrobiony (bez testu na urządzeniu) |
 | [MEM-E7-PLAT-04](../MEM-E7-PLAT-04-ekran-s20-plan-rodzinny.md) | Ekran S20 „Plan rodzinny” | - / UI | 2–4 | niezrobiony: zależy od -07 |

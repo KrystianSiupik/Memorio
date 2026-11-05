@@ -34,6 +34,12 @@ internal sealed class AlbumContent(ArchiveDbContext database, IMemories memories
         return rows.ToDictionary(row => row.Id, row => new AlbumMemorySummary(row.PlaceName, row.DateFrom, row.Photos));
     }
 
+    public async Task<IReadOnlyList<Guid>> ChooseToTrimAsync(Guid albumId, IReadOnlyCollection<Guid> keptMemoryIds, long limitBytes, CancellationToken cancellationToken)
+    {
+        var items = await material.OfAlbumAsync(albumId, cancellationToken);
+        return TrimSelection.ToTrim(items.Select(item => item.ToCandidate()), keptMemoryIds, limitBytes);
+    }
+
     public async Task<IReadOnlyList<AlbumTrimMaterial>> TrimMaterialAsync(Guid albumId, CancellationToken cancellationToken) =>
         [.. (await material.OfAlbumAsync(albumId, cancellationToken)).Select(item => new AlbumTrimMaterial(item.MemoryId, item.PlaceName, item.DateFrom, item.SizeBytes))];
 

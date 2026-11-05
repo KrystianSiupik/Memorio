@@ -786,6 +786,11 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String planAlbumTrimAt(String date, String limit) {
+    return '$date: to, co przekracza $limit, zostanie wyjęte z albumu. Autorzy zachowają swoje wspomnienia na własnych kontach.';
+  }
+
+  @override
   String get planHeld =>
       'Przycięcie wstrzymane: ostrzeżenie do kogoś nie dotarło. Nic nie zostanie przycięte, dopóki nie dotrze.';
 
