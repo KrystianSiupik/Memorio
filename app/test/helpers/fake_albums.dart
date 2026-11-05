@@ -181,6 +181,7 @@ const myMemory = AlbumMemory(
 AlbumDetails albumDetails({
   bool isOwner = false,
   bool isMember = true,
+  bool isReadOnly = false,
   List<AlbumMemory> memories = const [myMemory],
   int freeBytes = 1024 * 1024 * 1024,
   String? successor,
@@ -190,6 +191,7 @@ AlbumDetails albumDetails({
   name: 'Rodzina',
   isOwner: isOwner,
   isMember: isMember,
+  isReadOnly: isReadOnly,
   successorAccountId: successor,
   members: isMember ? const [owner, me, otherMember] : const [],
   memories: memories,

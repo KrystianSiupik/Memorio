@@ -6,6 +6,7 @@ import '../features/account/account.dart';
 import '../features/albums/albums.dart';
 import '../features/map/map.dart';
 import '../features/memories/memories.dart';
+import '../features/plans/plans.dart';
 import '../features/shared_with_me/shared_with_me.dart';
 import 'home_shell.dart';
 import 'routes.dart';
@@ -89,6 +90,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                     onOpenMemory: (memoryId) => MemoryRoute(memoryId).go(context),
                     onManage: () => AlbumManageRoute(id).go(context),
                     onConsents: () => AlbumConsentsRoute(id).go(context),
+                    onPlan: () => AlbumPlanRoute(id).go(context),
                     onLeft: () => const AlbumsRoute().go(context),
                   );
                 },
@@ -96,6 +98,19 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: AlbumManageRoute.path,
                     builder: (context, state) => AlbumManagePage(albumId: state.pathParameters['id']!),
+                  ),
+                  GoRoute(
+                    path: AlbumPlanRoute.path,
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return PlanPage(albumId: id, onChooseMaterial: () => AlbumPlanMaterialRoute(id).go(context));
+                    },
+                    routes: [
+                      GoRoute(
+                        path: AlbumPlanMaterialRoute.path,
+                        builder: (context, state) => PlanMaterialPage(albumId: state.pathParameters['id']),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: AlbumConsentsRoute.path,
@@ -109,7 +124,17 @@ final routerProvider = Provider<GoRouter>((ref) {
             SharedWithMeRoute.path,
             Builder(builder: (context) => SharedWithMePage(onOpenAlbum: (id) => AlbumRoute(id).go(context))),
           ),
-          _tab(AccountRoute.path, const AccountPage()),
+          _tab(
+            AccountRoute.path,
+            Builder(builder: (context) => AccountPage(onOpenPlan: () => const PlanRoute().go(context))),
+            routes: [
+              GoRoute(
+                path: PlanRoute.path,
+                builder: (context, state) => PlanPage(onChooseMaterial: () => const PlanMaterialRoute().go(context)),
+                routes: [GoRoute(path: PlanMaterialRoute.path, builder: (context, state) => const PlanMaterialPage())],
+              ),
+            ],
+          ),
         ],
       ),
     ],

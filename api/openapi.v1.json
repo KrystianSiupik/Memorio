@@ -246,6 +246,30 @@
         }
       }
     },
+    "/v1/memories/trim-material": {
+      "get": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "What a trim of the person\u0027s archive could take, oldest first, with sizes.",
+        "operationId": "GetTrimMaterial",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrimMaterialResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/memories/{id}/restore": {
       "post": {
         "tags": [
@@ -605,6 +629,41 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AlbumResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/trim-material": {
+      "get": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "For the owner: what a trim of the album could take, oldest first, with sizes.",
+        "operationId": "GetAlbumTrimMaterial",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AlbumTrimMaterialResponse"
+                  }
                 }
               }
             }
@@ -1561,6 +1620,171 @@
         }
       }
     },
+    "/v1/plan": {
+      "get": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "The plan of the person\u0027s account: mode, dates and what is used.",
+        "operationId": "GetPlan",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/plan/refresh": {
+      "post": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "Asks the payment source now instead of waiting for its notification.",
+        "operationId": "RefreshPlan",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/plan/kept-material": {
+      "put": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "In the window before the trim: the memories to keep first; a new choice replaces the earlier one.",
+        "operationId": "KeepMaterial",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KeepMaterialRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/plan": {
+      "get": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "For the owner: the plan of the album.",
+        "operationId": "GetAlbumPlan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/plan/refresh": {
+      "post": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "For the owner: asks the payment source now.",
+        "operationId": "RefreshAlbumPlan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/plan/kept-material": {
+      "put": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "For the owner, in the window before the trim: the memories to keep first.",
+        "operationId": "KeepAlbumMaterial",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KeepMaterialRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
     "/v1/auth/register": {
       "post": {
         "tags": [
@@ -2229,7 +2453,8 @@
           "myPhotos",
           "freeBytes",
           "limitBytes",
-          "myCuratorAccountId"
+          "myCuratorAccountId",
+          "isReadOnly"
         ],
         "type": "object",
         "properties": {
@@ -2303,6 +2528,9 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "isReadOnly": {
+            "type": "boolean"
           }
         }
       },
@@ -2344,6 +2572,35 @@
             "items": {
               "$ref": "#/components/schemas/AlbumInvitedResponse"
             }
+          }
+        }
+      },
+      "AlbumTrimMaterialResponse": {
+        "required": [
+          "memoryId",
+          "placeName",
+          "dateFrom",
+          "sizeBytes"
+        ],
+        "type": "object",
+        "properties": {
+          "memoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "placeName": {
+            "type": "string"
+          },
+          "dateFrom": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
           }
         }
       },
@@ -2656,6 +2913,24 @@
           }
         }
       },
+      "KeepMaterialRequest": {
+        "required": [
+          "memoryIds"
+        ],
+        "type": "object",
+        "properties": {
+          "memoryIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
       "KeptContributionResponse": {
         "required": [
           "albumId",
@@ -2901,6 +3176,118 @@
           }
         }
       },
+      "PlanResponse": {
+        "required": [
+          "mode",
+          "entitledUntil",
+          "readOnlySince",
+          "trimAt",
+          "choiceOpensAt",
+          "isChoiceOpen",
+          "isHeld",
+          "lastCheckedAt",
+          "keptMemoryIds",
+          "usedBytes",
+          "limitBytes",
+          "freeLimitBytes",
+          "aiUsed",
+          "aiLimit"
+        ],
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string"
+          },
+          "entitledUntil": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "readOnlySince": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "trimAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "choiceOpensAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "isChoiceOpen": {
+            "type": "boolean"
+          },
+          "isHeld": {
+            "type": "boolean"
+          },
+          "lastCheckedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "keptMemoryIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "usedBytes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "limitBytes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "freeLimitBytes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "aiUsed": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "aiLimit": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "RefreshRequest": {
         "required": [
           "refreshToken"
@@ -3082,6 +3469,35 @@
           }
         }
       },
+      "TrimMaterialResponse": {
+        "required": [
+          "memoryId",
+          "placeName",
+          "dateFrom",
+          "sizeBytes"
+        ],
+        "type": "object",
+        "properties": {
+          "memoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "placeName": {
+            "type": "string"
+          },
+          "dateFrom": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          }
+        }
+      },
       "UploadResponse": {
         "required": [
           "key",
@@ -3128,6 +3544,9 @@
     },
     {
       "name": "Places"
+    },
+    {
+      "name": "Plans"
     },
     {
       "name": "Auth"

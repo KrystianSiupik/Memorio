@@ -1434,6 +1434,162 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Przywróć'**
   String get restore;
+
+  /// S18
+  ///
+  /// In pl, this message translates to:
+  /// **'Plan i subskrypcja'**
+  String get planTitle;
+
+  /// No description provided for @planAlbumTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Plan albumu'**
+  String get planAlbumTitle;
+
+  /// No description provided for @planModeFree.
+  ///
+  /// In pl, this message translates to:
+  /// **'Plan darmowy'**
+  String get planModeFree;
+
+  /// No description provided for @planModeActive.
+  ///
+  /// In pl, this message translates to:
+  /// **'Plan Premium'**
+  String get planModeActive;
+
+  /// No description provided for @planModeReadOnly.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tylko do odczytu'**
+  String get planModeReadOnly;
+
+  /// No description provided for @planModeOverLimit.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nic nowego ponad darmowy limit'**
+  String get planModeOverLimit;
+
+  /// No description provided for @planModeTrimmed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Plan darmowy po przycięciu'**
+  String get planModeTrimmed;
+
+  /// No description provided for @planUsage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zajęte miejsce: {used} z {limit}'**
+  String planUsage(String used, String limit);
+
+  /// No description provided for @planAiUsage.
+  ///
+  /// In pl, this message translates to:
+  /// **'AI w tym miesiącu: {used} z {limit}'**
+  String planAiUsage(int used, int limit);
+
+  /// No description provided for @planPaidUntil.
+  ///
+  /// In pl, this message translates to:
+  /// **'Opłacony do: {date}'**
+  String planPaidUntil(String date);
+
+  /// No description provided for @planReadOnlySince.
+  ///
+  /// In pl, this message translates to:
+  /// **'Plan wygasł: {date}'**
+  String planReadOnlySince(String date);
+
+  /// No description provided for @planTrimAt.
+  ///
+  /// In pl, this message translates to:
+  /// **'{date}: to, co przekracza {limit}, trafi do kosza na 30 dni.'**
+  String planTrimAt(String date, String limit);
+
+  /// No description provided for @planHeld.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przycięcie wstrzymane: ostrzeżenie do kogoś nie dotarło. Nic nie zostanie przycięte, dopóki nie dotrze.'**
+  String get planHeld;
+
+  /// No description provided for @planNothingLost.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nic nie zniknie do tej daty. Możesz wszystko oglądać, a po opłaceniu planu wszystko wróci do pełnych funkcji bez żadnego działania.'**
+  String get planNothingLost;
+
+  /// No description provided for @planChoose.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wybierz, co zostanie'**
+  String get planChoose;
+
+  /// No description provided for @planRefresh.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przywróć zakupy / odśwież'**
+  String get planRefresh;
+
+  /// No description provided for @planNoAccess.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ten plan widzi tylko osoba, która za niego płaci.'**
+  String get planNoAccess;
+
+  /// No description provided for @planChoiceClosed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wybór materiału nie jest teraz otwarty.'**
+  String get planChoiceClosed;
+
+  /// S19
+  ///
+  /// In pl, this message translates to:
+  /// **'Wybierz, co zostanie po przycięciu'**
+  String get planMaterialTitle;
+
+  /// No description provided for @planMaterialLimit.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wybrano {used} z darmowego limitu {limit}'**
+  String planMaterialLimit(String used, String limit);
+
+  /// No description provided for @planMaterialDeadline.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wybór możesz zmieniać do: {date}. Bez wyboru zostaje to, co najstarsze.'**
+  String planMaterialDeadline(String date);
+
+  /// No description provided for @planMaterialTooMuch.
+  ///
+  /// In pl, this message translates to:
+  /// **'To za dużo: odznacz coś, aby zmieścić się w limicie.'**
+  String get planMaterialTooMuch;
+
+  /// No description provided for @planMaterialKeep.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zachowaj wybrane'**
+  String get planMaterialKeep;
+
+  /// No description provided for @planMaterialSaved.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wybór zapisany.'**
+  String get planMaterialSaved;
+
+  /// No description provided for @albumReadOnly.
+  ///
+  /// In pl, this message translates to:
+  /// **'Plan albumu wygasł: album jest tylko do odczytu. Wszyscy dalej go oglądają, ale nic nowego nie można dodać.'**
+  String get albumReadOnly;
+
+  /// No description provided for @albumReadOnlyRefused.
+  ///
+  /// In pl, this message translates to:
+  /// **'Plan tego albumu wygasł: nic nowego nie można dodać, dopóki nie zostanie opłacony.'**
+  String get albumReadOnlyRefused;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

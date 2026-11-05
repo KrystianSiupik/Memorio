@@ -16,6 +16,7 @@ class AlbumPage extends ConsumerStatefulWidget {
     required this.onOpenMemory,
     required this.onManage,
     required this.onConsents,
+    required this.onPlan,
     required this.onLeft,
   });
 
@@ -23,6 +24,7 @@ class AlbumPage extends ConsumerStatefulWidget {
   final void Function(String memoryId) onOpenMemory;
   final VoidCallback onManage;
   final VoidCallback onConsents;
+  final VoidCallback onPlan;
   final VoidCallback onLeft;
 
   @override
@@ -173,6 +175,12 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
               icon: const Icon(Icons.settings_outlined),
               onPressed: widget.onManage,
             ),
+          if (details.value?.isOwner ?? false)
+            IconButton(
+              tooltip: l10n.planAlbumTitle,
+              icon: const Icon(Icons.workspace_premium_outlined),
+              onPressed: widget.onPlan,
+            ),
           if (details.value?.isMember ?? false)
             IconButton(
               tooltip: l10n.albumConsents,
@@ -201,11 +209,12 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
                     ),
                     Text(l10n.albumNoOwnerState),
                   ],
+                  if (album.isReadOnly) Text(l10n.albumReadOnly, key: const Key('s10-read-only')),
                   ...failureBlock(context),
                   if (album.isMember) ...[
                     const SizedBox(height: 8),
                     FilledButton(
-                      onPressed: offline || busy ? null : () => _addMemory(context),
+                      onPressed: offline || busy || album.isReadOnly ? null : () => _addMemory(context),
                       child: Text(l10n.albumAddMemory),
                     ),
                   ],
@@ -236,7 +245,9 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
                               children: [
                                 if (memory.isMine)
                                   TextButton(
-                                    onPressed: offline || busy || album.poolIsFull ? null : () => _addPhotos(memory.id),
+                                    onPressed: offline || busy || album.poolIsFull || album.isReadOnly
+                                        ? null
+                                        : () => _addPhotos(memory.id),
                                     child: Text(l10n.albumAddPhotos),
                                   ),
                                 TextButton(

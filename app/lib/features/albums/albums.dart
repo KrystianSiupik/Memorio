@@ -20,4 +20,5 @@ export 'presentation/albums_providers.dart'
         entrustedProvider,
         invitationsProvider,
         keptContributionsProvider,
+        bytesText,
         sharedAlbumsProvider;

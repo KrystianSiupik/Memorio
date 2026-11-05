@@ -738,4 +738,100 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get restore => 'Przywróć';
+
+  @override
+  String get planTitle => 'Plan i subskrypcja';
+
+  @override
+  String get planAlbumTitle => 'Plan albumu';
+
+  @override
+  String get planModeFree => 'Plan darmowy';
+
+  @override
+  String get planModeActive => 'Plan Premium';
+
+  @override
+  String get planModeReadOnly => 'Tylko do odczytu';
+
+  @override
+  String get planModeOverLimit => 'Nic nowego ponad darmowy limit';
+
+  @override
+  String get planModeTrimmed => 'Plan darmowy po przycięciu';
+
+  @override
+  String planUsage(String used, String limit) {
+    return 'Zajęte miejsce: $used z $limit';
+  }
+
+  @override
+  String planAiUsage(int used, int limit) {
+    return 'AI w tym miesiącu: $used z $limit';
+  }
+
+  @override
+  String planPaidUntil(String date) {
+    return 'Opłacony do: $date';
+  }
+
+  @override
+  String planReadOnlySince(String date) {
+    return 'Plan wygasł: $date';
+  }
+
+  @override
+  String planTrimAt(String date, String limit) {
+    return '$date: to, co przekracza $limit, trafi do kosza na 30 dni.';
+  }
+
+  @override
+  String get planHeld =>
+      'Przycięcie wstrzymane: ostrzeżenie do kogoś nie dotarło. Nic nie zostanie przycięte, dopóki nie dotrze.';
+
+  @override
+  String get planNothingLost =>
+      'Nic nie zniknie do tej daty. Możesz wszystko oglądać, a po opłaceniu planu wszystko wróci do pełnych funkcji bez żadnego działania.';
+
+  @override
+  String get planChoose => 'Wybierz, co zostanie';
+
+  @override
+  String get planRefresh => 'Przywróć zakupy / odśwież';
+
+  @override
+  String get planNoAccess => 'Ten plan widzi tylko osoba, która za niego płaci.';
+
+  @override
+  String get planChoiceClosed => 'Wybór materiału nie jest teraz otwarty.';
+
+  @override
+  String get planMaterialTitle => 'Wybierz, co zostanie po przycięciu';
+
+  @override
+  String planMaterialLimit(String used, String limit) {
+    return 'Wybrano $used z darmowego limitu $limit';
+  }
+
+  @override
+  String planMaterialDeadline(String date) {
+    return 'Wybór możesz zmieniać do: $date. Bez wyboru zostaje to, co najstarsze.';
+  }
+
+  @override
+  String get planMaterialTooMuch => 'To za dużo: odznacz coś, aby zmieścić się w limicie.';
+
+  @override
+  String get planMaterialKeep => 'Zachowaj wybrane';
+
+  @override
+  String get planMaterialSaved => 'Wybór zapisany.';
+
+  @override
+  String get albumReadOnly =>
+      'Plan albumu wygasł: album jest tylko do odczytu. Wszyscy dalej go oglądają, ale nic nowego nie można dodać.';
+
+  @override
+  String get albumReadOnlyRefused =>
+      'Plan tego albumu wygasł: nic nowego nie można dodać, dopóki nie zostanie opłacony.';
 }
