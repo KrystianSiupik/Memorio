@@ -24,7 +24,17 @@ internal sealed class Audiences(IDbContextOutbox<AccessDbContext> outbox) : IAud
     {
         await Database.Database.ExecuteSqlAsync($"DELETE FROM access.album_viewers WHERE account_id = {accountId}", cancellationToken);
         await Database.Database.ExecuteSqlAsync($"DELETE FROM access.album_blocks WHERE account_id = {accountId}", cancellationToken);
+        await Database.Database.ExecuteSqlAsync($"DELETE FROM access.legacy_grants WHERE owner_account_id = {accountId}", cancellationToken);
     }
+
+    public Task GrantLegacyAsync(LegacyGrant grant, CancellationToken cancellationToken) =>
+        Database.Database.ExecuteSqlAsync(
+            $"""
+            INSERT INTO access.legacy_grants (owner_account_id, contact_hash, granted_at)
+            VALUES ({grant.OwnerAccountId}, {grant.ContactHash}, {grant.GrantedAt})
+            ON CONFLICT (owner_account_id) DO NOTHING
+            """,
+            cancellationToken);
 
     public async Task<bool> SaveAsync(CancellationToken cancellationToken)
     {

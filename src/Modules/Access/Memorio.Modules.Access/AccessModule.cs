@@ -50,6 +50,7 @@ public sealed class AccessModule : IModule
         services.AddScoped<BlockUserHandler>();
         services.AddScoped<UnblockUserHandler>();
         services.AddScoped<ForgetDeletedAccount>();
+        services.AddScoped<GrantLegacyRead>();
 
         services.AddHealthChecks().AddCheck<AccessDatabaseHealthCheck>(AccessDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))

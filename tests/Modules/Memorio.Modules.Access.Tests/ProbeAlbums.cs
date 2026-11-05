@@ -134,6 +134,9 @@ internal sealed class ProbeAccessReader(AccessDatabase database) : IAccessReader
         return (bool)(await command.ExecuteScalarAsync(cancellationToken))!;
     }
 
+    public Task<IReadOnlyCollection<Guid>> LegacyArchivesAsync(Guid personId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyCollection<Guid>>([]);
+
     public Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken) =>
         VisibleAlbumsAsync(personId, cancellationToken);
 
@@ -167,6 +170,9 @@ internal sealed class CachingAccessReader(IAccessReader inner) : IAccessReader
 
         return canSee;
     }
+
+    public Task<IReadOnlyCollection<Guid>> LegacyArchivesAsync(Guid personId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyCollection<Guid>>([]);
 
     public Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken) =>
         VisibleAlbumsAsync(personId, cancellationToken);

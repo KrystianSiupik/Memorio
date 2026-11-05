@@ -49,6 +49,30 @@ namespace Memorio.Modules.Access.Infrastructure.Persistence.Migrations
                     b.ToTable("album_audiences", "access");
                 });
 
+            modelBuilder.Entity("Memorio.Modules.Access.Domain.Audiences.LegacyGrant", b =>
+                {
+                    b.Property<Guid>("OwnerAccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owner_account_id");
+
+                    b.Property<string>("ContactHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("contact_hash");
+
+                    b.Property<DateTimeOffset>("GrantedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("granted_at");
+
+                    b.HasKey("OwnerAccountId");
+
+                    b.HasIndex("ContactHash")
+                        .HasDatabaseName("ix_legacy_grants_contact_hash");
+
+                    b.ToTable("legacy_grants", "access");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Access.Domain.Audiences.AlbumAudience", b =>
                 {
                     b.OwnsMany("Memorio.Modules.Access.Domain.Audiences.AlbumBlock", "Blocks", b1 =>

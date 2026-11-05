@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Memorio.Modules.Access.Contracts;
 using Memorio.Modularity;
 using Memorio.Modules.Archive.Application.Commands.AddPhoto;
 using Memorio.Modules.Archive.Application.Commands.RestoreMemory;
@@ -35,6 +36,9 @@ internal static class MemoriesEndpoints
         memories.MapGet("/mine", GetMineAsync)
             .WithName("ListMyMemories")
             .WithSummary("The person's own active memories, newest first.");
+        memories.MapGet("/legacy/{ownerAccountId:guid}", GetLegacyAsync)
+            .WithName("ListLegacyMemories")
+            .WithSummary("For the legacy contact of a person who died: their private memories, oldest first.");
         memories.MapGet("/trim-material", GetTrimMaterialAsync)
             .WithName("GetTrimMaterial")
             .WithSummary("What a trim of the person's archive could take, oldest first, with sizes.");
@@ -166,6 +170,22 @@ internal static class MemoriesEndpoints
         var trashed = await query.GetAsync(CurrentAccount.IdOf(principal), cancellationToken);
         return TypedResults.Ok<IReadOnlyList<TrashedMemoryResponse>>(
             [.. trashed.Select(item => new TrashedMemoryResponse(item.Id, item.PlaceName, item.DateFrom, item.Description, item.Photos, item.TrashedAt, item.DaysLeft))]);
+    }
+
+    private static async Task<Results<Ok<IReadOnlyList<MyMemoryResponse>>, ProblemHttpResult>> GetLegacyAsync(
+        Guid ownerAccountId,
+        ClaimsPrincipal principal,
+        IAccessReader access,
+        ITrimMaterialQuery query,
+        CancellationToken cancellationToken)
+    {
+        if (!(await access.LegacyArchivesAsync(CurrentAccount.IdOf(principal), cancellationToken)).Contains(ownerAccountId))
+        {
+            return Problems.From(MemoryErrors.NoAccess);
+        }
+
+        var items = await query.OfAccountAsync(ownerAccountId, cancellationToken);
+        return TypedResults.Ok<IReadOnlyList<MyMemoryResponse>>([.. items.Select(item => new MyMemoryResponse(item.MemoryId, item.PlaceName, item.DateFrom))]);
     }
 
     private static async Task<Ok<IReadOnlyList<TrimMaterialResponse>>> GetTrimMaterialAsync(

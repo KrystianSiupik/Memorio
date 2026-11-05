@@ -200,6 +200,9 @@ internal interface IAudiences
     /// <summary>A deleted account leaves no trace in any audience.</summary>
     Task ForgetAsync(Guid accountId, CancellationToken cancellationToken);
 
+    /// <summary>Asking again changes nothing.</summary>
+    Task GrantLegacyAsync(LegacyGrant grant, CancellationToken cancellationToken);
+
     /// <summary>Stores the changes with their events, in one transaction. False when another decision got there first.</summary>
     Task<bool> SaveAsync(CancellationToken cancellationToken);
 }

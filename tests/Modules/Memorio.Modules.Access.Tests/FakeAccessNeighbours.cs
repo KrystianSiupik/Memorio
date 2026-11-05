@@ -1,12 +1,19 @@
 using System.Collections.Concurrent;
 using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Album.Contracts;
+using Memorio.Modules.Succession.Contracts;
 
 namespace Memorio.Modules.Access.Tests;
 
 /// <summary>What Album and Account answer: albums with owners and participants, from memory.</summary>
-public sealed class FakeAccessNeighbours : IAlbumMembership, IAlbumNames, IAccountDirectory
+public sealed class FakeAccessNeighbours : IAlbumMembership, IAlbumNames, IAccountDirectory, ILegacyContacts
 {
+    private readonly ConcurrentDictionary<Guid, string> _contacts = new();
+
+    public void ContactOf(Guid owner, string email) => _contacts[owner] = email;
+
+    public Task<string?> ContactOfAsync(Guid ownerAccountId, CancellationToken cancellationToken) => Task.FromResult(_contacts.GetValueOrDefault(ownerAccountId));
+
     private readonly ConcurrentDictionary<Guid, Guid> _owners = new();
     private readonly ConcurrentDictionary<(Guid Album, Guid Account), bool> _participants = new();
 
