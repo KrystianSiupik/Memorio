@@ -192,9 +192,20 @@ internal sealed class PlanCycle : AggregateRoot<EntitledResource>
 
         _warningsDelivered.Add(days);
         Sequence++;
-        if (IsHeld && _warningsDue.All(_warningsDelivered.Contains))
+        if (!IsHeld)
+        {
+            return;
+        }
+
+        var missing = _warningsDue.Where(due => !_warningsDelivered.Contains(due)).ToList();
+        if (missing.Count == 0)
         {
             ReleaseHold(now);
+        }
+        else
+        {
+            // The retry that just succeeded was for one warning; it goes on with the next one.
+            Raise(new TrimHeld(Guid.CreateVersion7(), now, Id, missing[0], WarningRound, Sequence));
         }
     }
 

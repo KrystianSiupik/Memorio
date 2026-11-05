@@ -7,6 +7,20 @@ namespace Memorio.Modules.Notifications.Tests;
 
 public sealed class FakeNotificationNeighbours : IAlbumMessaging, IAccountDirectory, INotificationSender
 {
+    private readonly ConcurrentDictionary<Guid, IReadOnlyCollection<Guid>> _members = new();
+    private readonly ConcurrentDictionary<string, DeliveryOutcome> _refused = new();
+
+    public void Members(Guid albumId, params Guid[] people) => _members[albumId] = people;
+
+    internal void Refuses(string email, DeliveryOutcome outcome = DeliveryOutcome.Refused) => _refused[email] = outcome;
+
+    public void Accepts(string email) => _refused.TryRemove(email, out _);
+
+    public void Gone(Guid accountId) => _emails.TryRemove(accountId, out _);
+
+    public Task<IReadOnlyCollection<Guid>> MembersOfAsync(Guid albumId, CancellationToken cancellationToken) =>
+        Task.FromResult(_members.GetValueOrDefault(albumId) ?? []);
+
     private readonly ConcurrentDictionary<Guid, PendingInvitation> _invitations = new();
     private readonly ConcurrentDictionary<Guid, string> _emails = new();
     private readonly ConcurrentBag<(string Email, string Kind, string? InvitedBy)> _sent = [];
@@ -48,14 +62,19 @@ public sealed class FakeNotificationNeighbours : IAlbumMessaging, IAccountDirect
     public Task<IReadOnlyDictionary<Guid, string>> EmailsOfAsync(IReadOnlyCollection<Guid> accountIds, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyDictionary<Guid, string>>(accountIds.Where(_emails.ContainsKey).ToDictionary(id => id, id => _emails[id]));
 
-    Task INotificationSender.SendAsync(string email, NotificationKind kind, Guid albumId, string? invitedBy, CancellationToken cancellationToken)
+    Task<DeliveryOutcome> INotificationSender.SendAsync(string email, NotificationKind kind, Guid albumId, string? detail, CancellationToken cancellationToken)
     {
         if (_failures.TryRemove(email, out _))
         {
             throw new InvalidOperationException("The provider does not answer.");
         }
 
-        _sent.Add((email, kind.ToString(), invitedBy));
-        return Task.CompletedTask;
+        if (_refused.TryGetValue(email, out var outcome))
+        {
+            return Task.FromResult(outcome);
+        }
+
+        _sent.Add((email, kind.ToString(), detail));
+        return Task.FromResult(DeliveryOutcome.Delivered);
     }
 }

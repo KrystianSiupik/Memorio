@@ -56,6 +56,8 @@ public sealed class PlansModule : IModule
         services.AddScoped<ActivateAfterTakeoverHandler>();
         services.AddScoped<MarkAlbumOwnerlessHandler>();
         services.AddScoped<CloseCycleWhenAccountDeleted>();
+        services.AddScoped<RecordWarningDelivered>();
+        services.AddScoped<HoldTrimWhenUndelivered>();
         services.AddScheduledJob<PlanCycleJob>(PlanCycleJob.JobName, PlanCycleJob.Cron);
 
         services.AddHealthChecks().AddCheck<PlansDatabaseHealthCheck>(PlansDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);

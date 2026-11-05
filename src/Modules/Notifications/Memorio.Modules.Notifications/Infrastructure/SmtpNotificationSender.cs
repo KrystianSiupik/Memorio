@@ -19,16 +19,22 @@ internal sealed partial class SmtpNotificationSender(
     IAlbumNames albums,
     ILogger<SmtpNotificationSender> logger) : INotificationSender
 {
-    public async Task SendAsync(string email, NotificationKind kind, Guid albumId, string? invitedBy, CancellationToken cancellationToken)
+    public async Task<DeliveryOutcome> SendAsync(string email, NotificationKind kind, Guid albumId, string? detail, CancellationToken cancellationToken)
     {
         // This sender is registered only with a host, and the options require a sender address with it.
         var smtp = options.Value.Smtp;
         var names = await albums.NamesOfAsync([albumId], cancellationToken);
-        var (subject, body) = NotificationTexts.Of(kind, names.GetValueOrDefault(albumId), smtp.AppUrl, invitedBy);
+        var (subject, body) = NotificationTexts.Of(kind, names.GetValueOrDefault(albumId), smtp.AppUrl, detail);
+
+        if (!MailboxAddress.TryParse(email, out var recipient))
+        {
+            LogRefused(logger, kind, albumId);
+            return DeliveryOutcome.Refused;
+        }
 
         using var message = new MimeMessage();
         message.From.Add(new MailboxAddress(smtp.FromName, smtp.From!));
-        message.To.Add(MailboxAddress.Parse(email));
+        message.To.Add(recipient);
         message.Subject = subject;
         message.Body = new TextPart("plain") { Text = body };
 
@@ -39,6 +45,7 @@ internal sealed partial class SmtpNotificationSender(
             await client.AuthenticateAsync(smtp.Username, smtp.Password ?? "", cancellationToken);
         }
 
+        var outcome = DeliveryOutcome.Delivered;
         try
         {
             await client.SendAsync(message, cancellationToken);
@@ -46,9 +53,11 @@ internal sealed partial class SmtpNotificationSender(
         catch (SmtpCommandException exception) when (exception.ErrorCode == SmtpErrorCode.RecipientNotAccepted && (int)exception.StatusCode >= 500)
         {
             LogRefused(logger, kind, albumId);
+            outcome = DeliveryOutcome.Refused;
         }
 
         await client.DisconnectAsync(quit: true, cancellationToken);
+        return outcome;
     }
 
     private static SecureSocketOptions SecurityOf(string security) => security switch

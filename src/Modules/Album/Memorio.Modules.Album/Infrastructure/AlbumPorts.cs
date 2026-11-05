@@ -54,6 +54,16 @@ internal sealed class AlbumMessaging(AlbumDbContext database) : IAlbumMessaging
             """,
             new { invitationId },
             cancellationToken: cancellationToken));
+
+    public async Task<IReadOnlyCollection<Guid>> MembersOfAsync(Guid albumId, CancellationToken cancellationToken) =>
+        [.. await database.Database.GetDbConnection().QueryAsync<Guid>(new CommandDefinition(
+            """
+            SELECT owner_account_id FROM album.albums WHERE id = @albumId
+            UNION
+            SELECT account_id FROM album.album_participants WHERE album_id = @albumId
+            """,
+            new { albumId },
+            cancellationToken: cancellationToken))];
 }
 
 internal sealed class AlbumSuccession(IAlbums albums, TimeProvider clock) : IAlbumSuccession

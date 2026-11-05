@@ -8,10 +8,12 @@ using Memorio.Modules.Notifications.Contracts;
 using Memorio.Modules.Notifications.Domain;
 using Memorio.Modules.Notifications.Infrastructure;
 using Memorio.Modules.Notifications.Infrastructure.Persistence;
+using Memorio.Modules.Notifications.Infrastructure.Scheduling;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Wolverine.EntityFrameworkCore;
 
 namespace Memorio.Modules.Notifications;
 
@@ -36,7 +38,7 @@ public sealed class NotificationsModule : IModule
         }
 
         services.TryAddSingleton(TimeProvider.System);
-        services.AddDbContext<NotificationsDbContext>(database => database.UseNotificationsDatabase(connectionString));
+        services.AddDbContextWithWolverineIntegration<NotificationsDbContext>(database => database.UseNotificationsDatabase(connectionString));
         services.AddScoped<INotificationLedger, NotificationLedger>();
         services.AddScoped<IInvitationBlocks, InvitationBlocks>();
         services.AddScoped<BlockInvitationsHandler>();
@@ -52,6 +54,11 @@ public sealed class NotificationsModule : IModule
         services.AddScoped<NotifyOwnerOfFullPool>();
         services.AddScoped<AskToChooseKeepOrTake>();
         services.AddScoped<NotifyTagged>();
+        services.AddScoped<ITrimWarningReports, TrimWarningReports>();
+        services.AddScoped<WarnBeforeTrimHandler>();
+        services.AddScoped<WarnWhenDue>();
+        services.AddScoped<RetryWhileHeld>();
+        services.AddScheduledJob<TrimWarningRetryJob>(RetryWhileHeld.JobName);
 
         services.AddHealthChecks().AddCheck<NotificationsDatabaseHealthCheck>(NotificationsDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))
