@@ -20,6 +20,7 @@ public sealed class FakeAlbumNeighbours : IAlbumSeatLimit, IInvitationBlocks, IA
         Task.FromResult(_blockedPeople.ContainsKey((albumId, accountId)));
 
     private readonly ConcurrentDictionary<Guid, int> _seats = new();
+    private readonly ConcurrentDictionary<Guid, bool> _readOnly = new();
     private readonly ConcurrentDictionary<string, bool> _blocked = new();
     private readonly ConcurrentDictionary<Guid, string> _emails = new();
     private readonly ConcurrentDictionary<Guid, AlbumMemoryFacts> _memories = new();
@@ -31,6 +32,8 @@ public sealed class FakeAlbumNeighbours : IAlbumSeatLimit, IInvitationBlocks, IA
     public IReadOnlyDictionary<Guid, long> Reserved => _reserved;
 
     public void SeatsOf(Guid albumId, int seats) => _seats[albumId] = seats;
+
+    public void ReadOnly(Guid albumId) => _readOnly[albumId] = true;
 
     public void Block(string email) => _blocked[email] = true;
 
@@ -57,6 +60,9 @@ public sealed class FakeAlbumNeighbours : IAlbumSeatLimit, IInvitationBlocks, IA
     public bool IsLinked(Guid memoryId, Guid albumId) => _links.ContainsKey((memoryId, albumId));
 
     public Task<int> SeatsOfAsync(Guid albumId, CancellationToken cancellationToken) => Task.FromResult(_seats.GetValueOrDefault(albumId, 10));
+
+
+    public Task<bool> IsReadOnlyAsync(Guid albumId, CancellationToken cancellationToken) => Task.FromResult(_readOnly.ContainsKey(albumId));
 
     public Task<bool> IsBlockedAsync(string email, CancellationToken cancellationToken) => Task.FromResult(_blocked.ContainsKey(email));
 

@@ -1,3 +1,5 @@
+using Memorio.Modules.Limits.Contracts;
+
 namespace Memorio.Modules.Limits.Domain.Pools;
 
 internal interface IPools
@@ -16,6 +18,9 @@ internal interface IPools
 
     /// <summary>A pool not used yet has nothing used and the default limit.</summary>
     Task<(long UsedBytes, long LimitBytes)> GetUsageAsync(Guid poolId, CancellationToken cancellationToken);
+
+    /// <summary>A pool not used yet has nothing used and the default limit; AI used counts the month of <paramref name="at"/>.</summary>
+    Task<PoolStanding> GetStandingAsync(Guid poolId, DateTimeOffset at, CancellationToken cancellationToken);
 
     /// <summary>Only a newer limit overwrites (D-016). A lower limit may leave the pool over it: nothing new fits then.</summary>
     Task<bool> SetLimitAsync(Guid accountId, long limitBytes, int aiLimit, long sequence, CancellationToken cancellationToken);
