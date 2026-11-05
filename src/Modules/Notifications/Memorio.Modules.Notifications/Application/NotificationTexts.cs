@@ -38,6 +38,18 @@ internal static class NotificationTexts
             NotificationKind.AlbumWithoutOwner => (
                 "Album w GEO nie ma właściciela",
                 $"Nikt nie prowadzi teraz: {album}.\n\nNic z niego nie znika. Każdy uczestnik może go przejąć, opłacając plan. Po końcu opłaconego okresu album będzie tylko do odczytu."),
+            NotificationKind.TakeoverOffered => (
+                "Wskazano Cię jako następcę albumu w GEO",
+                $"Wskazano Cię jako następcę: {album}.\n\nMasz 30 dni na decyzję, czy go przejmujesz. Bez odpowiedzi album zostanie bez właściciela, a przejąć go będzie mógł inny uczestnik."),
+            NotificationKind.SuccessorReminder => (
+                "Przypomnienie o decyzji w sprawie albumu w GEO",
+                $"Czekamy na Twoją decyzję: {album}.\n\nZostało mniej niż 30 dni. Bez odpowiedzi album zostanie bez właściciela."),
+            NotificationKind.DeathReportRejected => (
+                "Zgłoszenie w GEO nie zostało potwierdzone",
+                $"Nie potwierdziliśmy zgłoszenia dotyczącego: {album}.\n\nAlbum zostaje bez zmian. Jeśli to pomyłka, możesz zgłosić ponownie z czytelnym dokumentem."),
+            NotificationKind.PrivateArchiveShared => (
+                "Masz dostęp do prywatnych wspomnień osoby, która Cię wskazała",
+                "Osoba, która wskazała Cię jako kontakt spadkowy, zmarła.\n\nMożesz oglądać jej prywatne wspomnienia na ekranie „Udostępnione mi”, po zalogowaniu na ten adres e-mail. Tylko do odczytu."),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
         };
         return (subject, string.IsNullOrWhiteSpace(appUrl) ? body : $"{body}\n\nOtwórz GEO: {appUrl}");

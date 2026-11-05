@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Memorio.Modules.Archive.Infrastructure.Queries;
 
 /// <summary>
-/// The author's own memory, or one in an album the person may see now (ADR 0011).
+/// The author's own memory, one in an album the person may see now, or a private one of someone who named them as their legacy contact (ADR 0011, S2:C8).
 /// Photos as addresses signed for this read, valid for 5 minutes.
 /// </summary>
 internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStorage storage, IAccessReader access) : IMemoryDetailsQuery
@@ -20,7 +20,9 @@ internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStora
         FROM archive.memories
         WHERE id = @memoryId AND state = 'Active'
           AND (author_account_id = @accountId
-               OR EXISTS (SELECT 1 FROM archive.memory_albums link WHERE link.memory_id = @memoryId AND link.album_id = ANY(@visibleAlbums)))
+               OR EXISTS (SELECT 1 FROM archive.memory_albums link WHERE link.memory_id = @memoryId AND link.album_id = ANY(@visibleAlbums))
+               OR (author_account_id = ANY(@legacyArchives)
+                   AND NOT EXISTS (SELECT 1 FROM archive.memory_albums link WHERE link.memory_id = @memoryId)))
         """;
 
     private const string PhotosSql = """
@@ -31,8 +33,9 @@ internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStora
     {
         var connection = database.Database.GetDbConnection();
         var visibleAlbums = (await access.VisibleAlbumsAsync(accountId, cancellationToken)).ToArray();
+        var legacyArchives = (await access.LegacyArchivesAsync(accountId, cancellationToken)).ToArray();
         var row = await connection.QuerySingleOrDefaultAsync<MemoryRow>(
-            new CommandDefinition(MemorySql, new { memoryId, accountId, visibleAlbums }, cancellationToken: cancellationToken));
+            new CommandDefinition(MemorySql, new { memoryId, accountId, visibleAlbums, legacyArchives }, cancellationToken: cancellationToken));
         if (row is null)
         {
             return null;

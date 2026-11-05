@@ -38,6 +38,13 @@ public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool, IAl
         _takingPart[(personId, albumId)] = true;
     }
 
+    private readonly ConcurrentDictionary<(Guid Person, Guid Owner), bool> _legacy = new();
+
+    public void IsLegacyContact(Guid personId, Guid ownerAccountId) => _legacy[(personId, ownerAccountId)] = true;
+
+    public Task<IReadOnlyCollection<Guid>> LegacyArchivesAsync(Guid personId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyCollection<Guid>>([.. _legacy.Keys.Where(key => key.Person == personId).Select(key => key.Owner)]);
+
     public Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyCollection<Guid>>([.. _takingPart.Keys.Where(key => key.Person == personId).Select(key => key.Album)]);
 

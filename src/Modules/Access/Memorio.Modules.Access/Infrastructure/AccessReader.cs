@@ -1,6 +1,8 @@
 using Dapper;
 using Memorio.Modules.Access.Contracts;
+using Memorio.Modules.Access.Domain.Audiences;
 using Memorio.Modules.Access.Infrastructure.Persistence;
+using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Album.Contracts;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +13,7 @@ namespace Memorio.Modules.Access.Infrastructure;
 /// next read (D-022). Then being in the album, read straight from Album (D-250), or a place on the list of viewers.
 /// The hidden scope of E8 is still to come.
 /// </summary>
-internal sealed class AccessReader(IAlbumMembership membership, AccessDbContext database) : IAccessReader, IBlockList
+internal sealed class AccessReader(IAlbumMembership membership, IAccountDirectory directory, AccessDbContext database) : IAccessReader, IBlockList
 {
     public async Task<bool> CanSeeAlbumAsync(Guid personId, Guid albumId, CancellationToken cancellationToken)
     {
@@ -49,6 +51,20 @@ internal sealed class AccessReader(IAlbumMembership membership, AccessDbContext 
             new { personId },
             cancellationToken: cancellationToken));
         return [.. (await membership.AlbumsOfAsync(personId, cancellationToken)).Except(blocked)];
+    }
+
+    public async Task<IReadOnlyCollection<Guid>> LegacyArchivesAsync(Guid personId, CancellationToken cancellationToken)
+    {
+        // The address of this moment: the contact was named by address, and may have no account until now.
+        if (await directory.EmailOfAsync(personId, cancellationToken) is not { } email)
+        {
+            return [];
+        }
+
+        return [.. await database.Database.GetDbConnection().QueryAsync<Guid>(new CommandDefinition(
+            "SELECT owner_account_id FROM access.legacy_grants WHERE contact_hash = @hash",
+            new { hash = LegacyGrant.HashOf(email) },
+            cancellationToken: cancellationToken))];
     }
 
     public Task<bool> IsBlockedAsync(Guid albumId, Guid accountId, CancellationToken cancellationToken) =>

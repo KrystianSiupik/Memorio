@@ -1,4 +1,5 @@
 using Memorio.Modularity;
+using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Notifications.Api;
 using Memorio.Modules.Notifications.Application;
 using Memorio.Modules.Notifications.Application.Commands;
@@ -59,6 +60,11 @@ public sealed class NotificationsModule : IModule
         services.AddScoped<WarnBeforeTrimHandler>();
         services.AddScoped<WarnWhenDue>();
         services.AddScoped<NotifyOfNewOwner>();
+        services.AddScoped<RemindSuccessor>();
+        services.AddScoped<NotifyOfRejectedReport>();
+        services.AddScoped<NotifyLegacyContact>();
+        services.AddScoped(provider => new NotifySuccessor(provider.GetRequiredService<IAccountDirectory>(), provider.GetRequiredService<IDeadlines>(), provider.GetRequiredService<SendOnce>()));
+        services.AddScheduledJob<SuccessorReminderJob>(NotifySuccessor.JobName);
         // Through a factory: IDeadlines exists only in the worker, and the API host validates its services at startup.
         services.AddScoped(provider => new RetryWhileHeld(provider.GetRequiredService<IDeadlines>()));
         services.AddScheduledJob<TrimWarningRetryJob>(RetryWhileHeld.JobName);

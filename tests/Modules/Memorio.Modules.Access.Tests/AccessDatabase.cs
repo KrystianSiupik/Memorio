@@ -2,6 +2,7 @@ using Memorio.Hosting.Messaging;
 using Memorio.Modules.Access.Infrastructure.Persistence;
 using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Album.Contracts;
+using Memorio.Modules.Succession.Contracts;
 using Memorio.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,6 +87,7 @@ public sealed class AccessDatabase : PostgresDatabase
         builder.Services.AddSingleton<IAlbumMembership>(Neighbours);
         builder.Services.AddSingleton<IAlbumNames>(Neighbours);
         builder.Services.AddSingleton<IAccountDirectory>(Neighbours);
+        builder.Services.AddSingleton<ILegacyContacts>(Neighbours);
         _host = builder.Build();
 
         await using (var scope = CreateScope())

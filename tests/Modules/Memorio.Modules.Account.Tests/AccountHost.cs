@@ -207,6 +207,7 @@ public sealed class AccountHost : PostgresDatabase
         configuration["Album:ConnectionString"] = ConnectionStringFor("memorio_album");
         configuration["Limits:ConnectionString"] = ConnectionStringFor("memorio_limits");
         configuration["Access:ConnectionString"] = ConnectionStringFor("memorio_access");
+        configuration["Succession:ConnectionString"] = ConnectionStringFor("memorio_succession");
         configuration["Notifications:ConnectionString"] = ConnectionStringFor("memorio_notifications");
     }
 

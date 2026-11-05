@@ -14,6 +14,16 @@ internal sealed class AccessDbContext(DbContextOptions<AccessDbContext> options)
     {
         builder.HasDefaultSchema(Schema);
 
+        builder.Entity<LegacyGrant>(grant =>
+        {
+            grant.ToTable("legacy_grants");
+            grant.HasKey(item => item.OwnerAccountId);
+            grant.Property(item => item.OwnerAccountId).HasColumnName("owner_account_id").ValueGeneratedNever();
+            grant.Property(item => item.ContactHash).HasColumnName("contact_hash").HasMaxLength(64);
+            grant.Property(item => item.GrantedAt).HasColumnName("granted_at");
+            grant.HasIndex(item => item.ContactHash).HasDatabaseName("ix_legacy_grants_contact_hash");
+        });
+
         builder.Entity<AlbumAudience>(audience =>
         {
             audience.ToTable("album_audiences");

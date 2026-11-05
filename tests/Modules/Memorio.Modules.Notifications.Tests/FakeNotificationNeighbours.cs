@@ -2,11 +2,25 @@ using System.Collections.Concurrent;
 using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Album.Contracts;
 using Memorio.Modules.Notifications.Application.Ports;
+using Memorio.Modules.Succession.Contracts;
 
 namespace Memorio.Modules.Notifications.Tests;
 
-public sealed class FakeNotificationNeighbours : IAlbumMessaging, IAccountDirectory, INotificationSender
+public sealed class FakeNotificationNeighbours : IAlbumMessaging, IAccountDirectory, INotificationSender, ITakeoverOffers, ILegacyContacts
 {
+    private readonly ConcurrentDictionary<Guid, OpenTakeoverOffer> _offers = new();
+    private readonly ConcurrentDictionary<Guid, string> _contacts = new();
+
+    public void OfferOpen(Guid caseId, OpenTakeoverOffer offer) => _offers[caseId] = offer;
+
+    public void OfferAnswered(Guid caseId) => _offers.TryRemove(caseId, out _);
+
+    public void ContactOf(Guid owner, string email) => _contacts[owner] = email;
+
+    public Task<OpenTakeoverOffer?> FindOpenAsync(Guid caseId, CancellationToken cancellationToken) => Task.FromResult(_offers.GetValueOrDefault(caseId));
+
+    public Task<string?> ContactOfAsync(Guid ownerAccountId, CancellationToken cancellationToken) => Task.FromResult(_contacts.GetValueOrDefault(ownerAccountId));
+
     private readonly ConcurrentDictionary<Guid, IReadOnlyCollection<Guid>> _members = new();
     private readonly ConcurrentDictionary<string, DeliveryOutcome> _refused = new();
 

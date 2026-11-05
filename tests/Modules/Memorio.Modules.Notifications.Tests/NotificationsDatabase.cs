@@ -3,6 +3,7 @@ using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Album.Contracts;
 using Memorio.Modules.Notifications.Application.Ports;
 using Memorio.Modules.Notifications.Infrastructure.Persistence;
+using Memorio.Modules.Succession.Contracts;
 using Memorio.SharedKernel.Scheduling;
 using Memorio.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -71,6 +72,8 @@ public sealed class NotificationsDatabase : PostgresDatabase
         builder.Services.AddSingleton<IAlbumMessaging>(Neighbours);
         builder.Services.AddSingleton<IAccountDirectory>(Neighbours);
         builder.Services.AddSingleton<IDeadlines>(Deadlines);
+        builder.Services.AddSingleton<ITakeoverOffers>(Neighbours);
+        builder.Services.AddSingleton<ILegacyContacts>(Neighbours);
         _host = builder.Build();
 
         await using (var scope = CreateScope())

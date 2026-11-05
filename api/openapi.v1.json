@@ -31,7 +31,7 @@
         "tags": [
           "Access"
         ],
-        "summary": "Albums the person may read without being in them. Empty until links exist (E4).",
+        "summary": "Albums the person may read without being in them.",
         "operationId": "GetSharedWithMe",
         "responses": {
           "200": {
@@ -42,6 +42,30 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/SharedAlbumResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/legacy-archives": {
+      "get": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "People who named this person as their legacy contact and have died: their private memories can be read.",
+        "operationId": "ListLegacyArchives",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LegacyArchiveResponse"
                   }
                 }
               }
@@ -125,6 +149,41 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/NameSuccessorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/death-reports": {
+      "post": {
+        "tags": [
+          "Succession"
+        ],
+        "summary": "Someone in the album reports the death of its owner, with the certificate; the service checks it.",
+        "operationId": "ReportOwnerDeath",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportDeathRequest"
               }
             }
           },
@@ -229,6 +288,41 @@
         ],
         "summary": "The person\u0027s own active memories, newest first.",
         "operationId": "ListMyMemories",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyMemoryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/memories/legacy/{ownerAccountId}": {
+      "get": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "For the legacy contact of a person who died: their private memories, oldest first.",
+        "operationId": "ListLegacyMemories",
+        "parameters": [
+          {
+            "name": "ownerAccountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -667,6 +761,63 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/takeover": {
+      "get": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "For someone in an album without an owner: whether it can be taken over, and who holds it until when.",
+        "operationId": "GetAlbumTakeover",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlbumTakeoverResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/takeover-reservation": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "Holds an album without an owner for 30 minutes, to pay for its plan; asking again keeps one\u0027s own.",
+        "operationId": "ReserveAlbumTakeover",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -2025,6 +2176,198 @@
           }
         }
       }
+    },
+    "/v1/succession/uploads": {
+      "post": {
+        "tags": [
+          "Succession"
+        ],
+        "summary": "An address to send one certificate to, valid for 5 minutes.",
+        "operationId": "StartCertificateUpload",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartCertificateUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateUploadResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/succession/offers": {
+      "get": {
+        "tags": [
+          "Succession"
+        ],
+        "summary": "Albums waiting for the person\u0027s answer as their successor.",
+        "operationId": "ListTakeoverOffers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TakeoverOfferResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/succession/offers/{id}": {
+      "get": {
+        "tags": [
+          "Succession"
+        ],
+        "summary": "For the successor named: the album, the time to answer and what the founder brought.",
+        "operationId": "GetTakeoverOffer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TakeoverOfferResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/succession/offers/{id}/acceptance": {
+      "post": {
+        "tags": [
+          "Succession"
+        ],
+        "summary": "The successor takes the album over.",
+        "operationId": "AcceptTakeover",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/succession/offers/{id}/refusal": {
+      "post": {
+        "tags": [
+          "Succession"
+        ],
+        "summary": "The successor refuses; the album is left without an owner.",
+        "operationId": "RefuseTakeover",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/legacy-contact": {
+      "get": {
+        "tags": [
+          "Succession"
+        ],
+        "summary": "Who may read the person\u0027s private memories after their death.",
+        "operationId": "GetLegacyContact",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LegacyContactResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Succession"
+        ],
+        "summary": "Names that person, or replaces them.",
+        "operationId": "NameLegacyContact",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NameLegacyContactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Succession"
+        ],
+        "summary": "Nobody will get it; asking again changes nothing.",
+        "operationId": "RemoveLegacyContact",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2454,7 +2797,8 @@
           "freeBytes",
           "limitBytes",
           "myCuratorAccountId",
-          "isReadOnly"
+          "isReadOnly",
+          "isOwnerless"
         ],
         "type": "object",
         "properties": {
@@ -2531,6 +2875,9 @@
           },
           "isReadOnly": {
             "type": "boolean"
+          },
+          "isOwnerless": {
+            "type": "boolean"
           }
         }
       },
@@ -2572,6 +2919,33 @@
             "items": {
               "$ref": "#/components/schemas/AlbumInvitedResponse"
             }
+          }
+        }
+      },
+      "AlbumTakeoverResponse": {
+        "required": [
+          "isOwnerless",
+          "canReserve",
+          "reservedByMe",
+          "reservedUntil"
+        ],
+        "type": "object",
+        "properties": {
+          "isOwnerless": {
+            "type": "boolean"
+          },
+          "canReserve": {
+            "type": "boolean"
+          },
+          "reservedByMe": {
+            "type": "boolean"
+          },
+          "reservedUntil": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -2707,6 +3081,26 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "CertificateUploadResponse": {
+        "required": [
+          "key",
+          "url",
+          "contentType"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "contentType": {
+            "type": "string"
           }
         }
       },
@@ -2971,6 +3365,39 @@
           }
         }
       },
+      "LegacyArchiveResponse": {
+        "required": [
+          "ownerAccountId",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "ownerAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "LegacyContactResponse": {
+        "required": [
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "LoginRequest": {
         "required": [
           "email",
@@ -3124,6 +3551,20 @@
           },
           "dateFrom": {
             "type": "string"
+          }
+        }
+      },
+      "NameLegacyContactRequest": {
+        "required": [
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -3324,6 +3765,25 @@
           }
         }
       },
+      "ReportDeathRequest": {
+        "required": [
+          "id",
+          "uploadKey"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uploadKey": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "RequestAccountDeletionRequest": {
         "required": [
           "consentsToAlbumExpiry"
@@ -3405,6 +3865,20 @@
           }
         }
       },
+      "StartCertificateUploadRequest": {
+        "required": [
+          "contentType"
+        ],
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "StartUploadRequest": {
         "required": [
           "contentType"
@@ -3416,6 +3890,41 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "TakeoverOfferResponse": {
+        "required": [
+          "id",
+          "albumId",
+          "albumName",
+          "answerBy",
+          "founderMemories"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "albumId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "albumName": {
+            "type": "string"
+          },
+          "answerBy": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "founderMemories": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -3535,6 +4044,9 @@
     },
     {
       "name": "Albums"
+    },
+    {
+      "name": "Succession"
     },
     {
       "name": "Notifications"

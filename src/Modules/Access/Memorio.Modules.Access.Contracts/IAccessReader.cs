@@ -22,4 +22,10 @@ public interface IAccessReader
     /// map, where somebody else's album does not belong just because a link was opened once (D-277).
     /// </summary>
     Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// The accounts whose private memories the person may read as their legacy contact (S2:C8): after a confirmed death,
+    /// only someone the owner named in advance, read only. The filter of the same two reads as above.
+    /// </summary>
+    Task<IReadOnlyCollection<Guid>> LegacyArchivesAsync(Guid personId, CancellationToken cancellationToken);
 }
