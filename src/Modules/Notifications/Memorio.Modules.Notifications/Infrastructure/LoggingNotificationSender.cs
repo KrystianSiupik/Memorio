@@ -9,7 +9,7 @@ namespace Memorio.Modules.Notifications.Infrastructure;
 /// </summary>
 internal sealed partial class LoggingNotificationSender(ILogger<LoggingNotificationSender> logger) : INotificationSender
 {
-    public Task SendAsync(string email, NotificationKind kind, Guid albumId, CancellationToken cancellationToken)
+    public Task SendAsync(string email, NotificationKind kind, Guid albumId, string? invitedBy, CancellationToken cancellationToken)
     {
         LogNotSent(logger, kind, albumId);
         return Task.CompletedTask;

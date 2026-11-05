@@ -2,20 +2,21 @@ using Memorio.Modules.Notifications.Application.Ports;
 
 namespace Memorio.Modules.Notifications.Application;
 
-/// <summary>What a message says. Only the name of the album: never a memory, a photo or who did what (D-038).</summary>
+/// <summary>What a message says. The name of the album and, for an invitation, who invites: never a memory or a photo (D-038, D-268).</summary>
 internal static class NotificationTexts
 {
-    public static (string Subject, string Body) Of(NotificationKind kind, string? albumName, string? appUrl)
+    public static (string Subject, string Body) Of(NotificationKind kind, string? albumName, string? appUrl, string? invitedBy = null)
     {
+        var inviter = string.IsNullOrWhiteSpace(invitedBy) ? null : OneLine(invitedBy);
         var album = string.IsNullOrWhiteSpace(albumName) ? "album" : $"album „{OneLine(albumName)}”";
         var (subject, body) = kind switch
         {
             NotificationKind.Invitation => (
                 "Zaproszenie do albumu w GEO",
-                $"Zaproszono Cię do wspólnego albumu: {album}.\n\nZaloguj się albo załóż konto na ten adres e-mail, a zobaczysz zaproszenie i zdecydujesz, czy je przyjąć. Na ekranie zaproszenia możesz też wyłączyć kolejne zaproszenia z GEO."),
+                $"{(inviter is null ? "Zaproszono Cię" : $"{inviter} zaprasza Cię")} do wspólnego albumu: {album}.\n\nZaloguj się albo załóż konto na ten adres e-mail, a zobaczysz zaproszenie i zdecydujesz, czy je przyjąć. Na ekranie zaproszenia możesz też wyłączyć kolejne zaproszenia z GEO."),
             NotificationKind.InvitationReminder => (
                 "Przypomnienie o zaproszeniu do albumu w GEO",
-                $"Zaproszenie czeka na Twoją odpowiedź: {album}.\n\nTo jedyne przypomnienie. Jeśli nie chcesz odpowiadać, nic więcej nie musisz robić."),
+                $"{(inviter is null ? "Zaproszenie czeka" : $"Zaproszenie od {inviter} czeka")} na Twoją odpowiedź: {album}.\n\nTo jedyne przypomnienie. Jeśli nie chcesz odpowiadać, nic więcej nie musisz robić."),
             NotificationKind.PoolFull => (
                 "Pula albumu w GEO jest pełna",
                 $"Coś się nie zmieściło: {album}.\n\nAby uczestnicy mogli dodawać dalej, zwolnij miejsce albo wybierz większy plan."),

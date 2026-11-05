@@ -20,6 +20,11 @@ final class AlbumNoFreeSeats extends AlbumFailure {
   const AlbumNoFreeSeats();
 }
 
+/// The daily limit of invitations of an account.
+final class AlbumInvitationLimit extends AlbumFailure {
+  const AlbumInvitationLimit();
+}
+
 final class AlbumAddressBlocked extends AlbumFailure {
   const AlbumAddressBlocked();
 }

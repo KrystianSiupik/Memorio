@@ -23,7 +23,8 @@ public interface IAlbumMessaging
 }
 
 /// <param name="Email">The address the invitation goes to.</param>
-public sealed record PendingInvitation(Guid AlbumId, string Email);
+/// <param name="InvitedByAccountId">Who sent it; the message names them (D-268).</param>
+public sealed record PendingInvitation(Guid AlbumId, string Email, Guid InvitedByAccountId);
 
 /// <summary>Write port for Succession (C41): the fact of who is named stays with the album.</summary>
 public interface IAlbumSuccession

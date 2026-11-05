@@ -89,6 +89,21 @@ internal sealed class KeptContribution
         new() { AlbumId = albumId, AuthorAccountId = authorAccountId, ChosenByAuthor = chosenByAuthor, KeptAt = now };
 }
 
+/// <summary>
+/// How many invitations an account sent on a day, in all its albums (D-267): every one is a message to an address
+/// the person typed, so this is what stops an account from using them to send unwanted mail.
+/// </summary>
+internal sealed class InvitationQuota
+{
+    public const int DailyLimit = 10;
+
+    public Guid AccountId { get; private set; }
+
+    public DateOnly Day { get; private set; }
+
+    public int Used { get; private set; }
+}
+
 /// <summary>The last event about a deleted account applied here; an older one changes nothing (D-013).</summary>
 internal sealed class AppliedAccountEvent(Guid accountId, long sequence)
 {

@@ -8,6 +8,11 @@ internal interface IAlbums
 
     void Add(SharedAlbum album);
 
+    /// <summary>False when the account has no invitation left on this day. Two parallel calls never pass the limit together.</summary>
+    Task<bool> TryConsumeInvitationAsync(Guid accountId, DateOnly day, CancellationToken cancellationToken);
+
+    Task ForgetInvitationQuotaAsync(Guid accountId, CancellationToken cancellationToken);
+
     Task<AlbumMemory?> FindMemoryAsync(AlbumId albumId, Guid memoryId, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<AlbumMemory>> FindMemoriesOfAuthorAsync(AlbumId albumId, Guid authorAccountId, CancellationToken cancellationToken);

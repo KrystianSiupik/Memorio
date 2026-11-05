@@ -19,6 +19,23 @@ internal sealed class Albums(IDbContextOutbox<AlbumDbContext> outbox) : IAlbums
 
     public void Add(SharedAlbum album) => Database.Albums.Add(album);
 
+    public async Task<bool> TryConsumeInvitationAsync(Guid accountId, DateOnly day, CancellationToken cancellationToken)
+    {
+        await Database.Database.ExecuteSqlAsync(
+            $"DELETE FROM album.invitation_quotas WHERE account_id = {accountId} AND day < {day}",
+            cancellationToken);
+        return await Database.Database.ExecuteSqlAsync(
+            $"""
+            INSERT INTO album.invitation_quotas (account_id, day, used) VALUES ({accountId}, {day}, 1)
+            ON CONFLICT (account_id, day) DO UPDATE SET used = album.invitation_quotas.used + 1
+            WHERE album.invitation_quotas.used < {InvitationQuota.DailyLimit}
+            """,
+            cancellationToken) == 1;
+    }
+
+    public Task ForgetInvitationQuotaAsync(Guid accountId, CancellationToken cancellationToken) =>
+        Database.Database.ExecuteSqlAsync($"DELETE FROM album.invitation_quotas WHERE account_id = {accountId}", cancellationToken);
+
     public Task<AlbumMemory?> FindMemoryAsync(AlbumId albumId, Guid memoryId, CancellationToken cancellationToken) =>
         Database.AlbumMemories.FirstOrDefaultAsync(memory => memory.AlbumId == albumId && memory.MemoryId == memoryId, cancellationToken);
 

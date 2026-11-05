@@ -40,6 +40,9 @@ internal sealed class InviteToAlbumHandler(
         }
 
         var seatLimit = await seats.SeatsOfAsync(command.AlbumId.Value, cancellationToken);
+
+        // Counted once, and only for an invitation the album accepts: a refusal sends nothing.
+        var counted = false;
         return await AlbumDecision.UntilStoredAsync(
             albums,
             async () =>
@@ -50,8 +53,20 @@ internal sealed class InviteToAlbumHandler(
                     return AlbumErrors.NoAccess;
                 }
 
-                var invited = album.Invite(command.InvitationId, command.AccountId, email, seatLimit, clock.GetUtcNow());
-                return invited.IsFailure ? invited.Error : Result.Success();
+                var now = clock.GetUtcNow();
+                var invited = album.Invite(command.InvitationId, command.AccountId, email, seatLimit, now);
+                if (invited.IsFailure)
+                {
+                    return invited.Error;
+                }
+
+                if (!counted && !await albums.TryConsumeInvitationAsync(command.AccountId, DateOnly.FromDateTime(now.UtcDateTime), cancellationToken))
+                {
+                    return AlbumErrors.InvitationLimitReached;
+                }
+
+                counted = true;
+                return Result.Success();
             },
             cancellationToken);
     }

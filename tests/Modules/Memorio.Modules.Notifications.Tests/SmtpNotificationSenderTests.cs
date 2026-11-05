@@ -22,13 +22,14 @@ public sealed class SmtpNotificationSenderTests
         await using var server = new FakeSmtpServer();
         var album = Guid.CreateVersion7();
 
-        await Sender(server.Port, new Names(album, "Rodzina")).SendAsync("ania@example.invalid", NotificationKind.Invitation, album, Cancellation);
+        await Sender(server.Port, new Names(album, "Rodzina")).SendAsync("ania@example.invalid", NotificationKind.Invitation, album, "kasia@example.invalid", Cancellation);
 
         using var message = MimeMessage.Load(new MemoryStream(Encoding.Latin1.GetBytes(Assert.Single(server.Received))), Cancellation);
         Assert.Equal("Zaproszenie do albumu w GEO", message.Subject);
         Assert.Equal("ania@example.invalid", message.To.Mailboxes.Single().Address);
         Assert.Equal("powiadomienia@example.invalid", message.From.Mailboxes.Single().Address);
         Assert.Contains("album „Rodzina”", message.TextBody);
+        Assert.Contains("kasia@example.invalid zaprasza Cię", message.TextBody);
         Assert.Contains("https://app.example.invalid", message.TextBody);
     }
 
@@ -38,7 +39,7 @@ public sealed class SmtpNotificationSenderTests
         await using var server = new FakeSmtpServer(refusesRecipients: true);
         var album = Guid.CreateVersion7();
 
-        await Sender(server.Port, new Names(album, "Rodzina")).SendAsync("nikt@example.invalid", NotificationKind.Tagged, album, Cancellation);
+        await Sender(server.Port, new Names(album, "Rodzina")).SendAsync("nikt@example.invalid", NotificationKind.Tagged, album, null, Cancellation);
 
         Assert.Empty(server.Received);
     }
@@ -52,7 +53,7 @@ public sealed class SmtpNotificationSenderTests
             port = server.Port;
         }
 
-        await Assert.ThrowsAnyAsync<Exception>(() => Sender(port, new Names(Guid.Empty, "")).SendAsync("ania@example.invalid", NotificationKind.Tagged, Guid.CreateVersion7(), Cancellation));
+        await Assert.ThrowsAnyAsync<Exception>(() => Sender(port, new Names(Guid.Empty, "")).SendAsync("ania@example.invalid", NotificationKind.Tagged, Guid.CreateVersion7(), null, Cancellation));
     }
 
     [Theory]
@@ -67,6 +68,14 @@ public sealed class SmtpNotificationSenderTests
 
         Assert.NotEmpty(subject);
         Assert.Contains("album „Ro dzina”", body);
+    }
+
+    [Fact]
+    public void Without_a_known_inviter_the_invitation_still_makes_sense()
+    {
+        Assert.Contains("Zaproszono Cię", NotificationTexts.Of(NotificationKind.Invitation, "Rodzina", null).Body);
+        Assert.Contains("Zaproszenie od kasia@example.invalid czeka", NotificationTexts.Of(NotificationKind.InvitationReminder, "Rodzina", null, "kasia@example.invalid").Body);
+        Assert.DoesNotContain("kasia", NotificationTexts.Of(NotificationKind.Tagged, "Rodzina", null, "kasia@example.invalid").Body);
     }
 
     [Fact]

@@ -9,7 +9,7 @@ public sealed class FakeNotificationNeighbours : IAlbumMessaging, IAccountDirect
 {
     private readonly ConcurrentDictionary<Guid, PendingInvitation> _invitations = new();
     private readonly ConcurrentDictionary<Guid, string> _emails = new();
-    private readonly ConcurrentBag<(string Email, string Kind)> _sent = [];
+    private readonly ConcurrentBag<(string Email, string Kind, string? InvitedBy)> _sent = [];
     private readonly ConcurrentDictionary<string, int> _failures = new();
 
     public Guid NewAccount()
@@ -24,11 +24,15 @@ public sealed class FakeNotificationNeighbours : IAlbumMessaging, IAccountDirect
     public Guid NewInvitation()
     {
         var id = Guid.CreateVersion7();
-        _invitations[id] = new PendingInvitation(Guid.CreateVersion7(), $"{id}@example.invalid");
+        _invitations[id] = new PendingInvitation(Guid.CreateVersion7(), $"{id}@example.invalid", NewAccount());
         return id;
     }
 
     public string AddressOf(Guid invitationId) => _invitations[invitationId].Email;
+
+    public string InviterOf(Guid invitationId) => _emails[_invitations[invitationId].InvitedByAccountId];
+
+    public string? InvitedByIn(string email, string kind) => _sent.First(item => item.Email == email && item.Kind == kind).InvitedBy;
 
     public void Answered(Guid invitationId) => _invitations.TryRemove(invitationId, out _);
 
@@ -44,14 +48,14 @@ public sealed class FakeNotificationNeighbours : IAlbumMessaging, IAccountDirect
     public Task<IReadOnlyDictionary<Guid, string>> EmailsOfAsync(IReadOnlyCollection<Guid> accountIds, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyDictionary<Guid, string>>(accountIds.Where(_emails.ContainsKey).ToDictionary(id => id, id => _emails[id]));
 
-    Task INotificationSender.SendAsync(string email, NotificationKind kind, Guid albumId, CancellationToken cancellationToken)
+    Task INotificationSender.SendAsync(string email, NotificationKind kind, Guid albumId, string? invitedBy, CancellationToken cancellationToken)
     {
         if (_failures.TryRemove(email, out _))
         {
             throw new InvalidOperationException("The provider does not answer.");
         }
 
-        _sent.Add((email, kind.ToString()));
+        _sent.Add((email, kind.ToString(), invitedBy));
         return Task.CompletedTask;
     }
 }

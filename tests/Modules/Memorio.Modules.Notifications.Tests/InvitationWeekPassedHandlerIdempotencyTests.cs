@@ -20,6 +20,7 @@ public sealed class InvitationWeekPassedHandlerIdempotencyTests(NotificationsDat
         await DeliverAsync(passed);
 
         Assert.Equal(1, database.Neighbours.SentTo(email, "InvitationReminder"));
+        Assert.Equal(database.Neighbours.InviterOf(invitation), database.Neighbours.InvitedByIn(email, "InvitationReminder"));
     }
 
     [Fact]

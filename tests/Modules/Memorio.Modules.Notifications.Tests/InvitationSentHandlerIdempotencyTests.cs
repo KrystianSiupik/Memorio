@@ -22,6 +22,7 @@ public sealed class InvitationSentHandlerIdempotencyTests(NotificationsDatabase 
         await DeliverAsync(sent);
 
         Assert.Equal(1, database.Neighbours.SentTo(email, "Invitation"));
+        Assert.Equal(database.Neighbours.InviterOf(invitation), database.Neighbours.InvitedByIn(email, "Invitation"));
     }
 
     [Fact]

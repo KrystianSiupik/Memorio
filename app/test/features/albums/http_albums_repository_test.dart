@@ -100,6 +100,7 @@ void main() {
   group('failures by what the backend answered', () {
     final cases = <String, (int, Object?, Type)>{
       'no seat': (409, {'code': 'Album.NoFreeSeats'}, AlbumNoFreeSeats),
+      'invitation limit': (409, {'code': 'Album.InvitationLimitReached'}, AlbumInvitationLimit),
       'blocked': (409, {'code': 'Album.AddressBlocked'}, AlbumAddressBlocked),
       'invitation gone': (409, {'code': 'Album.InvitationGone'}, AlbumInvitationGone),
       'pool': (409, {'code': 'Album.PoolFull'}, AlbumPoolFull),

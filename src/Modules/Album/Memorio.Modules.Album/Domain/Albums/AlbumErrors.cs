@@ -13,6 +13,8 @@ internal static class AlbumErrors
     /// <summary>E43.</summary>
     public static readonly Error NoFreeSeats = Error.Conflict("Album.NoFreeSeats", "The plan of this album has no free seat.");
 
+    public static readonly Error InvitationLimitReached = Error.Conflict("Album.InvitationLimitReached", $"An account sends up to {InvitationQuota.DailyLimit} invitations a day.");
+
     /// <summary>E44.</summary>
     public static readonly Error AddressBlocked = Error.Conflict("Album.AddressBlocked", "This address does not take invitations.");
 

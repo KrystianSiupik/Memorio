@@ -34,6 +34,8 @@ internal sealed class WithdrawContributionsWhenAccountDeleted(IAlbums albums, Co
             album.Leave(integrationEvent.AccountId, now);
         }
 
+        await albums.ForgetInvitationQuotaAsync(integrationEvent.AccountId, cancellationToken);
+
         if (applied is null)
         {
             albums.Add(new AppliedAccountEvent(integrationEvent.AccountId, integrationEvent.Sequence));

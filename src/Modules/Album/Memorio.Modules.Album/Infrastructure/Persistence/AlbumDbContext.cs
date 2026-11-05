@@ -109,6 +109,15 @@ internal sealed class AlbumDbContext(DbContextOptions<AlbumDbContext> options) :
             kept.HasIndex(item => item.AuthorAccountId).HasDatabaseName("ix_album_kept_contributions_author_account_id");
         });
 
+        builder.Entity<InvitationQuota>(quota =>
+        {
+            quota.ToTable("invitation_quotas");
+            quota.HasKey(item => new { item.AccountId, item.Day });
+            quota.Property(item => item.AccountId).HasColumnName("account_id");
+            quota.Property(item => item.Day).HasColumnName("day");
+            quota.Property(item => item.Used).HasColumnName("used");
+        });
+
         builder.Entity<AppliedAccountEvent>(applied =>
         {
             applied.ToTable("applied_account_events");

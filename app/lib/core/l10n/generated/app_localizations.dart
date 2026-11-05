@@ -529,6 +529,12 @@ abstract class AppLocalizations {
   /// **'W planie tego albumu nie ma wolnego miejsca.'**
   String get albumNoFreeSeats;
 
+  /// No description provided for @albumInvitationLimit.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dzisiejszy limit 10 zaproszeń został wykorzystany. Spróbuj jutro.'**
+  String get albumInvitationLimit;
+
   /// No description provided for @albumAddressBlocked.
   ///
   /// In pl, this message translates to:

@@ -19,12 +19,12 @@ internal sealed partial class SmtpNotificationSender(
     IAlbumNames albums,
     ILogger<SmtpNotificationSender> logger) : INotificationSender
 {
-    public async Task SendAsync(string email, NotificationKind kind, Guid albumId, CancellationToken cancellationToken)
+    public async Task SendAsync(string email, NotificationKind kind, Guid albumId, string? invitedBy, CancellationToken cancellationToken)
     {
         // This sender is registered only with a host, and the options require a sender address with it.
         var smtp = options.Value.Smtp;
         var names = await albums.NamesOfAsync([albumId], cancellationToken);
-        var (subject, body) = NotificationTexts.Of(kind, names.GetValueOrDefault(albumId), smtp.AppUrl);
+        var (subject, body) = NotificationTexts.Of(kind, names.GetValueOrDefault(albumId), smtp.AppUrl, invitedBy);
 
         using var message = new MimeMessage();
         message.From.Add(new MailboxAddress(smtp.FromName, smtp.From!));
