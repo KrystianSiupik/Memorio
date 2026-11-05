@@ -23,6 +23,7 @@ AlbumResponse _$AlbumResponseFromJson(Map<String, dynamic> json) => AlbumRespons
   freeBytes: json['freeBytes'],
   limitBytes: json['limitBytes'],
   myCuratorAccountId: json['myCuratorAccountId'] as String?,
+  isReadOnly: json['isReadOnly'] as bool,
 );
 
 Map<String, dynamic> _$AlbumResponseToJson(AlbumResponse instance) => <String, dynamic>{
@@ -38,4 +39,5 @@ Map<String, dynamic> _$AlbumResponseToJson(AlbumResponse instance) => <String, d
   'freeBytes': instance.freeBytes,
   'limitBytes': instance.limitBytes,
   'myCuratorAccountId': instance.myCuratorAccountId,
+  'isReadOnly': instance.isReadOnly,
 };

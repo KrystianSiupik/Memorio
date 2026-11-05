@@ -12,6 +12,7 @@ import 'clients/albums_client.dart';
 import 'clients/notifications_client.dart';
 import 'clients/memories_client.dart';
 import 'clients/places_client.dart';
+import 'clients/plans_client.dart';
 import 'clients/auth_client.dart';
 
 /// Memorio API `vv1`
@@ -31,6 +32,7 @@ class MemorioApiClient {
   NotificationsClient? _notifications;
   MemoriesClient? _memories;
   PlacesClient? _places;
+  PlansClient? _plans;
   AuthClient? _auth;
 
   AppClient get app => _app ??= AppClient(_dio, baseUrl: _baseUrl);
@@ -48,6 +50,8 @@ class MemorioApiClient {
   MemoriesClient get memories => _memories ??= MemoriesClient(_dio, baseUrl: _baseUrl);
 
   PlacesClient get places => _places ??= PlacesClient(_dio, baseUrl: _baseUrl);
+
+  PlansClient get plans => _plans ??= PlansClient(_dio, baseUrl: _baseUrl);
 
   AuthClient get auth => _auth ??= AuthClient(_dio, baseUrl: _baseUrl);
 }

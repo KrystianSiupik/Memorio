@@ -15,6 +15,7 @@ import '../models/my_memory_response.dart';
 import '../models/request_data_deletion_request.dart';
 import '../models/start_upload_request.dart';
 import '../models/trashed_memory_response.dart';
+import '../models/trim_material_response.dart';
 import '../models/upload_response.dart';
 
 part 'memories_client.g.dart';
@@ -34,6 +35,10 @@ abstract class MemoriesClient {
   /// The person's own active memories, newest first.
   @GET('/v1/memories/mine')
   Future<List<MyMemoryResponse>> listMyMemories();
+
+  /// What a trim of the person's archive could take, oldest first, with sizes.
+  @GET('/v1/memories/trim-material')
+  Future<List<TrimMaterialResponse>> getTrimMaterial();
 
   /// Takes the person's content back from the trash while its 30 days last.
   @POST('/v1/memories/{id}/restore')

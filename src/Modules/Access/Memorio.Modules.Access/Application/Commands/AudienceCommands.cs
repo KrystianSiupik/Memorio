@@ -9,7 +9,8 @@ namespace Memorio.Modules.Access.Application.Commands;
 /// <summary>A decision made again when a parallel one got there first: the loser reads the new state (D-269).</summary>
 internal static class AudienceDecision
 {
-    private const int Attempts = 3;
+    // A popular link means many entries at once, and each save beats the others; revoking it must not lose to them (D-287).
+    private const int Attempts = 8;
 
     public static async Task<Result> UntilStoredAsync(IAudiences audiences, Func<Task<Result>> decide, CancellationToken cancellationToken)
     {
@@ -25,6 +26,8 @@ internal static class AudienceDecision
             {
                 return Result.Success();
             }
+
+            await Task.Delay(Random.Shared.Next(5, 40), cancellationToken);
         }
 
         return AccessErrors.AlreadyDecided;

@@ -68,6 +68,7 @@ class AlbumDetails {
     required this.freeBytes,
     required this.limitBytes,
     required this.myCuratorAccountId,
+    this.isReadOnly = false,
   });
 
   final String id;
@@ -84,6 +85,9 @@ class AlbumDetails {
   final int freeBytes;
   final int limitBytes;
   final String? myCuratorAccountId;
+
+  /// The plan ended: everyone reads, nothing new comes in (S2:B1).
+  final bool isReadOnly;
 
   bool get poolIsFull => freeBytes <= 0;
 }

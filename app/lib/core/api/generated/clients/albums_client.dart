@@ -10,6 +10,7 @@ import '../models/add_memory_request.dart';
 import '../models/album_list_item_response.dart';
 import '../models/album_response.dart';
 import '../models/album_seats_response.dart';
+import '../models/album_trim_material_response.dart';
 import '../models/answered_invitation_response.dart';
 import '../models/arrange_request.dart';
 import '../models/create_album_request.dart';
@@ -50,6 +51,10 @@ abstract class AlbumsClient {
   /// The album with its memories, members, the person's own contributions and the pool.
   @GET('/v1/albums/{id}')
   Future<AlbumResponse> getAlbum({@Path('id') required String id});
+
+  /// For the owner: what a trim of the album could take, oldest first, with sizes.
+  @GET('/v1/albums/{id}/trim-material')
+  Future<List<AlbumTrimMaterialResponse>> getAlbumTrimMaterial({@Path('id') required String id});
 
   /// For the owner: seats taken, invited and free.
   @GET('/v1/albums/{id}/seats')

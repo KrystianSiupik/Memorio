@@ -116,6 +116,30 @@ final class AlbumManageRoute extends AppRoute {
   String get location => '${const AlbumRoute('').location}$id/$path';
 }
 
+/// S18 of an album, for its owner.
+final class AlbumPlanRoute extends AppRoute {
+  const AlbumPlanRoute(this.id);
+
+  static const path = 'plan';
+
+  final String id;
+
+  @override
+  String get location => '${const AlbumRoute('').location}$id/$path';
+}
+
+/// S19 of an album.
+final class AlbumPlanMaterialRoute extends AppRoute {
+  const AlbumPlanMaterialRoute(this.id);
+
+  static const path = 'material';
+
+  final String id;
+
+  @override
+  String get location => '${AlbumPlanRoute(id).location}/$path';
+}
+
 /// S12 from inside an album: its curator too.
 final class AlbumConsentsRoute extends AppRoute {
   const AlbumConsentsRoute(this.id);
@@ -177,4 +201,24 @@ final class AccountRoute extends TabRoute {
 
   @override
   String get location => path;
+}
+
+/// S18 of the person.
+final class PlanRoute extends AppRoute {
+  const PlanRoute();
+
+  static const path = 'plan';
+
+  @override
+  String get location => '${AccountRoute.path}/$path';
+}
+
+/// S19 of the person.
+final class PlanMaterialRoute extends AppRoute {
+  const PlanMaterialRoute();
+
+  static const path = 'material';
+
+  @override
+  String get location => '${const PlanRoute().location}/$path';
 }

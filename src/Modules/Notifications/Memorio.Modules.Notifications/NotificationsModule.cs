@@ -9,6 +9,7 @@ using Memorio.Modules.Notifications.Domain;
 using Memorio.Modules.Notifications.Infrastructure;
 using Memorio.Modules.Notifications.Infrastructure.Persistence;
 using Memorio.Modules.Notifications.Infrastructure.Scheduling;
+using Memorio.SharedKernel.Scheduling;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,7 +58,8 @@ public sealed class NotificationsModule : IModule
         services.AddScoped<ITrimWarningReports, TrimWarningReports>();
         services.AddScoped<WarnBeforeTrimHandler>();
         services.AddScoped<WarnWhenDue>();
-        services.AddScoped<RetryWhileHeld>();
+        // Through a factory: IDeadlines exists only in the worker, and the API host validates its services at startup.
+        services.AddScoped(provider => new RetryWhileHeld(provider.GetRequiredService<IDeadlines>()));
         services.AddScheduledJob<TrimWarningRetryJob>(RetryWhileHeld.JobName);
 
         services.AddHealthChecks().AddCheck<NotificationsDatabaseHealthCheck>(NotificationsDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);

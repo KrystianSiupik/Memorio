@@ -51,6 +51,11 @@ final class AlbumPoolFull extends AlbumFailure {
   const AlbumPoolFull();
 }
 
+/// The plan of this album ended.
+final class AlbumReadOnly extends AlbumFailure {
+  const AlbumReadOnly();
+}
+
 final class AlbumOwnerCannotLeave extends AlbumFailure {
   const AlbumOwnerCannotLeave();
 }

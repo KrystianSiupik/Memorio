@@ -76,6 +76,7 @@ class HttpAlbumsRepository implements AlbumsRepository {
       name: album.name,
       isOwner: album.isOwner,
       isMember: album.isMember,
+      isReadOnly: album.isReadOnly,
       successorAccountId: album.successorAccountId,
       members: [
         for (final member in album.members)
@@ -322,6 +323,7 @@ class HttpAlbumsRepository implements AlbumsRepository {
       'Album.AddressBlocked' => const AlbumAddressBlocked(),
       'Album.InvitationGone' => const AlbumInvitationGone(),
       'Album.PoolFull' || 'Archive.SpaceLimitExceeded' => const AlbumPoolFull(),
+      'Album.ReadOnly' => const AlbumReadOnly(),
       'Album.OwnerCannotLeave' => const AlbumOwnerCannotLeave(),
       'Album.AlreadyDecided' || 'Succession.AlreadyDecided' || 'Access.AlreadyDecided' => const AlbumAlreadyDecided(),
       _ => switch (response.statusCode) {
