@@ -30,7 +30,7 @@ public sealed class AlbumSeatLimitTests(PlansDatabase database)
         var services = scope.ServiceProvider;
         var limit = services.GetRequiredService<IAlbumSeatLimit>();
         var advance = services.GetRequiredService<AdvanceCycleHandler>();
-        await services.GetRequiredService<RecordEntitlementHandler>().HandleAsync(new RecordEntitlement("manual", "paid", album, now.AddDays(1), now, "test"), Cancellation);
+        await services.GetRequiredService<RecordEntitlementHandler>().HandleAsync(new RecordEntitlement("manual", Guid.CreateVersion7().ToString(), album, now.AddDays(1), now, "test"), Cancellation);
 
         await advance.HandleAsync(album, now, Cancellation);
         Assert.Equal(10, await limit.SeatsOfAsync(album.Id, Cancellation));

@@ -23,6 +23,9 @@ public interface IAlbumMessaging
 {
     /// <summary>Null when the invitation no longer waits for an answer: nothing to write about.</summary>
     Task<PendingInvitation?> FindPendingInvitationAsync(Guid invitationId, CancellationToken cancellationToken);
+
+    /// <summary>The owner and the participants: who hears about what happens to the album (S2:B1).</summary>
+    Task<IReadOnlyCollection<Guid>> MembersOfAsync(Guid albumId, CancellationToken cancellationToken);
 }
 
 /// <param name="Email">The address the invitation goes to.</param>

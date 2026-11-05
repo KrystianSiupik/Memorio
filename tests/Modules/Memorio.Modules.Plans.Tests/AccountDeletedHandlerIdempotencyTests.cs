@@ -20,7 +20,7 @@ public sealed class AccountDeletedHandlerIdempotencyTests(PlansDatabase database
         var now = DateTimeOffset.UtcNow;
         await using var scope = database.CreateScope();
         var services = scope.ServiceProvider;
-        await services.GetRequiredService<RecordEntitlementHandler>().HandleAsync(new RecordEntitlement("manual", "first", account, now.AddMonths(1), now, "test"), Cancellation);
+        await services.GetRequiredService<RecordEntitlementHandler>().HandleAsync(new RecordEntitlement("manual", Guid.CreateVersion7().ToString(), account, now.AddMonths(1), now, "test"), Cancellation);
         await services.GetRequiredService<AdvanceCycleHandler>().HandleAsync(account, now, Cancellation);
 
         await using (var delivery = database.CreateScope())

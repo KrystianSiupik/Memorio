@@ -9,10 +9,10 @@ namespace Memorio.Modules.Notifications.Infrastructure;
 /// </summary>
 internal sealed partial class LoggingNotificationSender(ILogger<LoggingNotificationSender> logger) : INotificationSender
 {
-    public Task SendAsync(string email, NotificationKind kind, Guid albumId, string? invitedBy, CancellationToken cancellationToken)
+    public Task<DeliveryOutcome> SendAsync(string email, NotificationKind kind, Guid albumId, string? detail, CancellationToken cancellationToken)
     {
         LogNotSent(logger, kind, albumId);
-        return Task.CompletedTask;
+        return Task.FromResult(DeliveryOutcome.NotSent);
     }
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Message {Kind} about album {AlbumId} not delivered: no provider is set up.")]

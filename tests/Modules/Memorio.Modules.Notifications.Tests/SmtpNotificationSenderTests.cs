@@ -39,8 +39,9 @@ public sealed class SmtpNotificationSenderTests
         await using var server = new FakeSmtpServer(refusesRecipients: true);
         var album = Guid.CreateVersion7();
 
-        await Sender(server.Port, new Names(album, "Rodzina")).SendAsync("nikt@example.invalid", NotificationKind.Tagged, album, null, Cancellation);
+        var outcome = await Sender(server.Port, new Names(album, "Rodzina")).SendAsync("nikt@example.invalid", NotificationKind.Tagged, album, null, Cancellation);
 
+        Assert.Equal(DeliveryOutcome.Refused, outcome);
         Assert.Empty(server.Received);
     }
 

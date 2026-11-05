@@ -2,12 +2,12 @@ using Memorio.Modules.Notifications.Application.Ports;
 
 namespace Memorio.Modules.Notifications.Application;
 
-/// <summary>What a message says. The name of the album and, for an invitation, who invites: never a memory or a photo (D-038, D-268).</summary>
+/// <summary>What a message says. The name of the album and, for an invitation, who invites, for a warning, when: never a memory or a photo (D-038, D-268).</summary>
 internal static class NotificationTexts
 {
-    public static (string Subject, string Body) Of(NotificationKind kind, string? albumName, string? appUrl, string? invitedBy = null)
+    public static (string Subject, string Body) Of(NotificationKind kind, string? albumName, string? appUrl, string? detail = null)
     {
-        var inviter = string.IsNullOrWhiteSpace(invitedBy) ? null : OneLine(invitedBy);
+        var inviter = string.IsNullOrWhiteSpace(detail) ? null : OneLine(detail);
         var album = string.IsNullOrWhiteSpace(albumName) ? "album" : $"album „{OneLine(albumName)}”";
         var (subject, body) = kind switch
         {
@@ -26,6 +26,12 @@ internal static class NotificationTexts
             NotificationKind.Tagged => (
                 "Oznaczono Cię we wspomnieniu w GEO",
                 $"Oznaczono Cię we wspomnieniu: {album}.\n\nJeśli nie chcesz tego oznaczenia, możesz je usunąć jednym kliknięciem w albumie."),
+            NotificationKind.TrimWarningAlbum => (
+                $"Album w GEO zostanie przycięty za {OneLine(detail ?? "")}",
+                $"Plan albumu wygasł: {album}.\n\nZa {OneLine(detail ?? "")} to, co przekracza darmowy limit, trafi do kosza na 30 dni, a potem zniknie. Właściciel może wybrać, co zostanie, albo odnowić plan: wtedy nic nie zniknie."),
+            NotificationKind.TrimWarningAccount => (
+                $"Twoje archiwum w GEO zostanie przycięte za {OneLine(detail ?? "")}",
+                $"Twój plan wygasł.\n\nZa {OneLine(detail ?? "")} to, co przekracza darmowy limit, trafi do kosza na 30 dni, a potem zniknie. Możesz wybrać, co zostanie, albo odnowić plan: wtedy nic nie zniknie."),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
         };
         return (subject, string.IsNullOrWhiteSpace(appUrl) ? body : $"{body}\n\nOtwórz GEO: {appUrl}");

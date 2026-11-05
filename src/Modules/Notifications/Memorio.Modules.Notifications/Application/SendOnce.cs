@@ -10,7 +10,39 @@ namespace Memorio.Modules.Notifications.Application;
 /// </summary>
 internal sealed class SendOnce(INotificationLedger ledger, INotificationSender sender, TimeProvider clock)
 {
-    public async Task SendAsync(string subject, long sequence, string email, NotificationKind kind, Guid albumId, CancellationToken cancellationToken, string? invitedBy = null)
+    /// <summary>For messages nothing depends on: an address refused for good ends here.</summary>
+    public async Task SendAsync(string subject, long sequence, string email, NotificationKind kind, Guid albumId, CancellationToken cancellationToken, string? detail = null)
+    {
+        if (await PrepareAsync(subject, sequence, cancellationToken) is not { } sent)
+        {
+            return;
+        }
+
+        await sender.SendAsync(email, kind, albumId, detail, cancellationToken);
+        sent.MarkSent(clock.GetUtcNow());
+        await ledger.SaveAsync(cancellationToken);
+    }
+
+    /// <summary>For messages something waits for: marked only when delivered, so a later try goes to whoever it failed for.</summary>
+    public async Task<DeliveryOutcome> TrySendAsync(string subject, long sequence, string email, NotificationKind kind, Guid albumId, string? detail, CancellationToken cancellationToken)
+    {
+        if (await PrepareAsync(subject, sequence, cancellationToken) is not { } sent)
+        {
+            return DeliveryOutcome.Delivered;
+        }
+
+        var outcome = await sender.SendAsync(email, kind, albumId, detail, cancellationToken);
+        if (outcome == DeliveryOutcome.Delivered)
+        {
+            sent.MarkSent(clock.GetUtcNow());
+            await ledger.SaveAsync(cancellationToken);
+        }
+
+        return outcome;
+    }
+
+    /// <summary>Null when this message went out already or is late.</summary>
+    private async Task<SentNotification?> PrepareAsync(string subject, long sequence, CancellationToken cancellationToken)
     {
         var sent = await ledger.FindAsync(subject, cancellationToken);
         if (sent is null)
@@ -18,19 +50,20 @@ internal sealed class SendOnce(INotificationLedger ledger, INotificationSender s
             sent = SentNotification.Create(subject, sequence);
             ledger.Add(sent);
             await ledger.SaveAsync(cancellationToken);
+            return sent;
         }
-        else if (sent.Sequence > sequence || (sent.Sequence == sequence && sent.SentAt is not null))
+
+        if (sent.Sequence > sequence || (sent.Sequence == sequence && sent.SentAt is not null))
         {
-            return;
+            return null;
         }
-        else if (sent.Sequence < sequence)
+
+        if (sent.Sequence < sequence)
         {
             sent.MoveTo(sequence);
             await ledger.SaveAsync(cancellationToken);
         }
 
-        await sender.SendAsync(email, kind, albumId, invitedBy, cancellationToken);
-        sent.MarkSent(clock.GetUtcNow());
-        await ledger.SaveAsync(cancellationToken);
+        return sent;
     }
 }
