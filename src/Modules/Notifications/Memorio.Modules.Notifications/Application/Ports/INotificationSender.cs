@@ -11,6 +11,8 @@ internal enum NotificationKind
     Tagged,
     TrimWarningAlbum,
     TrimWarningAccount,
+    NewOwner,
+    AlbumWithoutOwner,
 }
 
 /// <summary>What became of a message. Only <see cref="Delivered"/> is proof: the trim of an archive waits without it (S2:C10).</summary>

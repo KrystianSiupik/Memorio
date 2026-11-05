@@ -32,6 +32,12 @@ internal static class NotificationTexts
             NotificationKind.TrimWarningAccount => (
                 $"Twoje archiwum w GEO zostanie przycięte za {OneLine(detail ?? "")}",
                 $"Twój plan wygasł.\n\nZa {OneLine(detail ?? "")} to, co przekracza darmowy limit, trafi do kosza na 30 dni, a potem zniknie. Możesz wybrać, co zostanie, albo odnowić plan: wtedy nic nie zniknie."),
+            NotificationKind.NewOwner => (
+                "Album w GEO ma nowego właściciela",
+                $"Nowy właściciel prowadzi teraz {album}.\n\nTwoje treści zostają w nim bez zmian. Jeśli nie chcesz w nim zostać, możesz wyjść i wybrać, czy je zostawić, czy zabrać."),
+            NotificationKind.AlbumWithoutOwner => (
+                "Album w GEO nie ma właściciela",
+                $"Nikt nie prowadzi teraz: {album}.\n\nNic z niego nie znika. Każdy uczestnik może go przejąć, opłacając plan. Po końcu opłaconego okresu album będzie tylko do odczytu."),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
         };
         return (subject, string.IsNullOrWhiteSpace(appUrl) ? body : $"{body}\n\nOtwórz GEO: {appUrl}");

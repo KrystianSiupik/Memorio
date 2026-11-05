@@ -325,7 +325,7 @@ public sealed class PlanCycleTests
         cycle.ApplyEntitlement(End, Paid);
         cycle.ClearDomainEvents();
 
-        cycle.MarkOwnerless();
+        cycle.MarkOwnerless(1, End);
         cycle.ApplyEntitlement(End, End.AddDays(-1));
         Assert.Equal(PlanMode.Active, cycle.Mode);
 
@@ -337,7 +337,7 @@ public sealed class PlanCycleTests
     public void Paying_for_an_album_without_an_owner_does_not_activate_it()
     {
         var cycle = ReadOnlyCycle();
-        cycle.MarkOwnerless();
+        cycle.MarkOwnerless(1, End);
 
         cycle.ApplyEntitlement(End.AddYears(1), End.AddMonths(2));
 
@@ -355,7 +355,7 @@ public sealed class PlanCycleTests
     {
         var cycle = ReadOnlyCycle();
         DeliverAllWarnings(cycle);
-        cycle.MarkOwnerless();
+        cycle.MarkOwnerless(1, End);
         var trimAt = cycle.TrimAt!.Value;
         cycle.ApplyEntitlement(trimAt.AddYears(1), trimAt);
         cycle.ClearDomainEvents();
@@ -370,16 +370,54 @@ public sealed class PlanCycleTests
     public void The_takeover_activates_only_a_paid_plan()
     {
         var cycle = ReadOnlyCycle();
-        cycle.MarkOwnerless();
+        cycle.MarkOwnerless(1, End);
         var now = End.AddMonths(2);
 
-        Assert.Equal(PlanCycleErrors.NotPaid, cycle.ActivateAfterTakeover(now).Error);
+        Assert.Equal(PlanCycleErrors.NotPaid, cycle.ActivateAfterTakeover(2, now).Error);
 
         cycle.ApplyEntitlement(now.AddYears(1), now);
         cycle.ClearDomainEvents();
 
-        Assert.True(cycle.ActivateAfterTakeover(now).IsSuccess);
+        Assert.True(cycle.ActivateAfterTakeover(2, now).IsSuccess);
         Assert.IsType<PlanActivated>(Assert.Single(cycle.DomainEvents));
+        Assert.False(cycle.IsOwnerless);
+    }
+
+    [Fact]
+    public void An_album_that_never_paid_goes_read_only_when_it_loses_its_owner()
+    {
+        var cycle = PlanCycle.Start(Album);
+
+        cycle.MarkOwnerless(1, Paid);
+
+        Assert.IsType<PlanWentReadOnly>(Assert.Single(cycle.DomainEvents));
+        Assert.Equal(Paid.AddMonths(24), cycle.TrimAt);
+    }
+
+    [Fact]
+    public void Paying_while_the_period_still_runs_is_reported_too()
+    {
+        var cycle = PlanCycle.Start(Album);
+        cycle.ApplyEntitlement(End, Paid);
+        cycle.MarkOwnerless(1, Paid);
+        cycle.ClearDomainEvents();
+
+        cycle.ApplyEntitlement(End.AddMonths(1), Paid.AddDays(1));
+
+        Assert.IsType<PaidWhileOwnerless>(Assert.Single(cycle.DomainEvents));
+    }
+
+    [Fact]
+    public void A_late_event_about_the_album_changes_nothing()
+    {
+        var cycle = ReadOnlyCycle();
+        cycle.MarkOwnerless(5, End);
+        var now = End.AddMonths(2);
+        cycle.ApplyEntitlement(now.AddYears(1), now);
+        Assert.True(cycle.ActivateAfterTakeover(6, now).IsSuccess);
+
+        cycle.MarkOwnerless(5, now);
+
         Assert.False(cycle.IsOwnerless);
     }
 

@@ -75,6 +75,9 @@ internal sealed class PlanCycle : AggregateRoot<EntitledResource>
     /// <summary>The album lost its owner (D-001): the plan runs until the paid period ends and does not come back by payment alone (D-004).</summary>
     public bool IsOwnerless { get; private set; }
 
+    /// <summary>The sequence of the last event about the album applied here (D-013).</summary>
+    public int LastAlbumSequence { get; private set; }
+
     /// <summary>Names the current series of warnings. A later hold released starts a new one.</summary>
     public int WarningRound { get; private set; }
 
@@ -107,7 +110,7 @@ internal sealed class PlanCycle : AggregateRoot<EntitledResource>
         EntitledUntil = entitledUntil;
         if (entitledUntil > now)
         {
-            if (IsOwnerless && Mode != PlanMode.Active)
+            if (IsOwnerless)
             {
                 if (changed)
                 {
@@ -284,24 +287,40 @@ internal sealed class PlanCycle : AggregateRoot<EntitledResource>
         Raise(new TrimOrdered(Guid.CreateVersion7(), now, Id, PlanTerms.Free, [.. _keptMemoryIds], Sequence));
     }
 
-    /// <summary>E162 (D-001): nothing changes until the paid period ends.</summary>
-    public void MarkOwnerless()
+    /// <summary>
+    /// E162 (D-001): a paid plan runs until its period ends (HS-020); what was never paid goes read-only now (S2:B3). An event
+    /// about the album older than the last one applied changes nothing (D-013).
+    /// </summary>
+    public void MarkOwnerless(int albumSequence, DateTimeOffset now)
     {
-        if (!IsOwnerless)
+        if (albumSequence <= LastAlbumSequence)
         {
-            IsOwnerless = true;
-            Sequence++;
+            return;
+        }
+
+        LastAlbumSequence = albumSequence;
+        IsOwnerless = true;
+        Sequence++;
+        if (Mode is PlanMode.Free)
+        {
+            GoReadOnly(now);
         }
     }
 
     /// <summary>C165: back to active only after a takeover and with the plan paid (D-004).</summary>
-    public Result ActivateAfterTakeover(DateTimeOffset now)
+    public Result ActivateAfterTakeover(int albumSequence, DateTimeOffset now)
     {
+        if (albumSequence <= LastAlbumSequence)
+        {
+            return Result.Success();
+        }
+
         if (!(EntitledUntil > now))
         {
             return PlanCycleErrors.NotPaid;
         }
 
+        LastAlbumSequence = albumSequence;
         IsOwnerless = false;
         Activate(now);
         return Result.Success();

@@ -52,6 +52,18 @@ internal sealed record ParticipantRemoved(Guid EventId, DateTimeOffset OccurredA
 /// <summary>E69.</summary>
 internal sealed record PhotoAddedInAlbum(Guid EventId, DateTimeOffset OccurredAt, AlbumId AlbumId, Guid MemoryId, Guid PhotoId) : IDomainEvent;
 
+/// <summary>E162.</summary>
+internal sealed record AlbumWithoutOwner(Guid EventId, DateTimeOffset OccurredAt, AlbumId AlbumId, int Sequence) : IDomainEvent;
+
+/// <summary>The successor is the owner now (after E123).</summary>
+internal sealed record AlbumOwnerChanged(Guid EventId, DateTimeOffset OccurredAt, AlbumId AlbumId, Guid OwnerAccountId, int Sequence) : IDomainEvent;
+
+/// <summary>E165.</summary>
+internal sealed record TakeoverReserved(Guid EventId, DateTimeOffset OccurredAt, AlbumId AlbumId, Guid AccountId, DateTimeOffset ReservedUntil, int Sequence) : IDomainEvent;
+
+/// <summary>E167.</summary>
+internal sealed record AlbumTakenOver(Guid EventId, DateTimeOffset OccurredAt, AlbumId AlbumId, Guid OwnerAccountId, int Sequence) : IDomainEvent;
+
 /// <summary>E175.</summary>
 internal sealed record ParticipantTagged(Guid EventId, DateTimeOffset OccurredAt, AlbumId AlbumId, Guid MemoryId, Guid AccountId, Guid ByAccountId, int Sequence) : IDomainEvent;
 

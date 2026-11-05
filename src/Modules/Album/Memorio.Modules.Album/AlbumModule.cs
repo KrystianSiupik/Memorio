@@ -3,6 +3,7 @@ using Memorio.Modules.Album.Api;
 using Memorio.Modules.Album.Application.Commands.Contributions;
 using Memorio.Modules.Album.Application.Commands.CreateAlbum;
 using Memorio.Modules.Album.Application.Commands.Invitations;
+using Memorio.Modules.Album.Application.Commands.Takeover;
 using Memorio.Modules.Album.Application.Policies;
 using Memorio.Modules.Album.Application.Queries;
 using Memorio.Modules.Album.Contracts;
@@ -69,12 +70,17 @@ public sealed class AlbumModule : IModule
         services.AddScoped<TrimAlbumWhenOrdered>();
         services.AddScoped<RestoreTrimmedWhenPlanActive>();
         services.AddScoped<RemoveBlockedParticipant>();
+        services.AddScoped<ReserveTakeoverHandler>();
+        services.AddScoped<ExpireTakeoverReservation>();
+        services.AddScoped<TakeOverWhenPaid>();
 
         // IDeadlines exists in the worker only, the one host running these (D-157): built on demand, so the
         // API, which never asks for them, still passes the container's validation in development.
         services.AddScoped(provider =>
             new InvitationReminderDeadline(provider.GetRequiredService<IAlbums>(), provider.GetRequiredService<IDeadlines>()));
         services.AddScheduledJob<InvitationReminderJob>(InvitationReminderDeadline.JobName);
+        services.AddScoped(provider => new TakeoverReservationDeadline(provider.GetRequiredService<IDeadlines>()));
+        services.AddScheduledJob<TakeoverReservationJob>(TakeoverReservationDeadline.JobName);
 
         services.AddHealthChecks().AddCheck<AlbumDatabaseHealthCheck>(AlbumDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))

@@ -58,6 +58,7 @@ public sealed class NotificationsModule : IModule
         services.AddScoped<ITrimWarningReports, TrimWarningReports>();
         services.AddScoped<WarnBeforeTrimHandler>();
         services.AddScoped<WarnWhenDue>();
+        services.AddScoped<NotifyOfNewOwner>();
         // Through a factory: IDeadlines exists only in the worker, and the API host validates its services at startup.
         services.AddScoped(provider => new RetryWhileHeld(provider.GetRequiredService<IDeadlines>()));
         services.AddScheduledJob<TrimWarningRetryJob>(RetryWhileHeld.JobName);

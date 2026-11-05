@@ -57,6 +57,7 @@ internal sealed class PlansDbContext(DbContextOptions<PlansDbContext> options) :
             cycle.Property(item => item.LedgerCheckedAt).HasColumnName("ledger_checked_at");
             cycle.Property(item => item.IsOwnerless).HasColumnName("is_ownerless");
             cycle.Property(item => item.WarningRound).HasColumnName("warning_round");
+            cycle.Property(item => item.LastAlbumSequence).HasColumnName("last_album_sequence");
             cycle.PrimitiveCollection(item => item.WarningsDue).HasColumnName("warnings_due").HasField("_warningsDue").UsePropertyAccessMode(PropertyAccessMode.Field);
             cycle.PrimitiveCollection(item => item.WarningsDelivered).HasColumnName("warnings_delivered").HasField("_warningsDelivered").UsePropertyAccessMode(PropertyAccessMode.Field);
             cycle.PrimitiveCollection(item => item.KeptMemoryIds).HasColumnName("kept_memory_ids").HasField("_keptMemoryIds").UsePropertyAccessMode(PropertyAccessMode.Field);

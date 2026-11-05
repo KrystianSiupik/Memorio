@@ -64,6 +64,9 @@ internal sealed class Albums(IDbContextOutbox<AlbumDbContext> outbox) : IAlbums
 
     public void Remove(KeptContribution kept) => Database.KeptContributions.Remove(kept);
 
+    public async Task<IReadOnlyList<SharedAlbum>> FindOwnedByAsync(Guid accountId, CancellationToken cancellationToken) =>
+        await Database.Albums.Where(album => album.OwnerAccountId == accountId).ToListAsync(cancellationToken);
+
     public async Task<IReadOnlyList<AlbumId>> FindOtherPeoplesAlbumsAsync(Guid accountId, CancellationToken cancellationToken)
     {
         var taking = Database.Albums
@@ -155,6 +158,11 @@ internal sealed class Albums(IDbContextOutbox<AlbumDbContext> outbox) : IAlbums
         ContributionsWithdrawn withdrawn => outbox.PublishAsync(new ContributionsWithdrawnEvent(withdrawn.EventId, withdrawn.OccurredAt, withdrawn.AlbumId.Value, withdrawn.AuthorAccountId, withdrawn.Sequence)),
         ParticipantRemoved removed => outbox.PublishAsync(new ParticipantRemovedEvent(removed.EventId, removed.OccurredAt, removed.AlbumId.Value, removed.AccountId, removed.Sequence)),
         ParticipantTagged tagged => outbox.PublishAsync(new ParticipantTaggedEvent(tagged.EventId, tagged.OccurredAt, tagged.AlbumId.Value, tagged.MemoryId, tagged.AccountId, tagged.Sequence)),
+
+        AlbumWithoutOwner released => outbox.PublishAsync(new AlbumWithoutOwnerEvent(released.EventId, released.OccurredAt, released.AlbumId.Value, released.Sequence)),
+        AlbumOwnerChanged changed => outbox.PublishAsync(new AlbumOwnerChangedEvent(changed.EventId, changed.OccurredAt, changed.AlbumId.Value, changed.OwnerAccountId, changed.Sequence)),
+        TakeoverReserved reserved => outbox.PublishAsync(new TakeoverReservedEvent(reserved.EventId, reserved.OccurredAt, reserved.AlbumId.Value, reserved.ReservedUntil, reserved.Sequence)),
+        AlbumTakenOver taken => outbox.PublishAsync(new AlbumTakenOverEvent(taken.EventId, taken.OccurredAt, taken.AlbumId.Value, taken.OwnerAccountId, taken.Sequence)),
 
         // The others stay inside the module.
         _ => ValueTask.CompletedTask,

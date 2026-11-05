@@ -181,6 +181,18 @@ namespace Memorio.Modules.Album.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("owner_account_id");
 
+                    b.Property<DateTimeOffset?>("OwnerlessSince")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ownerless_since");
+
+                    b.Property<Guid?>("ReservedByAccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("reserved_by_account_id");
+
+                    b.Property<DateTimeOffset?>("ReservedUntil")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("reserved_until");
+
                     b.Property<int>("Sequence")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAdd()
