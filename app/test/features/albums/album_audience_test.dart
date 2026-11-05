@@ -68,6 +68,28 @@ void main() {
       expect(albums.actions, ['revokeAccess:viewer-1']);
     });
 
+    testWidgets('blocked people are listed and can be unblocked', (tester) async {
+      albums.details = albumDetails(isOwner: true);
+      albums.blocked = const [AlbumViewer(accountId: 'blocked-1', email: 'zablokowany@example.invalid')];
+      await open(tester, location);
+
+      expect(find.text('zablokowany@example.invalid'), findsOneWidget);
+
+      await tester.tap(
+        find.descendant(of: find.byKey(const Key('s11-blocked-blocked-1')), matching: find.text('Odblokuj')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(albums.actions, ['unblock:blocked-1']);
+    });
+
+    testWidgets('nobody blocked shows no such section', (tester) async {
+      albums.details = albumDetails(isOwner: true);
+      await open(tester, location);
+
+      expect(find.text('Zablokowani'), findsNothing);
+    });
+
     testWidgets('a refusal is said and the link stays', (tester) async {
       albums.details = albumDetails(isOwner: true);
       albums.link = 'token-1';

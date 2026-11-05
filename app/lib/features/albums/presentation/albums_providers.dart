@@ -63,6 +63,10 @@ final albumViewersProvider = FutureProvider.family<List<AlbumViewer>, String>(
   (ref, id) => _load(ref, (albums) => albums.loadViewers(id)),
   retry: noAutomaticRetry,
 );
+final albumBlockedProvider = FutureProvider.family<List<AlbumViewer>, String>(
+  (ref, id) => _load(ref, (albums) => albums.loadBlocked(id)),
+  retry: noAutomaticRetry,
+);
 final albumLinkProvider = FutureProvider.family<String?, String>(
   (ref, id) => _load(ref, (albums) => albums.loadLink(id)),
   retry: noAutomaticRetry,

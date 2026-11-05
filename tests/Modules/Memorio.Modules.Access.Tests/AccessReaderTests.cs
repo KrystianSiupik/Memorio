@@ -55,6 +55,24 @@ public sealed class AccessReaderTests(AccessDatabase database)
     }
 
     [Fact]
+    public async Task The_map_filter_has_albums_the_person_is_in_without_those_read_through_a_link_or_blocked()
+    {
+        var (mine, _) = database.Neighbours.NewAlbum();
+        var person = database.Neighbours.NewParticipant(mine);
+        var (read, readOwner) = database.Neighbours.NewAlbum();
+        var (blocked, blockedOwner) = database.Neighbours.NewAlbum();
+        database.Neighbours.AddParticipant(blocked, person);
+        await using var scope = database.CreateScope();
+        var token = (await scope.ServiceProvider.GetRequiredService<ShareByLinkHandler>().HandleAsync(read, readOwner, Cancellation)).Value;
+        await scope.ServiceProvider.GetRequiredService<EnterByLinkHandler>().HandleAsync(token, person, Cancellation);
+        await scope.ServiceProvider.GetRequiredService<BlockUserHandler>().HandleAsync(blocked, blockedOwner, person, Cancellation);
+        var reader = scope.ServiceProvider.GetRequiredService<IAccessReader>();
+
+        Assert.Equal([mine], await reader.AlbumsTakingPartInAsync(person, Cancellation));
+        Assert.Contains(read, await reader.VisibleAlbumsAsync(person, Cancellation));
+    }
+
+    [Fact]
     public async Task A_block_wins_over_being_in_the_album_before_Album_has_removed_the_person()
     {
         var (album, owner) = database.Neighbours.NewAlbum();

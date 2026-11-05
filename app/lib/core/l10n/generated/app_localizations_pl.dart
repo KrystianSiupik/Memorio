@@ -251,7 +251,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String albumBlockConfirmBody(Object person) {
-    return '$person od razu straci dostęp i nie wejdzie już ani linkiem, ani przez zaproszenie. Tego nie da się cofnąć w aplikacji.';
+    return '$person od razu straci dostęp i nie wejdzie już ani linkiem, ani przez zaproszenie. Odblokować może później właściciel albumu.';
   }
 
   @override
@@ -259,6 +259,12 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get cancel => 'Anuluj';
+
+  @override
+  String get albumBlockedPeople => 'Zablokowani';
+
+  @override
+  String get albumUnblock => 'Odblokuj';
 
   @override
   String get albumBlocked => 'Nie masz dostępu do tego albumu.';

@@ -538,7 +538,7 @@ abstract class AppLocalizations {
   /// No description provided for @albumBlockConfirmBody.
   ///
   /// In pl, this message translates to:
-  /// **'{person} od razu straci dostęp i nie wejdzie już ani linkiem, ani przez zaproszenie. Tego nie da się cofnąć w aplikacji.'**
+  /// **'{person} od razu straci dostęp i nie wejdzie już ani linkiem, ani przez zaproszenie. Odblokować może później właściciel albumu.'**
   String albumBlockConfirmBody(Object person);
 
   /// No description provided for @albumBlockConfirm.
@@ -552,6 +552,18 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Anuluj'**
   String get cancel;
+
+  /// No description provided for @albumBlockedPeople.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zablokowani'**
+  String get albumBlockedPeople;
+
+  /// No description provided for @albumUnblock.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odblokuj'**
+  String get albumUnblock;
 
   /// No description provided for @albumBlocked.
   ///

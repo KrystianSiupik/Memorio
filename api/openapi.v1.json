@@ -1323,6 +1323,73 @@
             "description": "No Content"
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "The owner takes a block back; it gives no access by itself.",
+        "operationId": "UnblockUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/blocks": {
+      "get": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "For the owner: who is blocked in this album.",
+        "operationId": "GetAlbumBlocks",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BlockedPersonResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/v1/album-links/{token}": {
@@ -2364,6 +2431,25 @@
               "type": "string",
               "format": "uuid"
             }
+          }
+        }
+      },
+      "BlockedPersonResponse": {
+        "required": [
+          "accountId",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

@@ -24,6 +24,8 @@ public sealed class FakeAccessNeighbours : IAlbumMembership, IAlbumNames, IAccou
         return person;
     }
 
+    public void AddParticipant(Guid album, Guid person) => _participants[(album, person)] = true;
+
     public void Leaves(Guid album, Guid person) => _participants.TryRemove((album, person), out _);
 
     public Task<bool> IsMemberAsync(Guid accountId, Guid albumId, CancellationToken cancellationToken) =>

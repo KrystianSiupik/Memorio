@@ -144,6 +144,7 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
     if (confirmed == true && await act(() => albums.block(widget.albumId, chosen.$1))) {
       _refresh();
       ref.invalidate(albumViewersProvider(widget.albumId));
+      ref.invalidate(albumBlockedProvider(widget.albumId));
     }
   }
 

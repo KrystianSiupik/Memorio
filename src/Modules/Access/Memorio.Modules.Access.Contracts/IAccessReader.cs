@@ -16,4 +16,10 @@ public interface IAccessReader
     /// (<c>album_id = ANY(@visibleAlbums)</c>, D-031, D-126), fetched again for every query.
     /// </summary>
     Task<IReadOnlyCollection<Guid>> VisibleAlbumsAsync(Guid personId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Of those, the albums the person is in, without what they only read through a link: the filter of the private
+    /// map, where somebody else's album does not belong just because a link was opened once (D-277).
+    /// </summary>
+    Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken);
 }

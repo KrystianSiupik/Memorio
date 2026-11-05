@@ -16,6 +16,12 @@ internal sealed class AudienceQueries(AccessDbContext database) : IAudienceQueri
             new { albumId },
             cancellationToken: cancellationToken))];
 
+    public async Task<IReadOnlyList<Guid>> BlockedAsync(Guid albumId, CancellationToken cancellationToken) =>
+        [.. await database.Database.GetDbConnection().QueryAsync<Guid>(new CommandDefinition(
+            "SELECT account_id FROM access.album_blocks WHERE album_id = @albumId ORDER BY blocked_at, account_id",
+            new { albumId },
+            cancellationToken: cancellationToken))];
+
     public Task<string?> LinkTokenAsync(Guid albumId, CancellationToken cancellationToken) =>
         database.Database.GetDbConnection().ExecuteScalarAsync<string?>(new CommandDefinition(
             "SELECT link_token FROM access.album_audiences WHERE album_id = @albumId",

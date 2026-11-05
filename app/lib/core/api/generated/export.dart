@@ -36,6 +36,7 @@ export 'models/answered_invitation_response.dart';
 export 'models/approve_description_request.dart';
 export 'models/app_version_policy_response.dart';
 export 'models/arrange_request.dart';
+export 'models/blocked_person_response.dart';
 export 'models/choose_place_request.dart';
 export 'models/create_album_request.dart';
 export 'models/created_memory_response.dart';

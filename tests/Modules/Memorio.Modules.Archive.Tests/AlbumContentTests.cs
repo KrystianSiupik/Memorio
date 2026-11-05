@@ -22,7 +22,7 @@ public sealed class AlbumContentTests(ArchiveDatabase database)
         var map = scope.ServiceProvider.GetRequiredService<IMemoryMapQuery>();
         var content = scope.ServiceProvider.GetRequiredService<IAlbumContent>();
 
-        database.Neighbours.Sees(reader, album);
+        database.Neighbours.TakesPart(reader, album);
         Assert.Null(await details.GetAsync(memory.Id.Value, reader, Cancellation));
 
         await content.LinkAsync(memory.Id.Value, album, Cancellation);
@@ -35,6 +35,21 @@ public sealed class AlbumContentTests(ArchiveDatabase database)
 
         Assert.Null(await details.GetAsync(memory.Id.Value, reader, Cancellation));
         Assert.DoesNotContain(await map.GetAsync(reader, null, null, Cancellation), point => point.Id == memory.Id.Value);
+    }
+
+    [Fact]
+    public async Task An_album_read_through_a_link_opens_but_stays_off_the_private_map()
+    {
+        var reader = Guid.CreateVersion7();
+        var album = Guid.CreateVersion7();
+        var memory = await database.AddMemoryAsync(Guid.CreateVersion7());
+        await using var scope = database.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<IAlbumContent>().LinkAsync(memory.Id.Value, album, Cancellation);
+
+        database.Neighbours.Sees(reader, album);
+
+        Assert.NotNull(await scope.ServiceProvider.GetRequiredService<IMemoryDetailsQuery>().GetAsync(memory.Id.Value, reader, Cancellation));
+        Assert.DoesNotContain(await scope.ServiceProvider.GetRequiredService<IMemoryMapQuery>().GetAsync(reader, null, null, Cancellation), point => point.Id == memory.Id.Value);
     }
 
     [Fact]

@@ -111,6 +111,22 @@ internal sealed class AlbumAudience : AggregateRoot<Guid>
         Raise(new UserBlocked(Guid.CreateVersion7(), now, Id, accountId, Sequence));
     }
 
+    /// <summary>
+    /// The owner takes a block back (D-276). It gives nothing back by itself: someone let in through a link comes
+    /// in again through a working link, and someone who was in the album needs a new invitation.
+    /// </summary>
+    public Result Unblock(Guid accountId, DateTimeOffset now)
+    {
+        if (_blocks.RemoveAll(block => block.AccountId == accountId) == 0)
+        {
+            return AccessErrors.AlreadyDecided;
+        }
+
+        Sequence++;
+        Raise(new UserUnblocked(Guid.CreateVersion7(), now, Id, accountId));
+        return Result.Success();
+    }
+
     /// <summary>C65: for a rule, not a person asking. A block wins (D-022).</summary>
     public Result GrantRead(Guid accountId, DateTimeOffset now)
     {
@@ -148,6 +164,8 @@ internal sealed record AccessRevoked(Guid EventId, DateTimeOffset OccurredAt, Gu
 
 /// <summary>E67.</summary>
 internal sealed record UserBlocked(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, Guid AccountId, int Sequence) : IDomainEvent;
+
+internal sealed record UserUnblocked(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, Guid AccountId) : IDomainEvent;
 
 /// <summary>E160.</summary>
 internal sealed record ReadGranted(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, Guid AccountId) : IDomainEvent;

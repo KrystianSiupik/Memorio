@@ -33,6 +33,10 @@ abstract interface class AlbumsRepository {
 
   Future<Result<void, AlbumFailure>> block(String albumId, String accountId);
 
+  Future<Result<void, AlbumFailure>> unblock(String albumId, String accountId);
+
+  Future<Result<List<AlbumViewer>, AlbumFailure>> loadBlocked(String albumId);
+
   Future<Result<AlbumLinkPreview, AlbumFailure>> previewLink(String token);
 
   /// The album it let the person into.

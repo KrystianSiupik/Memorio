@@ -26,6 +26,9 @@ internal static class AudienceEndpoints
         albums.MapDelete("/viewers/{accountId:guid}", RevokeAccessAsync).WithName("RevokeAlbumAccess").WithSummary("The owner takes the access of someone let in; they may come back through a working link.");
         albums.MapPut("/blocks/{accountId:guid}", BlockAsync).WithName("BlockUser").WithSummary("The person may not come in by a link or an invitation, and loses access at once.");
 
+        albums.MapDelete("/blocks/{accountId:guid}", UnblockAsync).WithName("UnblockUser").WithSummary("The owner takes a block back; it gives no access by itself.");
+        albums.MapGet("/blocks", GetBlockedAsync).WithName("GetAlbumBlocks").WithSummary("For the owner: who is blocked in this album.");
+
         var links = v1.MapGroup("/album-links/{token}").WithTags("Access");
         links.MapGet("/", PreviewAsync).WithName("PreviewAlbumLink").WithSummary("Which album a working link leads to.");
         links.MapPost("/entry", EnterAsync).WithName("EnterAlbumByLink").WithSummary("Comes in through the link, by name.");
@@ -71,7 +74,7 @@ internal static class AudienceEndpoints
         var viewers = await queries.ViewersAsync(id, cancellationToken);
         var emails = await directory.EmailsOfAsync([.. viewers.Select(viewer => viewer.AccountId)], cancellationToken);
         return TypedResults.Ok<IReadOnlyList<AlbumViewerResponse>>(
-            [.. viewers.Select(viewer => new AlbumViewerResponse(viewer.AccountId, emails.GetValueOrDefault(viewer.AccountId), viewer.EnteredAt))]);
+            [.. viewers.Select(viewer => new AlbumViewerResponse(viewer.AccountId, emails.GetValueOrDefault(viewer.AccountId), new DateTimeOffset(viewer.EnteredAt)))]);
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> RevokeAccessAsync(Guid id, Guid accountId, ClaimsPrincipal principal, RevokeAccessHandler handler, CancellationToken cancellationToken)
@@ -84,6 +87,31 @@ internal static class AudienceEndpoints
     {
         var blocked = await handler.HandleAsync(id, CurrentAccount.IdOf(principal), accountId, cancellationToken);
         return blocked.IsFailure ? Problems.From(blocked.Error) : TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> UnblockAsync(Guid id, Guid accountId, ClaimsPrincipal principal, UnblockUserHandler handler, CancellationToken cancellationToken)
+    {
+        var unblocked = await handler.HandleAsync(id, CurrentAccount.IdOf(principal), accountId, cancellationToken);
+        return unblocked.IsFailure ? Problems.From(unblocked.Error) : TypedResults.NoContent();
+    }
+
+    private static async Task<Results<Ok<IReadOnlyList<BlockedPersonResponse>>, ProblemHttpResult>> GetBlockedAsync(
+        Guid id,
+        ClaimsPrincipal principal,
+        IAlbumMembership albums,
+        IAudienceQueries queries,
+        IAccountDirectory directory,
+        CancellationToken cancellationToken)
+    {
+        if (await albums.OwnerOfAsync(id, cancellationToken) != CurrentAccount.IdOf(principal))
+        {
+            return Problems.From(AccessErrors.NoAccess);
+        }
+
+        var blocked = await queries.BlockedAsync(id, cancellationToken);
+        var emails = await directory.EmailsOfAsync(blocked, cancellationToken);
+        return TypedResults.Ok<IReadOnlyList<BlockedPersonResponse>>(
+            [.. blocked.Select(accountId => new BlockedPersonResponse(accountId, emails.GetValueOrDefault(accountId)))]);
     }
 
     private static async Task<Results<Ok<AlbumLinkPreviewResponse>, ProblemHttpResult>> PreviewAsync(
@@ -121,6 +149,8 @@ internal static class AudienceEndpoints
 internal sealed record AlbumLinkResponse(string? Token);
 
 internal sealed record AlbumViewerResponse(Guid AccountId, string? Email, DateTimeOffset EnteredAt);
+
+internal sealed record BlockedPersonResponse(Guid AccountId, string? Email);
 
 internal sealed record AlbumLinkPreviewResponse(Guid AlbumId, string AlbumName);
 

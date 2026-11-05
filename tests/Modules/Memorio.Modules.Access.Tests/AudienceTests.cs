@@ -187,6 +187,31 @@ public sealed class AudienceTests(AccessDatabase database)
     }
 
     [Fact]
+    public async Task Only_the_owner_unblocks_and_it_gives_no_access_by_itself()
+    {
+        var (album, owner) = database.Neighbours.NewAlbum();
+        var participant = database.Neighbours.NewParticipant(album);
+        var person = Guid.CreateVersion7();
+        var token = await ShareAsync(album, owner);
+        await EnterAsync(token, person);
+        await using var scope = database.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<BlockUserHandler>().HandleAsync(album, participant, person, Cancellation);
+        var unblock = scope.ServiceProvider.GetRequiredService<UnblockUserHandler>();
+        var reader = scope.ServiceProvider.GetRequiredService<IAccessReader>();
+        var queries = scope.ServiceProvider.GetRequiredService<IAudienceQueries>();
+        Assert.Equal(person, Assert.Single(await queries.BlockedAsync(album, Cancellation)));
+
+        Assert.Equal(AccessErrors.NoAccess, (await unblock.HandleAsync(album, participant, person, Cancellation)).Error);
+        Assert.True((await unblock.HandleAsync(album, owner, person, Cancellation)).IsSuccess);
+        Assert.Equal(AccessErrors.AlreadyDecided, (await unblock.HandleAsync(album, owner, person, Cancellation)).Error);
+
+        Assert.Empty(await queries.BlockedAsync(album, Cancellation));
+        Assert.False(await reader.CanSeeAlbumAsync(person, album, Cancellation));
+        Assert.Equal(album, (await EnterAsync(token, person)).Value);
+        Assert.True(await reader.CanSeeAlbumAsync(person, album, Cancellation));
+    }
+
+    [Fact]
     public async Task A_rule_grants_reading_unless_a_block_stands_in_the_way()
     {
         var (album, owner) = database.Neighbours.NewAlbum();

@@ -179,6 +179,27 @@ internal sealed class BlockUserHandler(IAudiences audiences, IAlbumMembership al
     }
 }
 
+/// <summary>Only the owner takes a block back, also one a participant made (D-276).</summary>
+internal sealed class UnblockUserHandler(IAudiences audiences, IAlbumMembership albums, TimeProvider clock)
+{
+    public async Task<Result> HandleAsync(Guid albumId, Guid ownerAccountId, Guid accountId, CancellationToken cancellationToken)
+    {
+        if (await albums.OwnerOfAsync(albumId, cancellationToken) != ownerAccountId)
+        {
+            return AccessErrors.NoAccess;
+        }
+
+        return await AudienceDecision.UntilStoredAsync(
+            audiences,
+            async () =>
+            {
+                var audience = await audiences.FindAsync(albumId, cancellationToken);
+                return audience is null ? AccessErrors.AlreadyDecided : audience.Unblock(accountId, clock.GetUtcNow());
+            },
+            cancellationToken);
+    }
+}
+
 /// <summary>C65: a rule of another module gives someone the right to read (P31 of E9, D-272).</summary>
 internal sealed class ReadGrants(IAudiences audiences, TimeProvider clock) : IReadGrants
 {

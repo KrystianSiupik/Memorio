@@ -14,6 +14,7 @@ class FakeAlbumsRepository implements AlbumsRepository {
   List<OwnMemory> own = [];
   String? link;
   List<AlbumViewer> viewers = [];
+  List<AlbumViewer> blocked = [];
   AlbumLinkPreview? preview = const AlbumLinkPreview(albumId: 'album-1', albumName: 'Rodzina');
 
   AlbumFailure? loadFailure;
@@ -87,6 +88,12 @@ class FakeAlbumsRepository implements AlbumsRepository {
 
   @override
   Future<Result<void, AlbumFailure>> block(String albumId, String accountId) => _act('blockUser:$accountId');
+
+  @override
+  Future<Result<void, AlbumFailure>> unblock(String albumId, String accountId) => _act('unblock:$accountId');
+
+  @override
+  Future<Result<List<AlbumViewer>, AlbumFailure>> loadBlocked(String albumId) async => _load(blocked);
 
   @override
   Future<Result<AlbumLinkPreview, AlbumFailure>> previewLink(String token) async => _load(preview!);

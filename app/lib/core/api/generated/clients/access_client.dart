@@ -8,6 +8,7 @@ import 'package:retrofit/retrofit.dart';
 import '../models/album_link_preview_response.dart';
 import '../models/album_link_response.dart';
 import '../models/album_viewer_response.dart';
+import '../models/blocked_person_response.dart';
 import '../models/entered_album_response.dart';
 import '../models/shared_album_response.dart';
 
@@ -44,6 +45,14 @@ abstract class AccessClient {
   /// The person may not come in by a link or an invitation, and loses access at once.
   @PUT('/v1/albums/{id}/blocks/{accountId}')
   Future<void> blockUser({@Path('id') required String id, @Path('accountId') required String accountId});
+
+  /// The owner takes a block back; it gives no access by itself.
+  @DELETE('/v1/albums/{id}/blocks/{accountId}')
+  Future<void> unblockUser({@Path('id') required String id, @Path('accountId') required String accountId});
+
+  /// For the owner: who is blocked in this album.
+  @GET('/v1/albums/{id}/blocks')
+  Future<List<BlockedPersonResponse>> getAlbumBlocks({@Path('id') required String id});
 
   /// Which album a working link leads to.
   @GET('/v1/album-links/{token}')

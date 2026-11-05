@@ -42,6 +42,15 @@ internal sealed class AccessReader(IAlbumMembership membership, AccessDbContext 
         return [.. members.Union(viewed).Except(blocked)];
     }
 
+    public async Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken)
+    {
+        var blocked = await database.Database.GetDbConnection().QueryAsync<Guid>(new CommandDefinition(
+            "SELECT album_id FROM access.album_blocks WHERE account_id = @personId",
+            new { personId },
+            cancellationToken: cancellationToken));
+        return [.. (await membership.AlbumsOfAsync(personId, cancellationToken)).Except(blocked)];
+    }
+
     public Task<bool> IsBlockedAsync(Guid albumId, Guid accountId, CancellationToken cancellationToken) =>
         database.Database.GetDbConnection().ExecuteScalarAsync<bool>(new CommandDefinition(
             "SELECT EXISTS (SELECT 1 FROM access.album_blocks WHERE album_id = @albumId AND account_id = @accountId)",

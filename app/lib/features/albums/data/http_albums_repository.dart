@@ -172,6 +172,16 @@ class HttpAlbumsRepository implements AlbumsRepository {
       _attempt(() => access.blockUser(id: albumId, accountId: accountId));
 
   @override
+  Future<Result<void, AlbumFailure>> unblock(String albumId, String accountId) =>
+      _attempt(() => access.unblockUser(id: albumId, accountId: accountId));
+
+  @override
+  Future<Result<List<AlbumViewer>, AlbumFailure>> loadBlocked(String albumId) => _attempt(() async {
+    final items = await access.getAlbumBlocks(id: albumId);
+    return [for (final item in items) AlbumViewer(accountId: item.accountId, email: item.email)];
+  });
+
+  @override
   Future<Result<AlbumLinkPreview, AlbumFailure>> previewLink(String token) => _attempt(() async {
     final preview = await access.previewAlbumLink(token: token);
     return AlbumLinkPreview(albumId: preview.albumId, albumName: preview.albumName);

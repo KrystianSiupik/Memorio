@@ -79,6 +79,12 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
     }
   }
 
+  Future<void> _unblock(String accountId) async {
+    if (await act(() => albums.unblock(widget.albumId, accountId))) {
+      ref.invalidate(albumBlockedProvider(widget.albumId));
+    }
+  }
+
   Future<void> _copy(String address) async {
     await Clipboard.setData(ClipboardData(text: address));
     if (mounted) {
@@ -99,6 +105,7 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
     final album = ref.watch(albumDetailsProvider(widget.albumId)).value;
     final link = ref.watch(albumLinkProvider(widget.albumId)).value;
     final viewers = ref.watch(albumViewersProvider(widget.albumId)).value ?? const <AlbumViewer>[];
+    final blocked = ref.watch(albumBlockedProvider(widget.albumId)).value ?? const <AlbumViewer>[];
     return Scaffold(
       appBar: AppBar(title: Text(l10n.albumManage)),
       body: Column(
@@ -192,6 +199,19 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
                         child: Text(l10n.albumRevokeAccess),
                       ),
                     ),
+                  if (blocked.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Text(l10n.albumBlockedPeople, style: Theme.of(context).textTheme.titleMedium),
+                    for (final person in blocked)
+                      ListTile(
+                        key: Key('s11-blocked-${person.accountId}'),
+                        title: Text(person.label),
+                        trailing: TextButton(
+                          onPressed: offline || busy ? null : () => _unblock(person.accountId),
+                          child: Text(l10n.albumUnblock),
+                        ),
+                      ),
+                  ],
                 ],
               ),
             ),
