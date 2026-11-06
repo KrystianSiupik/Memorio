@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import '../domain/map_point.dart';
+import 'map_context_menu.dart' if (dart.library.js_interop) 'map_context_menu_web.dart';
 import 'map_providers.dart';
 
 /// Where the base map (`basemap.pmtiles`, fonts) is served from, set at build time:
@@ -57,6 +58,7 @@ class MapLibreMapView extends ConsumerStatefulWidget {
 class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
   late final Future<String> _style = _loadStyle();
   MapLibreMapController? _controller;
+  void Function()? _stopContextMenu;
   var _layersReady = false;
 
   Future<String> _loadStyle() async {
@@ -123,6 +125,9 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
     _layersReady = true;
     controller.onFeatureTapped.add(_featureTapped);
     controller.onFeatureHover.add(_featureHovered);
+    _stopContextMenu ??= listenToMapContextMenu(
+      (latitude, longitude, x, y) => ref.read(mapMenuProvider.notifier).open(latitude, longitude, Offset(x, y)),
+    );
     final latest = ref.read(mapPointsProvider);
     if (!identical(latest, points)) {
       await controller.setGeoJsonSource(_pointsSource, pointsToGeoJson(latest));
@@ -162,6 +167,7 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
   void dispose() {
     _controller?.onFeatureTapped.remove(_featureTapped);
     _controller?.onFeatureHover.remove(_featureHovered);
+    _stopContextMenu?.call();
     super.dispose();
   }
 
@@ -190,6 +196,12 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
         return MapLibreMap(
           styleString: json,
           trackCameraPosition: true,
+          // On a device the long press opens the menu; in a browser it comes with a double click, which zooms.
+          onMapLongClick: kIsWeb
+              ? null
+              : (point, coordinates) => ref
+                    .read(mapMenuProvider.notifier)
+                    .open(coordinates.latitude, coordinates.longitude, Offset(point.x, point.y)),
           initialCameraPosition: const CameraPosition(target: LatLng(30, 15), zoom: 1.2),
           onMapCreated: (controller) => _controller = controller,
           onStyleLoadedCallback: _addPoints,

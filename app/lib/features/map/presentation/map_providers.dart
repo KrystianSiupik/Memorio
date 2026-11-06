@@ -73,6 +73,24 @@ class HoveredPointNotifier extends Notifier<({String id, Offset at})?> {
   }
 }
 
+/// MEM-E12-PLAT-02: where the menu of the map was asked for (right click, long press); S03 shows it.
+final mapMenuProvider = NotifierProvider<MapMenuNotifier, ({double latitude, double longitude, Offset at})?>(
+  MapMenuNotifier.new,
+);
+
+class MapMenuNotifier extends Notifier<({double latitude, double longitude, Offset at})?> {
+  @override
+  ({double latitude, double longitude, Offset at})? build() => null;
+
+  void open(double latitude, double longitude, Offset at) => state = (latitude: latitude, longitude: longitude, at: at);
+
+  void close() {
+    if (ref.mounted) {
+      state = null;
+    }
+  }
+}
+
 /// The memory whose point was just tapped; the map view lives behind [mapViewProvider], so S03 hears it here.
 final tappedPointProvider = NotifierProvider<TappedPointNotifier, String?>(TappedPointNotifier.new);
 

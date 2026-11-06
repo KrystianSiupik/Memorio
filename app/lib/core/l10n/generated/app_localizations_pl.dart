@@ -438,6 +438,13 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get mapAddMemoryHere => 'Dodaj wspomnienie tutaj';
+
+  @override
+  String get ownPlaceFromMap =>
+      'Współrzędne z mapy są już wpisane: nazwij to miejsce (np. Warszawa) i dodaj je. Możesz też wyszukać miejsce po nazwie powyżej.';
+
+  @override
   String get mapPreviewUnavailable => 'Nie udało się wczytać podglądu.';
 
   @override

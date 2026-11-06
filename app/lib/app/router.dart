@@ -40,6 +40,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                 onOpenTrash: () => const TrashRoute().go(context),
                 onOpenMemory: (id) => MemoryRoute(id).go(context),
                 onReplay: () => const ReplayRoute().go(context),
+                onAddMemoryAt: (latitude, longitude) =>
+                    NewMemoryRoute(latitude: latitude, longitude: longitude).go(context),
               ),
             ),
             routes: [
@@ -53,7 +55,14 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(path: TrashRoute.path, builder: (context, state) => const TrashPage()),
               GoRoute(
                 path: NewMemoryRoute.path,
-                builder: (context, state) => NewMemoryPage(onSaved: () => const MapRoute().go(context)),
+                builder: (context, state) {
+                  final point = NewMemoryRoute.pointOf(state.uri.queryParameters);
+                  return NewMemoryPage(
+                    onSaved: () => const MapRoute().go(context),
+                    initialLatitude: point?.latitude,
+                    initialLongitude: point?.longitude,
+                  );
+                },
               ),
               GoRoute(
                 path: MemoryRoute.path,
