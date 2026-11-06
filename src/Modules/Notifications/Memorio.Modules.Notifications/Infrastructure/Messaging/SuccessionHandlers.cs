@@ -18,6 +18,13 @@ public static class DeathReportRejectedHandler
         services.GetRequiredService<NotifyOfRejectedReport>().HandleAsync(integrationEvent, cancellationToken);
 }
 
+/// <summary>E120 in the worker.</summary>
+public static class DeathReportedHandler
+{
+    public static Task Handle(DeathReportedEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
+        services.GetRequiredService<NotifyOwnerOfReport>().HandleAsync(integrationEvent, cancellationToken);
+}
+
 /// <summary>E126 in the worker.</summary>
 public static class PrivateArchiveSharedHandler
 {

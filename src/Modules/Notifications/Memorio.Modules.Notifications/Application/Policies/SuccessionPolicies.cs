@@ -59,6 +59,18 @@ internal sealed class NotifyOfRejectedReport(IAccountDirectory directory, SendOn
     }
 }
 
+/// <summary>E120: the owner hears about a report of their death while the service has not decided; the answer goes to the service (D-304).</summary>
+internal sealed class NotifyOwnerOfReport(IAccountDirectory directory, SendOnce send) : IIntegrationEventPolicy<DeathReportedEvent>
+{
+    public async Task HandleAsync(DeathReportedEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        if (await directory.EmailOfAsync(integrationEvent.OwnerAccountId, cancellationToken) is { } email)
+        {
+            await send.SendAsync($"reported:{integrationEvent.CaseId}", integrationEvent.Sequence, email, NotificationKind.DeathReported, integrationEvent.AlbumId, cancellationToken);
+        }
+    }
+}
+
 /// <summary>E126: the contact hears they may read. The owner is not named in the message: only after signing in, on this address.</summary>
 internal sealed class NotifyLegacyContact(ILegacyContacts contacts, SendOnce send) : IIntegrationEventPolicy<PrivateArchiveSharedEvent>
 {

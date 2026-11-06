@@ -47,6 +47,9 @@ internal static class NotificationTexts
             NotificationKind.DeathReportRejected => (
                 "Zgłoszenie w GEO nie zostało potwierdzone",
                 $"Nie potwierdziliśmy zgłoszenia dotyczącego: {album}.\n\nAlbum zostaje bez zmian. Jeśli to pomyłka, możesz zgłosić ponownie z czytelnym dokumentem."),
+            NotificationKind.DeathReported => (
+                "Ktoś zgłosił w GEO Twoją śmierć",
+                $"Uczestnik albumu zgłosił Twoją śmierć i przesłał akt zgonu: {album}.\n\nNic się jeszcze nie zmieniło. Obsługa sprawdzi dokument, zanim podejmie decyzję. Jeśli to pomyłka, odpowiedz na tę wiadomość: wtedy nikt nie przejmie Twoich albumów."),
             NotificationKind.PrivateArchiveShared => (
                 "Masz dostęp do prywatnych wspomnień osoby, która Cię wskazała",
                 "Osoba, która wskazała Cię jako kontakt spadkowy, zmarła.\n\nMożesz oglądać jej prywatne wspomnienia na ekranie „Udostępnione mi”, po zalogowaniu na ten adres e-mail. Tylko do odczytu."),
