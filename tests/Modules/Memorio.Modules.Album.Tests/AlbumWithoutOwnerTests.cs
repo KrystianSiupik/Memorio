@@ -221,7 +221,7 @@ public sealed class AlbumWithoutOwnerTests(AlbumDatabase database)
 public sealed class TakeoverReservedHandlerIdempotencyTests(AlbumDatabase database)
 {
     [Fact]
-    public async Task One_deadline_at_the_end_of_the_30_minutes()
+    public async Task One_deadline_a_day_after_the_30_minutes()
     {
         var album = Guid.CreateVersion7();
         var until = new DateTimeOffset(2030, 1, 1, 10, 30, 0, TimeSpan.Zero);
@@ -232,7 +232,7 @@ public sealed class TakeoverReservedHandlerIdempotencyTests(AlbumDatabase databa
         await policy.HandleAsync(reserved, TestContext.Current.CancellationToken);
         await policy.HandleAsync(reserved, TestContext.Current.CancellationToken);
 
-        Assert.Equal(until, database.Deadlines.Find(TakeoverReservationDeadline.JobName, album.ToString())?.ScheduledFor);
+        Assert.Equal(until + SharedAlbum.LatePaymentGrace, database.Deadlines.Find(TakeoverReservationDeadline.JobName, album.ToString())?.ScheduledFor);
     }
 }
 
@@ -284,7 +284,11 @@ public sealed class TakeoverReservationJobIdempotencyTests(AlbumDatabase databas
             Assert.NotNull((await check.ServiceProvider.GetRequiredService<IAlbums>().FindAsync(album, Cancellation))!.ReservedUntil);
 
             await FireAsync(album, until);
-            await FireAsync(album, until);
+            await using var late = database.CreateScope();
+            Assert.Equal(person, (await late.ServiceProvider.GetRequiredService<IAlbums>().FindAsync(album, Cancellation))!.ReservedByAccountId);
+
+            await FireAsync(album, until + SharedAlbum.LatePaymentGrace);
+            await FireAsync(album, until + SharedAlbum.LatePaymentGrace);
         }
 
         await using var after = database.CreateScope();

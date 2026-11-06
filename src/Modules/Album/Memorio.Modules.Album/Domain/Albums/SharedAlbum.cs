@@ -17,6 +17,12 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
     /// <summary>What a participant has to pay in (D-004).</summary>
     public static readonly TimeSpan ReservationTime = TimeSpan.FromMinutes(30);
 
+    /// <summary>
+    /// How long after the 30 minutes a payment still counts for whoever held the reservation, unless someone else reserved
+    /// since: a store purchase started in time may arrive late (D-306).
+    /// </summary>
+    public static readonly TimeSpan LatePaymentGrace = TimeSpan.FromHours(24);
+
     private readonly List<AlbumParticipant> _participants = [];
     private readonly List<AlbumInvitation> _invitations = [];
 
@@ -311,10 +317,13 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
         return Result.Success();
     }
 
-    /// <summary>C157: only a reservation whose time really ended.</summary>
+    /// <summary>
+    /// C157: the 30 minutes alone let someone else reserve; who held it is forgotten only once a late payment can no longer
+    /// count (D-306).
+    /// </summary>
     public void ExpireReservation(DateTimeOffset now)
     {
-        if (ReservedUntil is null || now < ReservedUntil)
+        if (ReservedUntil is null || now < ReservedUntil + LatePaymentGrace)
         {
             return;
         }
@@ -324,10 +333,13 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
         Sequence++;
     }
 
-    /// <summary>C156: whoever holds the reservation and paid. Without a reservation still running: E168, nothing changes.</summary>
+    /// <summary>
+    /// C156: whoever holds the reservation and paid, also late, up to <see cref="LatePaymentGrace"/> after its time, when
+    /// nobody reserved since (D-306). Otherwise E168: nothing changes.
+    /// </summary>
     public Result TakeOver(DateTimeOffset now)
     {
-        if (!IsOwnerless || !HasActiveReservation(now))
+        if (!IsOwnerless || ReservedByAccountId is null || !(now < ReservedUntil + LatePaymentGrace))
         {
             return AlbumErrors.TakeoverExpired;
         }
