@@ -131,6 +131,8 @@
   "albumRemoveParticipant": "Usuń uczestnika",
   "albumSuccessor": "Następca",
   "mapPreviewPhotos": "Zdjęcia: {count}",
+  "mapAddMemoryHere": "Dodaj wspomnienie tutaj",
+  "ownPlaceFromMap": "Współrzędne z mapy są już wpisane: nazwij to miejsce (np. Warszawa) i dodaj je. Możesz też wyszukać miejsce po nazwie powyżej.",
   "mapPreviewUnavailable": "Nie udało się wczytać podglądu.",
   "reportContent": "Zgłoś treść",
   "reportMemoryTitle": "Zgłoś wspomnienie",

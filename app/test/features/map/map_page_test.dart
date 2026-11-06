@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memorio/app/router.dart';
+import 'package:memorio/app/routes.dart';
 import 'package:memorio/core/offline/offline.dart';
 import 'package:memorio/core/result.dart';
 import 'package:memorio/features/account/account.dart';
@@ -99,6 +101,33 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Nie udało się wczytać podglądu.'), findsOneWidget);
+  });
+
+  testWidgets('the menu of the map opens S04 with the point filled in as an own place', (tester) async {
+    tester.view.physicalSize = const Size(1000, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final container = await open(tester);
+
+    container.read(mapMenuProvider.notifier).open(52.2297, 21.0122, const Offset(300, 300));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('s03-menu-add')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('s04-from-map')), findsOneWidget);
+    expect(find.widgetWithText(TextField, '52.229700'), findsOneWidget);
+    expect(find.widgetWithText(TextField, '21.012200'), findsOneWidget);
+  });
+
+  testWidgets('a point that is not on the Earth opens S04 empty', (tester) async {
+    final container = await open(tester);
+
+    container.read(routerProvider).go('${const NewMemoryRoute().location}?lat=123&lng=abc');
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('s04-from-map')), findsNothing);
+    expect(NewMemoryRoute.pointOf(const {'lat': '91', 'lng': '0'}), isNull);
+    expect(NewMemoryRoute.pointOf(const {'lat': '50', 'lng': '19'}), (latitude: 50.0, longitude: 19.0));
   });
 
   testWidgets('people and albums filters are there but off until albums exist', (tester) async {

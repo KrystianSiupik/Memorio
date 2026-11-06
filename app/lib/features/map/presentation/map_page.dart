@@ -16,7 +16,11 @@ class MapPage extends ConsumerWidget {
     required this.onOpenTrash,
     required this.onOpenMemory,
     required this.onReplay,
+    this.onAddMemoryAt,
   });
+
+  /// MEM-E12-PLAT-02: a memory at the point chosen on the map.
+  final void Function(double latitude, double longitude)? onAddMemoryAt;
 
   final VoidCallback onReplay;
 
@@ -51,6 +55,24 @@ class MapPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
 
+    ref.listen(mapMenuProvider, (previous, menu) async {
+      if (menu == null) {
+        return;
+      }
+      ref.read(mapMenuProvider.notifier).close();
+      final box = context.findRenderObject() as RenderBox?;
+      final origin = box?.localToGlobal(Offset.zero) ?? Offset.zero;
+      // The map sits under the app bar: its point is in the map's own space.
+      final at = origin + Offset(0, Scaffold.maybeOf(context)?.appBarMaxHeight ?? 0) + menu.at;
+      final chosen = await showMenu<String>(
+        context: context,
+        position: RelativeRect.fromLTRB(at.dx, at.dy, at.dx, at.dy),
+        items: [PopupMenuItem(key: const Key('s03-menu-add'), value: 'add', child: Text(l10n.mapAddMemoryHere))],
+      );
+      if (chosen == 'add') {
+        onAddMemoryAt?.call(menu.latitude, menu.longitude);
+      }
+    });
     ref.listen(tappedPointProvider, (previous, memoryId) {
       if (memoryId != null) {
         ref.read(tappedPointProvider.notifier).clear();

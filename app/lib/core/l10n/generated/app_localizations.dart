@@ -883,6 +883,18 @@ abstract class AppLocalizations {
   /// **'Zdjęcia: {count}'**
   String mapPreviewPhotos(Object count);
 
+  /// No description provided for @mapAddMemoryHere.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dodaj wspomnienie tutaj'**
+  String get mapAddMemoryHere;
+
+  /// No description provided for @ownPlaceFromMap.
+  ///
+  /// In pl, this message translates to:
+  /// **'Współrzędne z mapy są już wpisane: nazwij to miejsce (np. Warszawa) i dodaj je. Możesz też wyszukać miejsce po nazwie powyżej.'**
+  String get ownPlaceFromMap;
+
   /// No description provided for @mapPreviewUnavailable.
   ///
   /// In pl, this message translates to:

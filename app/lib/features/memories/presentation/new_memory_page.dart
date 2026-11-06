@@ -18,9 +18,19 @@ import 'memory_texts.dart';
 /// S04 New memory, a wizard: place and date, then content. The ids are made once per screen,
 /// so saving again after a failure repeats the same operations instead of doubling them.
 class NewMemoryPage extends ConsumerStatefulWidget {
-  const NewMemoryPage({super.key, required this.onSaved, this.isWeb = kIsWeb});
+  const NewMemoryPage({
+    super.key,
+    required this.onSaved,
+    this.isWeb = kIsWeb,
+    this.initialLatitude,
+    this.initialLongitude,
+  });
 
   final VoidCallback onSaved;
+
+  /// MEM-E12-PLAT-02: the point chosen on the map, filled in as an own place; the person names it.
+  final double? initialLatitude;
+  final double? initialLongitude;
 
   /// The offline queue has no database in a browser (D-115).
   final bool isWeb;
@@ -36,8 +46,8 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
   final _photos = <(String, PickedPhoto)>[];
   final _placeSearch = TextEditingController();
   final _ownName = TextEditingController();
-  final _ownLatitude = TextEditingController();
-  final _ownLongitude = TextEditingController();
+  late final _ownLatitude = TextEditingController(text: widget.initialLatitude?.toStringAsFixed(6));
+  late final _ownLongitude = TextEditingController(text: widget.initialLongitude?.toStringAsFixed(6));
   final _description = TextEditingController();
 
   var _step = 0;
@@ -419,6 +429,7 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
             onTap: () => _choose(option, offline: offline),
           ),
         const SizedBox(height: 12),
+        if (widget.initialLatitude != null) Text(l10n.ownPlaceFromMap, key: const Key('s04-from-map')),
         TextField(
           controller: _ownName,
           decoration: InputDecoration(labelText: l10n.ownPlaceName),

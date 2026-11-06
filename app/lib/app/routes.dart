@@ -62,12 +62,27 @@ final class MemoryRoute extends AppRoute {
 
 /// S04: a new memory, on the way through the map tab.
 final class NewMemoryRoute extends AppRoute {
-  const NewMemoryRoute();
+  const NewMemoryRoute({this.latitude, this.longitude});
 
   static const path = 'new';
 
+  /// MEM-E12-PLAT-02: the point chosen on the map, for an own place.
+  final double? latitude;
+  final double? longitude;
+
   @override
-  String get location => '${MapRoute.path}/$path';
+  String get location => latitude == null || longitude == null
+      ? '${MapRoute.path}/$path'
+      : '${MapRoute.path}/$path?lat=${latitude!.toStringAsFixed(6)}&lng=${longitude!.toStringAsFixed(6)}';
+
+  /// Only a point on the Earth counts; anything else opens S04 empty.
+  static ({double latitude, double longitude})? pointOf(Map<String, String> query) {
+    final latitude = double.tryParse(query['lat'] ?? '');
+    final longitude = double.tryParse(query['lng'] ?? '');
+    return latitude == null || longitude == null || latitude.abs() > 90 || longitude.abs() > 180
+        ? null
+        : (latitude: latitude, longitude: longitude);
+  }
 }
 
 /// S09: albums.
