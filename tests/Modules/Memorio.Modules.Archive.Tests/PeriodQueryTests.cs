@@ -37,6 +37,21 @@ public sealed class PeriodQueryTests(ArchiveDatabase database)
     }
 
     [Fact]
+    public async Task Within_a_day_by_the_hour_and_those_without_one_at_the_end()
+    {
+        var account = Guid.CreateVersion7();
+        var day = new DateOnly(2026, 8, 1);
+        var noHour = await database.AddMemoryAsync(account, dateFrom: day);
+        var evening = await database.AddMemoryAsync(account, dateFrom: day, time: "19:00");
+        var morning = await database.AddMemoryAsync(account, dateFrom: day, time: "08:15");
+
+        var period = await ReadAsync(account);
+
+        Assert.Equal([morning.Id.Value, evening.Id.Value, noHour.Id.Value], period.Select(memory => memory.Id));
+        Assert.Equal(["08:15", "19:00", null], period.Select(memory => memory.Time));
+    }
+
+    [Fact]
     public async Task Only_ones_own_and_albums_one_takes_part_in_and_never_the_trash()
     {
         var (author, reader, viewer) = (Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7());

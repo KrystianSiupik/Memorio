@@ -594,6 +594,17 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get timeChoose => 'Dodaj godzinę (nieobowiązkowo)';
+
+  @override
+  String timeChosen(Object time) {
+    return 'Godzina: $time';
+  }
+
+  @override
+  String get timeClear => 'Bez godziny';
+
+  @override
   String get dateInFuture => 'Wspomnienie nie może być z przyszłości.';
 
   @override

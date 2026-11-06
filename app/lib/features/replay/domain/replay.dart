@@ -10,6 +10,7 @@ class PeriodMemory {
     required this.datePrecision,
     required this.dateFrom,
     required this.dateTo,
+    this.time,
     this.description,
     required this.isMine,
     required this.photos,
@@ -25,6 +26,9 @@ class PeriodMemory {
   final String datePrecision;
   final String dateFrom;
   final String dateTo;
+
+  /// HH:mm, when the person gave the hour; orders memories within a day (D-303).
+  final String? time;
   final String? description;
   final bool isMine;
   final int photos;

@@ -101,9 +101,10 @@ class _MemoryDetailsPageState extends ConsumerState<MemoryDetailsPage> {
     final l10n = context.l10n;
     final active = !offline && !_busy;
     final failure = _failure;
-    final date = memory.dateFrom == memory.dateTo
+    final day = memory.dateFrom == memory.dateTo
         ? dayTextOf(memory.dateFrom)
         : '${dayTextOf(memory.dateFrom)} – ${dayTextOf(memory.dateTo)}';
+    final date = memory.time == null ? day : '$day, ${memory.time}';
 
     return ListView(
       padding: const EdgeInsets.all(16),

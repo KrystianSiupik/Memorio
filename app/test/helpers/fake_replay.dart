@@ -32,6 +32,7 @@ PeriodMemory periodMemory(
   String precision = 'Day',
   String from = '2026-03-01',
   String? to,
+  String? time,
   bool mine = true,
 }) => PeriodMemory(
   id: id,
@@ -41,6 +42,7 @@ PeriodMemory periodMemory(
   datePrecision: precision,
   dateFrom: from,
   dateTo: to ?? from,
+  time: time,
   description: 'Opis $place',
   isMine: mine,
   photos: 0,

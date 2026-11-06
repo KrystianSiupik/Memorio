@@ -46,6 +46,7 @@ class HttpMemoriesRepository implements MemoriesRepository {
         datePrecision: memory.precision.apiName,
         dateFrom: memory.from,
         dateTo: memory.to,
+        time: memory.time,
       ),
     ),
   );
@@ -120,6 +121,7 @@ class HttpMemoriesRepository implements MemoriesRepository {
       placeName: memory.placeName,
       dateFrom: memory.dateFrom,
       dateTo: memory.dateTo,
+      time: memory.time,
       isMine: memory.isMine,
       description: memory.description,
       descriptionIsAi: memory.descriptionIsAi,

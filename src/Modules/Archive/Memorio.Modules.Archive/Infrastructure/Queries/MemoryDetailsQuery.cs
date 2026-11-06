@@ -15,7 +15,7 @@ internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStora
 {
     private const string MemorySql = """
         SELECT id AS "Id", place_name AS "PlaceName", latitude AS "Latitude", longitude AS "Longitude", date_precision AS "DatePrecision",
-               date_from::text AS "DateFrom", date_to::text AS "DateTo", author_account_id AS "AuthorAccountId", description AS "Description",
+               date_from::text AS "DateFrom", date_to::text AS "DateTo", to_char(time_of_day, 'HH24:MI') AS "Time", author_account_id AS "AuthorAccountId", description AS "Description",
                description_ai_model IS NOT NULL AS "DescriptionIsAi"
         FROM archive.memories
         WHERE id = @memoryId AND state = 'Active'
@@ -51,6 +51,7 @@ internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStora
             row.DatePrecision,
             row.DateFrom,
             row.DateTo,
+            row.Time,
             row.AuthorAccountId,
             row.Description,
             row.DescriptionIsAi,
@@ -65,6 +66,7 @@ internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStora
         string DatePrecision,
         string DateFrom,
         string DateTo,
+        string? Time,
         Guid AuthorAccountId,
         string? Description,
         bool DescriptionIsAi);

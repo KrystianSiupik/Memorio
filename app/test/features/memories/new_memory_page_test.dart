@@ -142,6 +142,40 @@ void main() {
     expect(find.widgetWithText(AppBar, 'Mapa'), findsOneWidget);
   });
 
+  testWidgets('a day may get an hour, which can be taken back; other precisions have none', (tester) async {
+    await open(tester);
+    await choosePlace(tester);
+    await chooseToday(tester);
+    await tester.tap(find.byKey(const Key('s04-time')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(find.text('Godzina: 12:00'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('s04-time-clear')));
+    await tester.pump();
+    expect(find.text('Dodaj godzinę (nieobowiązkowo)'), findsOneWidget);
+
+    await tester.tap(find.text('Miesiąc'));
+    await tester.pump();
+    expect(find.byKey(const Key('s04-time')), findsNothing);
+  });
+
+  testWidgets('the hour goes with the memory', (tester) async {
+    await open(tester);
+    await choosePlace(tester);
+    await chooseToday(tester);
+    await tester.tap(find.byKey(const Key('s04-time')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Dalej'));
+    await tester.pumpAndSettle();
+
+    await save(tester);
+
+    expect(memories.created.single.time, '12:00');
+  });
+
   testWidgets('a description not approved is not sent', (tester) async {
     await open(tester);
     await toContent(tester);

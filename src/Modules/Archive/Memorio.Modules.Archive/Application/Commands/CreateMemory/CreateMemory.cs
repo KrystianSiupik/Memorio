@@ -6,14 +6,14 @@ using Memorio.SharedKernel.Results;
 namespace Memorio.Modules.Archive.Application.Commands.CreateMemory;
 
 /// <summary>C12: a person records a memory. The id comes from the client (offline queue): sending it again is the same memory.</summary>
-internal sealed record CreateMemory(Guid Id, Guid AuthorAccountId, string? PlaceReference, string? DatePrecision, string? DateFrom, string? DateTo);
+internal sealed record CreateMemory(Guid Id, Guid AuthorAccountId, string? PlaceReference, string? DatePrecision, string? DateFrom, string? DateTo, string? Time = null);
 
 internal sealed class CreateMemoryHandler(IMemories memories, IPlaceReader places, ITermsReader terms, TimeProvider clock)
 {
     public async Task<Result<Memory>> HandleAsync(CreateMemory command, CancellationToken cancellationToken)
     {
         var now = clock.GetUtcNow();
-        var date = MemoryDate.Create(command.DatePrecision, command.DateFrom, command.DateTo, DateOnly.FromDateTime(now.UtcDateTime));
+        var date = MemoryDate.Create(command.DatePrecision, command.DateFrom, command.DateTo, DateOnly.FromDateTime(now.UtcDateTime), command.Time);
         if (date.IsFailure)
         {
             return date.Error;

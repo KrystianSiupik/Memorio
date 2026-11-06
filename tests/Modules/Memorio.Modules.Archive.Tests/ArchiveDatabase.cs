@@ -79,9 +79,9 @@ public sealed class ArchiveDatabase : PostgresDatabase
         return memory;
     }
 
-    internal async Task<Memory> AddMemoryAsync(Guid accountId, int photos = 0, DateOnly? dateFrom = null, long photoBytes = 0)
+    internal async Task<Memory> AddMemoryAsync(Guid accountId, int photos = 0, DateOnly? dateFrom = null, long photoBytes = 0, string? time = null)
     {
-        var date = MemoryDate.Create("Day", (dateFrom ?? new DateOnly(2026, 7, 1)).ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), null, new DateOnly(2026, 11, 3)).Value;
+        var date = MemoryDate.Create("Day", (dateFrom ?? new DateOnly(2026, 7, 1)).ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), null, new DateOnly(2026, 11, 3), time).Value;
         var memory = Memory.Create(
             new MemoryId(Guid.CreateVersion7()), accountId, new MemoryPlace("osm:N:1", "Giewont", 49.25, 19.93), date, DateTimeOffset.UtcNow);
         for (var photo = 0; photo < photos; photo++)

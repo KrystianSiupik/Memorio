@@ -1171,6 +1171,24 @@ abstract class AppLocalizations {
   /// **'Do: {date}'**
   String dateChosenEnd(Object date);
 
+  /// No description provided for @timeChoose.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dodaj godzinę (nieobowiązkowo)'**
+  String get timeChoose;
+
+  /// No description provided for @timeChosen.
+  ///
+  /// In pl, this message translates to:
+  /// **'Godzina: {time}'**
+  String timeChosen(Object time);
+
+  /// No description provided for @timeClear.
+  ///
+  /// In pl, this message translates to:
+  /// **'Bez godziny'**
+  String get timeClear;
+
   /// No description provided for @dateInFuture.
   ///
   /// In pl, this message translates to:

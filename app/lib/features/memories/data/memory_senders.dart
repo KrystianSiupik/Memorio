@@ -31,6 +31,7 @@ Map<String, OperationSender> memorySenders(MemoriesRepository memories, PlacesRe
           precision: MemoryDatePrecision.values.byName(payload['precision']! as String),
           from: payload['from']! as String,
           to: payload['to'] as String?,
+          time: payload['time'] as String?,
         ),
       ),
     );
