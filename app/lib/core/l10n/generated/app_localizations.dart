@@ -877,6 +877,18 @@ abstract class AppLocalizations {
   /// **'Następca'**
   String get albumSuccessor;
 
+  /// No description provided for @mapPreviewPhotos.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zdjęcia: {count}'**
+  String mapPreviewPhotos(Object count);
+
+  /// No description provided for @mapPreviewUnavailable.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie udało się wczytać podglądu.'**
+  String get mapPreviewUnavailable;
+
   /// No description provided for @reportContent.
   ///
   /// In pl, this message translates to:

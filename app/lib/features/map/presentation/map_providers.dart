@@ -55,6 +55,24 @@ class MapFocusNotifier extends Notifier<MapPoint?> {
   }
 }
 
+/// MEM-E12-PLAT-01: the memory the mouse is over, and where on the map; the map view sets it, S03 shows the card.
+final hoveredPointProvider = NotifierProvider<HoveredPointNotifier, ({String id, Offset at})?>(
+  HoveredPointNotifier.new,
+);
+
+class HoveredPointNotifier extends Notifier<({String id, Offset at})?> {
+  @override
+  ({String id, Offset at})? build() => null;
+
+  void hover(String memoryId, Offset at) => state = (id: memoryId, at: at);
+
+  void leave(String memoryId) {
+    if (ref.mounted && state?.id == memoryId) {
+      state = null;
+    }
+  }
+}
+
 /// The memory whose point was just tapped; the map view lives behind [mapViewProvider], so S03 hears it here.
 final tappedPointProvider = NotifierProvider<TappedPointNotifier, String?>(TappedPointNotifier.new);
 

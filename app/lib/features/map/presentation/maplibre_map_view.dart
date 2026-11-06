@@ -122,6 +122,7 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
     );
     _layersReady = true;
     controller.onFeatureTapped.add(_featureTapped);
+    controller.onFeatureHover.add(_featureHovered);
     final latest = ref.read(mapPointsProvider);
     if (!identical(latest, points)) {
       await controller.setGeoJsonSource(_pointsSource, pointsToGeoJson(latest));
@@ -138,9 +139,29 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
     }
   }
 
+  /// Only single points have a memory id (a UUID); clusters have numbers.
+  void _featureHovered(
+    Point<double> point,
+    LatLng coordinates,
+    String id,
+    Annotation? annotation,
+    HoverEventType eventType,
+  ) {
+    if (!id.contains('-')) {
+      return;
+    }
+    final hovered = ref.read(hoveredPointProvider.notifier);
+    if (eventType == HoverEventType.leave) {
+      hovered.leave(id);
+    } else {
+      hovered.hover(id, Offset(point.x, point.y));
+    }
+  }
+
   @override
   void dispose() {
     _controller?.onFeatureTapped.remove(_featureTapped);
+    _controller?.onFeatureHover.remove(_featureHovered);
     super.dispose();
   }
 

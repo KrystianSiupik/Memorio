@@ -130,6 +130,22 @@ class HttpMemoriesRepository implements MemoriesRepository {
   });
 
   @override
+  Future<Result<MemoryPreview, MemoryFailure>> loadPreview(String id) => _attempt(() async {
+    final preview = await memories.getMemoryPreview(id: id);
+    return MemoryPreview(
+      id: preview.id,
+      placeName: preview.placeName,
+      datePrecision: preview.datePrecision,
+      dateFrom: preview.dateFrom,
+      dateTo: preview.dateTo,
+      time: preview.time,
+      excerpt: preview.excerpt,
+      photos: preview.photos as int,
+      photoUrl: preview.photoUrl,
+    );
+  });
+
+  @override
   Future<Result<void, MemoryFailure>> moveToTrash(String id) => _attempt(() => memories.trashMemory(id: id));
 
   @override

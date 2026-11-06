@@ -63,6 +63,44 @@ void main() {
     expect(find.text('Dodaj pierwsze wspomnienie'), findsNothing);
   });
 
+  testWidgets('hovering a point shows its place, date and the start of its description, and leaving hides it', (
+    tester,
+  ) async {
+    memories.previews['memory-1'] = const MemoryPreview(
+      id: 'memory-1',
+      placeName: 'Giewont',
+      datePrecision: 'Day',
+      dateFrom: '2026-07-01',
+      dateTo: '2026-07-01',
+      time: '09:30',
+      excerpt: 'Wejście o świcie…',
+      photos: 3,
+    );
+    final container = await open(tester);
+
+    container.read(hoveredPointProvider.notifier).hover('memory-1', const Offset(200, 200));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('s03-preview')), findsOneWidget);
+    expect(find.text('Giewont'), findsOneWidget);
+    expect(find.text('01.07.2026, 09:30'), findsOneWidget);
+    expect(find.text('Wejście o świcie…'), findsOneWidget);
+    expect(find.text('Zdjęcia: 3'), findsOneWidget);
+
+    container.read(hoveredPointProvider.notifier).leave('memory-1');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('s03-preview')), findsNothing);
+  });
+
+  testWidgets('a preview that cannot be read says so without covering the map', (tester) async {
+    final container = await open(tester);
+
+    container.read(hoveredPointProvider.notifier).hover('memory-1', const Offset(200, 200));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nie udało się wczytać podglądu.'), findsOneWidget);
+  });
+
   testWidgets('people and albums filters are there but off until albums exist', (tester) async {
     await open(tester);
 

@@ -433,6 +433,14 @@ class AppLocalizationsPl extends AppLocalizations {
   String get albumSuccessor => 'Następca';
 
   @override
+  String mapPreviewPhotos(Object count) {
+    return 'Zdjęcia: $count';
+  }
+
+  @override
+  String get mapPreviewUnavailable => 'Nie udało się wczytać podglądu.';
+
+  @override
   String get reportContent => 'Zgłoś treść';
 
   @override

@@ -5,6 +5,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/offline/offline.dart';
 import '../../memories/memories.dart';
 import 'map_providers.dart';
+import 'memory_preview_card.dart';
 
 /// S03 Map and globe. Points stay on the map through a reload and a lost connection: the provider
 /// keeps the last answer, so only the message around them changes.
@@ -65,6 +66,7 @@ class MapPage extends ConsumerWidget {
       }
     });
 
+    final hovered = ref.watch(hoveredPointProvider);
     final pins = ref.watch(memoryPinsProvider);
     final range = ref.watch(memoryDateFilterProvider);
     final pending = ref.watch(pendingOperationsProvider).value ?? const <PendingOperation>[];
@@ -95,6 +97,27 @@ class MapPage extends ConsumerWidget {
       body: Stack(
         children: [
           Positioned.fill(child: ref.watch(mapViewProvider)),
+          if (hovered != null)
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // Next to the point, turned towards the middle so the card stays on the screen.
+                final left = hovered.at.dx + 16 + MemoryPreviewCard.width > constraints.maxWidth
+                    ? hovered.at.dx - 16 - MemoryPreviewCard.width
+                    : hovered.at.dx + 16;
+                final top = hovered.at.dy > constraints.maxHeight / 2 ? null : hovered.at.dy + 16;
+                final bottom = top == null ? constraints.maxHeight - hovered.at.dy + 16 : null;
+                return Stack(
+                  children: [
+                    Positioned(
+                      left: left.clamp(8, constraints.maxWidth),
+                      top: top,
+                      bottom: bottom,
+                      child: MemoryPreviewCard(memoryId: hovered.id),
+                    ),
+                  ],
+                );
+              },
+            ),
           Positioned(
             top: 8,
             left: 8,

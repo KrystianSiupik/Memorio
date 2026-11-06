@@ -564,6 +564,38 @@
         }
       }
     },
+    "/v1/memories/{id}/preview": {
+      "get": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "What the map shows on hovering a memory: the place, the date, the first photo and the start of the description.",
+        "operationId": "GetMemoryPreview",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemoryPreviewResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/memories/{id}/description": {
       "put": {
         "tags": [
@@ -3918,6 +3950,65 @@
               "string"
             ],
             "format": "double"
+          }
+        }
+      },
+      "MemoryPreviewResponse": {
+        "required": [
+          "id",
+          "placeName",
+          "datePrecision",
+          "dateFrom",
+          "dateTo",
+          "time",
+          "excerpt",
+          "photos",
+          "photoUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "placeName": {
+            "type": "string"
+          },
+          "datePrecision": {
+            "type": "string"
+          },
+          "dateFrom": {
+            "type": "string"
+          },
+          "dateTo": {
+            "type": "string"
+          },
+          "time": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "excerpt": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "photos": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "photoUrl": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uri"
           }
         }
       },

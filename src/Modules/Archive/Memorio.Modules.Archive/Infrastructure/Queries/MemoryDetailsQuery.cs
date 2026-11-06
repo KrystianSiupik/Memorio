@@ -59,6 +59,26 @@ internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStora
             [.. photos.Select(photo => new MemoryPhoto(photo.Id, signed[new StorageKey(photo.StorageKey)].Url))]);
     }
 
+    public async Task<MemoryPreview?> PreviewAsync(Guid memoryId, Guid accountId, CancellationToken cancellationToken)
+    {
+        if (await FindAsync(memoryId, accountId, cancellationToken) is not { } row)
+        {
+            return null;
+        }
+
+        var photos = (await database.Database.GetDbConnection().QueryAsync<PhotoRow>(
+            new CommandDefinition(PhotosSql, new { memoryId }, cancellationToken: cancellationToken))).ToList();
+        Uri? first = null;
+        if (photos.Count > 0)
+        {
+            var key = new StorageKey(photos[0].StorageKey);
+            first = (await storage.SignReadsAsync([key], cancellationToken))[key].Url;
+        }
+
+        return new MemoryPreview(
+            row.Id, row.PlaceName, row.DatePrecision, row.DateFrom, row.DateTo, row.Time, MemoryPreview.ExcerptOf(row.Description), photos.Count, first);
+    }
+
     private async Task<MemoryRow?> FindAsync(Guid memoryId, Guid accountId, CancellationToken cancellationToken)
     {
         var visibleAlbums = (await access.VisibleAlbumsAsync(accountId, cancellationToken)).ToArray();

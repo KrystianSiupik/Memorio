@@ -50,6 +50,9 @@ abstract interface class MemoriesRepository {
 
   Future<Result<MemoryDetails, MemoryFailure>> loadDetails(String id);
 
+  /// MEM-E12-PLAT-01.
+  Future<Result<MemoryPreview, MemoryFailure>> loadPreview(String id);
+
   /// To the trash for 30 days.
   Future<Result<void, MemoryFailure>> moveToTrash(String id);
 
