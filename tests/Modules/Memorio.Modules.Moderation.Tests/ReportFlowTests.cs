@@ -29,16 +29,17 @@ public sealed class ReportFlowTests(ModerationTestDatabase database)
         return (await scope.ServiceProvider.GetRequiredService<IReports>().FindAsync(new ReportId(id), Cancellation))!;
     }
 
-    internal static async Task WriteActionAsync(ModerationTestDatabase database, Guid reportId, string kind, string outcome, string statement = "Uzasadnienie.")
+    internal static async Task WriteActionAsync(ModerationTestDatabase database, Guid reportId, string kind, string outcome, string statement = "Uzasadnienie.", string decidedBy = "test")
     {
         await using var connection = await database.OpenAsAsync(ModerationTestDatabase.Role);
         await using var command = new NpgsqlCommand(
-            "INSERT INTO moderation.operator_actions (id, kind, report_id, outcome, statement, decided_by, decided_at) VALUES (gen_random_uuid(), @kind, @report, @outcome, @statement, 'test', now())",
+            "INSERT INTO moderation.operator_actions (id, kind, report_id, outcome, statement, decided_by, decided_at) VALUES (gen_random_uuid(), @kind, @report, @outcome, @statement, @by, now())",
             connection);
         command.Parameters.AddWithValue("kind", kind);
         command.Parameters.AddWithValue("report", reportId);
         command.Parameters.AddWithValue("outcome", outcome);
         command.Parameters.AddWithValue("statement", statement);
+        command.Parameters.AddWithValue("by", decidedBy);
         await command.ExecuteNonQueryAsync(Cancellation);
     }
 
@@ -141,7 +142,7 @@ public sealed class ReportFlowTests(ModerationTestDatabase database)
             Assert.True((await scope.ServiceProvider.GetRequiredService<ReportDecisionHandler>().HandleAsync(new AppealDecision(new ReportId(id), author, "To moje zdjęcie."), Cancellation)).IsSuccess);
         }
 
-        await WriteActionAsync(database, id, OperatorAction.DecideAppeal, "Reversed", "Autor ma zgodę.");
+        await WriteActionAsync(database, id, OperatorAction.DecideAppeal, "Reversed", "Autor ma zgodę.", decidedBy: "test2");
         await FireAsync(database);
 
         var closed = await FindAsync(id);
@@ -149,6 +150,29 @@ public sealed class ReportFlowTests(ModerationTestDatabase database)
         Assert.False(closed.Hidden);
         Assert.True(await ModerationTestDatabase.EventuallyAsync(async () => await database.QueuedEventsAsync(nameof(ContentRestoredEvent), id) == 1));
         Assert.True(await ModerationTestDatabase.EventuallyAsync(async () => await database.QueuedEventsAsync(nameof(AppealDecidedEvent), id) == 1));
+    }
+
+    [Fact]
+    public async Task Three_unfounded_reports_in_90_days_suspend_reporting_and_the_reporter_is_told_each_time()
+    {
+        var reader = Guid.CreateVersion7();
+        for (var report = 0; report < Report.UnfoundedToSuspend; report++)
+        {
+            var (memory, _, _) = database.Neighbours.NewMemory();
+            database.Neighbours.Sees(memory, reader);
+            var id = Guid.CreateVersion7();
+            Assert.True((await ReportAsync(id, reader, "Memory", memory)).IsSuccess);
+            await WriteActionAsync(database, id, OperatorAction.Decide, "Unfounded", "Zdjęcie widoku z okna.");
+            await FireAsync(database);
+            Assert.True(await ModerationTestDatabase.EventuallyAsync(async () => await database.QueuedEventsAsync(nameof(ReportDecidedEvent), id) == 1));
+            Assert.True((await FindAsync(id)).Unfounded);
+        }
+
+        var (next, _, _) = database.Neighbours.NewMemory();
+        database.Neighbours.Sees(next, reader);
+        Assert.Equal(ReportErrors.ReportingSuspended, (await ReportAsync(Guid.CreateVersion7(), reader, "Memory", next, nameof(ReportReason.Threat))).Error);
+        var (other, _, someoneElse) = database.Neighbours.NewMemory();
+        Assert.True((await ReportAsync(Guid.CreateVersion7(), someoneElse, "Memory", other)).IsSuccess);
     }
 
     [Fact]

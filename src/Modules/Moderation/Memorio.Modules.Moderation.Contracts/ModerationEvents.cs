@@ -30,10 +30,11 @@ public sealed record ContentHiddenEvent(
 public sealed record ContentReportedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid ReportId, string Category, Guid? AuthorAccountId, bool HiddenNow, int Sequence) : IIntegrationEvent;
 
 /// <summary>E112: decided with reasons for both sides; <paramref name="Verdict"/> is Removed or Kept. The reasons come from <see cref="IReportNotices"/>.</summary>
-public sealed record ReportDecidedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid ReportId, string Verdict, Guid? AuthorAccountId, int Sequence) : IIntegrationEvent;
+/// <paramref name="Unfounded"/>: kept, and the report was manifestly unfounded; the reporter is warned (D-315).
+public sealed record ReportDecidedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid ReportId, string Verdict, bool Unfounded, Guid? AuthorAccountId, int Sequence) : IIntegrationEvent;
 
-/// <summary>The author's appeal is decided; reversed shows the content again.</summary>
-public sealed record AppealDecidedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid ReportId, bool Reversed, Guid AuthorAccountId, int Sequence) : IIntegrationEvent;
+/// <summary>An appeal is decided: the author's against a removal, or the reporter's against keeping it (<paramref name="ByReporter"/>, D-314).</summary>
+public sealed record AppealDecidedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid ReportId, bool Reversed, bool ByReporter, Guid? AuthorAccountId, int Sequence) : IIntegrationEvent;
 
 /// <summary>The hold ended: a decision kept the content, or an appeal reversed the removal.</summary>
 public sealed record ContentRestoredEvent(Guid EventId, DateTimeOffset OccurredAt, Guid HoldId, Guid ResourceId, int Sequence) : IIntegrationEvent;

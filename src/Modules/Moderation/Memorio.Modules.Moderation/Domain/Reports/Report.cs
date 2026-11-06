@@ -61,6 +61,14 @@ internal sealed class Report : AggregateRoot<ReportId>
 
     public const int MaximumLocationLength = 1_000;
 
+    /// <summary>D-315: three manifestly unfounded reports within this time suspend reporting...</summary>
+    public static readonly TimeSpan UnfoundedWindow = TimeSpan.FromDays(90);
+
+    /// <summary>...for this long (DSA art. 23, after the warning each unfounded decision gives).</summary>
+    public static readonly TimeSpan Suspension = TimeSpan.FromDays(183);
+
+    public const int UnfoundedToSuspend = 3;
+
     /// <summary>DSA art. 20: at least six months to appeal.</summary>
     public static readonly TimeSpan AppealWindow = TimeSpan.FromDays(183);
 
@@ -105,6 +113,9 @@ internal sealed class Report : AggregateRoot<ReportId>
 
     public string? DecidedBy { get; private set; }
 
+    /// <summary>Kept, and the report was manifestly unfounded: it counts towards suspending the reporter (D-315).</summary>
+    public bool Unfounded { get; private set; }
+
     public DateTimeOffset? DecidedAt { get; private set; }
 
     public DateTimeOffset? AppealUntil { get; private set; }
@@ -112,6 +123,9 @@ internal sealed class Report : AggregateRoot<ReportId>
     public string? AppealText { get; private set; }
 
     public DateTimeOffset? AppealedAt { get; private set; }
+
+    /// <summary>The appeal came from the reporter, against keeping the content (D-314); otherwise from the author.</summary>
+    public bool? AppealByReporter { get; private set; }
 
     public bool? AppealReversed { get; private set; }
 
@@ -196,11 +210,16 @@ internal sealed class Report : AggregateRoot<ReportId>
     }
 
     /// <summary>C111: one decision, with its reasons for both sides (DSA art. 17). Removed hides the content, kept shows it again.</summary>
-    public Result Decide(Verdict verdict, string? statement, string? decidedBy, DateTimeOffset now)
+    public Result Decide(Verdict verdict, string? statement, string? decidedBy, DateTimeOffset now, bool unfounded = false)
     {
         if (State != ReportState.Open)
         {
             return ReportErrors.AlreadyDecided;
+        }
+
+        if (unfounded && verdict != Reports.Verdict.Kept)
+        {
+            return ReportErrors.InvalidDecision;
         }
 
         var reasons = statement?.Trim();
@@ -214,22 +233,26 @@ internal sealed class Report : AggregateRoot<ReportId>
         Statement = reasons;
         DecidedBy = decidedBy.Trim();
         DecidedAt = now;
-        AppealUntil = verdict == Reports.Verdict.Removed && AuthorAccountId is not null ? now + AppealWindow : null;
+        Unfounded = unfounded;
+        // The side the decision went against may appeal: the author a removal, the reporter with an account keeping it (D-314).
+        AppealUntil = (verdict == Reports.Verdict.Removed ? AuthorAccountId : ReporterAccountId) is not null ? now + AppealWindow : null;
         Sequence++;
-        Raise(new ReportDecided(Guid.CreateVersion7(), now, Id, verdict, AuthorAccountId, Sequence));
+        Raise(new ReportDecided(Guid.CreateVersion7(), now, Id, verdict, unfounded, AuthorAccountId, Sequence));
         ShowOrHide(verdict == Reports.Verdict.Removed, now);
         return Result.Success();
     }
 
-    /// <summary>C112: only the author, only against a removal, within the window, once.</summary>
+    /// <summary>C112: the side the decision went against, within the window, once (DSA art. 20, D-314).</summary>
     public Result Appeal(Guid accountId, string? text, DateTimeOffset now)
     {
-        if (accountId != AuthorAccountId)
+        var byReporter = accountId == ReporterAccountId;
+        if (accountId != AuthorAccountId && !byReporter)
         {
             return ReportErrors.NoAccess;
         }
 
-        if (State != ReportState.Decided || Verdict != Reports.Verdict.Removed || !(now < AppealUntil))
+        var against = byReporter ? Reports.Verdict.Kept : Reports.Verdict.Removed;
+        if (State != ReportState.Decided || Verdict != against || !(now < AppealUntil))
         {
             return ReportErrors.AlreadyDecided;
         }
@@ -241,6 +264,7 @@ internal sealed class Report : AggregateRoot<ReportId>
         }
 
         State = ReportState.Appealed;
+        AppealByReporter = byReporter;
         AppealText = reasons;
         AppealedAt = now;
         Sequence++;
@@ -248,7 +272,7 @@ internal sealed class Report : AggregateRoot<ReportId>
         return Result.Success();
     }
 
-    /// <summary>The decision on the appeal, with its own reasons. Reversed shows the content again.</summary>
+    /// <summary>The decision on the appeal, with its own reasons. Reversed turns the first decision around: a removal shows the content again, keeping it hides it.</summary>
     public Result DecideAppeal(bool reversed, string? statement, string? decidedBy, DateTimeOffset now)
     {
         if (State != ReportState.Appealed)
@@ -262,13 +286,19 @@ internal sealed class Report : AggregateRoot<ReportId>
             return ReportErrors.InvalidDecision;
         }
 
+        // D-316: an appeal is decided by somebody else than the first decision (HS-007).
+        if (string.Equals(decidedBy.Trim(), DecidedBy, StringComparison.OrdinalIgnoreCase))
+        {
+            return ReportErrors.SameDecider;
+        }
+
         State = ReportState.Closed;
         AppealReversed = reversed;
         AppealStatement = reasons;
         AppealDecidedAt = now;
         Sequence++;
-        Raise(new AppealDecided(Guid.CreateVersion7(), now, Id, reversed, AuthorAccountId!.Value, Sequence));
-        ShowOrHide(!reversed, now);
+        Raise(new AppealDecided(Guid.CreateVersion7(), now, Id, reversed, AppealByReporter == true, AuthorAccountId, Sequence));
+        ShowOrHide(Verdict == Reports.Verdict.Removed ? !reversed : reversed, now);
         return Result.Success();
     }
 
@@ -316,7 +346,7 @@ internal sealed class Report : AggregateRoot<ReportId>
 internal sealed record ContentReported(Guid EventId, DateTimeOffset OccurredAt, ReportId ReportId, ReportCategory Category, Guid? AuthorAccountId, bool HiddenNow, int Sequence) : IDomainEvent;
 
 /// <summary>E112.</summary>
-internal sealed record ReportDecided(Guid EventId, DateTimeOffset OccurredAt, ReportId ReportId, Verdict Verdict, Guid? AuthorAccountId, int Sequence) : IDomainEvent;
+internal sealed record ReportDecided(Guid EventId, DateTimeOffset OccurredAt, ReportId ReportId, Verdict Verdict, bool Unfounded, Guid? AuthorAccountId, int Sequence) : IDomainEvent;
 
 /// <summary>E113.</summary>
 internal sealed record ContentHidden(Guid EventId, DateTimeOffset OccurredAt, ReportId ReportId, ReportTarget Target, Guid ResourceId, Guid? AuthorAccountId, int Sequence) : IDomainEvent;
@@ -327,7 +357,7 @@ internal sealed record ContentRestored(Guid EventId, DateTimeOffset OccurredAt, 
 /// <summary>E114: the service sees it in the queue.</summary>
 internal sealed record AppealFiled(Guid EventId, DateTimeOffset OccurredAt, ReportId ReportId, int Sequence) : IDomainEvent;
 
-internal sealed record AppealDecided(Guid EventId, DateTimeOffset OccurredAt, ReportId ReportId, bool Reversed, Guid AuthorAccountId, int Sequence) : IDomainEvent;
+internal sealed record AppealDecided(Guid EventId, DateTimeOffset OccurredAt, ReportId ReportId, bool Reversed, bool ByReporter, Guid? AuthorAccountId, int Sequence) : IDomainEvent;
 
 internal static class ReportErrors
 {
@@ -342,6 +372,12 @@ internal static class ReportErrors
     public static readonly Error OwnContent = Error.Validation("Moderation.OwnContent", "Your own content you can change or delete yourself.");
 
     public static readonly Error AlreadyDecided = Error.Conflict("Moderation.AlreadyDecided", "This has already been decided.");
+
+    public static readonly Error SameDecider = Error.Conflict("Moderation.SameDecider", "An appeal is decided by somebody else than the first decision.");
+
+    public static readonly Error ReportingSuspended = Error.Forbidden(
+        "Moderation.ReportingSuspended",
+        "Your reports are not accepted for now: three of them were manifestly unfounded within 90 days.");
 
     /// <summary>The same answer for content that does not exist and content the person does not see.</summary>
     public static readonly Error NoAccess = Error.Forbidden("Moderation.NoAccess", "No access to this content.");
@@ -364,7 +400,7 @@ internal sealed class OperatorAction
 
     public Guid ReportId { get; private set; }
 
-    /// <summary>For a decision: Removed or Kept; for an appeal: Reversed or Upheld.</summary>
+    /// <summary>For a decision: Removed, Kept or Unfounded (kept, and counted against the reporter); for an appeal: Reversed or Upheld.</summary>
     public string Outcome { get; private set; } = "";
 
     public string Statement { get; private set; } = "";
@@ -387,6 +423,11 @@ internal sealed class OperatorAction
 internal interface IReports
 {
     Task<Report?> FindAsync(ReportId id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// D-315: three unfounded reports of this reporter within 90 days, the last of them less than the suspension ago.
+    /// </summary>
+    Task<bool> IsSuspendedAsync(string reporterKey, DateTimeOffset now, CancellationToken cancellationToken);
 
     /// <summary>The open report of the same person about the same thing, if any.</summary>
     Task<Report?> FindOpenAsync(Report like, CancellationToken cancellationToken);

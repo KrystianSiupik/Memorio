@@ -57,6 +57,9 @@ public sealed class FakeModerationNeighbours : IAlbumMembership, IAccessReader, 
         return (memory, author, reader);
     }
 
+    /// <summary>One more person sees this memory.</summary>
+    public void Sees(Guid memory, Guid person) => _memories[memory].Seen.Add(person);
+
     public (Guid Album, Guid Owner, Guid Member) NewAlbum()
     {
         var (album, owner, member) = (Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7());

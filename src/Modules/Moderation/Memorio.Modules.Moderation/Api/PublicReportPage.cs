@@ -57,6 +57,14 @@ internal static class PublicReportPage
         var reported = await handler.HandleAsync(
             new SubmitPublicReport(new ReportId(id), form["email"], form["location"], form["reason"], form["explanation"]),
             cancellationToken);
+        if (reported.IsFailure && reported.Error == ReportErrors.ReportingSuspended)
+        {
+            return Results.Content(
+                Page("Nie przyjmujemy teraz Twoich zgłoszeń", "<p>Trzy Twoje zgłoszenia w ciągu 90 dni uznaliśmy za oczywiście bezzasadne, więc przez 6 miesięcy od ostatniego nie przyjmujemy zgłoszeń z tego adresu.</p>"),
+                "text/html; charset=utf-8",
+                statusCode: 403);
+        }
+
         return reported.IsFailure
             ? Invalid()
             : Results.Content(

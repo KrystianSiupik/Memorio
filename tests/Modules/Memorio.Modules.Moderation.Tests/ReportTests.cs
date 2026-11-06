@@ -65,7 +65,7 @@ public sealed class ReportTests
         Assert.True(illegal.Decide(Verdict.Kept, "To nie jest groźba.", "obsluga", Now).IsSuccess);
         Assert.Single(illegal.DomainEvents.OfType<ContentRestored>());
         Assert.False(illegal.Hidden);
-        Assert.Null(illegal.AppealUntil);
+        Assert.Equal(Now + Report.AppealWindow, illegal.AppealUntil);
     }
 
     [Fact]
@@ -93,6 +93,37 @@ public sealed class ReportTests
         Assert.Single(report.DomainEvents.OfType<ContentRestored>());
         Assert.Equal(ReportState.Closed, report.State);
         Assert.Equal(ReportErrors.AlreadyDecided, report.DecideAppeal(reversed: false, "x", "obsluga", Now).Error);
+    }
+
+    [Fact]
+    public void The_reporter_appeals_keeping_and_a_reversal_hides_it()
+    {
+        var reporter = Guid.CreateVersion7();
+        var report = Report.Submit(new ReportId(Guid.CreateVersion7()), reporter, ReportTarget.Memory, Guid.CreateVersion7(), Guid.CreateVersion7(), "PersonalData", "Moje dane.", Now).Value;
+        report.Decide(Verdict.Kept, "Brak danych.", "obsluga", Now);
+
+        Assert.Equal(Now + Report.AppealWindow, report.AppealUntil);
+        Assert.True(report.Appeal(reporter, "Na zdjęciu jest mój adres.", Now).IsSuccess);
+        Assert.Equal(true, report.AppealByReporter);
+        report.ClearDomainEvents();
+        Assert.True(report.DecideAppeal(reversed: true, "Widać adres.", "obsluga2", Now).IsSuccess);
+
+        Assert.True(report.Hidden);
+        Assert.Single(report.DomainEvents.OfType<ContentHidden>());
+        Assert.True(Assert.Single(report.DomainEvents.OfType<AppealDecided>()).ByReporter);
+    }
+
+    [Fact]
+    public void An_appeal_is_decided_by_somebody_else_and_unfounded_is_only_for_keeping()
+    {
+        var author = Guid.CreateVersion7();
+        var report = Reported(author: author);
+        Assert.Equal(ReportErrors.InvalidDecision, report.Decide(Verdict.Removed, "x", "obsluga", Now, unfounded: true).Error);
+        report.Decide(Verdict.Removed, "Dane osobowe.", "obsluga", Now);
+        report.Appeal(author, "Nie zgadzam się.", Now);
+
+        Assert.Equal(ReportErrors.SameDecider, report.DecideAppeal(reversed: true, "Jednak tak.", " Obsluga ", Now).Error);
+        Assert.True(report.DecideAppeal(reversed: false, "Dane są widoczne.", "obsluga2", Now).IsSuccess);
     }
 
     [Fact]

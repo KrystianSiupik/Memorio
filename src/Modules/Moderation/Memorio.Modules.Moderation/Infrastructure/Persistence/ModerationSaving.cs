@@ -60,11 +60,11 @@ internal static class ModerationSaving
         ContentReported reported => outbox.PublishAsync(new ContentReportedEvent(
             reported.EventId, reported.OccurredAt, reported.ReportId.Value, reported.Category.ToString(), reported.AuthorAccountId, reported.HiddenNow, reported.Sequence)),
         ReportDecided decided => outbox.PublishAsync(new ReportDecidedEvent(
-            decided.EventId, decided.OccurredAt, decided.ReportId.Value, decided.Verdict.ToString(), decided.AuthorAccountId, decided.Sequence)),
+            decided.EventId, decided.OccurredAt, decided.ReportId.Value, decided.Verdict.ToString(), decided.Unfounded, decided.AuthorAccountId, decided.Sequence)),
         ContentHidden hidden => outbox.PublishAsync(new ContentHiddenEvent(
             hidden.EventId, hidden.OccurredAt, hidden.ReportId.Value, hidden.Target.ToString(), hidden.ResourceId, hidden.AuthorAccountId, hidden.Sequence)),
         ContentRestored restored => outbox.PublishAsync(new ContentRestoredEvent(restored.EventId, restored.OccurredAt, restored.ReportId.Value, restored.ResourceId, restored.Sequence)),
-        AppealDecided appeal => outbox.PublishAsync(new AppealDecidedEvent(appeal.EventId, appeal.OccurredAt, appeal.ReportId.Value, appeal.Reversed, appeal.AuthorAccountId, appeal.Sequence)),
+        AppealDecided appeal => outbox.PublishAsync(new AppealDecidedEvent(appeal.EventId, appeal.OccurredAt, appeal.ReportId.Value, appeal.Reversed, appeal.ByReporter, appeal.AuthorAccountId, appeal.Sequence)),
 
         RemovalOrderReceived removal => outbox.PublishAsync(new RemovalOrderReceivedEvent(removal.EventId, removal.OccurredAt, removal.OrderId.Value, removal.Sequence)),
         DataOrderReceived data => outbox.PublishAsync(new DataOrderReceivedEvent(data.EventId, data.OccurredAt, data.OrderId.Value, data.Sequence)),

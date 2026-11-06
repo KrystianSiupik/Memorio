@@ -538,6 +538,13 @@ class AppLocalizationsPl extends AppLocalizations {
   String get myModerationAppealUpheld => 'Odwołanie nieuwzględnione.';
 
   @override
+  String get myModerationReporterAppealReversed => 'Odwołanie uwzględnione: treść została ukryta.';
+
+  @override
+  String get reportSuspended =>
+      'Nie przyjmujemy teraz Twoich zgłoszeń: trzy w ciągu 90 dni uznaliśmy za oczywiście bezzasadne.';
+
+  @override
   String get myModerationAppealReason => 'Dlaczego decyzja jest błędna';
 
   @override

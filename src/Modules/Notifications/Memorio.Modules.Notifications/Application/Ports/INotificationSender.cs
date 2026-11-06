@@ -28,6 +28,10 @@ internal enum NotificationKind
     AppealReversed,
     AppealUpheld,
     ContentHiddenByOrder,
+    ReporterAppealReversed,
+    ContentRemovedOnAppeal,
+    ReporterAppealUpheld,
+    ReportUnfounded,
     PrivateArchiveShared,
 }
 

@@ -36,6 +36,12 @@ internal sealed class SubmitReportHandler(IReports reports, IReportedMemories me
     /// <summary>The same id, or the open report of the same person about the same thing, is the answer; nothing new waits in the queue.</summary>
     public static async Task<Result<ReportId>> StoreAsync(IReports reports, Report report, CancellationToken cancellationToken)
     {
+        // A suspended reporter hides nothing and grows no queue (D-315).
+        if (await reports.IsSuspendedAsync(report.ReporterKey, report.ReportedAt, cancellationToken))
+        {
+            return ReportErrors.ReportingSuspended;
+        }
+
         for (var attempt = 0; attempt < 2; attempt++)
         {
             if (await reports.FindAsync(report.Id, cancellationToken) is { } known)
@@ -69,7 +75,7 @@ internal sealed class SubmitPublicReportHandler(IReports reports, TimeProvider c
 }
 
 /// <summary>C111 and the decision on an appeal, as the service wrote them (D-309).</summary>
-internal sealed record DecideReport(ReportId Id, Verdict Verdict, string? Statement, string? DecidedBy);
+internal sealed record DecideReport(ReportId Id, Verdict Verdict, string? Statement, string? DecidedBy, bool Unfounded = false);
 
 internal sealed record DecideAppeal(ReportId Id, bool Reversed, string? Statement, string? DecidedBy);
 
@@ -79,7 +85,7 @@ internal sealed record AppealDecision(ReportId Id, Guid AccountId, string? Text)
 internal sealed class ReportDecisionHandler(IReports reports, TimeProvider clock)
 {
     public Task<Result> HandleAsync(DecideReport command, CancellationToken cancellationToken) =>
-        DecideAsync(command.Id, report => report.Decide(command.Verdict, command.Statement, command.DecidedBy, clock.GetUtcNow()), cancellationToken);
+        DecideAsync(command.Id, report => report.Decide(command.Verdict, command.Statement, command.DecidedBy, clock.GetUtcNow(), command.Unfounded), cancellationToken);
 
     public Task<Result> HandleAsync(DecideAppeal command, CancellationToken cancellationToken) =>
         DecideAsync(command.Id, report => report.DecideAppeal(command.Reversed, command.Statement, command.DecidedBy, clock.GetUtcNow()), cancellationToken);

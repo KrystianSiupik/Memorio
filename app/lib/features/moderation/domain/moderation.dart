@@ -42,6 +42,9 @@ class MyReport {
     this.verdict,
     this.statement,
     required this.reportedAt,
+    this.appealUntil,
+    this.appealReversed,
+    this.appealStatement,
   });
 
   final String id;
@@ -54,6 +57,12 @@ class MyReport {
   final String? verdict;
   final String? statement;
   final DateTime reportedAt;
+  final DateTime? appealUntil;
+  final bool? appealReversed;
+  final String? appealStatement;
+
+  /// The reporter may appeal keeping the content while the window lasts (DSA art. 20, D-314).
+  bool canAppeal(DateTime now) => state == 'Decided' && verdict == 'Kept' && (appealUntil?.isAfter(now) ?? false);
 }
 
 /// R18: a report about the person's own content. Who reported it is never known here.
@@ -118,6 +127,11 @@ final class ModerationOwnContent extends ModerationFailure {
 
 final class ModerationInvalidInput extends ModerationFailure {
   const ModerationInvalidInput();
+}
+
+/// Three manifestly unfounded reports within 90 days (D-315).
+final class ModerationSuspended extends ModerationFailure {
+  const ModerationSuspended();
 }
 
 final class ModerationAlreadyDecided extends ModerationFailure {

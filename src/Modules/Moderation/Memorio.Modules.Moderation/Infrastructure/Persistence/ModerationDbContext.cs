@@ -51,9 +51,11 @@ internal sealed class ModerationDbContext(DbContextOptions<ModerationDbContext> 
             item.Property(found => found.Statement).HasColumnName("statement").HasMaxLength(Report.MaximumExplanationLength);
             item.Property(found => found.DecidedBy).HasColumnName("decided_by").HasMaxLength(200);
             item.Property(found => found.DecidedAt).HasColumnName("decided_at");
+            item.Property(found => found.Unfounded).HasColumnName("unfounded");
             item.Property(found => found.AppealUntil).HasColumnName("appeal_until");
             item.Property(found => found.AppealText).HasColumnName("appeal_text").HasMaxLength(Report.MaximumExplanationLength);
             item.Property(found => found.AppealedAt).HasColumnName("appealed_at");
+            item.Property(found => found.AppealByReporter).HasColumnName("appeal_by_reporter");
             item.Property(found => found.AppealReversed).HasColumnName("appeal_reversed");
             item.Property(found => found.AppealStatement).HasColumnName("appeal_statement").HasMaxLength(Report.MaximumExplanationLength);
             item.Property(found => found.AppealDecidedAt).HasColumnName("appeal_decided_at");
@@ -62,6 +64,7 @@ internal sealed class ModerationDbContext(DbContextOptions<ModerationDbContext> 
             item.Property(found => found.TargetKey).HasColumnName("target_key").HasMaxLength(Report.MaximumLocationLength);
             item.Ignore(found => found.DomainEvents);
             item.HasIndex(found => found.ReporterAccountId).HasDatabaseName("ix_reports_reporter");
+            item.HasIndex(found => found.ReporterKey).HasDatabaseName("ix_reports_unfounded").HasFilter("unfounded");
             item.HasIndex(found => found.AuthorAccountId).HasDatabaseName("ix_reports_author");
             // One open report of a person about a thing (S2:C2): a second at the same moment loses and reads the first.
             item.HasIndex(found => new { found.ReporterKey, found.TargetKey }).HasDatabaseName("ux_reports_open").IsUnique().HasFilter("state = 'Open'");

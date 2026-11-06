@@ -27,6 +27,7 @@ String moderationFailureText(AppLocalizations l10n, Object? failure) => switch (
   ModerationOffline() => l10n.authOffline,
   ModerationNoAccess() => l10n.reportNoAccess,
   ModerationOwnContent() => l10n.reportOwnContent,
+  ModerationSuspended() => l10n.reportSuspended,
   ModerationInvalidInput() => l10n.invalidInput,
   ModerationAlreadyDecided() => l10n.alreadyDecided,
   _ => l10n.serverError,

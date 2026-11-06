@@ -11,7 +11,20 @@ internal interface IModerationQueries
 /// <param name="Target">Memory or Album.</param>
 /// <param name="State">Open, Decided, Appealed or Closed.</param>
 /// <param name="Verdict">Removed or Kept, once decided.</param>
-internal sealed record MyReport(Guid Id, string Target, Guid? TargetId, string Reason, string State, string? Verdict, string? Statement, DateTimeOffset ReportedAt, DateTimeOffset? DecidedAt);
+/// <param name="AppealUntil">Set while the reporter may appeal keeping the content (D-314).</param>
+internal sealed record MyReport(
+    Guid Id,
+    string Target,
+    Guid? TargetId,
+    string Reason,
+    string State,
+    string? Verdict,
+    string? Statement,
+    DateTimeOffset ReportedAt,
+    DateTimeOffset? DecidedAt,
+    DateTimeOffset? AppealUntil,
+    bool? AppealReversed,
+    string? AppealStatement);
 
 /// <param name="Hidden">Nobody else sees it because of this report now.</param>
 /// <param name="AppealUntil">Set while an appeal is possible.</param>

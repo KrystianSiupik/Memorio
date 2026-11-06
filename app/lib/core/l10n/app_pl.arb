@@ -163,6 +163,8 @@
   "myModerationAppealPending": "Odwołanie czeka na decyzję.",
   "myModerationAppealReversed": "Odwołanie uwzględnione: treść jest znów widoczna.",
   "myModerationAppealUpheld": "Odwołanie nieuwzględnione.",
+  "myModerationReporterAppealReversed": "Odwołanie uwzględnione: treść została ukryta.",
+  "reportSuspended": "Nie przyjmujemy teraz Twoich zgłoszeń: trzy w ciągu 90 dni uznaliśmy za oczywiście bezzasadne.",
   "myModerationAppealReason": "Dlaczego decyzja jest błędna",
   "myModerationAppealUntil": "Możesz się odwołać do {date}.",
   "myModerationAppeal": "Odwołaj się",
