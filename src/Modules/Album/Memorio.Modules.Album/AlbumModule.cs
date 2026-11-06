@@ -50,6 +50,7 @@ public sealed class AlbumModule : IModule
         services.AddScoped<IAlbumMessaging, AlbumMessaging>();
         services.AddScoped<IAlbumSuccession, AlbumSuccession>();
         services.AddScoped<CreateAlbumHandler>();
+        services.AddScoped<CreateAlbumFromPeriodHandler>();
         services.AddScoped<InviteToAlbumHandler>();
         services.AddScoped<AnswerInvitationHandler>();
         services.AddScoped<WithdrawInvitationHandler>();

@@ -15,6 +15,9 @@ public interface IAlbumContent
     /// <summary>The memory no longer is in the album; photos its pool paid for go back to the author's. Safe to call again.</summary>
     Task UnlinkAsync(Guid memoryId, Guid albumId, CancellationToken cancellationToken);
 
+    /// <summary>R7 for C71: the person's own active memories in a period, oldest first; only those may go into an album (D-248).</summary>
+    Task<IReadOnlyList<Guid>> OwnInPeriodAsync(Guid accountId, DateOnly from, DateOnly to, CancellationToken cancellationToken);
+
     /// <summary>What goes when this album comes down to the limit: the owner's choice stays first, then the oldest (D-284).</summary>
     Task<IReadOnlyList<Guid>> ChooseToTrimAsync(Guid albumId, IReadOnlyCollection<Guid> keptMemoryIds, long limitBytes, CancellationToken cancellationToken);
 

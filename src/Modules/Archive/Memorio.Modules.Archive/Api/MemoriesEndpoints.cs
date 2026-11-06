@@ -10,6 +10,7 @@ using Memorio.Modules.Archive.Application.Commands.CreateMemory;
 using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
 using Memorio.Modules.Archive.Application.Queries.MemoryMap;
 using Memorio.Modules.Archive.Application.Queries.MyMemories;
+using Memorio.Modules.Archive.Application.Queries.Period;
 using Memorio.Modules.Archive.Application.Queries.Trash;
 using Memorio.Modules.Archive.Application.Queries.TrimMaterial;
 using Memorio.Modules.Archive.Domain.Memories;
@@ -33,6 +34,9 @@ internal static class MemoriesEndpoints
         memories.MapGet("/map", GetMapAsync)
             .WithName("GetMemoryMap")
             .WithSummary("One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap.");
+        memories.MapGet("/period", GetPeriodAsync)
+            .WithName("GetPeriod")
+            .WithSummary("Everything the person may see in a period (yyyy-MM-dd, both days in), in order, with the first photos.");
         memories.MapGet("/mine", GetMineAsync)
             .WithName("ListMyMemories")
             .WithSummary("The person's own active memories, newest first.");
@@ -234,6 +238,33 @@ internal static class MemoriesEndpoints
             [.. points.Select(point => new MemoryPointResponse(point.Id, point.Latitude, point.Longitude))]);
     }
 
+    private static async Task<Results<Ok<IReadOnlyList<PeriodMemoryResponse>>, ProblemHttpResult>> GetPeriodAsync(
+        string? from,
+        string? to,
+        ClaimsPrincipal principal,
+        IPeriodQuery query,
+        CancellationToken cancellationToken)
+    {
+        if (!TryParsePeriod(from, to, out var first, out var last))
+        {
+            return Problems.From(MemoryErrors.InvalidDate);
+        }
+
+        var memories = await query.GetAsync(CurrentAccount.IdOf(principal), first, last, cancellationToken);
+        return TypedResults.Ok<IReadOnlyList<PeriodMemoryResponse>>(
+            [.. memories.Select(memory => new PeriodMemoryResponse(
+                memory.Id, memory.PlaceName, memory.Latitude, memory.Longitude, memory.DatePrecision, memory.DateFrom, memory.DateTo,
+                memory.Description, memory.IsMine, memory.Photos, memory.PhotoUrls))]);
+    }
+
+    /// <summary>Both days required, in order; a period is what the person chose, never everything (S2:C1).</summary>
+    internal static bool TryParsePeriod(string? from, string? to, out DateOnly first, out DateOnly last)
+    {
+        first = last = default;
+        return TryParseDate(from, out var start) && TryParseDate(to, out var end) && start is { } a && end is { } b && a <= b
+            && (first = a) == a && (last = b) == b;
+    }
+
     private static bool TryParseDate(string? value, out DateOnly? date)
     {
         date = null;
@@ -281,6 +312,8 @@ internal sealed record RequestDataDeletionRequest(bool Confirmed);
 internal sealed record TrashedMemoryResponse(Guid Id, string PlaceName, string DateFrom, string? Description, int Photos, DateTimeOffset TrashedAt, int DaysLeft);
 
 internal sealed record MyMemoryResponse(Guid Id, string PlaceName, string DateFrom);
+
+internal sealed record PeriodMemoryResponse(Guid Id, string PlaceName, double Latitude, double Longitude, string DatePrecision, string DateFrom, string DateTo, string? Description, bool IsMine, int Photos, IReadOnlyList<Uri> PhotoUrls);
 
 internal sealed record MemoryPointResponse(Guid Id, double Latitude, double Longitude);
 

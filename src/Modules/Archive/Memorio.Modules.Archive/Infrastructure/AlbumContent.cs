@@ -1,5 +1,6 @@
 using Dapper;
 using Memorio.Modules.Archive.Application.Commands.AddPhoto;
+using Memorio.Modules.Archive.Application.Queries.Period;
 using Memorio.Modules.Archive.Application.Queries.TrimMaterial;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Archive.Domain.Memories;
@@ -9,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Memorio.Modules.Archive.Infrastructure;
 
-internal sealed class AlbumContent(ArchiveDbContext database, IMemories memories, ISpacePool personalPool, IAlbumPool albumPool, AddPhotoHandler addPhoto, ITrimMaterialQuery material)
+internal sealed class AlbumContent(ArchiveDbContext database, IMemories memories, ISpacePool personalPool, IAlbumPool albumPool, AddPhotoHandler addPhoto, ITrimMaterialQuery material, IPeriodQuery period)
     : IAlbumContent
 {
     public async Task<AlbumMemoryFacts?> DescribeAsync(Guid memoryId, CancellationToken cancellationToken)
@@ -33,6 +34,9 @@ internal sealed class AlbumContent(ArchiveDbContext database, IMemories memories
             cancellationToken: cancellationToken));
         return rows.ToDictionary(row => row.Id, row => new AlbumMemorySummary(row.PlaceName, row.DateFrom, row.Photos));
     }
+
+    public Task<IReadOnlyList<Guid>> OwnInPeriodAsync(Guid accountId, DateOnly from, DateOnly to, CancellationToken cancellationToken) =>
+        period.OwnAsync(accountId, from, to, cancellationToken);
 
     public async Task<IReadOnlyList<Guid>> ChooseToTrimAsync(Guid albumId, IReadOnlyCollection<Guid> keptMemoryIds, long limitBytes, CancellationToken cancellationToken)
     {

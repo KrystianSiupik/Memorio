@@ -28,6 +28,7 @@ internal static class AlbumsEndpoints
         var albums = v1.MapGroup("/albums").WithTags("Albums");
 
         albums.MapPost("/", CreateAsync).WithName("CreateAlbum").WithSummary("Creates an album; the id comes from the client, so a retry changes nothing.");
+        albums.MapPost("/from-period", CreateFromPeriodAsync).WithName("CreateAlbumFromPeriod").WithSummary("An album of the person's own memories of a period (yyyy-MM-dd); the id comes from the client, so a retry changes nothing.");
         albums.MapGet("/", ListAsync).WithName("ListAlbums").WithSummary("The albums the person owns or takes part in.");
         albums.MapGet("/kept-contributions", KeptAsync).WithName("ListKeptContributions").WithSummary("What stayed in albums the person is no longer in.");
         albums.MapGet("/entrusted", EntrustedAsync).WithName("ListEntrusted").WithSummary("Memories entrusted to the person as a curator.");
@@ -57,6 +58,20 @@ internal static class AlbumsEndpoints
 
     private static async Task<Results<NoContent, ProblemHttpResult>> CreateAsync(CreateAlbumRequest request, ClaimsPrincipal principal, CreateAlbumHandler handler, CancellationToken cancellationToken) =>
         Answer(await handler.HandleAsync(new CreateAlbum(request.Id, CurrentAccount.IdOf(principal), request.Name), cancellationToken));
+
+    private static async Task<Results<Ok<PeriodAlbumResponse>, ProblemHttpResult>> CreateFromPeriodAsync(CreateAlbumFromPeriodRequest request, ClaimsPrincipal principal, CreateAlbumFromPeriodHandler handler, CancellationToken cancellationToken)
+    {
+        var culture = System.Globalization.CultureInfo.InvariantCulture;
+        if (!DateOnly.TryParseExact(request.From, "yyyy-MM-dd", culture, System.Globalization.DateTimeStyles.None, out var from)
+            || !DateOnly.TryParseExact(request.To, "yyyy-MM-dd", culture, System.Globalization.DateTimeStyles.None, out var to)
+            || from > to)
+        {
+            return Problems.From(AlbumErrors.InvalidPeriod);
+        }
+
+        var created = await handler.HandleAsync(new CreateAlbumFromPeriod(request.Id, CurrentAccount.IdOf(principal), request.Name, from, to), cancellationToken);
+        return created.IsFailure ? Problems.From(created.Error) : TypedResults.Ok(new PeriodAlbumResponse(created.Value.Added, created.Value.NotFitting));
+    }
 
     private static async Task<Ok<IReadOnlyList<AlbumListItemResponse>>> ListAsync(ClaimsPrincipal principal, IAlbumQueries queries, CancellationToken cancellationToken)
     {
@@ -249,6 +264,10 @@ internal static class AlbumsEndpoints
 
 /// <param name="Id">A UUID the client made for this album; the idempotency key.</param>
 internal sealed record CreateAlbumRequest(Guid Id, string? Name);
+
+internal sealed record CreateAlbumFromPeriodRequest(Guid Id, string? Name, string? From, string? To);
+
+internal sealed record PeriodAlbumResponse(int Added, int NotFitting);
 
 /// <param name="Id">A UUID the client made for this invitation.</param>
 internal sealed record InviteRequest(Guid Id, string? Email);

@@ -14,6 +14,7 @@ using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
 using Memorio.Modules.Archive.Application.Queries.MemoryMap;
 using Memorio.Modules.Archive.Application.Queries.MyMemories;
 using Memorio.Modules.Archive.Application.Queries.Trash;
+using Memorio.Modules.Archive.Application.Queries.Period;
 using Memorio.Modules.Archive.Application.Queries.TrimMaterial;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Archive.Domain.Memories;
@@ -70,6 +71,7 @@ public sealed class ArchiveModule : IModule
         services.AddScheduledJob<TrashSweepJob>(TrashSweepJob.JobName, TrashSweepJob.Cron);
         services.AddScoped<RestoreMemoryHandler>();
         services.AddScoped<ITrimMaterialQuery, TrimMaterialQuery>();
+        services.AddScoped<IPeriodQuery, PeriodQuery>();
         services.AddScoped<TrimArchiveHandler>();
         services.AddScoped<RestoreTrimmedHandler>();
         services.AddScoped<TrimWhenOrdered>();
