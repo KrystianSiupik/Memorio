@@ -19,6 +19,8 @@ public sealed class AnonymousEndpointsTests
         "* /health",
         "GET /openapi/{documentName}.json",
         "* /ready",
+        "GET /report",
+        "POST /report",
         "GET /v1/app/version-policy",
         "POST /v1/auth/external/{provider}",
         "POST /v1/auth/login",

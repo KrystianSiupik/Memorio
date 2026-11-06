@@ -100,6 +100,7 @@ services:
       Limits__ConnectionString: &limits Host=postgres;Database=memorio;Username=memorio_limits;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Access__ConnectionString: &access Host=postgres;Database=memorio;Username=memorio_access;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Succession__ConnectionString: &succession Host=postgres;Database=memorio;Username=memorio_succession;Maximum Pool Size=5;Timeout=5;Password=memorio_local
+      Moderation__ConnectionString: &moderation Host=postgres;Database=memorio;Username=memorio_moderation;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Notifications__ConnectionString: &notifications Host=postgres;Database=memorio;Username=memorio_notifications;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Album__ConnectionString: &album Host=postgres;Database=memorio;Username=memorio_album;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Archive__ConnectionString: &archive Host=postgres;Database=memorio;Username=memorio_archive;Maximum Pool Size=5;Timeout=5;Password=memorio_local
@@ -130,6 +131,7 @@ services:
       Limits__ConnectionString: *limits
       Access__ConnectionString: *access
       Succession__ConnectionString: *succession
+      Moderation__ConnectionString: *moderation
       Notifications__ConnectionString: *notifications
       Album__ConnectionString: *album
       Archive__ConnectionString: *archive

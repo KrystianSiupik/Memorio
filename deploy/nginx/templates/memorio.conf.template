@@ -3,6 +3,7 @@
 
 # Sign-in and registration: 10 attempts a minute per address, bursts of 20 (password guessing).
 limit_req_zone $binary_remote_addr zone=auth:10m rate=10r/m;
+limit_req_zone $binary_remote_addr zone=report:10m rate=5r/m;
 limit_req_status 429;
 
 server {
@@ -51,6 +52,12 @@ server {
 
     location /v1/auth/ {
         limit_req zone=auth burst=20 nodelay;
+        proxy_pass $api;
+    }
+
+    # Reporting without an account (S21): anonymous, so a few per address.
+    location = /report {
+        limit_req zone=report burst=5 nodelay;
         proxy_pass $api;
     }
 

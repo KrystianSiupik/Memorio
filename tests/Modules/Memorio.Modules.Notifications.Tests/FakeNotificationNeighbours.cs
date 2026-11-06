@@ -1,13 +1,20 @@
 using System.Collections.Concurrent;
 using Memorio.Modules.Account.Contracts;
 using Memorio.Modules.Album.Contracts;
+using Memorio.Modules.Moderation.Contracts;
 using Memorio.Modules.Notifications.Application.Ports;
 using Memorio.Modules.Succession.Contracts;
 
 namespace Memorio.Modules.Notifications.Tests;
 
-public sealed class FakeNotificationNeighbours : IAlbumMessaging, IAccountDirectory, INotificationSender, ITakeoverOffers, ILegacyContacts
+public sealed class FakeNotificationNeighbours : IAlbumMessaging, IAccountDirectory, INotificationSender, ITakeoverOffers, ILegacyContacts, IReportNotices
 {
+    private readonly ConcurrentDictionary<Guid, ReportNotice> _notices = new();
+
+    public void Notice(Guid reportId, ReportNotice notice) => _notices[reportId] = notice;
+
+    public Task<ReportNotice?> NoticeOfAsync(Guid reportId, CancellationToken cancellationToken) => Task.FromResult(_notices.GetValueOrDefault(reportId));
+
     private readonly ConcurrentDictionary<Guid, OpenTakeoverOffer> _offers = new();
     private readonly ConcurrentDictionary<Guid, string> _contacts = new();
 

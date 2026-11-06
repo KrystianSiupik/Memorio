@@ -1,6 +1,7 @@
 using Dapper;
 using Memorio.Modules.Access.Contracts;
 using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
+using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Archive.Infrastructure.Persistence;
 using Memorio.SharedKernel.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ namespace Memorio.Modules.Archive.Infrastructure.Queries;
 /// The author's own memory, one in an album the person may see now, or a private one of someone who named them as their legacy contact (ADR 0011, S2:C8).
 /// Photos as addresses signed for this read, valid for 5 minutes.
 /// </summary>
-internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStorage storage, IAccessReader access) : IMemoryDetailsQuery
+internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStorage storage, IAccessReader access) : IMemoryDetailsQuery, IReportedMemories
 {
     private const string MemorySql = """
         SELECT id AS "Id", place_name AS "PlaceName", latitude AS "Latitude", longitude AS "Longitude", date_precision AS "DatePrecision",
@@ -29,14 +30,14 @@ internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStora
         SELECT id AS "Id", storage_key AS "StorageKey" FROM archive.photos WHERE memory_id = @memoryId ORDER BY id
         """;
 
+    public async Task<Guid?> AuthorSeenByAsync(Guid memoryId, Guid personId, CancellationToken cancellationToken) =>
+        (await FindAsync(memoryId, personId, cancellationToken))?.AuthorAccountId;
+
     public async Task<MemoryDetails?> GetAsync(Guid memoryId, Guid accountId, CancellationToken cancellationToken)
     {
         var connection = database.Database.GetDbConnection();
-        var visibleAlbums = (await access.VisibleAlbumsAsync(accountId, cancellationToken)).ToArray();
-        var legacyArchives = (await access.LegacyArchivesAsync(accountId, cancellationToken)).ToArray();
-        var row = await connection.QuerySingleOrDefaultAsync<MemoryRow>(
-            new CommandDefinition(MemorySql, new { memoryId, accountId, visibleAlbums, legacyArchives }, cancellationToken: cancellationToken));
-        if (row is null || (row.AuthorAccountId != accountId && (await access.HiddenFromAsync(accountId, [memoryId], cancellationToken)).Count > 0))
+        var row = await FindAsync(memoryId, accountId, cancellationToken);
+        if (row is null)
         {
             return null;
         }
@@ -56,6 +57,17 @@ internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStora
             row.Description,
             row.DescriptionIsAi,
             [.. photos.Select(photo => new MemoryPhoto(photo.Id, signed[new StorageKey(photo.StorageKey)].Url))]);
+    }
+
+    private async Task<MemoryRow?> FindAsync(Guid memoryId, Guid accountId, CancellationToken cancellationToken)
+    {
+        var visibleAlbums = (await access.VisibleAlbumsAsync(accountId, cancellationToken)).ToArray();
+        var legacyArchives = (await access.LegacyArchivesAsync(accountId, cancellationToken)).ToArray();
+        var row = await database.Database.GetDbConnection().QuerySingleOrDefaultAsync<MemoryRow>(
+            new CommandDefinition(MemorySql, new { memoryId, accountId, visibleAlbums, legacyArchives }, cancellationToken: cancellationToken));
+        return row is null || (row.AuthorAccountId != accountId && (await access.HiddenFromAsync(accountId, [memoryId], cancellationToken)).Count > 0)
+            ? null
+            : row;
     }
 
     private sealed record MemoryRow(
