@@ -29,7 +29,10 @@ public sealed record ParticipantTaggedEvent(Guid EventId, DateTimeOffset Occurre
 /// <summary>E162: the album has no owner. Only the effect, whatever the cause (D-001).</summary>
 public sealed record AlbumWithoutOwnerEvent(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, int Sequence) : IIntegrationEvent;
 
-/// <summary>The successor took the album over.</summary>
+/// <summary>D-307: the living owner offers the album to this person, until <paramref name="AnswerBy"/>.</summary>
+public sealed record HandoverOfferedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, Guid ToAccountId, DateTimeOffset AnswerBy, int Sequence) : IIntegrationEvent;
+
+/// <summary>The successor took the album over, or the person the living owner handed it to (D-307).</summary>
 public sealed record AlbumOwnerChangedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, Guid OwnerAccountId, int Sequence) : IIntegrationEvent;
 
 /// <summary>E165: someone holds the album until this time.</summary>

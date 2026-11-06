@@ -433,6 +433,56 @@ class AppLocalizationsPl extends AppLocalizations {
   String get albumSuccessor => 'Następca';
 
   @override
+  String get albumHandover => 'Przekazanie albumu';
+
+  @override
+  String get albumHandoverExplain =>
+      'Możesz już teraz przekazać album komuś z uczestników. Ta osoba zostanie właścicielem, a Ty zostaniesz w albumie jako uczestnik.';
+
+  @override
+  String get albumHandOver => 'Przekaż album';
+
+  @override
+  String albumHandoverTo(Object person) {
+    return 'Przekazać album: $person?';
+  }
+
+  @override
+  String get albumHandoverQuestion =>
+      'Co z Twoimi własnymi wspomnieniami w tym albumie? Zdecyduj teraz: zostaną w albumie albo wyjmiemy je z niego, gdy ta osoba przyjmie album. U Ciebie zostaną w obu przypadkach.';
+
+  @override
+  String get albumHandoverKeep => 'Zostają w albumie';
+
+  @override
+  String get albumHandoverTake => 'Zabieram je';
+
+  @override
+  String albumHandoverWaiting(Object date, Object person) {
+    return 'Czeka na odpowiedź: $person, do $date.';
+  }
+
+  @override
+  String get albumHandoverWithdraw => 'Wycofaj propozycję';
+
+  @override
+  String albumHandoverForMe(Object date) {
+    return 'Właściciel chce Ci przekazać ten album. Możesz odpowiedzieć do $date.';
+  }
+
+  @override
+  String get albumHandoverOwnerKeeps => 'Jego wspomnienia zostaną w albumie.';
+
+  @override
+  String get albumHandoverOwnerTakes => 'Jego wspomnienia zostaną z albumu wyjęte.';
+
+  @override
+  String get albumHandoverAccept => 'Przejmuję album';
+
+  @override
+  String get albumHandoverRefuse => 'Odmawiam';
+
+  @override
   String get albumNoSuccessor => 'Nie wskazano następcy';
 
   @override

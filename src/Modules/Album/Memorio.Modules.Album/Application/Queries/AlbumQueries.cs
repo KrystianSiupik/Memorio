@@ -3,6 +3,9 @@ namespace Memorio.Modules.Album.Application.Queries;
 /// <summary>R20: facts only; whether the person may do something follows from them at the edge.</summary>
 internal sealed record TakeoverState(bool IsOwnerless, Guid? ReservedByAccountId, DateTimeOffset? ReservedUntil);
 
+/// <summary>D-307: the handover that waits, if any.</summary>
+internal sealed record HandoverState(Guid OwnerAccountId, Guid? ToAccountId, bool KeepsContributions, DateTimeOffset? Until);
+
 internal sealed record AlbumListItem(Guid Id, string Name, Guid OwnerAccountId, int Members, int Memories);
 
 internal sealed record AlbumMemberRow(Guid AccountId, bool IsOwner);
@@ -48,6 +51,9 @@ internal interface IAlbumQueries
 
     /// <summary>Null when there is no such album.</summary>
     Task<TakeoverState?> TakeoverStateAsync(Guid albumId, CancellationToken cancellationToken);
+
+    /// <summary>Null when there is no such album.</summary>
+    Task<HandoverState?> HandoverStateAsync(Guid albumId, CancellationToken cancellationToken);
 
     /// <summary>The caller has asked Access: this only reads.</summary>
     Task<AlbumView?> ViewAsync(Guid albumId, CancellationToken cancellationToken);

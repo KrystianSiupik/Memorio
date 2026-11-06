@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/result.dart';
+import '../../memories/memories.dart' show dayText;
 import '../domain/album.dart';
 import 'albums_providers.dart';
 
@@ -33,6 +34,7 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
   }
 
   void _refresh() {
+    ref.invalidate(albumHandoverProvider(widget.albumId));
     ref.invalidate(albumSeatsProvider(widget.albumId));
     ref.invalidate(albumDetailsProvider(widget.albumId));
     ref.invalidate(albumsProvider);
@@ -92,6 +94,54 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
     }
   }
 
+  /// S2:B3: the owner says now, while they still can, what becomes of their own contributions.
+  Future<void> _handOver(AlbumMember member) async {
+    final l10n = context.l10n;
+    final keep = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.albumHandoverTo(member.label)),
+        content: Text(l10n.albumHandoverQuestion),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
+          TextButton(
+            key: const Key('s11-handover-take'),
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.albumHandoverTake),
+          ),
+          FilledButton(
+            key: const Key('s11-handover-keep'),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.albumHandoverKeep),
+          ),
+        ],
+      ),
+    );
+    if (keep != null && mounted) {
+      await _then(act(() => albums.offerHandover(widget.albumId, member.accountId, keepContributions: keep)));
+    }
+  }
+
+  List<Widget> _handoverBlock(AlbumDetails album, AlbumHandover handover) {
+    final l10n = context.l10n;
+    final member = album.members.where((member) => member.accountId == handover.toAccountId).firstOrNull;
+    return [
+      const SizedBox(height: 16),
+      Text(l10n.albumHandover, style: Theme.of(context).textTheme.titleMedium),
+      if (handover.waits) ...[
+        Text(
+          l10n.albumHandoverWaiting(dayText(handover.until!.toLocal()), member?.label ?? ''),
+          key: const Key('s11-handover-waiting'),
+        ),
+        TextButton(
+          onPressed: offline || busy ? null : () => _then(act(() => albums.withdrawHandover(widget.albumId))),
+          child: Text(l10n.albumHandoverWithdraw),
+        ),
+      ] else
+        Text(l10n.albumHandoverExplain),
+    ];
+  }
+
   Future<void> _then(Future<bool> action) async {
     if (await action) {
       _refresh();
@@ -106,6 +156,7 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
     final link = ref.watch(albumLinkProvider(widget.albumId)).value;
     final viewers = ref.watch(albumViewersProvider(widget.albumId)).value ?? const <AlbumViewer>[];
     final blocked = ref.watch(albumBlockedProvider(widget.albumId)).value ?? const <AlbumViewer>[];
+    final handover = ref.watch(albumHandoverProvider(widget.albumId)).value ?? AlbumHandover.none;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.albumManage)),
       body: Column(
@@ -165,6 +216,12 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
                                     : () => _then(act(() => albums.nameSuccessor(widget.albumId, member.accountId))),
                                 child: Text(l10n.albumNameSuccessor),
                               ),
+                            if (!handover.waits)
+                              TextButton(
+                                key: Key('s11-hand-over-${member.accountId}'),
+                                onPressed: offline || busy ? null : () => _handOver(member),
+                                child: Text(l10n.albumHandOver),
+                              ),
                             TextButton(
                               onPressed: offline || busy
                                   ? null
@@ -176,6 +233,7 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
                       ),
                     if (album.successorAccountId == null)
                       Text(l10n.albumNoSuccessor, key: const Key('s11-no-successor')),
+                    ..._handoverBlock(album, handover),
                   ],
                   const SizedBox(height: 16),
                   Text(l10n.albumLink, style: Theme.of(context).textTheme.titleMedium),

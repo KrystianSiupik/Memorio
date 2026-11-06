@@ -60,6 +60,9 @@ internal sealed class AlbumDbContext(DbContextOptions<AlbumDbContext> options) :
             album.Property(item => item.OwnerlessSince).HasColumnName("ownerless_since");
             album.Property(item => item.ReservedByAccountId).HasColumnName("reserved_by_account_id");
             album.Property(item => item.ReservedUntil).HasColumnName("reserved_until");
+            album.Property(item => item.HandoverToAccountId).HasColumnName("handover_to_account_id");
+            album.Property(item => item.HandoverKeepsContributions).HasColumnName("handover_keeps_contributions");
+            album.Property(item => item.HandoverUntil).HasColumnName("handover_until");
             album.Ignore(item => item.IsOwnerless);
             album.Ignore(item => item.DomainEvents);
             album.HasIndex(item => item.OwnerAccountId).HasDatabaseName("ix_albums_owner_account_id");

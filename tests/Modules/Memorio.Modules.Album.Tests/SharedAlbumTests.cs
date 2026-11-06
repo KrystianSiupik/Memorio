@@ -215,4 +215,33 @@ public sealed class SharedAlbumTests
         Assert.True(album.TakeOver(later.AddMinutes(1)).IsSuccess);
         Assert.True(album.IsOwner(second));
     }
+
+    [Fact]
+    public void A_handover_waits_30_days_and_an_offer_again_keeps_its_time()
+    {
+        var album = NewAlbum();
+        var person = Guid.CreateVersion7();
+        album.AddParticipant(person);
+
+        Assert.True(album.OfferHandover(Owner, person, keepContributions: true, Now).IsSuccess);
+        album.OfferHandover(Owner, person, keepContributions: true, Now.AddDays(1));
+        Assert.Equal(Now + SharedAlbum.HandoverWindow, album.HandoverUntil);
+
+        Assert.Equal(AlbumErrors.HandoverGone, album.AcceptHandover(person, Now + SharedAlbum.HandoverWindow).Error);
+        Assert.True(album.IsOwner(Owner));
+    }
+
+    [Fact]
+    public void An_album_without_an_owner_forgets_the_handover()
+    {
+        var album = NewAlbum();
+        var person = Guid.CreateVersion7();
+        album.AddParticipant(person);
+        album.OfferHandover(Owner, person, keepContributions: false, Now);
+
+        album.ReleaseOwner(Now);
+
+        Assert.Null(album.HandoverToAccountId);
+        Assert.Equal(AlbumErrors.HandoverGone, album.AcceptHandover(person, Now).Error);
+    }
 }

@@ -23,6 +23,22 @@ class SharedAlbum {
   final String name;
 }
 
+/// D-307: a handover the living owner offered, seen by the owner and by the person it is offered to.
+class AlbumHandover {
+  const AlbumHandover({this.toAccountId, this.forMe = false, this.keepsContributions = true, this.until});
+
+  static const none = AlbumHandover();
+
+  final String? toAccountId;
+  final bool forMe;
+
+  /// The owner's own contributions stay in the album.
+  final bool keepsContributions;
+  final DateTime? until;
+
+  bool get waits => toAccountId != null;
+}
+
 class AlbumMember {
   const AlbumMember({required this.accountId, required this.email, required this.isOwner});
 

@@ -7,6 +7,7 @@ import 'package:retrofit/retrofit.dart';
 
 import '../models/add_album_photo_request.dart';
 import '../models/add_memory_request.dart';
+import '../models/album_handover_response.dart';
 import '../models/album_list_item_response.dart';
 import '../models/album_response.dart';
 import '../models/album_seats_response.dart';
@@ -23,6 +24,7 @@ import '../models/invite_request.dart';
 import '../models/kept_contribution_response.dart';
 import '../models/leave_request.dart';
 import '../models/name_successor_request.dart';
+import '../models/offer_handover_request.dart';
 import '../models/period_album_response.dart';
 
 part 'albums_client.g.dart';
@@ -70,6 +72,26 @@ abstract class AlbumsClient {
   /// Holds an album without an owner for 30 minutes, to pay for its plan; asking again keeps one's own.
   @POST('/v1/albums/{id}/takeover-reservation')
   Future<void> reserveAlbumTakeover({@Path('id') required String id});
+
+  /// For the owner and the person it is offered to: the handover that waits, if any.
+  @GET('/v1/albums/{id}/handover')
+  Future<AlbumHandoverResponse> getAlbumHandover({@Path('id') required String id});
+
+  /// The owner offers the album to someone in it and chooses what becomes of their own contributions; a new offer replaces the earlier one.
+  @PUT('/v1/albums/{id}/handover')
+  Future<void> offerAlbumHandover({@Path('id') required String id, @Body() required OfferHandoverRequest body});
+
+  /// The owner takes the offer back; asking again changes nothing.
+  @DELETE('/v1/albums/{id}/handover')
+  Future<void> withdrawAlbumHandover({@Path('id') required String id});
+
+  /// The person becomes the owner; the former owner stays in the album.
+  @POST('/v1/albums/{id}/handover/acceptance')
+  Future<void> acceptAlbumHandover({@Path('id') required String id});
+
+  /// The album stays with its owner.
+  @POST('/v1/albums/{id}/handover/refusal')
+  Future<void> refuseAlbumHandover({@Path('id') required String id});
 
   /// For the owner: seats taken, invited and free.
   @GET('/v1/albums/{id}/seats')

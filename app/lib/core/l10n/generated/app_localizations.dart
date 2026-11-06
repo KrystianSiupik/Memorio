@@ -877,6 +877,90 @@ abstract class AppLocalizations {
   /// **'Następca'**
   String get albumSuccessor;
 
+  /// No description provided for @albumHandover.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przekazanie albumu'**
+  String get albumHandover;
+
+  /// No description provided for @albumHandoverExplain.
+  ///
+  /// In pl, this message translates to:
+  /// **'Możesz już teraz przekazać album komuś z uczestników. Ta osoba zostanie właścicielem, a Ty zostaniesz w albumie jako uczestnik.'**
+  String get albumHandoverExplain;
+
+  /// No description provided for @albumHandOver.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przekaż album'**
+  String get albumHandOver;
+
+  /// No description provided for @albumHandoverTo.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przekazać album: {person}?'**
+  String albumHandoverTo(Object person);
+
+  /// No description provided for @albumHandoverQuestion.
+  ///
+  /// In pl, this message translates to:
+  /// **'Co z Twoimi własnymi wspomnieniami w tym albumie? Zdecyduj teraz: zostaną w albumie albo wyjmiemy je z niego, gdy ta osoba przyjmie album. U Ciebie zostaną w obu przypadkach.'**
+  String get albumHandoverQuestion;
+
+  /// No description provided for @albumHandoverKeep.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zostają w albumie'**
+  String get albumHandoverKeep;
+
+  /// No description provided for @albumHandoverTake.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zabieram je'**
+  String get albumHandoverTake;
+
+  /// No description provided for @albumHandoverWaiting.
+  ///
+  /// In pl, this message translates to:
+  /// **'Czeka na odpowiedź: {person}, do {date}.'**
+  String albumHandoverWaiting(Object date, Object person);
+
+  /// No description provided for @albumHandoverWithdraw.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wycofaj propozycję'**
+  String get albumHandoverWithdraw;
+
+  /// No description provided for @albumHandoverForMe.
+  ///
+  /// In pl, this message translates to:
+  /// **'Właściciel chce Ci przekazać ten album. Możesz odpowiedzieć do {date}.'**
+  String albumHandoverForMe(Object date);
+
+  /// No description provided for @albumHandoverOwnerKeeps.
+  ///
+  /// In pl, this message translates to:
+  /// **'Jego wspomnienia zostaną w albumie.'**
+  String get albumHandoverOwnerKeeps;
+
+  /// No description provided for @albumHandoverOwnerTakes.
+  ///
+  /// In pl, this message translates to:
+  /// **'Jego wspomnienia zostaną z albumu wyjęte.'**
+  String get albumHandoverOwnerTakes;
+
+  /// No description provided for @albumHandoverAccept.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przejmuję album'**
+  String get albumHandoverAccept;
+
+  /// No description provided for @albumHandoverRefuse.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odmawiam'**
+  String get albumHandoverRefuse;
+
   /// No description provided for @albumNoSuccessor.
   ///
   /// In pl, this message translates to:

@@ -55,8 +55,11 @@ internal sealed record PhotoAddedInAlbum(Guid EventId, DateTimeOffset OccurredAt
 /// <summary>E162.</summary>
 internal sealed record AlbumWithoutOwner(Guid EventId, DateTimeOffset OccurredAt, AlbumId AlbumId, int Sequence) : IDomainEvent;
 
-/// <summary>The successor is the owner now (after E123).</summary>
+/// <summary>The successor is the owner now (after E123), or the person the living owner handed it to (D-307).</summary>
 internal sealed record AlbumOwnerChanged(Guid EventId, DateTimeOffset OccurredAt, AlbumId AlbumId, Guid OwnerAccountId, int Sequence) : IDomainEvent;
+
+/// <summary>D-307: the living owner offers the album to someone in it.</summary>
+internal sealed record HandoverOffered(Guid EventId, DateTimeOffset OccurredAt, AlbumId AlbumId, Guid ToAccountId, DateTimeOffset AnswerBy, int Sequence) : IDomainEvent;
 
 /// <summary>E165.</summary>
 internal sealed record TakeoverReserved(Guid EventId, DateTimeOffset OccurredAt, AlbumId AlbumId, Guid AccountId, DateTimeOffset ReservedUntil, int Sequence) : IDomainEvent;

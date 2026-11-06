@@ -59,6 +59,11 @@ final albumSeatsProvider = FutureProvider.family<AlbumSeats, String>(
   retry: noAutomaticRetry,
 );
 
+final albumHandoverProvider = FutureProvider.family<AlbumHandover, String>(
+  (ref, id) => _load(ref, (albums) => albums.loadHandover(id)),
+  retry: noAutomaticRetry,
+);
+
 final albumViewersProvider = FutureProvider.family<List<AlbumViewer>, String>(
   (ref, id) => _load(ref, (albums) => albums.loadViewers(id)),
   retry: noAutomaticRetry,

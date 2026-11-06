@@ -161,6 +161,7 @@ internal sealed class Albums(IDbContextOutbox<AlbumDbContext> outbox) : IAlbums
 
         AlbumWithoutOwner released => outbox.PublishAsync(new AlbumWithoutOwnerEvent(released.EventId, released.OccurredAt, released.AlbumId.Value, released.Sequence)),
         AlbumOwnerChanged changed => outbox.PublishAsync(new AlbumOwnerChangedEvent(changed.EventId, changed.OccurredAt, changed.AlbumId.Value, changed.OwnerAccountId, changed.Sequence)),
+        HandoverOffered offered => outbox.PublishAsync(new HandoverOfferedEvent(offered.EventId, offered.OccurredAt, offered.AlbumId.Value, offered.ToAccountId, offered.AnswerBy, offered.Sequence)),
         TakeoverReserved reserved => outbox.PublishAsync(new TakeoverReservedEvent(reserved.EventId, reserved.OccurredAt, reserved.AlbumId.Value, reserved.ReservedUntil, reserved.Sequence)),
         AlbumTakenOver taken => outbox.PublishAsync(new AlbumTakenOverEvent(taken.EventId, taken.OccurredAt, taken.AlbumId.Value, taken.OwnerAccountId, taken.Sequence)),
 

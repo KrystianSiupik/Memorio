@@ -50,6 +50,9 @@ internal static class NotificationTexts
             NotificationKind.DeathReported => (
                 "Ktoś zgłosił w GEO Twoją śmierć",
                 $"Uczestnik albumu zgłosił Twoją śmierć i przesłał akt zgonu: {album}.\n\nNic się jeszcze nie zmieniło. Obsługa sprawdzi dokument, zanim podejmie decyzję. Jeśli to pomyłka, odpowiedz na tę wiadomość: wtedy nikt nie przejmie Twoich albumów."),
+            NotificationKind.HandoverOffered => (
+                "Właściciel chce Ci przekazać album w GEO",
+                $"Właściciel proponuje Ci prowadzenie albumu: {album}.\n\nOtwórz album w aplikacji i zdecyduj w ciągu 30 dni. Do tego czasu nic się nie zmienia."),
             NotificationKind.PrivateArchiveShared => (
                 "Masz dostęp do prywatnych wspomnień osoby, która Cię wskazała",
                 "Osoba, która wskazała Cię jako kontakt spadkowy, zmarła.\n\nMożesz oglądać jej prywatne wspomnienia na ekranie „Udostępnione mi”, po zalogowaniu na ten adres e-mail. Tylko do odczytu."),
