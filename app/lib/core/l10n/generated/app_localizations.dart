@@ -1435,6 +1435,126 @@ abstract class AppLocalizations {
   /// **'Przywróć'**
   String get restore;
 
+  /// S08
+  ///
+  /// In pl, this message translates to:
+  /// **'Prześledź'**
+  String get replayTitle;
+
+  /// No description provided for @replayPeriod.
+  ///
+  /// In pl, this message translates to:
+  /// **'Okres: {period}'**
+  String replayPeriod(String period);
+
+  /// No description provided for @replayOtherRange.
+  ///
+  /// In pl, this message translates to:
+  /// **'Inny okres'**
+  String get replayOtherRange;
+
+  /// No description provided for @replayEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'W tym okresie nie ma wspomnień'**
+  String get replayEmpty;
+
+  /// No description provided for @replayStep.
+  ///
+  /// In pl, this message translates to:
+  /// **'{current} z {total}'**
+  String replayStep(int current, int total);
+
+  /// No description provided for @replayPrevious.
+  ///
+  /// In pl, this message translates to:
+  /// **'Poprzednie'**
+  String get replayPrevious;
+
+  /// No description provided for @replayNext.
+  ///
+  /// In pl, this message translates to:
+  /// **'Następne'**
+  String get replayNext;
+
+  /// No description provided for @replayPlay.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odtwarzaj'**
+  String get replayPlay;
+
+  /// No description provided for @replayPause.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zatrzymaj'**
+  String get replayPause;
+
+  /// No description provided for @replayTempo.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tempo {speed}×'**
+  String replayTempo(int speed);
+
+  /// No description provided for @replayEnd.
+  ///
+  /// In pl, this message translates to:
+  /// **'To już wszystko z tego okresu'**
+  String get replayEnd;
+
+  /// No description provided for @replayStats.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wspomnienia: {memories}, miejsca: {places}'**
+  String replayStats(int memories, int places);
+
+  /// No description provided for @replayAgain.
+  ///
+  /// In pl, this message translates to:
+  /// **'Od początku'**
+  String get replayAgain;
+
+  /// No description provided for @replayCreateAlbum.
+  ///
+  /// In pl, this message translates to:
+  /// **'Utwórz album z okresu'**
+  String get replayCreateAlbum;
+
+  /// No description provided for @replayCreateAlbumExplained.
+  ///
+  /// In pl, this message translates to:
+  /// **'Do albumu trafią Twoje wspomnienia z tego okresu. Cudze zostają w swoich albumach.'**
+  String get replayCreateAlbumExplained;
+
+  /// No description provided for @replayAlbumName.
+  ///
+  /// In pl, this message translates to:
+  /// **'Prześledź {period}'**
+  String replayAlbumName(String period);
+
+  /// No description provided for @replayAlbumCreated.
+  ///
+  /// In pl, this message translates to:
+  /// **'Album gotowy, dodano wspomnień: {count}.'**
+  String replayAlbumCreated(int count);
+
+  /// No description provided for @replayAlbumNotFitting.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie zmieściło się w puli albumu: {count}.'**
+  String replayAlbumNotFitting(int count);
+
+  /// No description provided for @replayOpenAlbum.
+  ///
+  /// In pl, this message translates to:
+  /// **'Otwórz album'**
+  String get replayOpenAlbum;
+
+  /// No description provided for @replayTooLong.
+  ///
+  /// In pl, this message translates to:
+  /// **'W tym okresie jest za dużo wspomnień na jeden album. Wybierz krótszy.'**
+  String get replayTooLong;
+
   /// S23
   ///
   /// In pl, this message translates to:

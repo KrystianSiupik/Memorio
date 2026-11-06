@@ -7,6 +7,7 @@ import '../features/albums/albums.dart';
 import '../features/map/map.dart';
 import '../features/memories/memories.dart';
 import '../features/plans/plans.dart';
+import '../features/replay/replay.dart';
 import '../features/shared_with_me/shared_with_me.dart';
 import '../features/succession/succession.dart';
 import 'home_shell.dart';
@@ -37,9 +38,17 @@ final routerProvider = Provider<GoRouter>((ref) {
                 onAddMemory: () => const NewMemoryRoute().go(context),
                 onOpenTrash: () => const TrashRoute().go(context),
                 onOpenMemory: (id) => MemoryRoute(id).go(context),
+                onReplay: () => const ReplayRoute().go(context),
               ),
             ),
             routes: [
+              GoRoute(
+                path: ReplayRoute.path,
+                builder: (context, state) => ReplayPage(
+                  onOpenMemory: (id) => MemoryRoute(id).go(context),
+                  onOpenAlbum: (id) => AlbumRoute(id).go(context),
+                ),
+              ),
               GoRoute(path: TrashRoute.path, builder: (context, state) => const TrashPage()),
               GoRoute(
                 path: NewMemoryRoute.path,

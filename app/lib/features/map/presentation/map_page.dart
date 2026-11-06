@@ -9,7 +9,15 @@ import 'map_providers.dart';
 /// S03 Map and globe. Points stay on the map through a reload and a lost connection: the provider
 /// keeps the last answer, so only the message around them changes.
 class MapPage extends ConsumerWidget {
-  const MapPage({super.key, required this.onAddMemory, required this.onOpenTrash, required this.onOpenMemory});
+  const MapPage({
+    super.key,
+    required this.onAddMemory,
+    required this.onOpenTrash,
+    required this.onOpenMemory,
+    required this.onReplay,
+  });
+
+  final VoidCallback onReplay;
 
   final VoidCallback onAddMemory;
   final VoidCallback onOpenTrash;
@@ -75,6 +83,7 @@ class MapPage extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.mapTitle),
         actions: [
+          IconButton(tooltip: l10n.replayTitle, icon: const Icon(Icons.play_circle_outline), onPressed: onReplay),
           IconButton(tooltip: l10n.mapOpenTrash, icon: const Icon(Icons.delete_outline), onPressed: onOpenTrash),
         ],
       ),

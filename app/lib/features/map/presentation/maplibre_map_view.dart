@@ -146,6 +146,14 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(mapFocusProvider, (previous, point) {
+      if (point != null) {
+        _controller?.animateCamera(
+          CameraUpdate.newLatLngZoom(LatLng(point.latitude, point.longitude), 9),
+          duration: const Duration(seconds: 2),
+        );
+      }
+    });
     ref.listen(mapPointsProvider, (previous, points) {
       if (_layersReady) {
         _controller?.setGeoJsonSource(_pointsSource, pointsToGeoJson(points));

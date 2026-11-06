@@ -740,6 +740,81 @@ class AppLocalizationsPl extends AppLocalizations {
   String get restore => 'Przywróć';
 
   @override
+  String get replayTitle => 'Prześledź';
+
+  @override
+  String replayPeriod(String period) {
+    return 'Okres: $period';
+  }
+
+  @override
+  String get replayOtherRange => 'Inny okres';
+
+  @override
+  String get replayEmpty => 'W tym okresie nie ma wspomnień';
+
+  @override
+  String replayStep(int current, int total) {
+    return '$current z $total';
+  }
+
+  @override
+  String get replayPrevious => 'Poprzednie';
+
+  @override
+  String get replayNext => 'Następne';
+
+  @override
+  String get replayPlay => 'Odtwarzaj';
+
+  @override
+  String get replayPause => 'Zatrzymaj';
+
+  @override
+  String replayTempo(int speed) {
+    return 'Tempo $speed×';
+  }
+
+  @override
+  String get replayEnd => 'To już wszystko z tego okresu';
+
+  @override
+  String replayStats(int memories, int places) {
+    return 'Wspomnienia: $memories, miejsca: $places';
+  }
+
+  @override
+  String get replayAgain => 'Od początku';
+
+  @override
+  String get replayCreateAlbum => 'Utwórz album z okresu';
+
+  @override
+  String get replayCreateAlbumExplained =>
+      'Do albumu trafią Twoje wspomnienia z tego okresu. Cudze zostają w swoich albumach.';
+
+  @override
+  String replayAlbumName(String period) {
+    return 'Prześledź $period';
+  }
+
+  @override
+  String replayAlbumCreated(int count) {
+    return 'Album gotowy, dodano wspomnień: $count.';
+  }
+
+  @override
+  String replayAlbumNotFitting(int count) {
+    return 'Nie zmieściło się w puli albumu: $count.';
+  }
+
+  @override
+  String get replayOpenAlbum => 'Otwórz album';
+
+  @override
+  String get replayTooLong => 'W tym okresie jest za dużo wspomnień na jeden album. Wybierz krótszy.';
+
+  @override
   String get takeoverTitle => 'Przejęcie albumu';
 
   @override

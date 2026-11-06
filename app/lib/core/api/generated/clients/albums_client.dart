@@ -14,6 +14,7 @@ import '../models/album_takeover_response.dart';
 import '../models/album_trim_material_response.dart';
 import '../models/answered_invitation_response.dart';
 import '../models/arrange_request.dart';
+import '../models/create_album_from_period_request.dart';
 import '../models/create_album_request.dart';
 import '../models/entrust_request.dart';
 import '../models/entrusted_memory_response.dart';
@@ -22,6 +23,7 @@ import '../models/invite_request.dart';
 import '../models/kept_contribution_response.dart';
 import '../models/leave_request.dart';
 import '../models/name_successor_request.dart';
+import '../models/period_album_response.dart';
 
 part 'albums_client.g.dart';
 
@@ -40,6 +42,10 @@ abstract class AlbumsClient {
   /// The albums the person owns or takes part in.
   @GET('/v1/albums')
   Future<List<AlbumListItemResponse>> listAlbums();
+
+  /// An album of the person's own memories of a period (yyyy-MM-dd); the id comes from the client, so a retry changes nothing.
+  @POST('/v1/albums/from-period')
+  Future<PeriodAlbumResponse> createAlbumFromPeriod({@Body() required CreateAlbumFromPeriodRequest body});
 
   /// What stayed in albums the person is no longer in.
   @GET('/v1/albums/kept-contributions')
