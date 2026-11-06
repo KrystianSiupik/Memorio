@@ -877,6 +877,240 @@ abstract class AppLocalizations {
   /// **'Następca'**
   String get albumSuccessor;
 
+  /// No description provided for @reportContent.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zgłoś treść'**
+  String get reportContent;
+
+  /// No description provided for @reportMemoryTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zgłoś wspomnienie'**
+  String get reportMemoryTitle;
+
+  /// No description provided for @reportAlbumTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zgłoś album'**
+  String get reportAlbumTitle;
+
+  /// No description provided for @reportExplained.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zgłoszenie trafi do obsługi Memorio. Autor nie dowie się, kto zgłosił. Treści niezgodne z prawem ukrywamy od razu i rozpatrujemy w ciągu 24 godzin, pozostałe zostają widoczne do decyzji, którą podejmujemy w ciągu 7 dni.'**
+  String get reportExplained;
+
+  /// No description provided for @reportCategory.
+  ///
+  /// In pl, this message translates to:
+  /// **'Co jest nie tak?'**
+  String get reportCategory;
+
+  /// No description provided for @reasonChildAbuse.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wykorzystywanie dzieci'**
+  String get reasonChildAbuse;
+
+  /// No description provided for @reasonTerrorism.
+  ///
+  /// In pl, this message translates to:
+  /// **'Treści terrorystyczne'**
+  String get reasonTerrorism;
+
+  /// No description provided for @reasonThreat.
+  ///
+  /// In pl, this message translates to:
+  /// **'Groźby'**
+  String get reasonThreat;
+
+  /// No description provided for @reasonIncitement.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nawoływanie do przemocy lub nienawiści'**
+  String get reasonIncitement;
+
+  /// No description provided for @reasonOtherIllegal.
+  ///
+  /// In pl, this message translates to:
+  /// **'Inna treść niezgodna z prawem'**
+  String get reasonOtherIllegal;
+
+  /// No description provided for @reasonSomeonesImage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Mój wizerunek bez mojej zgody'**
+  String get reasonSomeonesImage;
+
+  /// No description provided for @reasonPersonalData.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moje dane osobowe'**
+  String get reasonPersonalData;
+
+  /// No description provided for @reasonDefamation.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zniesławienie'**
+  String get reasonDefamation;
+
+  /// No description provided for @reasonCopyright.
+  ///
+  /// In pl, this message translates to:
+  /// **'Naruszenie praw autorskich'**
+  String get reasonCopyright;
+
+  /// No description provided for @reasonOther.
+  ///
+  /// In pl, this message translates to:
+  /// **'Inny powód'**
+  String get reasonOther;
+
+  /// No description provided for @reportIllegalHidden.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ta treść zostanie ukryta od razu po wysłaniu zgłoszenia, do decyzji obsługi.'**
+  String get reportIllegalHidden;
+
+  /// No description provided for @reportExplanation.
+  ///
+  /// In pl, this message translates to:
+  /// **'Uzasadnienie'**
+  String get reportExplanation;
+
+  /// No description provided for @reportSend.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zgłoś'**
+  String get reportSend;
+
+  /// No description provided for @reportSent.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dziękujemy. Decyzję z uzasadnieniem zobaczysz na ekranie „Moje zgłoszenia i decyzje”.'**
+  String get reportSent;
+
+  /// No description provided for @reportSentIllegal.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dziękujemy. Treść jest już ukryta. Decyzję z uzasadnieniem zobaczysz na ekranie „Moje zgłoszenia i decyzje”.'**
+  String get reportSentIllegal;
+
+  /// No description provided for @reportBack.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wróć'**
+  String get reportBack;
+
+  /// No description provided for @reportNoAccess.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tej treści już nie widzisz.'**
+  String get reportNoAccess;
+
+  /// No description provided for @reportOwnContent.
+  ///
+  /// In pl, this message translates to:
+  /// **'Własną treść możesz zmienić albo usunąć samodzielnie.'**
+  String get reportOwnContent;
+
+  /// No description provided for @myModerationTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moje zgłoszenia i decyzje'**
+  String get myModerationTitle;
+
+  /// No description provided for @myModerationEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie masz zgłoszeń ani decyzji'**
+  String get myModerationEmpty;
+
+  /// No description provided for @myModerationAboutMine.
+  ///
+  /// In pl, this message translates to:
+  /// **'Decyzje o moich treściach'**
+  String get myModerationAboutMine;
+
+  /// No description provided for @myModerationMine.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moje zgłoszenia'**
+  String get myModerationMine;
+
+  /// No description provided for @myModerationReported.
+  ///
+  /// In pl, this message translates to:
+  /// **'{reason}, zgłoszone {date}'**
+  String myModerationReported(Object date, Object reason);
+
+  /// No description provided for @myModerationHidden.
+  ///
+  /// In pl, this message translates to:
+  /// **'Teraz widzisz to tylko Ty.'**
+  String get myModerationHidden;
+
+  /// No description provided for @myModerationStatement.
+  ///
+  /// In pl, this message translates to:
+  /// **'Uzasadnienie: {statement}'**
+  String myModerationStatement(Object statement);
+
+  /// No description provided for @myModerationAppealPending.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odwołanie czeka na decyzję.'**
+  String get myModerationAppealPending;
+
+  /// No description provided for @myModerationAppealReversed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odwołanie uwzględnione: treść jest znów widoczna.'**
+  String get myModerationAppealReversed;
+
+  /// No description provided for @myModerationAppealUpheld.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odwołanie nieuwzględnione.'**
+  String get myModerationAppealUpheld;
+
+  /// No description provided for @myModerationAppealReason.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dlaczego decyzja jest błędna'**
+  String get myModerationAppealReason;
+
+  /// No description provided for @myModerationAppealUntil.
+  ///
+  /// In pl, this message translates to:
+  /// **'Możesz się odwołać do {date}.'**
+  String myModerationAppealUntil(Object date);
+
+  /// No description provided for @myModerationAppeal.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odwołaj się'**
+  String get myModerationAppeal;
+
+  /// No description provided for @verdictRemoved.
+  ///
+  /// In pl, this message translates to:
+  /// **'Decyzja: treść ukryta'**
+  String get verdictRemoved;
+
+  /// No description provided for @verdictKept.
+  ///
+  /// In pl, this message translates to:
+  /// **'Decyzja: treść zostaje'**
+  String get verdictKept;
+
+  /// No description provided for @verdictPending.
+  ///
+  /// In pl, this message translates to:
+  /// **'Czeka na decyzję'**
+  String get verdictPending;
+
   /// No description provided for @albumHandover.
   ///
   /// In pl, this message translates to:

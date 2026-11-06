@@ -14,6 +14,7 @@ import 'package:memorio/features/memories/memories.dart';
 import 'package:memorio/features/map/map.dart';
 import 'package:memorio/features/plans/plans.dart';
 import 'package:memorio/features/replay/replay.dart';
+import 'package:memorio/features/moderation/moderation.dart';
 import 'package:memorio/features/succession/succession.dart';
 
 import 'fake_account.dart';
@@ -23,6 +24,7 @@ import 'fake_memories.dart';
 import 'fake_places.dart';
 import 'fake_plans.dart';
 import 'fake_replay.dart';
+import 'fake_moderation.dart';
 import 'fake_succession.dart';
 import 'fake_token_store.dart';
 
@@ -51,6 +53,7 @@ Future<ProviderContainer> pumpMemorioApp(
   PlansRepository? plans,
   ReplayRepository? replay,
   SuccessionRepository? succession,
+  ModerationRepository? moderation,
   FakeHttpAdapter? http,
   Stream<bool>? online,
   Stream<List<PendingOperation>>? pending,
@@ -72,6 +75,7 @@ Future<ProviderContainer> pumpMemorioApp(
       plansRepositoryProvider.overrideWithValue(plans ?? FakePlansRepository()),
       replayRepositoryProvider.overrideWithValue(replay ?? FakeReplayRepository()),
       successionRepositoryProvider.overrideWithValue(succession ?? FakeSuccessionRepository()),
+      moderationRepositoryProvider.overrideWithValue(moderation ?? FakeModerationRepository()),
       photoPickerProvider.overrideWithValue(FakePhotoPicker()),
       localDatabaseProvider.overrideWithValue(database),
       isOnlineProvider.overrideWith((ref) => online ?? Stream.value(true)),

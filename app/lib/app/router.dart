@@ -9,6 +9,7 @@ import '../features/memories/memories.dart';
 import '../features/plans/plans.dart';
 import '../features/replay/replay.dart';
 import '../features/shared_with_me/shared_with_me.dart';
+import '../features/moderation/moderation.dart';
 import '../features/succession/succession.dart';
 import 'home_shell.dart';
 import 'routes.dart';
@@ -56,10 +57,27 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: MemoryRoute.path,
-                builder: (context, state) => MemoryDetailsPage(
-                  memoryId: state.pathParameters['id']!,
-                  onLeave: () => const MapRoute().go(context),
-                ),
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return MemoryDetailsPage(
+                    memoryId: id,
+                    onLeave: () => const MapRoute().go(context),
+                    onReport: () => MemoryReportRoute(id).go(context),
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: MemoryReportRoute.path,
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return ReportContentPage(
+                        target: ReportTarget.memory,
+                        targetId: id,
+                        onDone: () => MemoryRoute(id).go(context),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -110,6 +128,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                     onConsents: () => AlbumConsentsRoute(id).go(context),
                     onPlan: () => AlbumPlanRoute(id).go(context),
                     onReportDeath: () => ReportDeathRoute(id).go(context),
+                    onReport: () => AlbumReportRoute(id).go(context),
                     ownerlessBlock: AlbumTakeoverBlock(albumId: id),
                     onLeft: () => const AlbumsRoute().go(context),
                   );
@@ -118,6 +137,17 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: AlbumManageRoute.path,
                     builder: (context, state) => AlbumManagePage(albumId: state.pathParameters['id']!),
+                  ),
+                  GoRoute(
+                    path: AlbumReportRoute.path,
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return ReportContentPage(
+                        target: ReportTarget.album,
+                        targetId: id,
+                        onDone: () => AlbumRoute(id).go(context),
+                      );
+                    },
                   ),
                   GoRoute(
                     path: ReportDeathRoute.path,
@@ -171,10 +201,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               builder: (context) => AccountPage(
                 onOpenPlan: () => const PlanRoute().go(context),
                 onOpenLegacyContact: () => const LegacyContactRoute().go(context),
+                onOpenModeration: () => const MyModerationRoute().go(context),
               ),
             ),
             routes: [
               GoRoute(path: LegacyContactRoute.path, builder: (context, state) => const LegacyContactPage()),
+              GoRoute(path: MyModerationRoute.path, builder: (context, state) => const MyModerationPage()),
               GoRoute(
                 path: PlanRoute.path,
                 builder: (context, state) => PlanPage(onChooseMaterial: () => const PlanMaterialRoute().go(context)),
