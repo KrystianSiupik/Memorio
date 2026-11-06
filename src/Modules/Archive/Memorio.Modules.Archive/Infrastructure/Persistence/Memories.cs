@@ -40,6 +40,9 @@ internal sealed class Memories(IDbContextOutbox<ArchiveDbContext> outbox) : IMem
             .Select(memory => new OverdueMemory(memory.Id, memory.Sequence))
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<MemoryId>> FindAwaitingErasureAsync(CancellationToken cancellationToken) =>
+        await Database.Memories.AsNoTracking().Where(memory => memory.State == MemoryState.Erasing).Select(memory => memory.Id).ToListAsync(cancellationToken);
+
     public void Remove(Memory memory) => Database.Memories.Remove(memory);
 
     public Task<AppliedAccountEvent?> FindAppliedAsync(Guid accountId, CancellationToken cancellationToken) =>

@@ -12,6 +12,7 @@ public sealed class DeleteAccountTests
     private static readonly AccountId Account = new(Guid.CreateVersion7());
 
     private readonly FakeDeletions _deletions = new();
+    private readonly FakeLegalHolds _holds = new();
 
     [Fact]
     public async Task At_the_end_of_the_window_the_account_goes_and_gives_the_event()
@@ -64,6 +65,19 @@ public sealed class DeleteAccountTests
     }
 
     [Fact]
+    public async Task While_an_order_holds_the_data_the_account_waits_for_the_next_sweep()
+    {
+        await StoredAsync();
+        _holds.Hold(Account.Value);
+
+        Assert.Equal(AccountErrors.DataHeld, (await HandleAsync(sequence: 1, WindowEnd)).Error);
+        Assert.Empty(_deletions.Saved);
+
+        _holds.Release(Account.Value);
+        Assert.True((await HandleAsync(sequence: 1, WindowEnd)).IsSuccess);
+    }
+
+    [Fact]
     public async Task Without_a_request_there_is_nothing_to_delete()
     {
         var refused = await HandleAsync(sequence: 1, WindowEnd);
@@ -93,5 +107,5 @@ public sealed class DeleteAccountTests
     }
 
     private Task<SharedKernel.Results.Result> HandleAsync(int sequence, DateTimeOffset at) =>
-        new DeleteAccountHandler(_deletions).HandleAsync(new DeleteAccount(Account, sequence, at), TestContext.Current.CancellationToken);
+        new DeleteAccountHandler(_deletions, _holds).HandleAsync(new DeleteAccount(Account, sequence, at), TestContext.Current.CancellationToken);
 }

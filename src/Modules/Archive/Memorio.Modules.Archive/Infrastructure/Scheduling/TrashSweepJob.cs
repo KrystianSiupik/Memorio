@@ -1,3 +1,4 @@
+using Memorio.Modules.Archive.Application.Commands.DeleteMemory;
 using Memorio.Modules.Archive.Application.Policies;
 using Memorio.Modules.Archive.Domain.Memories;
 using Memorio.SharedKernel.Scheduling;
@@ -8,7 +9,8 @@ namespace Memorio.Modules.Archive.Infrastructure.Scheduling;
 
 /// <summary>
 /// Safety net of the promise that the trash lasts 30 days (D-228, as D-215 for accounts): once a day, what is
-/// still in the trash after its window goes the way its deadline would have. Each memory has its own scope,
+/// still in the trash after its window goes the way its deadline would have, and what a legal hold kept goes once it
+/// ended (D-312). Each memory has its own scope,
 /// and one failing memory does not stop the others.
 /// </summary>
 internal sealed partial class TrashSweepJob(IMemories memories, IServiceScopeFactory scopes, ILogger<TrashSweepJob> logger) : IScheduledJob
@@ -34,6 +36,20 @@ internal sealed partial class TrashSweepJob(IMemories memories, IServiceScopeFac
             catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
             {
                 LogFailed(logger, exception, overdue.MemoryId.Value);
+                failed++;
+            }
+        }
+
+        foreach (var waiting in await memories.FindAwaitingErasureAsync(cancellationToken))
+        {
+            try
+            {
+                await using var scope = scopes.CreateAsyncScope();
+                await scope.ServiceProvider.GetRequiredService<EraseAwaitingHandler>().HandleAsync(waiting, cancellationToken);
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+            {
+                LogFailed(logger, exception, waiting.Value);
                 failed++;
             }
         }

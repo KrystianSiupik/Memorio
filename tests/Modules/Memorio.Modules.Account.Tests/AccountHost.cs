@@ -47,6 +47,8 @@ public sealed class AccountHost : PostgresDatabase
     /// <summary>The worker's scheduler: tests fire its deadlines themselves, 30 days are long.</summary>
     public FakeDeadlines Deadlines { get; } = new();
 
+    public FakeLegalHolds Holds { get; } = new();
+
     /// <summary>The services of the worker side, for delivering an event or a firing the way it does.</summary>
     public IServiceProvider Worker => _worker!.Services;
 
@@ -170,6 +172,7 @@ public sealed class AccountHost : PostgresDatabase
         new ArchiveModule().AddServices(builder.Services, builder.Configuration);
         new AlbumModule().AddServices(builder.Services, builder.Configuration);
         new LimitsModule().AddServices(builder.Services, builder.Configuration);
+        builder.Services.AddSingleton<Memorio.Modules.Moderation.Contracts.ILegalHolds>(Holds);
         builder.Services.RemoveAll<IExternalIdentityVerifier>();
         builder.Services.AddSingleton<IExternalIdentityVerifier>(new FakeGoogle());
 
@@ -190,6 +193,7 @@ public sealed class AccountHost : PostgresDatabase
             [typeof(AccountModule).Assembly, typeof(ArchiveModule).Assembly, typeof(AccountHost).Assembly]);
         worker.Services.AddSingleton(Recorded);
         worker.Services.AddSingleton<IDeadlines>(Deadlines);
+        worker.Services.AddSingleton<Memorio.Modules.Moderation.Contracts.ILegalHolds>(Holds);
         worker.Services.AddSingleton<IObjectStorage>(new UnusedOnThisRouteStorage());
         new AccountModule().AddServices(worker.Services, worker.Configuration);
         new ArchiveModule().AddServices(worker.Services, worker.Configuration);

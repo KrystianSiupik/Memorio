@@ -4,6 +4,9 @@ namespace Memorio.Modules.Account.Domain.Accounts;
 
 internal static class AccountErrors
 {
+    /// <summary>An order of an authority holds the account's data; never shown to the person (D-312).</summary>
+    public static readonly Error DataHeld = Error.Conflict("Account.DataHeld", "The account cannot go for good yet.");
+
     public static readonly Error AgeDeclarationRequired = Error.Validation(
         "Account.AgeDeclarationRequired",
         $"An account needs the declaration of being at least {AgeDeclaration.MinimumAge}.");

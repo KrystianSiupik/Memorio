@@ -12,6 +12,9 @@ internal interface IMemories
     /// <summary>What is still in the trash although its window ended by <paramref name="at"/>.</summary>
     Task<IReadOnlyList<OverdueMemory>> FindOverdueAsync(DateTimeOffset at, CancellationToken cancellationToken);
 
+    /// <summary>What waits to go for good until a legal hold ends (D-312).</summary>
+    Task<IReadOnlyList<MemoryId>> FindAwaitingErasureAsync(CancellationToken cancellationToken);
+
     /// <summary>Stores the memory, or finds the one already under its id (the id comes from the client, D-118).</summary>
     Task<Memory> AddOrFindAsync(Memory memory, CancellationToken cancellationToken);
 

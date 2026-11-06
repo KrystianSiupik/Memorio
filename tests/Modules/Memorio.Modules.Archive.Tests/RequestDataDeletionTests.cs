@@ -39,6 +39,30 @@ public sealed class RequestDataDeletionTests(ArchiveDatabase database)
     }
 
     [Fact]
+    public async Task While_an_order_holds_the_author_it_waits_unseen_and_goes_with_the_sweep_after()
+    {
+        var account = Guid.CreateVersion7();
+        var memory = await database.AddMemoryAsync(account, photos: 1);
+        database.Neighbours.Holds(account);
+
+        Assert.True((await RequestAsync(memory.Id, account)).IsSuccess);
+
+        Assert.Equal(MemoryState.Erasing, (await FindAsync(memory.Id))!.State);
+        await using (var scope = database.CreateScope())
+        {
+            Assert.Null(await scope.ServiceProvider.GetRequiredService<Application.Queries.MemoryDetails.IMemoryDetailsQuery>().GetAsync(memory.Id.Value, account, Cancellation));
+        }
+
+        await database.FireAsync(new(Infrastructure.Scheduling.TrashSweepJob.JobName, null, DateTimeOffset.UtcNow, new Dictionary<string, string>(), Attempt: 1));
+        Assert.NotNull(await FindAsync(memory.Id));
+
+        database.Neighbours.Releases(account);
+        await database.FireAsync(new(Infrastructure.Scheduling.TrashSweepJob.JobName, null, DateTimeOffset.UtcNow, new Dictionary<string, string>(), Attempt: 1));
+        Assert.Null(await FindAsync(memory.Id));
+        Assert.True(await ArchiveDatabase.EventuallyAsync(async () => await database.QueuedEventsAsync(nameof(ContentDeleted), memory.Id.Value) == 1));
+    }
+
+    [Fact]
     public async Task Without_the_confirmation_nothing_happens()
     {
         var account = Guid.CreateVersion7();

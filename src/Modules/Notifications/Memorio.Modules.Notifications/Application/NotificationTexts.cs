@@ -80,6 +80,9 @@ internal static class NotificationTexts
             NotificationKind.AppealUpheld => (
                 "Twoje odwołanie w Memorio nie zostało uwzględnione",
                 $"Treść pozostaje ukryta.\n\nUzasadnienie: {OneLine(detail ?? "")}"),
+            NotificationKind.ContentHiddenByOrder => (
+                "Twoja treść w Memorio została ukryta na nakaz organu",
+                "Na nakaz uprawnionego organu ukryliśmy Twoją treść: widzisz ją tylko Ty.\n\nNie możemy jej przywrócić bez decyzji tego organu."),
             NotificationKind.PrivateArchiveShared => (
                 "Masz dostęp do prywatnych wspomnień osoby, która Cię wskazała",
                 "Osoba, która wskazała Cię jako kontakt spadkowy, zmarła.\n\nMożesz oglądać jej prywatne wspomnienia na ekranie „Udostępnione mi”, po zalogowaniu na ten adres e-mail. Tylko do odczytu."),

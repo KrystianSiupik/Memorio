@@ -170,6 +170,19 @@ internal sealed class Memory : AggregateRoot<MemoryId>
         return at < WindowEndsAt ? MemoryErrors.TrashWindowOpen : Result.Success();
     }
 
+    /// <summary>D-312: what a legal hold keeps waits unseen, also by its author, instead of going now.</summary>
+    public void AwaitErasure(DateTimeOffset now)
+    {
+        if (State == MemoryState.Erasing)
+        {
+            return;
+        }
+
+        State = MemoryState.Erasing;
+        WindowEndsAt = now;
+        Sequence++;
+    }
+
     /// <summary>E22 and E23: one author, so the last content goes with the memory (D-221).</summary>
     public void DeleteDefinitively(DateTimeOffset now)
     {

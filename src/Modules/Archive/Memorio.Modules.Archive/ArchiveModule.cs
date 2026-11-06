@@ -79,6 +79,7 @@ public sealed class ArchiveModule : IModule
         services.AddScoped<ITrashQuery, TrashQuery>();
         services.AddScoped<RequestDataDeletionHandler>();
         services.AddScoped<MemoryEraser>();
+        services.AddScoped<EraseAwaitingHandler>();
         services.AddScoped<DeleteMemoryHandler>();
         services.AddScoped<TrashMemoryHandler>();
         services.AddScoped<MemoryDetailsQuery>();
