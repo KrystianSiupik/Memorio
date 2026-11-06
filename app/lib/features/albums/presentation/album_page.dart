@@ -17,6 +17,8 @@ class AlbumPage extends ConsumerStatefulWidget {
     required this.onManage,
     required this.onConsents,
     required this.onPlan,
+    required this.onReportDeath,
+    required this.ownerlessBlock,
     required this.onLeft,
   });
 
@@ -25,6 +27,10 @@ class AlbumPage extends ConsumerStatefulWidget {
   final VoidCallback onManage;
   final VoidCallback onConsents;
   final VoidCallback onPlan;
+  final VoidCallback onReportDeath;
+
+  /// What someone in an album without an owner can do about it.
+  final Widget ownerlessBlock;
   final VoidCallback onLeft;
 
   @override
@@ -207,9 +213,11 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
                       l10n.albumPoolLeft(bytesText(album.freeBytes), bytesText(album.limitBytes)),
                       key: const Key('s10-pool'),
                     ),
-                    Text(l10n.albumNoOwnerState),
+                    if (album.isOwnerless) widget.ownerlessBlock else Text(l10n.albumNoOwnerState),
                   ],
                   if (album.isReadOnly) Text(l10n.albumReadOnly, key: const Key('s10-read-only')),
+                  if (album.isMember && !album.isOwner && !album.isOwnerless)
+                    TextButton(onPressed: widget.onReportDeath, child: Text(l10n.albumReportDeath)),
                   ...failureBlock(context),
                   if (album.isMember) ...[
                     const SizedBox(height: 8),

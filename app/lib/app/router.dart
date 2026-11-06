@@ -8,6 +8,7 @@ import '../features/map/map.dart';
 import '../features/memories/memories.dart';
 import '../features/plans/plans.dart';
 import '../features/shared_with_me/shared_with_me.dart';
+import '../features/succession/succession.dart';
 import 'home_shell.dart';
 import 'routes.dart';
 
@@ -61,6 +62,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 onOpenInvitation: (id) => InvitationRoute(id).go(context),
                 onOpenConsents: () => const MyConsentsRoute().go(context),
                 onOpenEntrusted: () => const EntrustedRoute().go(context),
+                header: TakeoverOffersList(onOpen: (id) => TakeoverOfferRoute(id).go(context)),
               ),
             ),
             routes: [
@@ -69,6 +71,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => AlbumLinkPage(
                   token: state.pathParameters['token']!,
                   onEntered: (albumId) => AlbumRoute(albumId).go(context),
+                ),
+              ),
+              GoRoute(
+                path: TakeoverOfferRoute.path,
+                builder: (context, state) => TakeoverOfferPage(
+                  caseId: state.pathParameters['id']!,
+                  onDone: () => const AlbumsRoute().go(context),
                 ),
               ),
               GoRoute(path: MyConsentsRoute.path, builder: (context, state) => const AlbumConsentsPage()),
@@ -91,6 +100,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                     onManage: () => AlbumManageRoute(id).go(context),
                     onConsents: () => AlbumConsentsRoute(id).go(context),
                     onPlan: () => AlbumPlanRoute(id).go(context),
+                    onReportDeath: () => ReportDeathRoute(id).go(context),
+                    ownerlessBlock: AlbumTakeoverBlock(albumId: id),
                     onLeft: () => const AlbumsRoute().go(context),
                   );
                 },
@@ -98,6 +109,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: AlbumManageRoute.path,
                     builder: (context, state) => AlbumManagePage(albumId: state.pathParameters['id']!),
+                  ),
+                  GoRoute(
+                    path: ReportDeathRoute.path,
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return ReportDeathPage(albumId: id, onDone: () => AlbumRoute(id).go(context));
+                    },
                   ),
                   GoRoute(
                     path: AlbumPlanRoute.path,
@@ -122,12 +140,32 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           _tab(
             SharedWithMeRoute.path,
-            Builder(builder: (context) => SharedWithMePage(onOpenAlbum: (id) => AlbumRoute(id).go(context))),
+            Builder(
+              builder: (context) => SharedWithMePage(
+                onOpenAlbum: (id) => AlbumRoute(id).go(context),
+                header: LegacyArchivesList(onOpen: (owner) => LegacyArchiveRoute(owner).go(context)),
+              ),
+            ),
+            routes: [
+              GoRoute(
+                path: LegacyArchiveRoute.path,
+                builder: (context, state) => LegacyArchivePage(
+                  ownerAccountId: state.pathParameters['owner']!,
+                  onOpenMemory: (id) => MemoryRoute(id).go(context),
+                ),
+              ),
+            ],
           ),
           _tab(
             AccountRoute.path,
-            Builder(builder: (context) => AccountPage(onOpenPlan: () => const PlanRoute().go(context))),
+            Builder(
+              builder: (context) => AccountPage(
+                onOpenPlan: () => const PlanRoute().go(context),
+                onOpenLegacyContact: () => const LegacyContactRoute().go(context),
+              ),
+            ),
             routes: [
+              GoRoute(path: LegacyContactRoute.path, builder: (context, state) => const LegacyContactPage()),
               GoRoute(
                 path: PlanRoute.path,
                 builder: (context, state) => PlanPage(onChooseMaterial: () => const PlanMaterialRoute().go(context)),

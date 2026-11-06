@@ -33,14 +33,17 @@ decide() {
     echo "ok: the worker applies it within a minute; check with: cases.sh result $id"
 }
 
+storage() { compose exec -T api printenv "Storage__$1" | tr -d '\r'; }
+
 certificate() {
     local id="$1" file="$2" key
     key="$(sql -tA -c "SELECT certificate_key FROM succession.takeover_cases WHERE id = '$id'" | tail -1)"
     [ -n "$key" ] || { echo "no certificate for this case" >&2; exit 1; }
     note "case $id certificate read"
-    # Bucket credentials from the application's own environment.
-    # shellcheck disable=SC2016
-    compose exec -T api sh -c 'AWS_ACCESS_KEY_ID="$Storage__AccessKey" AWS_SECRET_ACCESS_KEY="$Storage__SecretKey" aws --endpoint-url "$Storage__Endpoint" s3 cp "s3://$Storage__Bucket/'"$key"'" -' > "$file"
+    # The application's own bucket credentials, in a throwaway container on the application's network.
+    docker run --rm --network "container:$(compose ps -q api)" \
+        -e AWS_ACCESS_KEY_ID="$(storage AccessKey)" -e AWS_SECRET_ACCESS_KEY="$(storage SecretKey)" -e AWS_DEFAULT_REGION="$(storage Region)" \
+        amazon/aws-cli:2.22.35 --endpoint-url "$(storage Endpoint)" s3 cp "s3://$(storage Bucket)/$key" - > "$file"
     echo "ok: written to $file; delete it after checking"
 }
 

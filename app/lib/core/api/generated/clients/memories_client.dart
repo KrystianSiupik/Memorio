@@ -36,6 +36,10 @@ abstract class MemoriesClient {
   @GET('/v1/memories/mine')
   Future<List<MyMemoryResponse>> listMyMemories();
 
+  /// For the legacy contact of a person who died: their private memories, oldest first.
+  @GET('/v1/memories/legacy/{ownerAccountId}')
+  Future<List<MyMemoryResponse>> listLegacyMemories({@Path('ownerAccountId') required String ownerAccountId});
+
   /// What a trim of the person's archive could take, oldest first, with sizes.
   @GET('/v1/memories/trim-material')
   Future<List<TrimMaterialResponse>> getTrimMaterial();

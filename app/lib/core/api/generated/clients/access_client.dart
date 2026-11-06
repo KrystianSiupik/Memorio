@@ -10,6 +10,7 @@ import '../models/album_link_response.dart';
 import '../models/album_viewer_response.dart';
 import '../models/blocked_person_response.dart';
 import '../models/entered_album_response.dart';
+import '../models/legacy_archive_response.dart';
 import '../models/shared_album_response.dart';
 
 part 'access_client.g.dart';
@@ -18,9 +19,13 @@ part 'access_client.g.dart';
 abstract class AccessClient {
   factory AccessClient(Dio dio, {String? baseUrl}) = _AccessClient;
 
-  /// Albums the person may read without being in them. Empty until links exist (E4).
+  /// Albums the person may read without being in them.
   @GET('/v1/shared-with-me')
   Future<List<SharedAlbumResponse>> getSharedWithMe();
+
+  /// People who named this person as their legacy contact and have died: their private memories can be read.
+  @GET('/v1/legacy-archives')
+  Future<List<LegacyArchiveResponse>> listLegacyArchives();
 
   /// The owner gets the link; a working link stays the same.
   @POST('/v1/albums/{id}/link')

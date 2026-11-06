@@ -25,6 +25,7 @@ class AlbumResponse {
     required this.limitBytes,
     required this.myCuratorAccountId,
     required this.isReadOnly,
+    required this.isOwnerless,
   });
 
   factory AlbumResponse.fromJson(Map<String, Object?> json) => _$AlbumResponseFromJson(json);
@@ -42,6 +43,7 @@ class AlbumResponse {
   final dynamic limitBytes;
   final String? myCuratorAccountId;
   final bool isReadOnly;
+  final bool isOwnerless;
 
   Map<String, Object?> toJson() => _$AlbumResponseToJson(this);
 }

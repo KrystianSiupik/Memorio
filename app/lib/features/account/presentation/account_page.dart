@@ -9,9 +9,10 @@ import 'session_providers.dart';
 
 /// S24 Account and privacy: what goes with the account, deleting it and changing one's mind.
 class AccountPage extends ConsumerStatefulWidget {
-  const AccountPage({super.key, required this.onOpenPlan});
+  const AccountPage({super.key, required this.onOpenPlan, required this.onOpenLegacyContact});
 
   final VoidCallback onOpenPlan;
+  final VoidCallback onOpenLegacyContact;
 
   @override
   ConsumerState<AccountPage> createState() => _AccountPageState();
@@ -78,6 +79,11 @@ class _AccountPageState extends ConsumerState<AccountPage> {
         title: Text(context.l10n.accountTitle),
         // In the bar: available also when the data did not load, and without a connection.
         actions: [
+          IconButton(
+            tooltip: context.l10n.legacyContactTitle,
+            icon: const Icon(Icons.contact_emergency_outlined),
+            onPressed: widget.onOpenLegacyContact,
+          ),
           IconButton(
             tooltip: context.l10n.planTitle,
             icon: const Icon(Icons.workspace_premium_outlined),

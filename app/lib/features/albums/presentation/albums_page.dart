@@ -14,7 +14,11 @@ class AlbumsPage extends ConsumerStatefulWidget {
     required this.onOpenInvitation,
     required this.onOpenConsents,
     required this.onOpenEntrusted,
+    this.header,
   });
+
+  /// What comes before the albums: offers waiting for this person.
+  final Widget? header;
 
   final void Function(String albumId) onOpenAlbum;
   final void Function(String invitationId) onOpenInvitation;
@@ -91,6 +95,7 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> with AlbumActions {
               builder: (list) => ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
+                  ?widget.header,
                   if (invitations.isNotEmpty) ...[
                     Text(l10n.albumInvitations, style: Theme.of(context).textTheme.titleMedium),
                     for (final invitation in invitations)

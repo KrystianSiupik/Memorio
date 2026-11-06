@@ -31,6 +31,7 @@ void main() {
           'isOwner': false,
           'isMember': true,
           'isReadOnly': false,
+          'isOwnerless': false,
           'successorAccountId': null,
           'members': [
             {'accountId': 'o1', 'email': 'o@example.invalid', 'isOwner': true},
