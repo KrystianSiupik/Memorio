@@ -396,6 +396,7 @@ public sealed class OperatorDecisionsJobIdempotencyTests(SuccessionTestDatabase 
         await FireAsync();
 
         Assert.Equal(CaseState.Rejected, (await database.CaseAsync(caseId)).State);
+        Assert.True(await SuccessionTestDatabase.EventuallyAsync(async () => await database.QueuedEventsAsync(nameof(DeathReportedEvent), caseId) == 1));
         Assert.True(await SuccessionTestDatabase.EventuallyAsync(async () => await database.QueuedEventsAsync(nameof(DeathReportRejectedEvent), caseId) == 1));
     }
 }

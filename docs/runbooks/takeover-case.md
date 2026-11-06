@@ -10,10 +10,11 @@ Procedura obsługi (zadanie Z1, S2:B3, D-295). Polecenia na serwerze jako root w
 2. Pobierz akt do tymczasowego pliku: `succession/cases.sh certificate <id sprawy> /root/akt`.
 3. Sprawdź dokument: czy czytelny, czy dotyczy tej osoby. Aplikacja zna właściciela tylko po adresie e-mail, więc zgodność nazwiska z kontem trzeba potwierdzić osobno.
 4. **Usuń plik:** `rm /root/akt`. Akt nie może zostać poza magazynem.
-5. Zdecyduj:
+5. Sprawdź skrzynkę adresu nadawcy powiadomień: właściciel dostał wiadomość o zgłoszeniu i mógł odpowiedzieć, że żyje (D-304). Odpowiedź właściciela to odrzucenie zgłoszenia.
+6. Zdecyduj:
    - `succession/cases.sh confirm <id sprawy> --reason "..."`: zgon potwierdzony,
    - `succession/cases.sh reject <id sprawy> --reason "..."`: zgłoszenie odrzucone, zgłaszający dostanie wiadomość.
-6. Sprawdź wynik po minucie: `succession/cases.sh result <id sprawy>`. Pole `outcome` powinno mieć wartość `Applied`.
+7. Sprawdź wynik po minucie: `succession/cases.sh result <id sprawy>`. Pole `outcome` powinno mieć wartość `Applied`.
 
 ## Co dzieje się po potwierdzeniu
 

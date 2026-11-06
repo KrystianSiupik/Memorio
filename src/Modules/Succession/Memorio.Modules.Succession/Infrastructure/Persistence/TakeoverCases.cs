@@ -87,6 +87,7 @@ internal sealed class TakeoverCases(IDbContextOutbox<SuccessionDbContext> outbox
 
     private ValueTask PublishAsync(IDomainEvent domainEvent) => domainEvent switch
     {
+        DeathReported reported => outbox.PublishAsync(new DeathReportedEvent(reported.EventId, reported.OccurredAt, reported.CaseId.Value, reported.AlbumId, reported.OwnerAccountId, reported.Sequence)),
         DeathConfirmed confirmed => outbox.PublishAsync(new DeathConfirmedEvent(confirmed.EventId, confirmed.OccurredAt, confirmed.OwnerAccountId, confirmed.Sequence)),
         DeathReportRejected rejected => outbox.PublishAsync(new DeathReportRejectedEvent(rejected.EventId, rejected.OccurredAt, rejected.CaseId.Value, rejected.AlbumId, rejected.ReportedByAccountId, rejected.Sequence)),
         TakeoverOffered offered => outbox.PublishAsync(new TakeoverOfferedEvent(offered.EventId, offered.OccurredAt, offered.CaseId.Value, offered.AlbumId, offered.SuccessorAccountId, offered.AnswerBy, offered.Sequence)),

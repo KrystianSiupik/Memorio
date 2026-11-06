@@ -2,6 +2,9 @@ using Memorio.SharedKernel.Messaging;
 
 namespace Memorio.Modules.Succession.Contracts;
 
+/// <summary>E120: someone in the album reported the owner's death; the service has not decided yet. The owner hears it (D-304).</summary>
+public sealed record DeathReportedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid CaseId, Guid AlbumId, Guid OwnerAccountId, int Sequence) : IIntegrationEvent;
+
 /// <summary>E121: the service checked the certificate; this owner is dead. Everything the person left follows from this.</summary>
 public sealed record DeathConfirmedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid OwnerAccountId, int Sequence) : IIntegrationEvent;
 

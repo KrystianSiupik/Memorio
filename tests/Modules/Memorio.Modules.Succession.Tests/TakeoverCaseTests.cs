@@ -8,8 +8,23 @@ public sealed class TakeoverCaseTests
     private static readonly DateTimeOffset Now = new(2030, 1, 1, 12, 0, 0, TimeSpan.Zero);
     private static readonly Guid Successor = Guid.CreateVersion7();
 
-    private static TakeoverCase Reported() =>
-        TakeoverCase.Report(new TakeoverCaseId(Guid.CreateVersion7()), Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7(), "certificates/x/original", Now);
+    private static TakeoverCase Reported()
+    {
+        var found = TakeoverCase.Report(new TakeoverCaseId(Guid.CreateVersion7()), Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7(), "certificates/x/original", Now);
+        found.ClearDomainEvents();
+        return found;
+    }
+
+    [Fact]
+    public void A_report_tells_the_owner()
+    {
+        var (album, owner) = (Guid.CreateVersion7(), Guid.CreateVersion7());
+
+        var found = TakeoverCase.Report(new TakeoverCaseId(Guid.CreateVersion7()), album, owner, Guid.CreateVersion7(), "certificates/x/original", Now);
+
+        var reported = Assert.IsType<DeathReported>(Assert.Single(found.DomainEvents));
+        Assert.Equal((album, owner), (reported.AlbumId, reported.OwnerAccountId));
+    }
 
     private static TakeoverCase Offered()
     {

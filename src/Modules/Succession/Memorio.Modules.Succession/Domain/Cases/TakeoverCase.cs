@@ -56,9 +56,13 @@ internal sealed class TakeoverCase : AggregateRoot<TakeoverCaseId>
 
     public int Sequence { get; private set; } = 1;
 
-    /// <summary>C120.</summary>
-    public static TakeoverCase Report(TakeoverCaseId id, Guid albumId, Guid ownerAccountId, Guid reportedByAccountId, string certificateKey, DateTimeOffset now) =>
-        new(id, albumId, ownerAccountId, now) { State = CaseState.Reported, ReportedByAccountId = reportedByAccountId, CertificateKey = certificateKey };
+    /// <summary>C120. The owner hears about it: a living one can object before the service decides (D-304).</summary>
+    public static TakeoverCase Report(TakeoverCaseId id, Guid albumId, Guid ownerAccountId, Guid reportedByAccountId, string certificateKey, DateTimeOffset now)
+    {
+        var reported = new TakeoverCase(id, albumId, ownerAccountId, now) { State = CaseState.Reported, ReportedByAccountId = reportedByAccountId, CertificateKey = certificateKey };
+        reported.Raise(new DeathReported(Guid.CreateVersion7(), now, id, albumId, ownerAccountId, reported.Sequence));
+        return reported;
+    }
 
     /// <summary>The way for the other albums of someone whose death is confirmed, or who deleted the account: nothing more to verify.</summary>
     public static TakeoverCase Open(TakeoverCaseId id, Guid albumId, Guid ownerAccountId, Guid? successorAccountId, DateTimeOffset now)
@@ -190,7 +194,7 @@ internal sealed class TakeoverCase : AggregateRoot<TakeoverCaseId>
 }
 
 /// <summary>E120.</summary>
-internal sealed record DeathReported(Guid EventId, DateTimeOffset OccurredAt, TakeoverCaseId CaseId) : IDomainEvent;
+internal sealed record DeathReported(Guid EventId, DateTimeOffset OccurredAt, TakeoverCaseId CaseId, Guid AlbumId, Guid OwnerAccountId, int Sequence) : IDomainEvent;
 
 /// <summary>E121.</summary>
 internal sealed record DeathConfirmed(Guid EventId, DateTimeOffset OccurredAt, Guid OwnerAccountId, int Sequence) : IDomainEvent;

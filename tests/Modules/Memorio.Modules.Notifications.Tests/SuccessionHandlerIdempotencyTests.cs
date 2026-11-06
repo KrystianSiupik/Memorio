@@ -79,6 +79,24 @@ public sealed class DeathReportRejectedHandlerIdempotencyTests(NotificationsData
     }
 }
 
+/// <summary>SD6: E120 delivered twice.</summary>
+public sealed class DeathReportedHandlerIdempotencyTests(NotificationsDatabase database)
+{
+    [Fact]
+    public async Task The_owner_hears_once()
+    {
+        var owner = database.Neighbours.NewAccount();
+        var reported = new DeathReportedEvent(Guid.CreateVersion7(), DateTimeOffset.UtcNow, Guid.CreateVersion7(), Guid.CreateVersion7(), owner, 1);
+        await using var scope = database.CreateScope();
+        var policy = scope.ServiceProvider.GetRequiredService<NotifyOwnerOfReport>();
+
+        await policy.HandleAsync(reported, TestContext.Current.CancellationToken);
+        await policy.HandleAsync(reported, TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, database.Neighbours.SentTo(database.Neighbours.EmailOf(owner), nameof(NotificationKind.DeathReported)));
+    }
+}
+
 /// <summary>SD6: E126 delivered twice.</summary>
 public sealed class PrivateArchiveSharedHandlerIdempotencyTests(NotificationsDatabase database)
 {
