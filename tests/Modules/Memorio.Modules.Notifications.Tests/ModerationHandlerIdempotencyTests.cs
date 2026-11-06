@@ -34,7 +34,7 @@ public sealed class ReportDecidedHandlerIdempotencyTests(NotificationsDatabase d
         var (report, author) = (Guid.CreateVersion7(), database.Neighbours.NewAccount());
         var email = $"{report}@example.invalid";
         database.Neighbours.Notice(report, new ReportNotice(null, email, "SomeonesImage", "Wizerunek bez zgody.", null));
-        var decided = new ReportDecidedEvent(Guid.CreateVersion7(), DateTimeOffset.UtcNow, report, "Removed", author, 2);
+        var decided = new ReportDecidedEvent(Guid.CreateVersion7(), DateTimeOffset.UtcNow, report, "Removed", false, author, 2);
         await using var scope = database.CreateScope();
         var policy = scope.ServiceProvider.GetRequiredService<NotifyOfModeration>();
 
@@ -54,7 +54,7 @@ public sealed class AppealDecidedHandlerIdempotencyTests(NotificationsDatabase d
     {
         var (report, author) = (Guid.CreateVersion7(), database.Neighbours.NewAccount());
         database.Neighbours.Notice(report, new ReportNotice(Guid.CreateVersion7(), null, "Other", "x", "Autor ma zgodę."));
-        var decided = new AppealDecidedEvent(Guid.CreateVersion7(), DateTimeOffset.UtcNow, report, true, author, 4);
+        var decided = new AppealDecidedEvent(Guid.CreateVersion7(), DateTimeOffset.UtcNow, report, true, false, author, 4);
         await using var scope = database.CreateScope();
         var policy = scope.ServiceProvider.GetRequiredService<NotifyOfModeration>();
 

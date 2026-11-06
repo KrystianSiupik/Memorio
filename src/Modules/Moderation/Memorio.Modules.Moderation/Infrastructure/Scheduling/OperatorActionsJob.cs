@@ -121,6 +121,7 @@ internal sealed partial class OperatorActionsJob(IReports reports, IOrders order
         {
             (OperatorAction.Decide, nameof(Verdict.Removed)) => handler.HandleAsync(new DecideReport(report, Verdict.Removed, action.Statement, action.DecidedBy), cancellationToken),
             (OperatorAction.Decide, nameof(Verdict.Kept)) => handler.HandleAsync(new DecideReport(report, Verdict.Kept, action.Statement, action.DecidedBy), cancellationToken),
+            (OperatorAction.Decide, "Unfounded") => handler.HandleAsync(new DecideReport(report, Verdict.Kept, action.Statement, action.DecidedBy, Unfounded: true), cancellationToken),
             (OperatorAction.DecideAppeal, "Reversed") => handler.HandleAsync(new DecideAppeal(report, Reversed: true, action.Statement, action.DecidedBy), cancellationToken),
             (OperatorAction.DecideAppeal, "Upheld") => handler.HandleAsync(new DecideAppeal(report, Reversed: false, action.Statement, action.DecidedBy), cancellationToken),
             _ => Task.FromResult<Result>(ReportErrors.InvalidDecision),

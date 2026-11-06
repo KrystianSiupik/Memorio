@@ -3972,7 +3972,10 @@
           "verdict",
           "statement",
           "reportedAt",
-          "decidedAt"
+          "decidedAt",
+          "appealUntil",
+          "appealReversed",
+          "appealStatement"
         ],
         "type": "object",
         "properties": {
@@ -4018,6 +4021,25 @@
               "string"
             ],
             "format": "date-time"
+          },
+          "appealUntil": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "appealReversed": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "appealStatement": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

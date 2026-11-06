@@ -200,25 +200,7 @@ class _MyModerationPageState extends ConsumerState<MyModerationPage> with Modera
                   if (about.appealReversed case final reversed?)
                     Text(reversed ? l10n.myModerationAppealReversed : l10n.myModerationAppealUpheld),
                   if (about.appealStatement case final statement?) Text(l10n.myModerationStatement(statement)),
-                  if (about.canAppeal(now)) ...[
-                    const SizedBox(height: 8),
-                    TextField(
-                      key: Key('s22-appeal-text-${about.id}'),
-                      controller: _appealOf(about.id),
-                      maxLength: 4000,
-                      maxLines: 3,
-                      decoration: InputDecoration(labelText: l10n.myModerationAppealReason),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                    Text(l10n.myModerationAppealUntil(dayText(about.appealUntil!))),
-                    FilledButton(
-                      key: Key('s22-appeal-${about.id}'),
-                      onPressed: offline || busy || _appealOf(about.id).text.trim().isEmpty
-                          ? null
-                          : () => _appeal(about.id),
-                      child: Text(l10n.myModerationAppeal),
-                    ),
-                  ],
+                  if (about.canAppeal(now)) ..._appealBlock(about.id, about.appealUntil!),
                 ],
               ),
             ),
@@ -228,17 +210,48 @@ class _MyModerationPageState extends ConsumerState<MyModerationPage> with Modera
           Text(l10n.myModerationMine, style: Theme.of(context).textTheme.titleMedium),
         ],
         for (final report in value.reports)
-          ListTile(
+          Card(
             key: Key('s22-report-${report.id}'),
-            title: Text(l10n.myModerationReported(dayText(report.reportedAt), reportReasonText(l10n, report.reason))),
-            subtitle: Text(
-              [
-                _verdictText(report.verdict),
-                if (report.statement case final statement?) l10n.myModerationStatement(statement),
-              ].join('\n'),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.myModerationReported(dayText(report.reportedAt), reportReasonText(l10n, report.reason))),
+                  Text(_verdictText(report.verdict)),
+                  if (report.statement case final statement?) Text(l10n.myModerationStatement(statement)),
+                  if (report.state == 'Appealed') Text(l10n.myModerationAppealPending),
+                  if (report.appealReversed case final reversed?)
+                    Text(reversed ? l10n.myModerationReporterAppealReversed : l10n.myModerationAppealUpheld),
+                  if (report.appealStatement case final statement?) Text(l10n.myModerationStatement(statement)),
+                  if (report.canAppeal(now)) ..._appealBlock(report.id, report.appealUntil!),
+                ],
+              ),
             ),
           ),
       ],
     );
+  }
+
+  /// The appeal of either side, while its window lasts.
+  List<Widget> _appealBlock(String id, DateTime until) {
+    final l10n = context.l10n;
+    return [
+      const SizedBox(height: 8),
+      TextField(
+        key: Key('s22-appeal-text-$id'),
+        controller: _appealOf(id),
+        maxLength: 4000,
+        maxLines: 3,
+        decoration: InputDecoration(labelText: l10n.myModerationAppealReason),
+        onChanged: (_) => setState(() {}),
+      ),
+      Text(l10n.myModerationAppealUntil(dayText(until))),
+      FilledButton(
+        key: Key('s22-appeal-$id'),
+        onPressed: offline || busy || _appealOf(id).text.trim().isEmpty ? null : () => _appeal(id),
+        child: Text(l10n.myModerationAppeal),
+      ),
+    ];
   }
 }

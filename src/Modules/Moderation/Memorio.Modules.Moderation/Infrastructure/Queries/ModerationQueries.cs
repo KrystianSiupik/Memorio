@@ -18,14 +18,17 @@ internal sealed class ModerationQueries(ModerationDbContext database) : IModerat
 
     private const string MineSql = """
         SELECT id AS "Id", target AS "Target", target_id AS "TargetId", reason AS "Reason", state AS "State", verdict AS "Verdict",
-               statement AS "Statement", reported_at AS "ReportedAt", decided_at AS "DecidedAt"
+               statement AS "Statement", reported_at AS "ReportedAt", decided_at AS "DecidedAt",
+               CASE WHEN verdict = 'Kept' THEN appeal_until END AS "AppealUntil",
+               CASE WHEN appeal_by_reporter THEN appeal_reversed END AS "AppealReversed",
+               CASE WHEN appeal_by_reporter THEN appeal_statement END AS "AppealStatement"
         FROM moderation.reports WHERE reporter_account_id = @accountId ORDER BY reported_at DESC
         """;
 
     private const string AboutSql = """
         SELECT id AS "Id", target AS "Target", target_id AS "TargetId", reason AS "Reason", category AS "Category", state AS "State",
                hidden AS "Hidden", verdict AS "Verdict", statement AS "Statement", reported_at AS "ReportedAt", decided_at AS "DecidedAt",
-               appeal_until AS "AppealUntil", appeal_reversed AS "AppealReversed", appeal_statement AS "AppealStatement"
+               CASE WHEN verdict = 'Removed' THEN appeal_until END AS "AppealUntil", appeal_reversed AS "AppealReversed", appeal_statement AS "AppealStatement"
         FROM moderation.reports WHERE author_account_id = @accountId ORDER BY reported_at DESC
         """;
 
@@ -37,7 +40,9 @@ internal sealed class ModerationQueries(ModerationDbContext database) : IModerat
 
     public async Task<IReadOnlyList<MyReport>> ReportsByAsync(Guid accountId, CancellationToken cancellationToken) =>
         [.. (await database.Database.GetDbConnection().QueryAsync<MineRow>(new CommandDefinition(MineSql, new { accountId }, cancellationToken: cancellationToken)))
-            .Select(row => new MyReport(row.Id, row.Target, row.TargetId, row.Reason, row.State, row.Verdict, row.Statement, Utc(row.ReportedAt), UtcOrNull(row.DecidedAt)))];
+            .Select(row => new MyReport(
+                row.Id, row.Target, row.TargetId, row.Reason, row.State, row.Verdict, row.Statement, Utc(row.ReportedAt), UtcOrNull(row.DecidedAt),
+                UtcOrNull(row.AppealUntil), row.AppealReversed, row.AppealStatement))];
 
     public async Task<IReadOnlyList<ReportAboutMine>> ReportsAboutAsync(Guid accountId, CancellationToken cancellationToken) =>
         [.. (await database.Database.GetDbConnection().QueryAsync<AboutRow>(new CommandDefinition(AboutSql, new { accountId }, cancellationToken: cancellationToken)))
@@ -71,6 +76,12 @@ internal sealed class ModerationQueries(ModerationDbContext database) : IModerat
         public DateTime ReportedAt { get; set; }
 
         public DateTime? DecidedAt { get; set; }
+
+        public DateTime? AppealUntil { get; set; }
+
+        public bool? AppealReversed { get; set; }
+
+        public string? AppealStatement { get; set; }
     }
 
     private sealed class AboutRow

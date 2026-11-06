@@ -1075,6 +1075,18 @@ abstract class AppLocalizations {
   /// **'Odwołanie nieuwzględnione.'**
   String get myModerationAppealUpheld;
 
+  /// No description provided for @myModerationReporterAppealReversed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odwołanie uwzględnione: treść została ukryta.'**
+  String get myModerationReporterAppealReversed;
+
+  /// No description provided for @reportSuspended.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie przyjmujemy teraz Twoich zgłoszeń: trzy w ciągu 90 dni uznaliśmy za oczywiście bezzasadne.'**
+  String get reportSuspended;
+
   /// No description provided for @myModerationAppealReason.
   ///
   /// In pl, this message translates to:

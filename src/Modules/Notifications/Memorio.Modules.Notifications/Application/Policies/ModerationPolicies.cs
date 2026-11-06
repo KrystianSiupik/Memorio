@@ -66,7 +66,7 @@ internal sealed class NotifyOfModeration(IReportNotices notices, IAccountDirecto
 
         var removed = integrationEvent.Verdict == "Removed";
         await TellReporterAsync(
-            integrationEvent.ReportId, "decided", integrationEvent.Sequence, notice, removed ? NotificationKind.ReportActedOn : NotificationKind.ReportNotActedOn, notice.Statement, cancellationToken);
+            integrationEvent.ReportId, "decided", integrationEvent.Sequence, notice, removed ? NotificationKind.ReportActedOn : integrationEvent.Unfounded ? NotificationKind.ReportUnfounded : NotificationKind.ReportNotActedOn, notice.Statement, cancellationToken);
         await TellAuthorAsync(
             integrationEvent.ReportId,
             "decided",
@@ -79,7 +79,12 @@ internal sealed class NotifyOfModeration(IReportNotices notices, IAccountDirecto
 
     public async Task HandleAsync(AppealDecidedEvent integrationEvent, CancellationToken cancellationToken)
     {
-        if (await notices.NoticeOfAsync(integrationEvent.ReportId, cancellationToken) is { } notice)
+        if (await notices.NoticeOfAsync(integrationEvent.ReportId, cancellationToken) is not { } notice)
+        {
+            return;
+        }
+
+        if (!integrationEvent.ByReporter)
         {
             await TellAuthorAsync(
                 integrationEvent.ReportId,
@@ -89,6 +94,21 @@ internal sealed class NotifyOfModeration(IReportNotices notices, IAccountDirecto
                 integrationEvent.Reversed ? NotificationKind.AppealReversed : NotificationKind.AppealUpheld,
                 notice.AppealStatement,
                 cancellationToken);
+            return;
+        }
+
+        await TellReporterAsync(
+            integrationEvent.ReportId,
+            "appeal",
+            integrationEvent.Sequence,
+            notice,
+            integrationEvent.Reversed ? NotificationKind.ReporterAppealReversed : NotificationKind.ReporterAppealUpheld,
+            notice.AppealStatement,
+            cancellationToken);
+        if (integrationEvent.Reversed)
+        {
+            // The author's content is hidden now: the decision about it, with the reasons and the appeal they have.
+            await TellAuthorAsync(integrationEvent.ReportId, "appeal", integrationEvent.AuthorAccountId, integrationEvent.Sequence, NotificationKind.ContentRemovedOnAppeal, notice.AppealStatement, cancellationToken);
         }
     }
 

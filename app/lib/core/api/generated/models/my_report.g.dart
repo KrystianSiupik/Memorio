@@ -16,6 +16,9 @@ MyReport _$MyReportFromJson(Map<String, dynamic> json) => MyReport(
   statement: json['statement'] as String?,
   reportedAt: DateTime.parse(json['reportedAt'] as String),
   decidedAt: json['decidedAt'] == null ? null : DateTime.parse(json['decidedAt'] as String),
+  appealUntil: json['appealUntil'] == null ? null : DateTime.parse(json['appealUntil'] as String),
+  appealReversed: json['appealReversed'] as bool?,
+  appealStatement: json['appealStatement'] as String?,
 );
 
 Map<String, dynamic> _$MyReportToJson(MyReport instance) => <String, dynamic>{
@@ -28,4 +31,7 @@ Map<String, dynamic> _$MyReportToJson(MyReport instance) => <String, dynamic>{
   'statement': instance.statement,
   'reportedAt': instance.reportedAt.toIso8601String(),
   'decidedAt': instance.decidedAt?.toIso8601String(),
+  'appealUntil': instance.appealUntil?.toIso8601String(),
+  'appealReversed': instance.appealReversed,
+  'appealStatement': instance.appealStatement,
 };

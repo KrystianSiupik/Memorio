@@ -18,6 +18,9 @@ class MyReport {
     required this.statement,
     required this.reportedAt,
     required this.decidedAt,
+    required this.appealUntil,
+    required this.appealReversed,
+    required this.appealStatement,
   });
 
   factory MyReport.fromJson(Map<String, Object?> json) => _$MyReportFromJson(json);
@@ -31,6 +34,9 @@ class MyReport {
   final String? statement;
   final DateTime reportedAt;
   final DateTime? decidedAt;
+  final DateTime? appealUntil;
+  final bool? appealReversed;
+  final String? appealStatement;
 
   Map<String, Object?> toJson() => _$MyReportToJson(this);
 }

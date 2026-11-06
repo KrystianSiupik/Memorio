@@ -18,8 +18,9 @@ Procedura obsługi (S2:C2, DSA art. 16, 17 i 20, D-309). Polecenia na serwerze j
 3. **Usuń pobrane pliki:** `rm -r /root/zgloszenie`.
 4. Zdecyduj, z uzasadnieniem, które dostaną obie strony (bez danych zgłaszającego):
    - `moderation/moderation.sh decide <id> removed --reason "…"`: treść ukryta, widzi ją tylko autor; nic nie jest usuwane,
-   - `moderation/moderation.sh decide <id> kept --reason "…"`: treść zostaje albo wraca.
-5. Odwołanie (stan `Appealed` na liście): `moderation/moderation.sh appeal <id> reversed|upheld --reason "…"`.
+   - `moderation/moderation.sh decide <id> kept --reason "…"`: treść zostaje albo wraca,
+   - `moderation/moderation.sh decide <id> unfounded --reason "…"`: treść zostaje, a zgłoszenie było oczywiście bezzasadne; zgłaszający dostaje ostrzeżenie, a po 3 takich w 90 dniach przez 6 miesięcy nie może zgłaszać (D-315).
+5. Odwołanie (stan `Appealed` na liście) rozpatruje **inna osoba** niż ta, która decydowała (D-316); od ukrycia odwołuje się autor, od „zostaje” zgłaszający: `moderation/moderation.sh appeal <id> reversed|upheld --reason "…"`.
 6. Sprawdź wynik po minucie: `moderation/moderation.sh result <id>`. Pole `result` powinno mieć wartość `Applied`.
 
 ## Treści z kategorii A

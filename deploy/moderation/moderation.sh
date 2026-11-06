@@ -4,7 +4,8 @@
 # Every look at content and every decision go to the operations log (S2:C8). Usage:
 #   moderation.sh list                                        reports and appeals waiting, the most urgent first (R9)
 #   moderation.sh show <report id> [directory]                the report and the content; photos into the directory
-#   moderation.sh decide <report id> removed|kept --reason "…"   the decision, with reasons for both sides
+#   moderation.sh decide <report id> removed|kept|unfounded --reason "…"   the decision, with reasons for both sides
+#                                                             (unfounded: kept, and a warning; 3 in 90 days suspend reporting)
 #   moderation.sh appeal <report id> reversed|upheld --reason "…"  the decision on the author's appeal
 #   moderation.sh result <report id>                          what became of the decisions
 # Orders of authorities (Z6, D-312), entered only once their basis is checked:
@@ -21,7 +22,7 @@ source "$(dirname "$0")/../backup/common.sh"
 operations_log="${OPERATIONS_LOG:-/var/lib/memorio/operations.log}"
 operator="${SUDO_USER:-$(id -un)}"
 
-usage() { sed -n '5,17p' "$0" >&2; exit 2; }
+usage() { sed -n '5,18p' "$0" >&2; exit 2; }
 
 valid_id() { [[ "$1" =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ ]] || usage; }
 
@@ -153,7 +154,7 @@ case "${1:-}" in
     show) valid_id "${2:-}"; show "$2" "${3:-}" ;;
     decide)
         valid_id "${2:-}"; [ "${4:-}" = --reason ] || usage
-        case "${3:-}" in removed) act "$2" Decide Removed "${5:-}" ;; kept) act "$2" Decide Kept "${5:-}" ;; *) usage ;; esac
+        case "${3:-}" in removed) act "$2" Decide Removed "${5:-}" ;; kept) act "$2" Decide Kept "${5:-}" ;; unfounded) act "$2" Decide Unfounded "${5:-}" ;; *) usage ;; esac
         ;;
     appeal)
         valid_id "${2:-}"; [ "${4:-}" = --reason ] || usage

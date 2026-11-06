@@ -349,6 +349,10 @@ namespace Memorio.Modules.Moderation.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<bool?>("AppealByReporter")
+                        .HasColumnType("boolean")
+                        .HasColumnName("appeal_by_reporter");
+
                     b.Property<DateTimeOffset?>("AppealDecidedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("appeal_decided_at");
@@ -470,6 +474,10 @@ namespace Memorio.Modules.Moderation.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("target_key");
 
+                    b.Property<bool>("Unfounded")
+                        .HasColumnType("boolean")
+                        .HasColumnName("unfounded");
+
                     b.Property<string>("Verdict")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
@@ -486,6 +494,10 @@ namespace Memorio.Modules.Moderation.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ReporterAccountId")
                         .HasDatabaseName("ix_reports_reporter");
+
+                    b.HasIndex("ReporterKey")
+                        .HasDatabaseName("ix_reports_unfounded")
+                        .HasFilter("unfounded");
 
                     b.HasIndex("ReporterKey", "TargetKey")
                         .IsUnique()

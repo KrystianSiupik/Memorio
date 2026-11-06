@@ -44,6 +44,9 @@ class HttpModerationRepository implements ModerationRepository {
             verdict: report.verdict,
             statement: report.statement,
             reportedAt: report.reportedAt,
+            appealUntil: report.appealUntil,
+            appealReversed: report.appealReversed,
+            appealStatement: report.appealStatement,
           ),
       ],
       aboutMine: [
@@ -90,6 +93,7 @@ class HttpModerationRepository implements ModerationRepository {
     final code = body is Map ? body['code'] : null;
     return switch (code) {
       'Moderation.OwnContent' => const ModerationOwnContent(),
+      'Moderation.ReportingSuspended' => const ModerationSuspended(),
       'Moderation.AlreadyDecided' => const ModerationAlreadyDecided(),
       _ => switch (response.statusCode) {
         403 || 404 => const ModerationNoAccess(),

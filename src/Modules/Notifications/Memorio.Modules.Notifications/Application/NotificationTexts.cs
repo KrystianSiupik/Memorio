@@ -80,6 +80,18 @@ internal static class NotificationTexts
             NotificationKind.AppealUpheld => (
                 "Twoje odwołanie w Memorio nie zostało uwzględnione",
                 $"Treść pozostaje ukryta.\n\nUzasadnienie: {OneLine(detail ?? "")}"),
+            NotificationKind.ReporterAppealReversed => (
+                "Twoje odwołanie w Memorio zostało uwzględnione",
+                $"Zgłoszona treść została ukryta.\n\nUzasadnienie: {OneLine(detail ?? "")}"),
+            NotificationKind.ContentRemovedOnAppeal => (
+                "Decyzja w sprawie Twojej treści w Memorio",
+                $"Po odwołaniu osoby zgłaszającej Twoja treść została ukryta: widzisz ją tylko Ty.\n\nUzasadnienie: {OneLine(detail ?? "")}"),
+            NotificationKind.ReportUnfounded => (
+                "Decyzja w sprawie Twojego zgłoszenia w Memorio",
+                $"Zgłoszona treść pozostaje dostępna, a zgłoszenie uznaliśmy za oczywiście bezzasadne.\n\nUzasadnienie: {OneLine(detail ?? "")}\n\nTo ostrzeżenie: po trzech takich zgłoszeniach w ciągu 90 dni przez 6 miesięcy nie przyjmiemy Twoich zgłoszeń."),
+            NotificationKind.ReporterAppealUpheld => (
+                "Twoje odwołanie w Memorio nie zostało uwzględnione",
+                $"Zgłoszona treść pozostaje dostępna.\n\nUzasadnienie: {OneLine(detail ?? "")}"),
             NotificationKind.ContentHiddenByOrder => (
                 "Twoja treść w Memorio została ukryta na nakaz organu",
                 "Na nakaz uprawnionego organu ukryliśmy Twoją treść: widzisz ją tylko Ty.\n\nNie możemy jej przywrócić bez decyzji tego organu."),

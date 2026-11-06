@@ -179,6 +179,15 @@ void main() {
         ],
         reports: [
           MyReport(id: 'r3', reason: ReportReason.copyright, state: 'Open', reportedAt: DateTime(2026, 11, 3, 12)),
+          MyReport(
+            id: 'r4',
+            reason: ReportReason.someonesImage,
+            state: 'Decided',
+            verdict: 'Kept',
+            statement: 'Nie widać twarzy.',
+            reportedAt: DateTime(2026, 11, 3, 12),
+            appealUntil: DateTime.now().add(const Duration(days: 100)),
+          ),
         ],
       );
       await open(tester, location);
@@ -196,6 +205,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(moderation.actions, ['appeal:r1:To moje zdjęcie.']);
+      expect(find.byKey(const Key('s22-appeal-r3')), findsNothing);
+      await tester.ensureVisible(find.byKey(const Key('s22-appeal-text-r4')));
+      await tester.enterText(find.byKey(const Key('s22-appeal-text-r4')), 'Widać mnie wyraźnie.');
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('s22-appeal-r4')));
+      await tester.pumpAndSettle();
+      expect(moderation.actions.last, 'appeal:r4:Widać mnie wyraźnie.');
     });
 
     testWidgets('a failed load says so and Ponów loads again', (tester) async {
