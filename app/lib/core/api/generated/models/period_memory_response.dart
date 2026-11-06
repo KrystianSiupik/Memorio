@@ -16,6 +16,7 @@ class PeriodMemoryResponse {
     required this.datePrecision,
     required this.dateFrom,
     required this.dateTo,
+    required this.time,
     required this.description,
     required this.isMine,
     required this.photos,
@@ -31,6 +32,7 @@ class PeriodMemoryResponse {
   final String datePrecision;
   final String dateFrom;
   final String dateTo;
+  final String? time;
   final String? description;
   final bool isMine;
   final dynamic photos;

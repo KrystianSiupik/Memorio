@@ -27,6 +27,7 @@ class NewMemory {
     required this.precision,
     required this.from,
     this.to,
+    this.time,
   });
 
   final String id;
@@ -38,6 +39,9 @@ class NewMemory {
 
   /// yyyy-MM-dd; only for a period.
   final String? to;
+
+  /// HH:mm, when the person knows the hour; only for a day. Orders memories within a day (D-303).
+  final String? time;
 }
 
 /// What S05 shows.
@@ -47,6 +51,7 @@ class MemoryDetails {
     required this.placeName,
     required this.dateFrom,
     required this.dateTo,
+    this.time,
     required this.isMine,
     required this.description,
     required this.descriptionIsAi,
@@ -59,6 +64,9 @@ class MemoryDetails {
   /// yyyy-MM-dd, the range the date stands for.
   final String dateFrom;
   final String dateTo;
+
+  /// HH:mm, when the person gave the hour.
+  final String? time;
   final bool isMine;
   final String? description;
   final bool descriptionIsAi;

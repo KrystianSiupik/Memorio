@@ -53,6 +53,27 @@ public sealed class CreateMemoryTests(ArchiveDatabase database)
     }
 
     [Fact]
+    public void A_day_may_have_an_hour()
+    {
+        var date = MemoryDate.Create("Day", "2026-07-15", null, new DateOnly(2026, 11, 3), "18:30");
+
+        Assert.Equal(new TimeOnly(18, 30), date.Value.Time);
+        Assert.Null(MemoryDate.Create("Day", "2026-07-15", null, new DateOnly(2026, 11, 3)).Value.Time);
+    }
+
+    [Theory]
+    [InlineData("Day", "25:00")]
+    [InlineData("Day", "18.30")]
+    [InlineData("Day", "8:30")]
+    [InlineData("Day", "")]
+    [InlineData("Month", "18:30")]
+    [InlineData("Year", "18:30")]
+    public void An_hour_is_only_for_a_day_and_only_as_HH_mm(string precision, string time)
+    {
+        Assert.Equal(MemoryErrors.InvalidDate, MemoryDate.Create(precision, "2026-07-15", null, new DateOnly(2026, 11, 3), time).Error);
+    }
+
+    [Fact]
     public void A_date_in_the_future_is_refused_but_the_devices_day_may_run_ahead()
     {
         var today = new DateOnly(2026, 11, 3);

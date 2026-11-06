@@ -79,7 +79,7 @@ internal static class MemoriesEndpoints
         CancellationToken cancellationToken)
     {
         var created = await handler.HandleAsync(
-            new CreateMemory(request.Id, CurrentAccount.IdOf(principal), request.PlaceReference, request.DatePrecision, request.DateFrom, request.DateTo),
+            new CreateMemory(request.Id, CurrentAccount.IdOf(principal), request.PlaceReference, request.DatePrecision, request.DateFrom, request.DateTo, request.Time),
             cancellationToken);
         return created.IsFailure ? Problems.From(created.Error) : TypedResults.Ok(new CreatedMemoryResponse(created.Value.Id.Value));
     }
@@ -139,6 +139,7 @@ internal static class MemoriesEndpoints
                 memory.DatePrecision,
                 memory.DateFrom,
                 memory.DateTo,
+                memory.Time,
                 memory.AuthorAccountId == accountId,
                 memory.Description,
                 memory.DescriptionIsAi,
@@ -253,7 +254,7 @@ internal static class MemoriesEndpoints
         var memories = await query.GetAsync(CurrentAccount.IdOf(principal), first, last, cancellationToken);
         return TypedResults.Ok<IReadOnlyList<PeriodMemoryResponse>>(
             [.. memories.Select(memory => new PeriodMemoryResponse(
-                memory.Id, memory.PlaceName, memory.Latitude, memory.Longitude, memory.DatePrecision, memory.DateFrom, memory.DateTo,
+                memory.Id, memory.PlaceName, memory.Latitude, memory.Longitude, memory.DatePrecision, memory.DateFrom, memory.DateTo, memory.Time,
                 memory.Description, memory.IsMine, memory.Photos, memory.PhotoUrls))]);
     }
 
@@ -287,6 +288,7 @@ internal static class MemoriesEndpoints
 /// <param name="AiDraftId">The AI draft it started from, if any.</param>
 internal sealed record ApproveDescriptionRequest(string? Text, Guid? AiDraftId);
 
+/// <param name="Time">HH:mm, when the person knows the hour.</param>
 /// <param name="IsMine">The person asking is the author.</param>
 /// <param name="DescriptionIsAi">The description started as an AI draft: shown with the AI marker.</param>
 internal sealed record MemoryDetailsResponse(
@@ -297,6 +299,7 @@ internal sealed record MemoryDetailsResponse(
     string DatePrecision,
     string DateFrom,
     string DateTo,
+    string? Time,
     bool IsMine,
     string? Description,
     bool DescriptionIsAi,
@@ -313,7 +316,7 @@ internal sealed record TrashedMemoryResponse(Guid Id, string PlaceName, string D
 
 internal sealed record MyMemoryResponse(Guid Id, string PlaceName, string DateFrom);
 
-internal sealed record PeriodMemoryResponse(Guid Id, string PlaceName, double Latitude, double Longitude, string DatePrecision, string DateFrom, string DateTo, string? Description, bool IsMine, int Photos, IReadOnlyList<Uri> PhotoUrls);
+internal sealed record PeriodMemoryResponse(Guid Id, string PlaceName, double Latitude, double Longitude, string DatePrecision, string DateFrom, string DateTo, string? Time, string? Description, bool IsMine, int Photos, IReadOnlyList<Uri> PhotoUrls);
 
 internal sealed record MemoryPointResponse(Guid Id, double Latitude, double Longitude);
 
@@ -332,7 +335,8 @@ internal sealed record AddPhotoRequest(Guid PhotoId, string? UploadKey);
 /// <param name="DatePrecision">Day, Month, Year or Period.</param>
 /// <param name="DateFrom">yyyy-MM-dd.</param>
 /// <param name="DateTo">yyyy-MM-dd; only for a period.</param>
-internal sealed record CreateMemoryRequest(Guid Id, string? PlaceReference, string? DatePrecision, string? DateFrom, string? DateTo);
+/// <param name="Time">HH:mm, when the person knows the hour; only for a day.</param>
+internal sealed record CreateMemoryRequest(Guid Id, string? PlaceReference, string? DatePrecision, string? DateFrom, string? DateTo, string? Time = null);
 
 internal sealed record CreatedMemoryResponse(Guid Id);
 

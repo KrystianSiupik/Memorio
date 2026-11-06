@@ -38,7 +38,7 @@ String periodDateText(PeriodMemory memory) {
     'Year' => from[0],
     'Month' => '${from[1]}.${from[0]}',
     'Period' => '${dayTextOf(memory.dateFrom)} – ${dayTextOf(memory.dateTo)}',
-    _ => dayTextOf(memory.dateFrom),
+    _ => memory.time == null ? dayTextOf(memory.dateFrom) : '${dayTextOf(memory.dateFrom)}, ${memory.time}',
   };
 }
 

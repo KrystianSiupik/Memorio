@@ -146,6 +146,10 @@ namespace Memorio.Modules.Archive.Infrastructure.Persistence.Migrations
                         .HasDefaultValue("Active")
                         .HasColumnName("state");
 
+                    b.Property<TimeOnly?>("Time")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("time_of_day");
+
                     b.Property<string>("TrashReason")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")

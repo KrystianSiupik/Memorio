@@ -40,6 +40,8 @@ internal sealed class Memory : AggregateRoot<MemoryId>
 
     public DateOnly DateTo { get; private set; }
 
+    public TimeOnly? Time { get; private set; }
+
     public IReadOnlyCollection<Photo> Photos => _photos.AsReadOnly();
 
     public MemoryState State { get; private set; } = MemoryState.Active;
@@ -74,6 +76,7 @@ internal sealed class Memory : AggregateRoot<MemoryId>
             DatePrecision = date.Precision,
             DateFrom = date.From,
             DateTo = date.To,
+            Time = date.Time,
         };
         memory.Raise(new MemoryCreated(Guid.CreateVersion7(), now, id, authorAccountId));
         return memory;

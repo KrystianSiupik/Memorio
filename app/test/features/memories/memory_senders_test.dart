@@ -24,6 +24,15 @@ void main() {
 
     expect(result, isA<Sent>());
     expect(memories.created.single.precision, MemoryDatePrecision.day);
+    expect(memories.created.single.time, isNull);
+  });
+
+  test('the hour from the payload goes along', () async {
+    await senders[MemoryOperations.createMemory]!(
+      operation(MemoryOperations.createMemory, {...create, 'time': '18:30'}),
+    );
+
+    expect(memories.created.single.time, '18:30');
   });
 
   test('no connection or a server error waits for later', () async {

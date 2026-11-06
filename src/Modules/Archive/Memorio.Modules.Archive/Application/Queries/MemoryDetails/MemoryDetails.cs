@@ -14,6 +14,7 @@ internal sealed record MemoryDetails(
     string DatePrecision,
     string DateFrom,
     string DateTo,
+    string? Time,
     Guid AuthorAccountId,
     string? Description,
     bool DescriptionIsAi,

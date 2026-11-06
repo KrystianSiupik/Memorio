@@ -12,6 +12,7 @@ CreateMemoryRequest _$CreateMemoryRequestFromJson(Map<String, dynamic> json) => 
   datePrecision: json['datePrecision'] as String?,
   dateFrom: json['dateFrom'] as String?,
   dateTo: json['dateTo'] as String?,
+  time: json['time'] as String?,
 );
 
 Map<String, dynamic> _$CreateMemoryRequestToJson(CreateMemoryRequest instance) => <String, dynamic>{
@@ -20,4 +21,5 @@ Map<String, dynamic> _$CreateMemoryRequestToJson(CreateMemoryRequest instance) =
   'datePrecision': instance.datePrecision,
   'dateFrom': instance.dateFrom,
   'dateTo': instance.dateTo,
+  'time': instance.time,
 };

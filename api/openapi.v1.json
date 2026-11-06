@@ -3290,6 +3290,12 @@
               "null",
               "string"
             ]
+          },
+          "time": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -3532,6 +3538,7 @@
           "datePrecision",
           "dateFrom",
           "dateTo",
+          "time",
           "isMine",
           "description",
           "descriptionIsAi",
@@ -3570,6 +3577,12 @@
           },
           "dateTo": {
             "type": "string"
+          },
+          "time": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "isMine": {
             "type": "boolean"
@@ -3718,6 +3731,7 @@
           "datePrecision",
           "dateFrom",
           "dateTo",
+          "time",
           "description",
           "isMine",
           "photos",
@@ -3756,6 +3770,12 @@
           },
           "dateTo": {
             "type": "string"
+          },
+          "time": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "description": {
             "type": [

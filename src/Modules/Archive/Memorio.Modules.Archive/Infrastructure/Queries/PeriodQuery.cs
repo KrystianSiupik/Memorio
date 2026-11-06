@@ -17,11 +17,11 @@ internal sealed class PeriodQuery(ArchiveDbContext database, IObjectStorage stor
         state = 'Active' AND date_to >= @from::date AND date_from <= @to::date
         """;
 
-    private const string Order = "ORDER BY date_from, date_to, created_at, id";
+    private const string Order = "ORDER BY date_from, date_to, time_of_day NULLS LAST, created_at, id";
 
     private const string Sql = $"""
         SELECT id AS "Id", place_name AS "PlaceName", latitude AS "Latitude", longitude AS "Longitude", date_precision AS "DatePrecision",
-               date_from::text AS "DateFrom", date_to::text AS "DateTo", description AS "Description", author_account_id = @accountId AS "IsMine",
+               date_from::text AS "DateFrom", date_to::text AS "DateTo", to_char(time_of_day, 'HH24:MI') AS "Time", description AS "Description", author_account_id = @accountId AS "IsMine",
                (SELECT count(*)::int FROM archive.photos photo WHERE photo.memory_id = archive.memories.id) AS "Photos"
         FROM archive.memories
         WHERE {Overlap}
@@ -61,7 +61,7 @@ internal sealed class PeriodQuery(ArchiveDbContext database, IObjectStorage stor
         var signed = await storage.SignReadsAsync([.. photos.Select(photo => new StorageKey(photo.StorageKey)).Distinct()], cancellationToken);
         var byMemory = photos.ToLookup(photo => photo.MemoryId, photo => signed[new StorageKey(photo.StorageKey)].Url);
         return [.. rows.Select(row => new PeriodMemory(
-            row.Id, row.PlaceName, row.Latitude, row.Longitude, row.DatePrecision, row.DateFrom, row.DateTo, row.Description, row.IsMine, row.Photos, [.. byMemory[row.Id]]))];
+            row.Id, row.PlaceName, row.Latitude, row.Longitude, row.DatePrecision, row.DateFrom, row.DateTo, row.Time, row.Description, row.IsMine, row.Photos, [.. byMemory[row.Id]]))];
     }
 
     public async Task<IReadOnlyList<Guid>> OwnAsync(Guid accountId, DateOnly from, DateOnly to, CancellationToken cancellationToken) =>
@@ -72,7 +72,7 @@ internal sealed class PeriodQuery(ArchiveDbContext database, IObjectStorage stor
 
     private static string Day(DateOnly day) => day.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-    private sealed record Row(Guid Id, string PlaceName, double Latitude, double Longitude, string DatePrecision, string DateFrom, string DateTo, string? Description, bool IsMine, int Photos);
+    private sealed record Row(Guid Id, string PlaceName, double Latitude, double Longitude, string DatePrecision, string DateFrom, string DateTo, string? Time, string? Description, bool IsMine, int Photos);
 
     private sealed record PhotoRow(Guid MemoryId, string StorageKey);
 }

@@ -18,6 +18,7 @@ class MemoryDetailsResponse {
     required this.datePrecision,
     required this.dateFrom,
     required this.dateTo,
+    required this.time,
     required this.isMine,
     required this.description,
     required this.descriptionIsAi,
@@ -33,6 +34,7 @@ class MemoryDetailsResponse {
   final String datePrecision;
   final String dateFrom;
   final String dateTo;
+  final String? time;
   final bool isMine;
   final String? description;
   final bool descriptionIsAi;

@@ -26,6 +26,7 @@ class HttpReplayRepository implements ReplayRepository {
           datePrecision: memory.datePrecision,
           dateFrom: memory.dateFrom,
           dateTo: memory.dateTo,
+          time: memory.time,
           description: memory.description,
           isMine: memory.isMine,
           photos: memory.photos as int,

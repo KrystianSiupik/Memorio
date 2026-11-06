@@ -14,6 +14,7 @@ class CreateMemoryRequest {
     required this.datePrecision,
     required this.dateFrom,
     required this.dateTo,
+    this.time,
   });
 
   factory CreateMemoryRequest.fromJson(Map<String, Object?> json) => _$CreateMemoryRequestFromJson(json);
@@ -23,6 +24,7 @@ class CreateMemoryRequest {
   final String? datePrecision;
   final String? dateFrom;
   final String? dateTo;
+  final String? time;
 
   Map<String, Object?> toJson() => _$CreateMemoryRequestToJson(this);
 }

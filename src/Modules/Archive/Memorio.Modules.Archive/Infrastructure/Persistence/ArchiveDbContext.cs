@@ -48,6 +48,7 @@ internal sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> option
             memory.Property(item => item.DatePrecision).HasColumnName("date_precision").HasConversion<string>().HasMaxLength(10).HasDefaultValue(DatePrecision.Day).HasSentinel((DatePrecision)(-1));
             memory.Property(item => item.DateFrom).HasColumnName("date_from").HasDefaultValue(new DateOnly(2000, 1, 1));
             memory.Property(item => item.DateTo).HasColumnName("date_to").HasDefaultValue(new DateOnly(2000, 1, 1));
+            memory.Property(item => item.Time).HasColumnName("time_of_day");
             memory.Property(item => item.Description).HasColumnName("description").HasMaxLength(Memory.MaximumDescriptionLength);
             memory.Property(item => item.DescriptionAiModel).HasColumnName("description_ai_model").HasMaxLength(200);
             memory.Property(item => item.DescriptionAiPromptVersion).HasColumnName("description_ai_prompt_version").HasMaxLength(200);

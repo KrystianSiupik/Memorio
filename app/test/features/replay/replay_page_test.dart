@@ -191,5 +191,9 @@ void main() {
   test('a date says only what the person gave', () {
     expect(periodDateText(periodMemory('m', 'x', precision: 'Year', from: '2026-01-01', to: '2026-12-31')), '2026');
     expect(periodDateText(periodMemory('m', 'x', precision: 'Day', from: '2026-05-14')), '14.05.2026');
+    expect(
+      periodDateText(periodMemory('m', 'x', precision: 'Day', from: '2026-05-14', time: '08:15')),
+      '14.05.2026, 08:15',
+    );
   });
 }

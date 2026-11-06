@@ -1024,8 +1024,15 @@ PO: „zaczynaj e9”. Odwracalne założenia, do sprawdzenia przez PO.
 
 | D | Decyzja | Dlaczego |
 |---|---|---|
-| D-300 | Kolejność w okresie: data początku, potem końca, a w obrębie dnia **kolejność dodania**. Nie ma komendy, którą osoba ustala własną kolejność (S2:C1 „kolejność ustalona przez użytkownika”), bo żaden ticket jej nie ma. **Do decyzji PO:** czy taka komenda ma powstać | kolejność dodania to najbliższe przybliżenie, a zmiana nie wymaga przebudowy |
+| D-300 | Kolejność w okresie: data początku, potem końca, a w obrębie dnia **kolejność dodania**. Nie ma komendy, którą osoba ustala własną kolejność (S2:C1 „kolejność ustalona przez użytkownika”), bo żaden ticket jej nie ma. **Zastąpione przez D-303** | kolejność dodania to najbliższe przybliżenie, a zmiana nie wymaga przebudowy |
 | D-301 | Album z okresu (C71) bierze **tylko własne wspomnienia** osoby (D-248): cudze zostają w swoich albumach. Co nie mieści się w puli nowego albumu, jest liczone i pokazywane, a album i tak powstaje. Limit 1000 wspomnień na raz. Wspomnienia idą zwykłą drogą C47, więc powtórka nic nie zmienia | wspomnienie wnosi tylko jego autor; jeden album na tysiące wspomnień to pomyłka okresu |
 | D-302 | S08 wybiera okres tylko jako dany rok albo zakres dat. **Nie ma** wyboru „album, osoba, kolekcja” (S1 §8), uczestników w panelu ani narracji AI (E6). Na czas ekranu mapa pokazuje tylko punkty okresu i jedzie do bieżącego wspomnienia; odtwarzanie rusza dopiero po „Odtwarzaj”, w tempie 6 albo 3 sekundy | tickety E5 obejmują okres; narracja to E6, osoby bez wyszukiwania (D-079) nie mają filtra |
 
 **Stan testów:** Archiwum 119/119, Album 94/94, API 46/46, aplikacja 317/317. **Prawdziwe uruchomienie API:** okres z przedziałem przez Nowy Rok w obu latach, kolejność, wspomnienie przyjaciela z albumu, brak cudzych prywatnych, album z okresu tylko z własnymi, powtórka bez zmian, zły okres odrzucony. **Nie sprawdzono:** animacji mapy na prawdziwej mapie (w testach mapa to atrapa, lokalnie brak kafelków), urządzeń.
+
+## MEM-E5-ARCHIWUM-02 · Godzina wspomnienia (2026-11-06)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-303 | Decyzja PO do D-300: w obrębie dnia kolejność **po godzinie**. Wspomnienie z dokładnością „dzień” może mieć nieobowiązkową godzinę (HH:mm, kolumna `time_of_day`), podawaną przy tworzeniu (C12) i pokazywaną w S05 i S08. Kolejność okresu: data początku, data końca, godzina, a wspomnienia bez godziny na końcu dnia w kolejności dodania. Godzina przy miesiącu, roku lub przedziale jest odrzucana (`Archive.InvalidDate`). Nie ma zmiany godziny po zapisaniu, bo nie ma też zmiany daty; godzina nie jest brana ze zdjęć (EXIF) | PO wybrał kolejność po dacie i godzinie zamiast ręcznego układania; godzina to wiedza osoby, jak data, więc ta sama droga i te same zasady |
+

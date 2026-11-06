@@ -48,6 +48,7 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
   MemoryDatePrecision _precision = MemoryDatePrecision.day;
   DateTime? _from;
   DateTime? _to;
+  TimeOfDay? _time;
   var _ownPlaceInvalid = false;
   var _consentsToAi = false;
   String _aiDraftRequestId = _uuid.v7();
@@ -301,6 +302,7 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
       'precision': memory.precision.name,
       'from': memory.from,
       'to': memory.to,
+      'time': memory.time,
     });
     for (final (id, photo) in _photos) {
       await queue.enqueue(MemoryOperations.addPhoto, {
@@ -327,7 +329,18 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
     precision: _precision,
     from: _apiDate(_from!),
     to: _precision == MemoryDatePrecision.period ? _apiDate(_to!) : null,
+    time: _precision == MemoryDatePrecision.day && _time != null ? _hourText(_time!) : null,
   );
+
+  static String _hourText(TimeOfDay time) =>
+      '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(context: context, initialTime: _time ?? const TimeOfDay(hour: 12, minute: 0));
+    if (picked != null && mounted) {
+      setState(() => _time = picked);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -444,6 +457,23 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
         onPressed: () => _pickDate(end: false),
         child: Text(_from == null ? l10n.dateChoose : l10n.dateChosen(dayText(_from!))),
       ),
+      if (_precision == MemoryDatePrecision.day)
+        Row(
+          children: [
+            TextButton(
+              key: const Key('s04-time'),
+              onPressed: _pickTime,
+              child: Text(_time == null ? l10n.timeChoose : l10n.timeChosen(_hourText(_time!))),
+            ),
+            if (_time != null)
+              IconButton(
+                key: const Key('s04-time-clear'),
+                tooltip: l10n.timeClear,
+                icon: const Icon(Icons.close),
+                onPressed: () => setState(() => _time = null),
+              ),
+          ],
+        ),
       if (_precision == MemoryDatePrecision.period)
         TextButton(
           onPressed: () => _pickDate(end: true),

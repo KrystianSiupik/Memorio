@@ -57,6 +57,23 @@ void main() {
     expect(find.byKey(const Key('s05-ai-marker')), findsOneWidget);
   });
 
+  testWidgets('a day with an hour shows both', (tester) async {
+    memories.details = const MemoryDetails(
+      id: 'memory-1',
+      placeName: 'Giewont',
+      dateFrom: '2026-07-01',
+      dateTo: '2026-07-01',
+      time: '18:30',
+      isMine: true,
+      description: null,
+      descriptionIsAi: false,
+      photoUrls: [],
+    );
+    await open(tester);
+
+    expect(find.text('Data: 01.07.2026, 18:30'), findsOneWidget);
+  });
+
   testWidgets('S05 → S03: moving to the trash leaves the screen', (tester) async {
     await open(tester);
 
