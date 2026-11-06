@@ -169,4 +169,50 @@ public sealed class SharedAlbumTests
         Assert.Equal(expected, InvitationEmail.Normalize(input));
 
     private static SharedAlbum NewAlbum() => SharedAlbum.Start(new AlbumId(Guid.CreateVersion7()), Owner, "Rodzina", Now).Value;
+
+    private static (SharedAlbum Album, Guid First, Guid Second) Ownerless()
+    {
+        var album = NewAlbum();
+        var (first, second) = (Guid.CreateVersion7(), Guid.CreateVersion7());
+        album.AddParticipant(first);
+        album.AddParticipant(second);
+        album.ReleaseOwner(Now);
+        return (album, first, second);
+    }
+
+    [Fact]
+    public void A_late_payment_counts_for_whoever_held_it_for_a_day()
+    {
+        var (album, first, _) = Ownerless();
+        album.ReserveTakeover(first, Now);
+        album.ExpireReservation(Now + SharedAlbum.ReservationTime);
+
+        Assert.True(album.TakeOver(Now + SharedAlbum.ReservationTime + TimeSpan.FromHours(3)).IsSuccess);
+        Assert.True(album.IsOwner(first));
+    }
+
+    [Fact]
+    public void After_the_day_a_payment_gives_nothing()
+    {
+        var (album, first, _) = Ownerless();
+        album.ReserveTakeover(first, Now);
+        var late = Now + SharedAlbum.ReservationTime + SharedAlbum.LatePaymentGrace;
+
+        Assert.Equal(AlbumErrors.TakeoverExpired, album.TakeOver(late).Error);
+        album.ExpireReservation(late);
+        Assert.Null(album.ReservedByAccountId);
+        Assert.True(album.IsOwnerless);
+    }
+
+    [Fact]
+    public void Someone_who_reserved_since_takes_the_place_of_the_late_one()
+    {
+        var (album, first, second) = Ownerless();
+        album.ReserveTakeover(first, Now);
+        var later = Now + SharedAlbum.ReservationTime;
+
+        Assert.True(album.ReserveTakeover(second, later).IsSuccess);
+        Assert.True(album.TakeOver(later.AddMinutes(1)).IsSuccess);
+        Assert.True(album.IsOwner(second));
+    }
 }

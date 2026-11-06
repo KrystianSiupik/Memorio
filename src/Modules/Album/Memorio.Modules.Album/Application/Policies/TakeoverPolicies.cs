@@ -8,13 +8,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Memorio.Modules.Album.Application.Policies;
 
-/// <summary>E165 starts the 30 minutes; a later reservation replaces the deadline under the same key.</summary>
+/// <summary>E165 starts the 30 minutes; the holder is forgotten after the grace for a late payment (D-306). A later reservation replaces the deadline under the same key.</summary>
 internal sealed class TakeoverReservationDeadline(IDeadlines deadlines) : IIntegrationEventPolicy<TakeoverReservedEvent>
 {
     public const string JobName = "Album.TakeoverReservation";
 
     public Task HandleAsync(TakeoverReservedEvent integrationEvent, CancellationToken cancellationToken) =>
-        deadlines.ScheduleAsync(JobName, integrationEvent.AlbumId.ToString(), integrationEvent.ReservedUntil, null, cancellationToken);
+        deadlines.ScheduleAsync(JobName, integrationEvent.AlbumId.ToString(), integrationEvent.ReservedUntil + SharedAlbum.LatePaymentGrace, null, cancellationToken);
 }
 
 /// <summary>P39 and C157: the time ended without a payment.</summary>
@@ -31,8 +31,8 @@ internal sealed class ExpireTakeoverReservation(IAlbums albums)
 }
 
 /// <summary>
-/// P40 and C156: whoever holds the reservation is the owner now. A payment without one is E168: nothing changes, and it
-/// is logged, because someone paid for a plan they did not get (D-294).
+/// P40 and C156: whoever holds the reservation is the owner now, also after a late payment (D-306). A payment without one
+/// is E168: nothing changes, and it is logged, because someone paid for a plan they did not get (D-294).
 /// </summary>
 internal sealed partial class TakeOverWhenPaid(IAlbums albums, TimeProvider clock, ILogger<TakeOverWhenPaid> logger) : IIntegrationEventPolicy<PaidWhileOwnerlessEvent>
 {
