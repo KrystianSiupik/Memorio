@@ -6,8 +6,46 @@ using Memorio.Modules.Archive.Contracts;
 namespace Memorio.Modules.Moderation.Tests;
 
 /// <summary>What Moderation asks of Archive, Album and Access: who sees what, and whose it is.</summary>
-public sealed class FakeModerationNeighbours : IAlbumMembership, IAccessReader, IReportedMemories
+public sealed class FakeModerationNeighbours : IAlbumMembership, IAccessReader, IReportedMemories, IAlbumContent, IContentHiding
 {
+    private readonly ConcurrentDictionary<Guid, HiddenContent> _hidden = new();
+
+    /// <summary>What Access was asked to hide, by hold.</summary>
+    public IReadOnlyDictionary<Guid, HiddenContent> Hidden => _hidden;
+
+    /// <summary>Access does not answer: the order is not confirmed.</summary>
+    public bool AccessDown { get; set; }
+
+    public Task<bool> HideAsync(HiddenContent content, CancellationToken cancellationToken)
+    {
+        if (AccessDown)
+        {
+            return Task.FromResult(false);
+        }
+
+        _hidden[content.HoldId] = content;
+        return Task.FromResult(true);
+    }
+
+    public Task<bool> ReleaseAsync(Guid holdId, Guid resourceId, int sequence, CancellationToken cancellationToken) => Task.FromResult(_hidden.TryRemove(holdId, out _));
+
+    public Task<AlbumMemoryFacts?> DescribeAsync(Guid memoryId, CancellationToken cancellationToken) =>
+        Task.FromResult(_memories.TryGetValue(memoryId, out var memory) ? new AlbumMemoryFacts(memory.Author, 0) : null);
+
+    public Task<IReadOnlyDictionary<Guid, AlbumMemorySummary>> SummarizeAsync(IReadOnlyCollection<Guid> memoryIds, CancellationToken cancellationToken) => throw new NotSupportedException();
+
+    public Task LinkAsync(Guid memoryId, Guid albumId, CancellationToken cancellationToken) => throw new NotSupportedException();
+
+    public Task UnlinkAsync(Guid memoryId, Guid albumId, CancellationToken cancellationToken) => throw new NotSupportedException();
+
+    public Task<IReadOnlyList<Guid>> OwnInPeriodAsync(Guid accountId, DateOnly from, DateOnly to, CancellationToken cancellationToken) => throw new NotSupportedException();
+
+    public Task<IReadOnlyList<Guid>> ChooseToTrimAsync(Guid albumId, IReadOnlyCollection<Guid> keptMemoryIds, long limitBytes, CancellationToken cancellationToken) => throw new NotSupportedException();
+
+    public Task<IReadOnlyList<AlbumTrimMaterial>> TrimMaterialAsync(Guid albumId, CancellationToken cancellationToken) => throw new NotSupportedException();
+
+    public Task<AlbumPhotoOutcome> AddPhotoAsync(AlbumPhoto photo, CancellationToken cancellationToken) => throw new NotSupportedException();
+
     private readonly ConcurrentDictionary<Guid, (Guid Author, HashSet<Guid> Seen)> _memories = new();
     private readonly ConcurrentDictionary<Guid, (Guid Owner, HashSet<Guid> Seen)> _albums = new();
 

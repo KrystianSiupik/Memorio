@@ -27,6 +27,7 @@ internal enum NotificationKind
     ContentKept,
     AppealReversed,
     AppealUpheld,
+    ContentHiddenByOrder,
     PrivateArchiveShared,
 }
 

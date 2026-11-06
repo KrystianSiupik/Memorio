@@ -8,8 +8,17 @@ using Memorio.Modules.Places.Contracts;
 namespace Memorio.Modules.Archive.Tests;
 
 /// <summary>The other modules Archive asks: every place exists but "missing", everybody accepted the terms unless told otherwise.</summary>
-public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool, IAlbumPool, IAiDraftReader, IAccessReader
+public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool, IAlbumPool, IAiDraftReader, IAccessReader, Memorio.Modules.Moderation.Contracts.ILegalHolds
 {
+    private readonly ConcurrentDictionary<Guid, bool> _held = new();
+
+    /// <summary>An order of an authority holds the account's data.</summary>
+    public void Holds(Guid accountId) => _held[accountId] = true;
+
+    public void Releases(Guid accountId) => _held.TryRemove(accountId, out _);
+
+    public Task<bool> IsHeldAsync(Guid accountId, CancellationToken cancellationToken) => Task.FromResult(_held.ContainsKey(accountId));
+
     private readonly ConcurrentDictionary<(Guid Draft, Guid Account), AiDraftInfo> _drafts = new();
 
     public void AddDraft(Guid draftId, Guid accountId) => _drafts[(draftId, accountId)] = new AiDraftInfo("Szkic.", "test-model", "draft@1");

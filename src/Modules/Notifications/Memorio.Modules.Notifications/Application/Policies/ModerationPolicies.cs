@@ -5,6 +5,18 @@ using Memorio.SharedKernel.Messaging;
 
 namespace Memorio.Modules.Notifications.Application.Policies;
 
+/// <summary>An order hid the author's content: they hear it, unless the authority asked that they do not (L11).</summary>
+internal sealed class NotifyOfOrder(IAccountDirectory directory, SendOnce send) : IIntegrationEventPolicy<RemovalOrderExecutedEvent>
+{
+    public async Task HandleAsync(RemovalOrderExecutedEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        if (!integrationEvent.Confidential && integrationEvent.AuthorAccountId is { } author && await directory.EmailOfAsync(author, cancellationToken) is { } email)
+        {
+            await send.SendAsync($"order:{integrationEvent.OrderId}", integrationEvent.Sequence, email, NotificationKind.ContentHiddenByOrder, Guid.Empty, cancellationToken);
+        }
+    }
+}
+
 /// <summary>
 /// Both sides of a report hear what happened, with the reasons (S2:C2, DSA art. 16 and 17). The author never learns who
 /// reported; the reporter never learns who the author is. No content, only the reason and the reasons of the decision.

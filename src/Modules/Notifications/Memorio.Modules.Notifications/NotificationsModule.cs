@@ -65,6 +65,7 @@ public sealed class NotificationsModule : IModule
         services.AddScoped<NotifyOwnerOfReport>();
         services.AddScoped<NotifyOfHandover>();
         services.AddScoped<NotifyOfModeration>();
+        services.AddScoped<NotifyOfOrder>();
         services.AddScoped<NotifyLegacyContact>();
         services.AddScoped(provider => new NotifySuccessor(provider.GetRequiredService<IAccountDirectory>(), provider.GetRequiredService<IDeadlines>(), provider.GetRequiredService<SendOnce>()));
         services.AddScheduledJob<SuccessorReminderJob>(NotifySuccessor.JobName);

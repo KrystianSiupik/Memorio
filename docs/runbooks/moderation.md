@@ -25,3 +25,13 @@ Procedura obsługi (S2:C2, DSA art. 16, 17 i 20, D-309). Polecenia na serwerze j
 ## Treści z kategorii A
 
 Materiały z wykorzystywaniem dzieci i treści terrorystyczne zgłoś dalej odpowiednim organom, poza tym systemem. Treść zostaje ukryta, nie usunięta: to dowód.
+
+## Nakazy organów (Z6)
+
+**Stan: procedura techniczna.** Kto sprawdza podstawę prawną nakazu i czy informujemy osobę, której dotyczy, ustala PO z prawnikiem (Z6). Wpisuj tylko nakaz, którego podstawę już sprawdzono.
+
+- **Usunięcie treści** (w tym treści terrorystyczne: **1 godzina**, L11): `moderation/moderation.sh order remove memory|album <id> --authority "…" --reference "…"`. Worker ukrywa treść w ciągu minuty; autor dostaje wiadomość, chyba że dodasz `--confidential`. Treść nie jest usuwana.
+- **Zabezpieczenie danych** (L18): `moderation/moderation.sh order preserve <id konta> --authority "…" --reference "…"`. Od tej chwili nic z konta nie znika na stałe: ani wspomnienia z kosza, ani na żądanie usunięcia, ani samo konto. Czeka niewidoczne do zamknięcia nakazu.
+- **Wydanie danych**: `moderation/moderation.sh order produce <id konta> …`, potem `moderation/moderation.sh disclose <id nakazu> /root/wydanie --what "co wydajesz"`. Dane wychodzą dopiero po zabezpieczeniu i po wpisie do dziennika. **Usuń katalog po przekazaniu.**
+- **Koniec**: `moderation/moderation.sh close <id nakazu>`. Blokada znika, a to, co czekało na usunięcie, usuwa dzienne zadanie Archiwum.
+- Stan: `moderation/moderation.sh orders`; dziennik wglądów i wydań: `moderation/moderation.sh log [<id>]`.

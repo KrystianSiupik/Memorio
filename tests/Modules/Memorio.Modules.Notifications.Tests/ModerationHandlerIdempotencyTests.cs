@@ -64,3 +64,23 @@ public sealed class AppealDecidedHandlerIdempotencyTests(NotificationsDatabase d
         Assert.Equal(1, database.Neighbours.SentTo(database.Neighbours.EmailOf(author), nameof(NotificationKind.AppealReversed)));
     }
 }
+
+/// <summary>SD6: an executed order delivered twice; a confidential one tells nobody.</summary>
+public sealed class RemovalOrderExecutedHandlerIdempotencyTests(NotificationsDatabase database)
+{
+    [Fact]
+    public async Task The_author_hears_once_unless_it_is_confidential()
+    {
+        var (author, quiet) = (database.Neighbours.NewAccount(), database.Neighbours.NewAccount());
+        await using var scope = database.CreateScope();
+        var policy = scope.ServiceProvider.GetRequiredService<NotifyOfOrder>();
+        var executed = new RemovalOrderExecutedEvent(Guid.CreateVersion7(), DateTimeOffset.UtcNow, Guid.CreateVersion7(), author, false, 2);
+
+        await policy.HandleAsync(executed, TestContext.Current.CancellationToken);
+        await policy.HandleAsync(executed, TestContext.Current.CancellationToken);
+        await policy.HandleAsync(new RemovalOrderExecutedEvent(Guid.CreateVersion7(), DateTimeOffset.UtcNow, Guid.CreateVersion7(), quiet, true, 2), TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, database.Neighbours.SentTo(database.Neighbours.EmailOf(author), nameof(NotificationKind.ContentHiddenByOrder)));
+        Assert.Equal(0, database.Neighbours.SentTo(database.Neighbours.EmailOf(quiet), nameof(NotificationKind.ContentHiddenByOrder)));
+    }
+}

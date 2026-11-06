@@ -17,5 +17,6 @@
     <ProjectReference Include="../Memorio.Modules.Account.Contracts/Memorio.Modules.Account.Contracts.csproj" />
     <ProjectReference Include="../../Album/Memorio.Modules.Album.Contracts/Memorio.Modules.Album.Contracts.csproj" />
     <ProjectReference Include="../../Archive/Memorio.Modules.Archive.Contracts/Memorio.Modules.Archive.Contracts.csproj" />
+    <ProjectReference Include="../../Moderation/Memorio.Modules.Moderation.Contracts/Memorio.Modules.Moderation.Contracts.csproj" />
   </ItemGroup>
 </Project>

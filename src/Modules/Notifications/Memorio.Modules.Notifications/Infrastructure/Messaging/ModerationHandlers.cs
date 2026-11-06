@@ -18,6 +18,13 @@ public static class ReportDecidedHandler
         services.GetRequiredService<NotifyOfModeration>().HandleAsync(integrationEvent, cancellationToken);
 }
 
+/// <summary>An order executed, in the worker.</summary>
+public static class RemovalOrderExecutedHandler
+{
+    public static Task Handle(RemovalOrderExecutedEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
+        services.GetRequiredService<NotifyOfOrder>().HandleAsync(integrationEvent, cancellationToken);
+}
+
 /// <summary>The decision on an appeal in the worker.</summary>
 public static class AppealDecidedHandler
 {

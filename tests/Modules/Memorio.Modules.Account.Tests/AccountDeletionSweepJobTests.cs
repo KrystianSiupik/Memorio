@@ -23,6 +23,7 @@ public sealed class AccountDeletionSweepJobTests
         var deletions = new OverdueDeletions(broken, healthy);
         await using var services = new ServiceCollection()
             .AddScoped<IAccountDeletions>(_ => deletions)
+            .AddSingleton<Memorio.Modules.Moderation.Contracts.ILegalHolds>(new FakeLegalHolds())
             .AddScoped<DeleteAccountHandler>()
             .AddScoped<DeleteAccountWhenWindowPassed>()
             .BuildServiceProvider();

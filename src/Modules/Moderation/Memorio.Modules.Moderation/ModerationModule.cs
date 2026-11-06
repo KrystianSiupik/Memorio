@@ -1,6 +1,9 @@
 using Memorio.Modularity;
 using Memorio.Modules.Moderation.Api;
+using Memorio.Modules.Moderation.Application.Commands.Orders;
 using Memorio.Modules.Moderation.Application.Commands.Reports;
+using Memorio.Modules.Moderation.Application.Policies;
+using Memorio.Modules.Moderation.Domain.Orders;
 using Memorio.Modules.Moderation.Application.Queries;
 using Memorio.Modules.Moderation.Contracts;
 using Memorio.Modules.Moderation.Domain.Reports;
@@ -42,6 +45,11 @@ public sealed class ModerationModule : IModule
         services.AddScoped<ModerationQueries>();
         services.AddScoped<IModerationQueries>(provider => provider.GetRequiredService<ModerationQueries>());
         services.AddScoped<IReportNotices>(provider => provider.GetRequiredService<ModerationQueries>());
+        services.AddScoped<ILegalHolds>(provider => provider.GetRequiredService<ModerationQueries>());
+        services.AddScoped<IOrders, Orders>();
+        services.AddScoped<OrderHandler>();
+        services.AddScoped<HideWhenRemovalOrdered>();
+        services.AddScoped<SecureWhenDataOrdered>();
         services.AddScoped<SubmitReportHandler>();
         services.AddScoped<SubmitPublicReportHandler>();
         services.AddScoped<ReportDecisionHandler>();

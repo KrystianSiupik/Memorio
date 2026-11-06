@@ -7,8 +7,15 @@ using Microsoft.EntityFrameworkCore;
 namespace Memorio.Modules.Moderation.Infrastructure.Queries;
 
 /// <summary>Dapper on the module's tables (D-126). Dapper reads timestamptz as DateTime, hence the rows with setters.</summary>
-internal sealed class ModerationQueries(ModerationDbContext database) : IModerationQueries, IReportNotices
+internal sealed class ModerationQueries(ModerationDbContext database) : IModerationQueries, IReportNotices, ILegalHolds
 {
+    private const string HeldSql = """
+        SELECT EXISTS (SELECT 1 FROM moderation.orders WHERE account_id = @accountId AND secured_at IS NOT NULL AND closed_at IS NULL)
+        """;
+
+    public async Task<bool> IsHeldAsync(Guid accountId, CancellationToken cancellationToken) =>
+        await database.Database.GetDbConnection().ExecuteScalarAsync<bool>(new CommandDefinition(HeldSql, new { accountId }, cancellationToken: cancellationToken));
+
     private const string MineSql = """
         SELECT id AS "Id", target AS "Target", target_id AS "TargetId", reason AS "Reason", state AS "State", verdict AS "Verdict",
                statement AS "Statement", reported_at AS "ReportedAt", decided_at AS "DecidedAt"

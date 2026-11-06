@@ -1,3 +1,4 @@
+using Memorio.Modules.Moderation.Domain.Orders;
 using Memorio.Modules.Moderation.Domain.Reports;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,14 @@ internal sealed class ModerationDbContext(DbContextOptions<ModerationDbContext> 
     public DbSet<Report> Reports => Set<Report>();
 
     public DbSet<OperatorAction> Actions => Set<OperatorAction>();
+
+    public DbSet<AuthorityOrder> Orders => Set<AuthorityOrder>();
+
+    public DbSet<IncomingOrder> IncomingOrders => Set<IncomingOrder>();
+
+    public DbSet<OrderAction> OrderActions => Set<OrderAction>();
+
+    public DbSet<AccessLogEntry> AccessLog => Set<AccessLogEntry>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -57,6 +66,78 @@ internal sealed class ModerationDbContext(DbContextOptions<ModerationDbContext> 
             // One open report of a person about a thing (S2:C2): a second at the same moment loses and reads the first.
             item.HasIndex(found => new { found.ReporterKey, found.TargetKey }).HasDatabaseName("ux_reports_open").IsUnique().HasFilter("state = 'Open'");
             item.HasIndex(found => found.DueBy).HasDatabaseName("ix_reports_queue").HasFilter("state IN ('Open', 'Appealed')");
+        });
+
+        builder.Entity<AuthorityOrder>(item =>
+        {
+            item.ToTable("orders");
+            item.HasKey(found => found.Id);
+            item.Property(found => found.Id).HasColumnName("id").HasConversion(id => id.Value, value => new OrderId(value)).ValueGeneratedNever();
+            item.Property(found => found.Kind).HasColumnName("kind").HasConversion<string>().HasMaxLength(20);
+            item.Property(found => found.Authority).HasColumnName("authority").HasMaxLength(AuthorityOrder.MaximumTextLength);
+            item.Property(found => found.Reference).HasColumnName("reference").HasMaxLength(AuthorityOrder.MaximumTextLength);
+            item.Property(found => found.ResourceKind).HasColumnName("resource_kind").HasConversion<string>().HasMaxLength(20);
+            item.Property(found => found.ResourceId).HasColumnName("resource_id");
+            item.Property(found => found.AccountId).HasColumnName("account_id");
+            item.Property(found => found.Confidential).HasColumnName("confidential");
+            item.Property(found => found.ReceivedBy).HasColumnName("received_by").HasMaxLength(200);
+            item.Property(found => found.ReceivedAt).HasColumnName("received_at");
+            item.Property(found => found.HiddenAt).HasColumnName("hidden_at");
+            item.Property(found => found.SecuredAt).HasColumnName("secured_at");
+            item.Property(found => found.DisclosedAt).HasColumnName("disclosed_at");
+            item.Property(found => found.ClosedAt).HasColumnName("closed_at");
+            item.Property(found => found.Sequence).HasColumnName("sequence").IsConcurrencyToken();
+            item.Ignore(found => found.DomainEvents);
+            item.HasIndex(found => found.AccountId).HasDatabaseName("ix_orders_held_account").HasFilter("secured_at IS NOT NULL AND closed_at IS NULL");
+        });
+
+        builder.Entity<IncomingOrder>(item =>
+        {
+            item.ToTable("incoming_orders", table => table.HasCheckConstraint("ck_incoming_orders_received_by", "length(btrim(received_by)) > 0"));
+            item.HasKey(found => found.Id);
+            item.Property(found => found.Id).HasColumnName("id").ValueGeneratedNever();
+            item.Property(found => found.Kind).HasColumnName("kind").HasMaxLength(20);
+            item.Property(found => found.Authority).HasColumnName("authority").HasMaxLength(AuthorityOrder.MaximumTextLength);
+            item.Property(found => found.Reference).HasColumnName("reference").HasMaxLength(AuthorityOrder.MaximumTextLength);
+            item.Property(found => found.ResourceKind).HasColumnName("resource_kind").HasMaxLength(20);
+            item.Property(found => found.ResourceId).HasColumnName("resource_id");
+            item.Property(found => found.AccountId).HasColumnName("account_id");
+            item.Property(found => found.Confidential).HasColumnName("confidential");
+            item.Property(found => found.ReceivedBy).HasColumnName("received_by").HasMaxLength(200);
+            item.Property(found => found.ReceivedAt).HasColumnName("received_at");
+            item.Property(found => found.AppliedAt).HasColumnName("applied_at");
+            item.Property(found => found.Result).HasColumnName("result").HasMaxLength(100);
+            item.HasIndex(found => found.ReceivedAt).HasDatabaseName("ix_incoming_orders_pending").HasFilter("applied_at IS NULL");
+        });
+
+        builder.Entity<OrderAction>(item =>
+        {
+            item.ToTable("order_actions", table => table.HasCheckConstraint("ck_order_actions_decided_by", "length(btrim(decided_by)) > 0"));
+            item.HasKey(found => found.Id);
+            item.Property(found => found.Id).HasColumnName("id").ValueGeneratedNever();
+            item.Property(found => found.OrderId).HasColumnName("order_id");
+            item.Property(found => found.Kind).HasColumnName("kind").HasMaxLength(20);
+            item.Property(found => found.Details).HasColumnName("details").HasMaxLength(AuthorityOrder.MaximumTextLength);
+            item.Property(found => found.DecidedBy).HasColumnName("decided_by").HasMaxLength(200);
+            item.Property(found => found.DecidedAt).HasColumnName("decided_at");
+            item.Property(found => found.AppliedAt).HasColumnName("applied_at");
+            item.Property(found => found.Result).HasColumnName("result").HasMaxLength(100);
+            item.HasIndex(found => found.DecidedAt).HasDatabaseName("ix_order_actions_pending").HasFilter("applied_at IS NULL");
+        });
+
+        builder.Entity<AccessLogEntry>(item =>
+        {
+            item.ToTable("access_log", table => table.HasCheckConstraint("ck_access_log_by", "length(btrim(by)) > 0"));
+            item.HasKey(found => found.Id);
+            item.Property(found => found.Id).HasColumnName("id").ValueGeneratedNever();
+            item.Property(found => found.At).HasColumnName("at");
+            item.Property(found => found.By).HasColumnName("by").HasMaxLength(200);
+            item.Property(found => found.Kind).HasColumnName("kind").HasMaxLength(20);
+            item.Property(found => found.SubjectId).HasColumnName("subject_id");
+            item.Property(found => found.ConcernsId).HasColumnName("concerns_id");
+            item.Property(found => found.What).HasColumnName("what").HasMaxLength(AuthorityOrder.MaximumTextLength);
+            item.Property(found => found.Basis).HasColumnName("basis").HasMaxLength(AuthorityOrder.MaximumTextLength);
+            item.HasIndex(found => found.SubjectId).HasDatabaseName("ix_access_log_subject");
         });
 
         builder.Entity<OperatorAction>(item =>

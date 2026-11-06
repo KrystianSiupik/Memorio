@@ -67,6 +67,8 @@ public sealed class ModerationTestDatabase : PostgresDatabase
         builder.Services.AddSingleton<IAlbumMembership>(Neighbours);
         builder.Services.AddSingleton<IAccessReader>(Neighbours);
         builder.Services.AddSingleton<IReportedMemories>(Neighbours);
+        builder.Services.AddSingleton<IAlbumContent>(Neighbours);
+        builder.Services.AddSingleton<IContentHiding>(Neighbours);
         _host = builder.Build();
 
         await using (var scope = CreateScope())
