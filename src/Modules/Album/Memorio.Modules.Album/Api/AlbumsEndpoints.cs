@@ -36,6 +36,11 @@ internal static class AlbumsEndpoints
         albums.MapGet("/{id:guid}/trim-material", TrimMaterialAsync).WithName("GetAlbumTrimMaterial").WithSummary("For the owner: what a trim of the album could take, oldest first, with sizes.");
         albums.MapGet("/{id:guid}/takeover", TakeoverAsync).WithName("GetAlbumTakeover").WithSummary("For someone in an album without an owner: whether it can be taken over, and who holds it until when.");
         albums.MapPost("/{id:guid}/takeover-reservation", ReserveTakeoverAsync).WithName("ReserveAlbumTakeover").WithSummary("Holds an album without an owner for 30 minutes, to pay for its plan; asking again keeps one's own.");
+        albums.MapGet("/{id:guid}/handover", HandoverAsync).WithName("GetAlbumHandover").WithSummary("For the owner and the person it is offered to: the handover that waits, if any.");
+        albums.MapPut("/{id:guid}/handover", OfferHandoverAsync).WithName("OfferAlbumHandover").WithSummary("The owner offers the album to someone in it and chooses what becomes of their own contributions; a new offer replaces the earlier one.");
+        albums.MapDelete("/{id:guid}/handover", WithdrawHandoverAsync).WithName("WithdrawAlbumHandover").WithSummary("The owner takes the offer back; asking again changes nothing.");
+        albums.MapPost("/{id:guid}/handover/acceptance", AcceptHandoverAsync).WithName("AcceptAlbumHandover").WithSummary("The person becomes the owner; the former owner stays in the album.");
+        albums.MapPost("/{id:guid}/handover/refusal", RefuseHandoverAsync).WithName("RefuseAlbumHandover").WithSummary("The album stays with its owner.");
         albums.MapGet("/{id:guid}/seats", SeatsAsync).WithName("GetAlbumSeats").WithSummary("For the owner: seats taken, invited and free.");
         albums.MapPost("/{id:guid}/invitations", InviteAsync).WithName("InviteToAlbum").WithSummary("Invites an address; the same address again refreshes its invitation and takes no second seat.");
         albums.MapDelete("/{id:guid}/invitations/{invitationId:guid}", WithdrawInvitationAsync).WithName("WithdrawInvitation").WithSummary("The owner takes an invitation back; the seat is free at once.");
@@ -177,6 +182,34 @@ internal static class AlbumsEndpoints
             reserved ? state.ReservedUntil : null));
     }
 
+    private static async Task<Results<Ok<AlbumHandoverResponse>, ProblemHttpResult>> HandoverAsync(Guid id, ClaimsPrincipal principal, IAlbumMembership membership, IAlbumQueries queries, TimeProvider clock, CancellationToken cancellationToken)
+    {
+        var accountId = CurrentAccount.IdOf(principal);
+        if (!await membership.IsMemberAsync(accountId, id, cancellationToken) || await queries.HandoverStateAsync(id, cancellationToken) is not { } state)
+        {
+            return Problems.From(AlbumErrors.NoAccess);
+        }
+
+        // Only the two people it concerns see it, and only while it waits.
+        var waits = state.ToAccountId is not null && state.Until > clock.GetUtcNow()
+            && (state.OwnerAccountId == accountId || state.ToAccountId == accountId);
+        return TypedResults.Ok(waits
+            ? new AlbumHandoverResponse(state.ToAccountId, state.ToAccountId == accountId, state.KeepsContributions, state.Until)
+            : new AlbumHandoverResponse(null, false, true, null));
+    }
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> OfferHandoverAsync(Guid id, OfferHandoverRequest request, ClaimsPrincipal principal, HandoverHandler handler, CancellationToken cancellationToken) =>
+        Answer(await handler.HandleAsync(new OfferHandover(new AlbumId(id), CurrentAccount.IdOf(principal), request.ToAccountId, request.KeepContributions), cancellationToken));
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> WithdrawHandoverAsync(Guid id, ClaimsPrincipal principal, HandoverHandler handler, CancellationToken cancellationToken) =>
+        Answer(await handler.HandleAsync(new WithdrawHandover(new AlbumId(id), CurrentAccount.IdOf(principal)), cancellationToken));
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> AcceptHandoverAsync(Guid id, ClaimsPrincipal principal, HandoverHandler handler, CancellationToken cancellationToken) =>
+        Answer(await handler.HandleAsync(new AnswerHandover(new AlbumId(id), CurrentAccount.IdOf(principal), Accepted: true), cancellationToken));
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> RefuseHandoverAsync(Guid id, ClaimsPrincipal principal, HandoverHandler handler, CancellationToken cancellationToken) =>
+        Answer(await handler.HandleAsync(new AnswerHandover(new AlbumId(id), CurrentAccount.IdOf(principal), Accepted: false), cancellationToken));
+
     private static async Task<Results<NoContent, ProblemHttpResult>> ReserveTakeoverAsync(Guid id, ClaimsPrincipal principal, ReserveTakeoverHandler handler, CancellationToken cancellationToken) =>
         Answer(await handler.HandleAsync(new ReserveTakeover(new AlbumId(id), CurrentAccount.IdOf(principal)), cancellationToken));
 
@@ -309,6 +342,16 @@ internal sealed record AlbumResponse(
     bool IsOwnerless);
 
 internal sealed record AlbumTrimMaterialResponse(Guid MemoryId, string PlaceName, string DateFrom, long SizeBytes);
+
+/// <param name="ToAccountId">Who it is offered to; null when nothing waits.</param>
+/// <param name="ForMe">The person asking is the one it is offered to.</param>
+/// <param name="KeepsContributions">The owner's own contributions stay in the album.</param>
+/// <param name="Until">The answer is possible until then.</param>
+internal sealed record AlbumHandoverResponse(Guid? ToAccountId, bool ForMe, bool KeepsContributions, DateTimeOffset? Until);
+
+/// <param name="ToAccountId">Someone in the album.</param>
+/// <param name="KeepContributions">True: the owner's own contributions stay in the album; false: they leave it on acceptance.</param>
+internal sealed record OfferHandoverRequest(Guid ToAccountId, bool KeepContributions);
 
 internal sealed record AlbumTakeoverResponse(bool IsOwnerless, bool CanReserve, bool ReservedByMe, DateTimeOffset? ReservedUntil);
 

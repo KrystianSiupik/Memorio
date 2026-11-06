@@ -893,6 +893,144 @@
         }
       }
     },
+    "/v1/albums/{id}/handover": {
+      "get": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "For the owner and the person it is offered to: the handover that waits, if any.",
+        "operationId": "GetAlbumHandover",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlbumHandoverResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The owner offers the album to someone in it and chooses what becomes of their own contributions; a new offer replaces the earlier one.",
+        "operationId": "OfferAlbumHandover",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfferHandoverRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The owner takes the offer back; asking again changes nothing.",
+        "operationId": "WithdrawAlbumHandover",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/handover/acceptance": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The person becomes the owner; the former owner stays in the album.",
+        "operationId": "AcceptAlbumHandover",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/albums/{id}/handover/refusal": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "The album stays with its owner.",
+        "operationId": "RefuseAlbumHandover",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
     "/v1/albums/{id}/seats": {
       "get": {
         "tags": [
@@ -2691,6 +2829,37 @@
           }
         }
       },
+      "AlbumHandoverResponse": {
+        "required": [
+          "toAccountId",
+          "forMe",
+          "keepsContributions",
+          "until"
+        ],
+        "type": "object",
+        "properties": {
+          "toAccountId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "forMe": {
+            "type": "boolean"
+          },
+          "keepsContributions": {
+            "type": "boolean"
+          },
+          "until": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
       "AlbumInvitedResponse": {
         "required": [
           "id",
@@ -3694,6 +3863,22 @@
           "accountId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "OfferHandoverRequest": {
+        "required": [
+          "toAccountId",
+          "keepContributions"
+        ],
+        "type": "object",
+        "properties": {
+          "toAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "keepContributions": {
+            "type": "boolean"
           }
         }
       },

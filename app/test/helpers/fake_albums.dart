@@ -17,6 +17,8 @@ class FakeAlbumsRepository implements AlbumsRepository {
   List<AlbumViewer> blocked = [];
   AlbumLinkPreview? preview = const AlbumLinkPreview(albumId: 'album-1', albumName: 'Rodzina');
 
+  AlbumHandover handover = AlbumHandover.none;
+
   AlbumFailure? loadFailure;
   AlbumFailure? actionFailure;
 
@@ -121,6 +123,23 @@ class FakeAlbumsRepository implements AlbumsRepository {
 
   @override
   Future<Result<void, AlbumFailure>> nameSuccessor(String albumId, String accountId) => _act('successor:$accountId');
+
+  @override
+  Future<Result<AlbumHandover, AlbumFailure>> loadHandover(String albumId) async => _load(handover);
+
+  @override
+  Future<Result<void, AlbumFailure>> offerHandover(
+    String albumId,
+    String toAccountId, {
+    required bool keepContributions,
+  }) => _act('handover:$toAccountId:${keepContributions ? 'keep' : 'take'}');
+
+  @override
+  Future<Result<void, AlbumFailure>> withdrawHandover(String albumId) => _act('handover-withdraw');
+
+  @override
+  Future<Result<void, AlbumFailure>> answerHandover(String albumId, {required bool accepted}) =>
+      _act('handover-${accepted ? 'accept' : 'refuse'}');
 
   @override
   Future<Result<void, AlbumFailure>> leave(String albumId, {required bool keepContributions}) =>

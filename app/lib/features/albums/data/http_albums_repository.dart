@@ -12,6 +12,7 @@ import '../../../core/api/generated/models/entrust_request.dart';
 import '../../../core/api/generated/models/invite_request.dart';
 import '../../../core/api/generated/models/leave_request.dart';
 import '../../../core/api/generated/models/name_successor_request.dart';
+import '../../../core/api/generated/models/offer_handover_request.dart';
 import '../../../core/api/generated/models/start_upload_request.dart';
 import '../../../core/result.dart';
 import '../../memories/memories.dart' show PickedPhoto;
@@ -296,6 +297,37 @@ class HttpAlbumsRepository implements AlbumsRepository {
   @override
   Future<Result<void, AlbumFailure>> decline(String invitationId) =>
       _attempt(() => albums.declineInvitation(id: invitationId));
+
+  @override
+  Future<Result<AlbumHandover, AlbumFailure>> loadHandover(String albumId) => _attempt(() async {
+    final handover = await albums.getAlbumHandover(id: albumId);
+    return AlbumHandover(
+      toAccountId: handover.toAccountId,
+      forMe: handover.forMe,
+      keepsContributions: handover.keepsContributions,
+      until: handover.until,
+    );
+  });
+
+  @override
+  Future<Result<void, AlbumFailure>> offerHandover(
+    String albumId,
+    String toAccountId, {
+    required bool keepContributions,
+  }) => _attempt(
+    () => albums.offerAlbumHandover(
+      id: albumId,
+      body: OfferHandoverRequest(toAccountId: toAccountId, keepContributions: keepContributions),
+    ),
+  );
+
+  @override
+  Future<Result<void, AlbumFailure>> withdrawHandover(String albumId) =>
+      _attempt(() => albums.withdrawAlbumHandover(id: albumId));
+
+  @override
+  Future<Result<void, AlbumFailure>> answerHandover(String albumId, {required bool accepted}) =>
+      _attempt(() => accepted ? albums.acceptAlbumHandover(id: albumId) : albums.refuseAlbumHandover(id: albumId));
 
   @override
   Future<Result<void, AlbumFailure>> blockInvitations() => _attempt(() => notifications.blockInvitations());

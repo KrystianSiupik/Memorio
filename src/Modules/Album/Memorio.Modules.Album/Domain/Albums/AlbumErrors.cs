@@ -48,6 +48,10 @@ internal static class AlbumErrors
     /// <summary>E168.</summary>
     public static readonly Error TakeoverExpired = Error.Conflict("Album.TakeoverExpired", "The reservation has ended.");
 
+    public static readonly Error HandoverNotParticipant = Error.Validation("Album.HandoverNotParticipant", "An album can be handed over only to someone in it.");
+
+    public static readonly Error HandoverGone = Error.Conflict("Album.HandoverGone", "This handover is no longer waiting.");
+
     public static readonly Error PeriodTooLong = Error.Validation("Album.PeriodTooLong", "This period has too many memories for one album; choose a shorter one.");
 
     public static readonly Error InvalidPeriod = Error.Validation("Album.InvalidPeriod", "A period has both days, the first one not after the last.");

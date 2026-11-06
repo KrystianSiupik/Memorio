@@ -54,6 +54,19 @@ abstract interface class AlbumsRepository {
 
   Future<Result<void, AlbumFailure>> leave(String albumId, {required bool keepContributions});
 
+  /// D-307: the handover that waits, if any.
+  Future<Result<AlbumHandover, AlbumFailure>> loadHandover(String albumId);
+
+  Future<Result<void, AlbumFailure>> offerHandover(
+    String albumId,
+    String toAccountId, {
+    required bool keepContributions,
+  });
+
+  Future<Result<void, AlbumFailure>> withdrawHandover(String albumId);
+
+  Future<Result<void, AlbumFailure>> answerHandover(String albumId, {required bool accepted});
+
   Future<Result<void, AlbumFailure>> addMemory(String albumId, String memoryId);
 
   Future<Result<void, AlbumFailure>> addPhoto(String albumId, String memoryId, String photoId, PickedPhoto photo);

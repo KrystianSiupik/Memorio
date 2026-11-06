@@ -99,6 +99,21 @@ internal sealed class AlbumQueries(AlbumDbContext database) : IAlbumQueries
             : new TakeoverState(row.IsOwnerless, row.ReservedByAccountId, row.ReservedUntil is { } until ? new DateTimeOffset(DateTime.SpecifyKind(until, DateTimeKind.Utc)) : null);
     }
 
+    public async Task<HandoverState?> HandoverStateAsync(Guid albumId, CancellationToken cancellationToken)
+    {
+        var row = await Connection.QuerySingleOrDefaultAsync<HandoverRow>(new CommandDefinition(
+            """
+            SELECT owner_account_id AS "OwnerAccountId", handover_to_account_id AS "ToAccountId",
+                   coalesce(handover_keeps_contributions, true) AS "KeepsContributions", handover_until AS "Until"
+            FROM album.albums WHERE id = @albumId
+            """,
+            new { albumId },
+            cancellationToken: cancellationToken));
+        return row is null
+            ? null
+            : new HandoverState(row.OwnerAccountId, row.ToAccountId, row.KeepsContributions, row.Until is { } until ? new DateTimeOffset(DateTime.SpecifyKind(until, DateTimeKind.Utc)) : null);
+    }
+
     public async Task<AlbumView?> ViewAsync(Guid albumId, CancellationToken cancellationToken)
     {
         var album = await Connection.QuerySingleOrDefaultAsync<AlbumRow>(new CommandDefinition(ViewSql, new { albumId }, cancellationToken: cancellationToken));
@@ -139,6 +154,18 @@ internal sealed class AlbumQueries(AlbumDbContext database) : IAlbumQueries
     private System.Data.Common.DbConnection Connection => database.Database.GetDbConnection();
 
     private sealed record AlbumRow(Guid Id, string Name, Guid OwnerAccountId, Guid? SuccessorAccountId);
+
+    // Dapper reads timestamptz as DateTime.
+    private sealed class HandoverRow
+    {
+        public Guid OwnerAccountId { get; set; }
+
+        public Guid? ToAccountId { get; set; }
+
+        public bool KeepsContributions { get; set; }
+
+        public DateTime? Until { get; set; }
+    }
 
     // Dapper reads timestamptz as DateTime.
     private sealed class TakeoverRow

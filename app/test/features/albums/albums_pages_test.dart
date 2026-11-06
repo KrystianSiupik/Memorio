@@ -218,6 +218,31 @@ void main() {
       expect(find.text('Moje albumy'), findsOneWidget);
     });
 
+    testWidgets('a handover offered to me shows the choice of the owner and takes my answer', (tester) async {
+      albums.details = albumDetails();
+      albums.handover = AlbumHandover(
+        toAccountId: 'account-1',
+        forMe: true,
+        keepsContributions: false,
+        until: DateTime.utc(2026, 12, 6, 12),
+      );
+      await open(tester, location);
+
+      expect(find.text('Właściciel chce Ci przekazać ten album. Możesz odpowiedzieć do 06.12.2026.'), findsOneWidget);
+      expect(find.text('Jego wspomnienia zostaną z albumu wyjęte.'), findsOneWidget);
+      await tester.tap(find.text('Przejmuję album'));
+      await tester.pumpAndSettle();
+
+      expect(albums.actions, ['handover-accept']);
+    });
+
+    testWidgets('no handover for me, no card', (tester) async {
+      albums.details = albumDetails();
+      await open(tester, location);
+
+      expect(find.byKey(const Key('s10-handover')), findsNothing);
+    });
+
     testWidgets('the owner has no way to leave but a way to manage', (tester) async {
       albums.details = albumDetails(isOwner: true);
       await open(tester, location);
@@ -330,6 +355,37 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(albums.actions, ['withdraw:inv-1', 'successor:other-1', 'remove:other-1']);
+    });
+
+    testWidgets('handing over asks what becomes of my own memories', (tester) async {
+      albums.details = albumDetails(isOwner: true);
+      await open(tester, location);
+
+      await tester.tap(find.byKey(const Key('s11-hand-over-other-1')));
+      await tester.pumpAndSettle();
+      expect(find.text('Przekazać album: inny@example.invalid?'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('s11-handover-take')));
+      await tester.pumpAndSettle();
+
+      expect(albums.actions, ['handover:other-1:take']);
+    });
+
+    testWidgets('a handover that waits shows who and until when, and can be withdrawn', (tester) async {
+      albums.details = albumDetails(isOwner: true);
+      albums.handover = AlbumHandover(toAccountId: 'other-1', until: DateTime.utc(2026, 12, 6, 12));
+      await open(tester, location);
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('s11-handover-waiting')),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('Czeka na odpowiedź: inny@example.invalid, do 06.12.2026.'), findsOneWidget);
+      expect(find.byKey(const Key('s11-hand-over-other-1')), findsNothing);
+      await tester.tap(find.text('Wycofaj propozycję'));
+      await tester.pumpAndSettle();
+
+      expect(albums.actions, ['handover-withdraw']);
     });
 
     testWidgets('not the owner: forbidden', (tester) async {

@@ -72,6 +72,7 @@ public sealed class AlbumModule : IModule
         services.AddScoped<RestoreTrimmedWhenPlanActive>();
         services.AddScoped<RemoveBlockedParticipant>();
         services.AddScoped<ReserveTakeoverHandler>();
+        services.AddScoped<HandoverHandler>();
         services.AddScoped<ExpireTakeoverReservation>();
         services.AddScoped<TakeOverWhenPaid>();
 

@@ -23,6 +23,9 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
     /// </summary>
     public static readonly TimeSpan LatePaymentGrace = TimeSpan.FromHours(24);
 
+    /// <summary>How long a handover while alive waits for the answer, as an offer after a death (HS-021, D-307).</summary>
+    public static readonly TimeSpan HandoverWindow = TimeSpan.FromDays(30);
+
     private readonly List<AlbumParticipant> _participants = [];
     private readonly List<AlbumInvitation> _invitations = [];
 
@@ -45,6 +48,14 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
     public Guid? ReservedByAccountId { get; private set; }
 
     public DateTimeOffset? ReservedUntil { get; private set; }
+
+    /// <summary>C-HO1: who the living owner offers the album to; one at a time (D-307).</summary>
+    public Guid? HandoverToAccountId { get; private set; }
+
+    /// <summary>The owner's choice for their own contributions, made when offering (S2:B3): true keeps them in the album.</summary>
+    public bool? HandoverKeepsContributions { get; private set; }
+
+    public DateTimeOffset? HandoverUntil { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
 
@@ -201,6 +212,7 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
         }
 
         ForgetSuccessor(accountId);
+        ForgetHandover(accountId);
         if (ReservedByAccountId == accountId)
         {
             ReservedByAccountId = null;
@@ -231,6 +243,7 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
         }
 
         ForgetSuccessor(accountId);
+        ForgetHandover(accountId);
         Sequence++;
         Raise(new ParticipantRemoved(Guid.CreateVersion7(), now, Id, accountId, Sequence));
         return Result.Success();
@@ -265,6 +278,7 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
 
         OwnerAccountId = NoOwner;
         SuccessorAccountId = null;
+        ForgetHandover(HandoverToAccountId);
         OwnerlessSince = now;
         Sequence++;
         Raise(new AlbumWithoutOwner(Guid.CreateVersion7(), now, Id, Sequence));
@@ -349,6 +363,96 @@ internal sealed class SharedAlbum : AggregateRoot<AlbumId>
         Sequence++;
         Raise(new AlbumTakenOver(Guid.CreateVersion7(), now, Id, newOwner, Sequence));
         return Result.Success();
+    }
+
+    /// <summary>
+    /// D-307: the living owner offers the album to someone in it, and says now what becomes of their own contributions
+    /// (S2:B3). A new offer replaces the earlier one. Nothing changes until the person accepts.
+    /// </summary>
+    public Result OfferHandover(Guid byAccountId, Guid toAccountId, bool keepContributions, DateTimeOffset now)
+    {
+        if (!IsOwner(byAccountId))
+        {
+            return AlbumErrors.NoAccess;
+        }
+
+        if (!_participants.Exists(participant => participant.AccountId == toAccountId))
+        {
+            return AlbumErrors.HandoverNotParticipant;
+        }
+
+        if (HandoverToAccountId == toAccountId && HandoverKeepsContributions == keepContributions && HandoverUntil > now)
+        {
+            return Result.Success();
+        }
+
+        HandoverToAccountId = toAccountId;
+        HandoverKeepsContributions = keepContributions;
+        HandoverUntil = now + HandoverWindow;
+        Sequence++;
+        Raise(new HandoverOffered(Guid.CreateVersion7(), now, Id, toAccountId, HandoverUntil.Value, Sequence));
+        return Result.Success();
+    }
+
+    /// <summary>The owner takes the offer back; asking again changes nothing.</summary>
+    public Result WithdrawHandover(Guid byAccountId)
+    {
+        if (!IsOwner(byAccountId))
+        {
+            return AlbumErrors.NoAccess;
+        }
+
+        if (HandoverToAccountId is not null)
+        {
+            ForgetHandover(HandoverToAccountId);
+            Sequence++;
+        }
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// D-307: the album, its pool and the role go to the person; the former owner stays in it as a participant. Gives back
+    /// whether the former owner's contributions stay; taking them is the caller's step, through C30.
+    /// </summary>
+    public Result<(Guid FormerOwner, bool KeepContributions)> AcceptHandover(Guid accountId, DateTimeOffset now)
+    {
+        if (HandoverToAccountId != accountId || !(HandoverUntil > now) || IsOwnerless)
+        {
+            return AlbumErrors.HandoverGone;
+        }
+
+        var former = OwnerAccountId;
+        var keep = HandoverKeepsContributions ?? true;
+        BecomeOwner(accountId);
+        _participants.Add(new AlbumParticipant(former, now));
+        ForgetHandover(accountId);
+        Sequence++;
+        Raise(new AlbumOwnerChanged(Guid.CreateVersion7(), now, Id, accountId, Sequence));
+        return (former, keep);
+    }
+
+    /// <summary>The person refuses: the album stays with its owner.</summary>
+    public Result RefuseHandover(Guid accountId)
+    {
+        if (HandoverToAccountId != accountId)
+        {
+            return AlbumErrors.HandoverGone;
+        }
+
+        ForgetHandover(accountId);
+        Sequence++;
+        return Result.Success();
+    }
+
+    private void ForgetHandover(Guid? accountId)
+    {
+        if (accountId is not null && HandoverToAccountId == accountId)
+        {
+            HandoverToAccountId = null;
+            HandoverKeepsContributions = null;
+            HandoverUntil = null;
+        }
     }
 
     private void BecomeOwner(Guid accountId)

@@ -17,6 +17,7 @@ internal enum NotificationKind
     SuccessorReminder,
     DeathReportRejected,
     DeathReported,
+    HandoverOffered,
     PrivateArchiveShared,
 }
 

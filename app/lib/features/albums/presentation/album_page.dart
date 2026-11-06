@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../account/account.dart';
-import '../../memories/memories.dart' show dayTextOf, memoryPinsProvider, photoPickerProvider;
+import '../../memories/memories.dart' show dayText, dayTextOf, memoryPinsProvider, photoPickerProvider;
 import '../domain/album.dart';
 import 'albums_providers.dart';
 
@@ -165,10 +165,49 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
     }
   }
 
+  /// D-307: the person the living owner offers the album to answers here.
+  Future<void> _answerHandover({required bool accepted}) async {
+    if (await act(() => albums.answerHandover(widget.albumId, accepted: accepted))) {
+      ref.invalidate(albumHandoverProvider(widget.albumId));
+      _refresh();
+    }
+  }
+
+  Widget _handoverCard(AlbumHandover handover) {
+    final l10n = context.l10n;
+    return Card(
+      key: const Key('s10-handover'),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.albumHandoverForMe(dayText(handover.until!.toLocal()))),
+            Text(handover.keepsContributions ? l10n.albumHandoverOwnerKeeps : l10n.albumHandoverOwnerTakes),
+            Wrap(
+              spacing: 8,
+              children: [
+                FilledButton(
+                  onPressed: offline || busy ? null : () => _answerHandover(accepted: true),
+                  child: Text(l10n.albumHandoverAccept),
+                ),
+                OutlinedButton(
+                  onPressed: offline || busy ? null : () => _answerHandover(accepted: false),
+                  child: Text(l10n.albumHandoverRefuse),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final details = ref.watch(albumDetailsProvider(widget.albumId));
+    final handover = ref.watch(albumHandoverProvider(widget.albumId)).value ?? AlbumHandover.none;
     final me = ref.watch(sessionProvider).value?.accountId;
 
     return Scaffold(
@@ -216,6 +255,7 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
                     if (album.isOwnerless) widget.ownerlessBlock else Text(l10n.albumNoOwnerState),
                   ],
                   if (album.isReadOnly) Text(l10n.albumReadOnly, key: const Key('s10-read-only')),
+                  if (handover.forMe && handover.waits) _handoverCard(handover),
                   if (album.isMember && !album.isOwner && !album.isOwnerless)
                     TextButton(onPressed: widget.onReportDeath, child: Text(l10n.albumReportDeath)),
                   ...failureBlock(context),

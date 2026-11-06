@@ -71,3 +71,21 @@ public sealed class AlbumWithoutOwnerHandlerIdempotencyTests(NotificationsDataba
         Assert.Contains("album „Rodzina”", body);
     }
 }
+
+/// <summary>SD6, D-307: a handover offer delivered twice.</summary>
+public sealed class HandoverOfferedHandlerIdempotencyTests(NotificationsDatabase database)
+{
+    [Fact]
+    public async Task The_person_hears_once()
+    {
+        var (album, person) = (Guid.CreateVersion7(), database.Neighbours.NewAccount());
+        var offered = new HandoverOfferedEvent(Guid.CreateVersion7(), DateTimeOffset.UtcNow, album, person, DateTimeOffset.UtcNow.AddDays(30), 3);
+        await using var scope = database.CreateScope();
+        var policy = scope.ServiceProvider.GetRequiredService<NotifyOfHandover>();
+
+        await policy.HandleAsync(offered, TestContext.Current.CancellationToken);
+        await policy.HandleAsync(offered, TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, database.Neighbours.SentTo(database.Neighbours.EmailOf(person), nameof(NotificationKind.HandoverOffered)));
+    }
+}

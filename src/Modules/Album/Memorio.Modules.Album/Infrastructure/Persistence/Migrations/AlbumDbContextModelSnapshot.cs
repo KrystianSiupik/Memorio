@@ -169,6 +169,18 @@ namespace Memorio.Modules.Album.Infrastructure.Persistence.Migrations
                         .HasDefaultValue(new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)))
                         .HasColumnName("created_at");
 
+                    b.Property<bool?>("HandoverKeepsContributions")
+                        .HasColumnType("boolean")
+                        .HasColumnName("handover_keeps_contributions");
+
+                    b.Property<Guid?>("HandoverToAccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("handover_to_account_id");
+
+                    b.Property<DateTimeOffset?>("HandoverUntil")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("handover_until");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .ValueGeneratedOnAdd()

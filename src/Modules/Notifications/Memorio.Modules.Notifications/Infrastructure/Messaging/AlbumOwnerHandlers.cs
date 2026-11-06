@@ -4,6 +4,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Memorio.Modules.Notifications.Infrastructure.Messaging;
 
+/// <summary>D-307 in the worker.</summary>
+public static class HandoverOfferedHandler
+{
+    public static Task Handle(HandoverOfferedEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
+        services.GetRequiredService<NotifyOfHandover>().HandleAsync(integrationEvent, cancellationToken);
+}
+
 /// <summary>E167 in the worker: only resolves this module's policy and calls it (D-135, D-252).</summary>
 public static class AlbumTakenOverHandler
 {
