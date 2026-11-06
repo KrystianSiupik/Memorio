@@ -10,7 +10,7 @@ namespace Memorio.Modules.Archive.Infrastructure.Queries;
 internal sealed class MemoryMapQuery(ArchiveDbContext database, IAccessReader access) : IMemoryMapQuery
 {
     private const string Sql = """
-        SELECT id AS "Id", latitude AS "Latitude", longitude AS "Longitude"
+        SELECT id AS "Id", latitude AS "Latitude", longitude AS "Longitude", author_account_id = @accountId AS "IsMine"
         FROM archive.memories
         WHERE state = 'Active'
           AND (author_account_id = @accountId
@@ -22,10 +22,13 @@ internal sealed class MemoryMapQuery(ArchiveDbContext database, IAccessReader ac
     public async Task<IReadOnlyList<MemoryPoint>> GetAsync(Guid accountId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken)
     {
         var visibleAlbums = (await access.AlbumsTakingPartInAsync(accountId, cancellationToken)).ToArray();
-        var points = await database.Database.GetDbConnection().QueryAsync<MemoryPoint>(new CommandDefinition(
+        var points = (await database.Database.GetDbConnection().QueryAsync<PointRow>(new CommandDefinition(
             Sql,
             new { accountId, visibleAlbums, from = from?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), to = to?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) },
-            cancellationToken: cancellationToken));
-        return [.. points];
+            cancellationToken: cancellationToken))).ToList();
+        var hidden = await access.HiddenFromAsync(accountId, [.. points.Where(point => !point.IsMine).Select(point => point.Id)], cancellationToken);
+        return [.. points.Where(point => !hidden.Contains(point.Id)).Select(point => new MemoryPoint(point.Id, point.Latitude, point.Longitude))];
     }
+
+    private sealed record PointRow(Guid Id, double Latitude, double Longitude, bool IsMine);
 }

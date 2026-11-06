@@ -38,6 +38,28 @@ public sealed class AlbumContentTests(ArchiveDatabase database)
     }
 
     [Fact]
+    public async Task A_memory_Moderation_hid_is_gone_for_others_and_stays_for_its_author()
+    {
+        var (author, reader, album) = (Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7());
+        var memory = await database.AddMemoryAsync(author, dateFrom: new DateOnly(2026, 9, 9));
+        await using var scope = database.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<IAlbumContent>().LinkAsync(memory.Id.Value, album, Cancellation);
+        database.Neighbours.TakesPart(reader, album);
+        database.Neighbours.Sees(reader, album);
+
+        database.Neighbours.Hides(memory.Id.Value);
+
+        var details = scope.ServiceProvider.GetRequiredService<IMemoryDetailsQuery>();
+        var map = scope.ServiceProvider.GetRequiredService<IMemoryMapQuery>();
+        var period = scope.ServiceProvider.GetRequiredService<Application.Queries.Period.IPeriodQuery>();
+        Assert.Null(await details.GetAsync(memory.Id.Value, reader, Cancellation));
+        Assert.DoesNotContain(await map.GetAsync(reader, null, null, Cancellation), point => point.Id == memory.Id.Value);
+        Assert.DoesNotContain(await period.GetAsync(reader, new DateOnly(2026, 9, 1), new DateOnly(2026, 9, 30), Cancellation), item => item.Id == memory.Id.Value);
+        Assert.NotNull(await details.GetAsync(memory.Id.Value, author, Cancellation));
+        Assert.Contains(await map.GetAsync(author, null, null, Cancellation), point => point.Id == memory.Id.Value);
+    }
+
+    [Fact]
     public async Task An_album_read_through_a_link_opens_but_stays_off_the_private_map()
     {
         var reader = Guid.CreateVersion7();

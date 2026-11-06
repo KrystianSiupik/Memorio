@@ -36,7 +36,7 @@ internal sealed class MemoryDetailsQuery(ArchiveDbContext database, IObjectStora
         var legacyArchives = (await access.LegacyArchivesAsync(accountId, cancellationToken)).ToArray();
         var row = await connection.QuerySingleOrDefaultAsync<MemoryRow>(
             new CommandDefinition(MemorySql, new { memoryId, accountId, visibleAlbums, legacyArchives }, cancellationToken: cancellationToken));
-        if (row is null)
+        if (row is null || (row.AuthorAccountId != accountId && (await access.HiddenFromAsync(accountId, [memoryId], cancellationToken)).Count > 0))
         {
             return null;
         }

@@ -49,6 +49,47 @@ namespace Memorio.Modules.Access.Infrastructure.Persistence.Migrations
                     b.ToTable("album_audiences", "access");
                 });
 
+            modelBuilder.Entity("Memorio.Modules.Access.Domain.Audiences.HiddenScope", b =>
+                {
+                    b.Property<Guid>("HoldId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("hold_id");
+
+                    b.Property<Guid?>("AuthorAccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("author_account_id");
+
+                    b.Property<DateTimeOffset>("ChangedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("changed_at");
+
+                    b.Property<bool>("Hidden")
+                        .HasColumnType("boolean")
+                        .HasColumnName("hidden");
+
+                    b.Property<Guid>("ResourceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("resource_id");
+
+                    b.Property<string>("ResourceKind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("resource_kind");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence");
+
+                    b.HasKey("HoldId");
+
+                    b.HasIndex("ResourceId")
+                        .HasDatabaseName("ix_hidden_scopes_resource")
+                        .HasFilter("hidden");
+
+                    b.ToTable("hidden_scopes", "access");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Access.Domain.Audiences.LegacyGrant", b =>
                 {
                     b.Property<Guid>("OwnerAccountId")

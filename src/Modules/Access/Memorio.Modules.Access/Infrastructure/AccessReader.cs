@@ -11,13 +11,13 @@ namespace Memorio.Modules.Access.Infrastructure;
 /// <summary>
 /// Access is denied unless a rule grants it (ADR 0011). A block comes first, so whatever raced with it loses at the
 /// next read (D-022). Then being in the album, read straight from Album (D-250), or a place on the list of viewers.
-/// The hidden scope of E8 is still to come.
+/// Last, a hidden scope of Moderation: nobody but the author sees what it hides (E161, P32).
 /// </summary>
 internal sealed class AccessReader(IAlbumMembership membership, IAccountDirectory directory, AccessDbContext database) : IAccessReader, IBlockList
 {
     public async Task<bool> CanSeeAlbumAsync(Guid personId, Guid albumId, CancellationToken cancellationToken)
     {
-        if (await IsBlockedAsync(albumId, personId, cancellationToken))
+        if (await IsBlockedAsync(albumId, personId, cancellationToken) || (await HiddenFromAsync(personId, [albumId], cancellationToken)).Count > 0)
         {
             return false;
         }
@@ -41,7 +41,8 @@ internal sealed class AccessReader(IAlbumMembership membership, IAccountDirector
             new { personId },
             cancellationToken: cancellationToken));
         var members = await membership.AlbumsOfAsync(personId, cancellationToken);
-        return [.. members.Union(viewed).Except(blocked)];
+        var seen = members.Union(viewed).Except(blocked).ToList();
+        return [.. seen.Except(await HiddenFromAsync(personId, seen, cancellationToken))];
     }
 
     public async Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken)
@@ -50,7 +51,25 @@ internal sealed class AccessReader(IAlbumMembership membership, IAccountDirector
             "SELECT album_id FROM access.album_blocks WHERE account_id = @personId",
             new { personId },
             cancellationToken: cancellationToken));
-        return [.. (await membership.AlbumsOfAsync(personId, cancellationToken)).Except(blocked)];
+        var taking = (await membership.AlbumsOfAsync(personId, cancellationToken)).Except(blocked).ToList();
+        return [.. taking.Except(await HiddenFromAsync(personId, taking, cancellationToken))];
+    }
+
+    public async Task<IReadOnlyCollection<Guid>> HiddenFromAsync(Guid personId, IReadOnlyCollection<Guid> resourceIds, CancellationToken cancellationToken)
+    {
+        if (resourceIds.Count == 0)
+        {
+            return [];
+        }
+
+        var hidden = await database.Database.GetDbConnection().QueryAsync<Guid>(new CommandDefinition(
+            """
+            SELECT DISTINCT resource_id FROM access.hidden_scopes
+            WHERE hidden AND resource_id = ANY(@ids) AND author_account_id IS DISTINCT FROM @personId
+            """,
+            new { ids = resourceIds.ToArray(), personId },
+            cancellationToken: cancellationToken));
+        return [.. hidden];
     }
 
     public async Task<IReadOnlyCollection<Guid>> LegacyArchivesAsync(Guid personId, CancellationToken cancellationToken)

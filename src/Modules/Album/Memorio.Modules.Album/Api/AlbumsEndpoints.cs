@@ -78,12 +78,13 @@ internal static class AlbumsEndpoints
         return created.IsFailure ? Problems.From(created.Error) : TypedResults.Ok(new PeriodAlbumResponse(created.Value.Added, created.Value.NotFitting));
     }
 
-    private static async Task<Ok<IReadOnlyList<AlbumListItemResponse>>> ListAsync(ClaimsPrincipal principal, IAlbumQueries queries, CancellationToken cancellationToken)
+    private static async Task<Ok<IReadOnlyList<AlbumListItemResponse>>> ListAsync(ClaimsPrincipal principal, IAlbumQueries queries, IAccessReader access, CancellationToken cancellationToken)
     {
         var accountId = CurrentAccount.IdOf(principal);
         var albums = await queries.MyAlbumsAsync(accountId, cancellationToken);
+        var hidden = await access.HiddenFromAsync(accountId, [.. albums.Select(album => album.Id)], cancellationToken);
         return TypedResults.Ok<IReadOnlyList<AlbumListItemResponse>>(
-            [.. albums.Select(album => new AlbumListItemResponse(album.Id, album.Name, album.OwnerAccountId == accountId, album.Members, album.Memories))]);
+            [.. albums.Where(album => !hidden.Contains(album.Id)).Select(album => new AlbumListItemResponse(album.Id, album.Name, album.OwnerAccountId == accountId, album.Members, album.Memories))]);
     }
 
     private static async Task<Results<Ok<AlbumResponse>, ProblemHttpResult>> GetAsync(
@@ -108,7 +109,9 @@ internal static class AlbumsEndpoints
             [.. album.Members.Select(member => member.AccountId).Union(album.Memories.Select(memory => memory.AuthorAccountId))],
             cancellationToken);
         var state = await pool.GetStateAsync(id, cancellationToken);
-        var visible = album.Memories.Where(memory => summaries.ContainsKey(memory.MemoryId)).ToList();
+        // What Moderation hid stays only for its author (E161).
+        var hidden = await access.HiddenFromAsync(accountId, [.. album.Memories.Where(memory => memory.AuthorAccountId != accountId).Select(memory => memory.MemoryId)], cancellationToken);
+        var visible = album.Memories.Where(memory => summaries.ContainsKey(memory.MemoryId) && !hidden.Contains(memory.MemoryId)).ToList();
         var entrustment = await queries.MyEntrustmentAsync(id, accountId, cancellationToken);
 
         // Someone reading through a link sees the content, not who is in the album or their addresses (D-271).

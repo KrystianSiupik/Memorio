@@ -137,6 +137,9 @@ internal sealed class ProbeAccessReader(AccessDatabase database) : IAccessReader
     public Task<IReadOnlyCollection<Guid>> LegacyArchivesAsync(Guid personId, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyCollection<Guid>>([]);
 
+    public Task<IReadOnlyCollection<Guid>> HiddenFromAsync(Guid personId, IReadOnlyCollection<Guid> resourceIds, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyCollection<Guid>>([]);
+
     public Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken) =>
         VisibleAlbumsAsync(personId, cancellationToken);
 
@@ -172,6 +175,9 @@ internal sealed class CachingAccessReader(IAccessReader inner) : IAccessReader
     }
 
     public Task<IReadOnlyCollection<Guid>> LegacyArchivesAsync(Guid personId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyCollection<Guid>>([]);
+
+    public Task<IReadOnlyCollection<Guid>> HiddenFromAsync(Guid personId, IReadOnlyCollection<Guid> resourceIds, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyCollection<Guid>>([]);
 
     public Task<IReadOnlyCollection<Guid>> AlbumsTakingPartInAsync(Guid personId, CancellationToken cancellationToken) =>
