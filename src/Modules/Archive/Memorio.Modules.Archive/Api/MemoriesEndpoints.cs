@@ -58,6 +58,9 @@ internal static class MemoriesEndpoints
         memories.MapDelete("/{id:guid}", TrashAsync)
             .WithName("TrashMemory")
             .WithSummary("Moves the person's content to the trash for 30 days.");
+        memories.MapGet("/{id:guid}/preview", GetPreviewAsync)
+            .WithName("GetMemoryPreview")
+            .WithSummary("What the map shows on hovering a memory: the place, the date, the first photo and the start of the description.");
         memories.MapGet("/{id:guid}", GetDetailsAsync)
             .WithName("GetMemory")
             .WithSummary("Everything about one memory the person may see.");
@@ -144,6 +147,19 @@ internal static class MemoriesEndpoints
                 memory.Description,
                 memory.DescriptionIsAi,
                 [.. memory.Photos.Select(photo => new MemoryPhotoResponse(photo.Id, photo.Url))]));
+    }
+
+    private static async Task<Results<Ok<MemoryPreviewResponse>, ProblemHttpResult>> GetPreviewAsync(
+        Guid id,
+        ClaimsPrincipal principal,
+        IMemoryDetailsQuery query,
+        CancellationToken cancellationToken)
+    {
+        var preview = await query.PreviewAsync(id, CurrentAccount.IdOf(principal), cancellationToken);
+        return preview is null
+            ? Problems.From(MemoryErrors.NoAccess)
+            : TypedResults.Ok(new MemoryPreviewResponse(
+                preview.Id, preview.PlaceName, preview.DatePrecision, preview.DateFrom, preview.DateTo, preview.Time, preview.Excerpt, preview.Photos, preview.PhotoUrl));
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> TrashAsync(
@@ -309,6 +325,20 @@ internal sealed record MemoryDetailsResponse(
 
 /// <param name="Url">Signed for 5 minutes.</param>
 internal sealed record MemoryPhotoResponse(Guid Id, Uri Url);
+
+/// <param name="Excerpt">The start of the description, up to 140 characters, cut at a word.</param>
+/// <param name="Photos">How many photos the memory has.</param>
+/// <param name="PhotoUrl">The first photo added, signed for 5 minutes.</param>
+internal sealed record MemoryPreviewResponse(
+    Guid Id,
+    string PlaceName,
+    string DatePrecision,
+    string DateFrom,
+    string DateTo,
+    string? Time,
+    string? Excerpt,
+    int Photos,
+    Uri? PhotoUrl);
 
 /// <param name="Confirmed">The person confirmed that this cannot be undone.</param>
 internal sealed record RequestDataDeletionRequest(bool Confirmed);

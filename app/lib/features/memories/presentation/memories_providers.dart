@@ -83,6 +83,16 @@ final memoryDetailsProvider = FutureProvider.family<MemoryDetails, String>((ref,
   };
 }, retry: noAutomaticRetry);
 
+/// MEM-E12-PLAT-01: kept while the map is open, so moving over the same point again asks nothing.
+final memoryPreviewProvider = FutureProvider.family<MemoryPreview, String>((ref, id) async {
+  ref.watch(sessionProvider.select((session) => session.value?.accountId));
+  final loaded = await ref.watch(memoriesRepositoryProvider).loadPreview(id);
+  return switch (loaded) {
+    Ok(:final value) => value,
+    Err(:final failure) => throw failure,
+  };
+}, retry: noAutomaticRetry);
+
 /// What S06 shows. Kept for the session: without a connection the screen reads the last answer.
 final trashProvider = FutureProvider<List<TrashedMemory>>((ref) async {
   ref.watch(sessionProvider.select((session) => session.value?.accountId));

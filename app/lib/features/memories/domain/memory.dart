@@ -75,6 +75,37 @@ class MemoryDetails {
   final List<String> photoUrls;
 }
 
+/// MEM-E12-PLAT-01: what the map shows on hovering a point.
+class MemoryPreview {
+  const MemoryPreview({
+    required this.id,
+    required this.placeName,
+    required this.datePrecision,
+    required this.dateFrom,
+    required this.dateTo,
+    this.time,
+    this.excerpt,
+    this.photos = 0,
+    this.photoUrl,
+  });
+
+  final String id;
+  final String placeName;
+
+  /// Day, Month, Year or Period.
+  final String datePrecision;
+  final String dateFrom;
+  final String dateTo;
+  final String? time;
+
+  /// The start of the description, cut at a word.
+  final String? excerpt;
+  final int photos;
+
+  /// The first photo added, signed for 5 minutes.
+  final String? photoUrl;
+}
+
 /// One row of S06.
 class TrashedMemory {
   const TrashedMemory({

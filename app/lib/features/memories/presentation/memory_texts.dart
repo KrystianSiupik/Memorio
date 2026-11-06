@@ -23,6 +23,17 @@ String dayText(DateTime date) {
   return '${twoDigits(local.day)}.${twoDigits(local.month)}.${local.year}';
 }
 
+/// The date as exactly as the person gave it (S2:C1), with the hour when there is one.
+String memoryDateText(String precision, String from, String to, String? time) {
+  final parts = from.split('-');
+  return switch (precision) {
+    'Year' => parts[0],
+    'Month' when parts.length == 3 => '${parts[1]}.${parts[0]}',
+    'Period' => '${dayTextOf(from)} – ${dayTextOf(to)}',
+    _ => time == null ? dayTextOf(from) : '${dayTextOf(from)}, $time',
+  };
+}
+
 /// dd.MM.yyyy from the yyyy-MM-dd the backend sends.
 String dayTextOf(String date) {
   final parts = date.split('-');

@@ -82,6 +82,15 @@ class FakeMemoriesRepository implements MemoriesRepository {
     return const Ok(null);
   }
 
+  /// Previews by memory id; a missing one is no access.
+  final previews = <String, MemoryPreview>{};
+
+  @override
+  Future<Result<MemoryPreview, MemoryFailure>> loadPreview(String id) async {
+    final preview = previews[id];
+    return preview == null ? const Err(MemoryNoAccess()) : Ok(preview);
+  }
+
   @override
   Future<Result<MemoryDetails, MemoryFailure>> loadDetails(String id) async {
     final failure = loadFailure;

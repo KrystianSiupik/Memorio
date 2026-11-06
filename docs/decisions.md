@@ -1069,3 +1069,8 @@ PO: „zaczynaj e9”. Odwracalne założenia, do sprawdzenia przez PO.
 | D-316 | **Decyzja PO do D-311 (4), HS-007:** odwołanie rozpatruje **inna osoba** niż ta, która wydała pierwszą decyzję. Pilnuje tego domena (`Moderation.SameDecider`), więc skrypt nie przepuści tej samej osoby | inaczej odwołanie jest fikcją |
 | D-317 | **Decyzja PO do D-311 (3):** powiadomienia obsługi o nowych zgłoszeniach i nakazach („dzwoneczek”) **po MVP**. Do tego czasu obsługa sprawdza `moderation.sh list` sama; HS-006 (dyżur przy nakazie 1 h) zostaje otwarte | PO |
 
+## MEM-E12 · UI mapy (2026-11-06)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-318 | **Nowy epik E12 z prośby PO po pokazie.** Podgląd po najechaniu (MEM-E12-PLAT-01): osobne lekkie zapytanie `GET /v1/memories/{id}/preview` z tym samym filtrem dostępu co szczegóły (także ukrycie przez moderację), pierwsze dodane zdjęcie (najstarszy identyfikator) jako podpisany oryginał, wycinek opisu do 140 znaków ucięty na słowie. Karta tylko po najechaniu myszą (przeglądarka); stuknięcie dalej otwiera S05, bo urządzenia dotykowe nie mają najechania. Podgląd zostaje w pamięci, póki mapa jest otwarta. **Nie ma miniatur**: duże zdjęcie przy wolnym łączu ładuje się dłużej | szczegóły podpisywałyby wszystkie zdjęcia przy każdym ruchu myszy; miniatury to osobna praca przy przesyłaniu zdjęć |

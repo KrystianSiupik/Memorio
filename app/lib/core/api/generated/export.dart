@@ -65,6 +65,7 @@ export 'models/login_request.dart';
 export 'models/memory_details_response.dart';
 export 'models/memory_photo_response.dart';
 export 'models/memory_point_response.dart';
+export 'models/memory_preview_response.dart';
 export 'models/my_memory_response.dart';
 export 'models/my_moderation_response.dart';
 export 'models/my_report.dart';

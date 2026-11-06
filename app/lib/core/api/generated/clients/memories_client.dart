@@ -11,6 +11,7 @@ import '../models/create_memory_request.dart';
 import '../models/created_memory_response.dart';
 import '../models/memory_details_response.dart';
 import '../models/memory_point_response.dart';
+import '../models/memory_preview_response.dart';
 import '../models/my_memory_response.dart';
 import '../models/period_memory_response.dart';
 import '../models/request_data_deletion_request.dart';
@@ -68,6 +69,10 @@ abstract class MemoriesClient {
   /// Everything about one memory the person may see.
   @GET('/v1/memories/{id}')
   Future<MemoryDetailsResponse> getMemory({@Path('id') required String id});
+
+  /// What the map shows on hovering a memory: the place, the date, the first photo and the start of the description.
+  @GET('/v1/memories/{id}/preview')
+  Future<MemoryPreviewResponse> getMemoryPreview({@Path('id') required String id});
 
   /// The author approves the description of a memory, naming the AI draft it started from, if any.
   @PUT('/v1/memories/{id}/description')

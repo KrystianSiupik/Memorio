@@ -130,6 +130,8 @@
   "albumWithdrawInvitation": "Wycofaj",
   "albumRemoveParticipant": "Usuń uczestnika",
   "albumSuccessor": "Następca",
+  "mapPreviewPhotos": "Zdjęcia: {count}",
+  "mapPreviewUnavailable": "Nie udało się wczytać podglądu.",
   "reportContent": "Zgłoś treść",
   "reportMemoryTitle": "Zgłoś wspomnienie",
   "reportAlbumTitle": "Zgłoś album",
