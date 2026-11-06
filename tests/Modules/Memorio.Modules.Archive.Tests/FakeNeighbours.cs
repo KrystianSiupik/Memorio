@@ -42,6 +42,14 @@ public sealed class FakeNeighbours : IPlaceReader, ITermsReader, ISpacePool, IAl
 
     public void IsLegacyContact(Guid personId, Guid ownerAccountId) => _legacy[(personId, ownerAccountId)] = true;
 
+    private readonly ConcurrentDictionary<Guid, bool> _hidden = new();
+
+    /// <summary>Moderation hid it: nobody but its author sees it (the author is the caller's business here).</summary>
+    public void Hides(Guid resourceId) => _hidden[resourceId] = true;
+
+    public Task<IReadOnlyCollection<Guid>> HiddenFromAsync(Guid personId, IReadOnlyCollection<Guid> resourceIds, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyCollection<Guid>>([.. resourceIds.Where(_hidden.ContainsKey)]);
+
     public Task<IReadOnlyCollection<Guid>> LegacyArchivesAsync(Guid personId, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyCollection<Guid>>([.. _legacy.Keys.Where(key => key.Person == personId).Select(key => key.Owner)]);
 

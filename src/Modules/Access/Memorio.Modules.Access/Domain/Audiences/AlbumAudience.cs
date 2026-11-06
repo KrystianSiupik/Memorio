@@ -185,6 +185,8 @@ internal static class AccessErrors
 
     public static readonly Error AlreadyDecided = Error.Conflict("Access.AlreadyDecided", "This has already been decided.");
 
+    public static readonly Error InvalidScope = Error.Validation("Access.InvalidScope", "A hidden scope needs its hold, a memory or an album, and a sequence from 1.");
+
     /// <summary>The same answer for an album that does not exist and one the person has no say in.</summary>
     public static readonly Error NoAccess = Error.Forbidden("Access.NoAccess", "No access to this album.");
 }

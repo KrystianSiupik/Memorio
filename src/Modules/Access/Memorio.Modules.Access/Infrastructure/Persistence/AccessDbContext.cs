@@ -14,6 +14,20 @@ internal sealed class AccessDbContext(DbContextOptions<AccessDbContext> options)
     {
         builder.HasDefaultSchema(Schema);
 
+        builder.Entity<HiddenScope>(scope =>
+        {
+            scope.ToTable("hidden_scopes");
+            scope.HasKey(item => item.HoldId);
+            scope.Property(item => item.HoldId).HasColumnName("hold_id").ValueGeneratedNever();
+            scope.Property(item => item.ResourceKind).HasColumnName("resource_kind").HasMaxLength(20);
+            scope.Property(item => item.ResourceId).HasColumnName("resource_id");
+            scope.Property(item => item.AuthorAccountId).HasColumnName("author_account_id");
+            scope.Property(item => item.Hidden).HasColumnName("hidden");
+            scope.Property(item => item.Sequence).HasColumnName("sequence");
+            scope.Property(item => item.ChangedAt).HasColumnName("changed_at");
+            scope.HasIndex(item => item.ResourceId).HasDatabaseName("ix_hidden_scopes_resource").HasFilter("hidden");
+        });
+
         builder.Entity<LegacyGrant>(grant =>
         {
             grant.ToTable("legacy_grants");

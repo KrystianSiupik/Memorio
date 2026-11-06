@@ -190,7 +190,9 @@ internal static class MemoriesEndpoints
         }
 
         var items = await query.OfAccountAsync(ownerAccountId, cancellationToken);
-        return TypedResults.Ok<IReadOnlyList<MyMemoryResponse>>([.. items.Select(item => new MyMemoryResponse(item.MemoryId, item.PlaceName, item.DateFrom))]);
+        var hidden = await access.HiddenFromAsync(CurrentAccount.IdOf(principal), [.. items.Select(item => item.MemoryId)], cancellationToken);
+        return TypedResults.Ok<IReadOnlyList<MyMemoryResponse>>(
+            [.. items.Where(item => !hidden.Contains(item.MemoryId)).Select(item => new MyMemoryResponse(item.MemoryId, item.PlaceName, item.DateFrom))]);
     }
 
     private static async Task<Ok<IReadOnlyList<TrimMaterialResponse>>> GetTrimMaterialAsync(

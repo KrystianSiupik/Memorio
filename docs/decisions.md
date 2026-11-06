@@ -1047,3 +1047,9 @@ PO: „zaczynaj e9”. Odwracalne założenia, do sprawdzenia przez PO.
 
 **Stan testów po D-304 do D-307:** Album 102/102, Sukcesja 31/31, Powiadomienia 44/44, API 46/46, architektura 49/49, baza 75/75, aplikacja 325/325. **Prawdziwe uruchomienie API i workera z lokalnym SMTP:** zgłoszenie zgonu wysyła wiadomość właścicielowi; przekazanie z zabraniem treści: oferta tylko od właściciela, wiadomość do wskazanej osoby, przyjęcie, nowa właścicielka, dawny właściciel w albumie bez swojego wspomnienia, które zostaje u niego, druga akceptacja odrzucona, brak martwych wiadomości.
 
+## MEM-E8 · Zgłoszenia, moderacja i nakazy (2026-11-06)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-308 | **Ukryty zakres (C67, E161) żyje w Dostępie** jako tabela `access.hidden_scopes`: jeden wiersz na **blokadę** (zgłoszenie albo nakaz), z zasobem (wspomnienie albo album), autorem i numerem kolejnym (D-013). Zasób jest ukryty, dopóki stoi choć jedna blokada. **Autor nadal widzi swoją treść**: wspomnienie autor, album właściciel; nikt inny. Odczyty albumów (`CanSeeAlbumAsync`, `VisibleAlbumsAsync`, `AlbumsTakingPartInAsync`) pomijają ukryte albumy same, a odczyty cudzych wspomnień (szczegóły, mapa, Prześledź, album, archiwum kontaktu spadkowego) i lista „moje albumy” pytają nowym `HiddenFromAsync`. Moderacja ukrywa przez port zapisu `IContentHiding` z odpowiedzią (nakaz w 1 h, L11) albo zdarzeniem E113 (P32); oba idą tą samą komendą, więc drugie nic nie zmienia. **Nic nie jest usuwane**: ukrycie zostawia dowód (S2:C2) | Dostęp jest jedynym miejscem, które odpowiada na „kto co widzi” (ADR 0011), a osobna blokada na zgłoszenie pozwala cofnąć jedną decyzję bez zdejmowania innej |
+

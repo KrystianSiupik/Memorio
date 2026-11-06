@@ -49,6 +49,8 @@ internal sealed class PeriodQuery(ArchiveDbContext database, IObjectStorage stor
             Sql,
             new { accountId, visibleAlbums, from = Day(from), to = Day(to) },
             cancellationToken: cancellationToken))).ToList();
+        var hidden = await access.HiddenFromAsync(accountId, [.. rows.Where(row => !row.IsMine).Select(row => row.Id)], cancellationToken);
+        rows.RemoveAll(row => hidden.Contains(row.Id));
         if (rows.Count == 0)
         {
             return [];

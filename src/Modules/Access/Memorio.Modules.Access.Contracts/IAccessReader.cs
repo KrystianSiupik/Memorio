@@ -28,4 +28,10 @@ public interface IAccessReader
     /// only someone the owner named in advance, read only. The filter of the same two reads as above.
     /// </summary>
     Task<IReadOnlyCollection<Guid>> LegacyArchivesAsync(Guid personId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Of these memories or albums, the ones Moderation hid from the person (E161): hidden from everyone but their
+    /// author. A read that shows somebody else's memory takes them out; the album reads above already do.
+    /// </summary>
+    Task<IReadOnlyCollection<Guid>> HiddenFromAsync(Guid personId, IReadOnlyCollection<Guid> resourceIds, CancellationToken cancellationToken);
 }
