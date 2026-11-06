@@ -102,6 +102,13 @@ public sealed class FakeAlbumNeighbours : IAlbumSeatLimit, IInvitationBlocks, IA
 
     public void PoolFull(Guid albumId) => _fullPools[albumId] = true;
 
+    private readonly ConcurrentDictionary<Guid, IReadOnlyList<Guid>> _periods = new();
+
+    public void InPeriod(Guid accountId, params Guid[] memories) => _periods[accountId] = memories;
+
+    public Task<IReadOnlyList<Guid>> OwnInPeriodAsync(Guid accountId, DateOnly from, DateOnly to, CancellationToken cancellationToken) =>
+        Task.FromResult(_periods.GetValueOrDefault(accountId) ?? []);
+
     public Task<IReadOnlyList<Guid>> ChooseToTrimAsync(Guid albumId, IReadOnlyCollection<Guid> keptMemoryIds, long limitBytes, CancellationToken cancellationToken) =>
         Task.FromResult(_trimmedAway.GetValueOrDefault(albumId) ?? []);
 
