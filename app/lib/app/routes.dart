@@ -268,3 +268,13 @@ final class LegacyArchiveRoute extends AppRoute {
   @override
   String get location => '${SharedWithMeRoute.path}/legacy/$ownerAccountId';
 }
+
+/// S08, on the way through the map tab.
+final class ReplayRoute extends AppRoute {
+  const ReplayRoute();
+
+  static const path = 'replay';
+
+  @override
+  String get location => '${MapRoute.path}/$path';
+}

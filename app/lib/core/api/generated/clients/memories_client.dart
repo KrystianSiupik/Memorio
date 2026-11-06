@@ -12,6 +12,7 @@ import '../models/created_memory_response.dart';
 import '../models/memory_details_response.dart';
 import '../models/memory_point_response.dart';
 import '../models/my_memory_response.dart';
+import '../models/period_memory_response.dart';
 import '../models/request_data_deletion_request.dart';
 import '../models/start_upload_request.dart';
 import '../models/trashed_memory_response.dart';
@@ -31,6 +32,10 @@ abstract class MemoriesClient {
   /// One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap.
   @GET('/v1/memories/map')
   Future<List<MemoryPointResponse>> getMemoryMap({@Query('from') String? from, @Query('to') String? to});
+
+  /// Everything the person may see in a period (yyyy-MM-dd, both days in), in order, with the first photos.
+  @GET('/v1/memories/period')
+  Future<List<PeriodMemoryResponse>> getPeriod({@Query('from') String? from, @Query('to') String? to});
 
   /// The person's own active memories, newest first.
   @GET('/v1/memories/mine')

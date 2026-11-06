@@ -1019,3 +1019,13 @@ PO: „zaczynaj e9”. Odwracalne założenia, do sprawdzenia przez PO.
 **Stan testów:** Sukcesja 30/30, Album 90/90, Plany 68/68, Dostęp 31/31, Archiwum 115/115, aplikacja 305/305, API 46/46, architektura 49/49.
 
 **Prawdziwe uruchomienie API, workera, magazynu Garage i lokalnego SMTP:** zgłoszenie z prawdziwym plikiem, decyzja przez wiersz i zadanie workera, oferty na dwa albumy, album bez następcy bez właściciela, przejęcie z wkładami fundatora, odmowa, kontakt spadkowy czyta tylko prywatne, rezerwacja, opłata przez prawdziwe odpalenie `Plans.Cycle`, odrzucone zgłoszenie. Bez martwych wiadomości. Pobranie aktu kontenerem `aws-cli` sprawdzone osobnym poleceniem, **sam skrypt `cases.sh` nie był uruchamiany**, bo wymaga serwera. **Nie sprawdzono:** terminów 30 dni i przypomnień w działającym workerze (tylko testy modułu), ekranów z prawdziwym API, urządzeń.
+
+## MEM-E5 · Prześledź (2026-11-06)
+
+| D | Decyzja | Dlaczego |
+|---|---|---|
+| D-300 | Kolejność w okresie: data początku, potem końca, a w obrębie dnia **kolejność dodania**. Nie ma komendy, którą osoba ustala własną kolejność (S2:C1 „kolejność ustalona przez użytkownika”), bo żaden ticket jej nie ma. **Do decyzji PO:** czy taka komenda ma powstać | kolejność dodania to najbliższe przybliżenie, a zmiana nie wymaga przebudowy |
+| D-301 | Album z okresu (C71) bierze **tylko własne wspomnienia** osoby (D-248): cudze zostają w swoich albumach. Co nie mieści się w puli nowego albumu, jest liczone i pokazywane, a album i tak powstaje. Limit 1000 wspomnień na raz. Wspomnienia idą zwykłą drogą C47, więc powtórka nic nie zmienia | wspomnienie wnosi tylko jego autor; jeden album na tysiące wspomnień to pomyłka okresu |
+| D-302 | S08 wybiera okres tylko jako dany rok albo zakres dat. **Nie ma** wyboru „album, osoba, kolekcja” (S1 §8), uczestników w panelu ani narracji AI (E6). Na czas ekranu mapa pokazuje tylko punkty okresu i jedzie do bieżącego wspomnienia; odtwarzanie rusza dopiero po „Odtwarzaj”, w tempie 6 albo 3 sekundy | tickety E5 obejmują okres; narracja to E6, osoby bez wyszukiwania (D-079) nie mają filtra |
+
+**Stan testów:** Archiwum 119/119, Album 94/94, API 46/46, aplikacja 317/317. **Prawdziwe uruchomienie API:** okres z przedziałem przez Nowy Rok w obu latach, kolejność, wspomnienie przyjaciela z albumu, brak cudzych prywatnych, album z okresu tylko z własnymi, powtórka bez zmian, zły okres odrzucony. **Nie sprawdzono:** animacji mapy na prawdziwej mapie (w testach mapa to atrapa, lokalnie brak kafelków), urządzeń.

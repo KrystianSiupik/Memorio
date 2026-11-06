@@ -281,6 +281,46 @@
         }
       }
     },
+    "/v1/memories/period": {
+      "get": {
+        "tags": [
+          "Memories"
+        ],
+        "summary": "Everything the person may see in a period (yyyy-MM-dd, both days in), in order, with the first photos.",
+        "operationId": "GetPeriod",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PeriodMemoryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/memories/mine": {
       "get": {
         "tags": [
@@ -643,6 +683,37 @@
                   "items": {
                     "$ref": "#/components/schemas/AlbumListItemResponse"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/from-period": {
+      "post": {
+        "tags": [
+          "Albums"
+        ],
+        "summary": "An album of the person\u0027s own memories of a period (yyyy-MM-dd); the id comes from the client, so a retry changes nothing.",
+        "operationId": "CreateAlbumFromPeriod",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAlbumFromPeriodRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodAlbumResponse"
                 }
               }
             }
@@ -3118,6 +3189,39 @@
           }
         }
       },
+      "CreateAlbumFromPeriodRequest": {
+        "required": [
+          "id",
+          "name",
+          "from",
+          "to"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "from": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "to": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "CreateAlbumRequest": {
         "required": [
           "id",
@@ -3577,6 +3681,105 @@
           "accountId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "PeriodAlbumResponse": {
+        "required": [
+          "added",
+          "notFitting"
+        ],
+        "type": "object",
+        "properties": {
+          "added": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "notFitting": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "PeriodMemoryResponse": {
+        "required": [
+          "id",
+          "placeName",
+          "latitude",
+          "longitude",
+          "datePrecision",
+          "dateFrom",
+          "dateTo",
+          "description",
+          "isMine",
+          "photos",
+          "photoUrls"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "placeName": {
+            "type": "string"
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d\u002B)?(?:[eE][\u002B-]?\\d\u002B)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d\u002B)?(?:[eE][\u002B-]?\\d\u002B)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "datePrecision": {
+            "type": "string"
+          },
+          "dateFrom": {
+            "type": "string"
+          },
+          "dateTo": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isMine": {
+            "type": "boolean"
+          },
+          "photos": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "photoUrls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
           }
         }
       },
