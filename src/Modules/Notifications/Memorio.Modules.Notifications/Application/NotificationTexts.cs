@@ -53,6 +53,33 @@ internal static class NotificationTexts
             NotificationKind.HandoverOffered => (
                 "Właściciel chce Ci przekazać album w GEO",
                 $"Właściciel proponuje Ci prowadzenie albumu: {album}.\n\nOtwórz album w aplikacji i zdecyduj w ciągu 30 dni. Do tego czasu nic się nie zmienia."),
+            NotificationKind.ReportReceived => (
+                "Przyjęliśmy Twoje zgłoszenie w Memorio",
+                "Dziękujemy za zgłoszenie.\n\nTreści niezgodne z prawem rozpatrujemy w ciągu 24 godzin, pozostałe w ciągu 7 dni. Decyzję z uzasadnieniem wyślemy na ten adres."),
+            NotificationKind.ContentReported => (
+                "Twoja treść w Memorio została zgłoszona",
+                $"Ktoś zgłosił Twoją treść. Powód zgłoszenia: {OneLine(detail ?? "")}.\n\nTreść pozostaje widoczna do decyzji, którą podejmiemy w ciągu 7 dni. Decyzję z uzasadnieniem zobaczysz w aplikacji na ekranie „Moje zgłoszenia i decyzje”."),
+            NotificationKind.ContentHiddenAfterReport => (
+                "Twoja treść w Memorio została ukryta po zgłoszeniu",
+                $"Ktoś zgłosił Twoją treść jako niezgodną z prawem. Powód zgłoszenia: {OneLine(detail ?? "")}.\n\nDo decyzji widzisz ją tylko Ty; nic nie zostało usunięte. Decyzję z uzasadnieniem podejmiemy w ciągu 24 godzin i pokażemy w aplikacji na ekranie „Moje zgłoszenia i decyzje”."),
+            NotificationKind.ReportActedOn => (
+                "Decyzja w sprawie Twojego zgłoszenia w Memorio",
+                $"Zgłoszona treść została ukryta.\n\nUzasadnienie: {OneLine(detail ?? "")}"),
+            NotificationKind.ReportNotActedOn => (
+                "Decyzja w sprawie Twojego zgłoszenia w Memorio",
+                $"Zgłoszona treść pozostaje dostępna.\n\nUzasadnienie: {OneLine(detail ?? "")}"),
+            NotificationKind.ContentRemoved => (
+                "Decyzja w sprawie Twojej treści w Memorio",
+                $"Twoja treść została ukryta: widzisz ją tylko Ty.\n\nUzasadnienie: {OneLine(detail ?? "")}\n\nMożesz się odwołać w aplikacji, na ekranie „Moje zgłoszenia i decyzje”, w ciągu 6 miesięcy."),
+            NotificationKind.ContentKept => (
+                "Decyzja w sprawie Twojej treści w Memorio",
+                $"Twoja treść pozostaje dostępna.\n\nUzasadnienie: {OneLine(detail ?? "")}"),
+            NotificationKind.AppealReversed => (
+                "Twoje odwołanie w Memorio zostało uwzględnione",
+                $"Twoja treść jest znów widoczna.\n\nUzasadnienie: {OneLine(detail ?? "")}"),
+            NotificationKind.AppealUpheld => (
+                "Twoje odwołanie w Memorio nie zostało uwzględnione",
+                $"Treść pozostaje ukryta.\n\nUzasadnienie: {OneLine(detail ?? "")}"),
             NotificationKind.PrivateArchiveShared => (
                 "Masz dostęp do prywatnych wspomnień osoby, która Cię wskazała",
                 "Osoba, która wskazała Cię jako kontakt spadkowy, zmarła.\n\nMożesz oglądać jej prywatne wspomnienia na ekranie „Udostępnione mi”, po zalogowaniu na ten adres e-mail. Tylko do odczytu."),

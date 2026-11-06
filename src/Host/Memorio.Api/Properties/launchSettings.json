@@ -16,6 +16,7 @@
         "Limits__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_limits;Password=memorio_local",
         "Access__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_access;Password=memorio_local",
         "Succession__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_succession;Password=memorio_local",
+        "Moderation__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_moderation;Password=memorio_local",
         "Notifications__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_notifications;Password=memorio_local",
         "Album__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_album;Password=memorio_local",
         "Archive__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_archive;Password=memorio_local",

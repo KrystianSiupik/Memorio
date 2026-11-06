@@ -1,7 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="WolverineFx.EntityFrameworkCore" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Memorio.Modules.Moderation.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="../../../BuildingBlocks/Memorio.SharedKernel/Memorio.SharedKernel.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Memorio.Modularity/Memorio.Modularity.csproj" />
     <ProjectReference Include="../Memorio.Modules.Moderation.Contracts/Memorio.Modules.Moderation.Contracts.csproj" />
+    <ProjectReference Include="../../Access/Memorio.Modules.Access.Contracts/Memorio.Modules.Access.Contracts.csproj" />
+    <ProjectReference Include="../../Album/Memorio.Modules.Album.Contracts/Memorio.Modules.Album.Contracts.csproj" />
+    <ProjectReference Include="../../Archive/Memorio.Modules.Archive.Contracts/Memorio.Modules.Archive.Contracts.csproj" />
   </ItemGroup>
 </Project>

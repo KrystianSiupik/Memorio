@@ -86,6 +86,7 @@
     <Project Path="tests/Modules/Memorio.Modules.Notifications.Tests/Memorio.Modules.Notifications.Tests.csproj" />
     <Project Path="tests/Modules/Memorio.Modules.Places.Tests/Memorio.Modules.Places.Tests.csproj" />
     <Project Path="tests/Modules/Memorio.Modules.Plans.Tests/Memorio.Modules.Plans.Tests.csproj" />
+    <Project Path="tests/Modules/Memorio.Modules.Moderation.Tests/Memorio.Modules.Moderation.Tests.csproj" />
     <Project Path="tests/Modules/Memorio.Modules.Succession.Tests/Memorio.Modules.Succession.Tests.csproj" />
   </Folder>
 </Solution>

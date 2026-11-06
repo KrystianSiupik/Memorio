@@ -105,6 +105,27 @@
         }
       }
     },
+    "/v1/moderation/mine": {
+      "get": {
+        "tags": [
+          "Moderation"
+        ],
+        "summary": "What the person reported, and the decisions about their own content, with the reasons.",
+        "operationId": "GetMyModeration",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyModerationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/account/me": {
       "get": {
         "tags": [
@@ -2145,6 +2166,72 @@
         }
       }
     },
+    "/v1/reports": {
+      "post": {
+        "tags": [
+          "Moderation"
+        ],
+        "summary": "Reports a memory or an album the person sees; the id comes from the client, and the same report again changes nothing.",
+        "operationId": "ReportContent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/{id}/appeal": {
+      "post": {
+        "tags": [
+          "Moderation"
+        ],
+        "summary": "The author appeals against the removal of their content, with reasons.",
+        "operationId": "AppealDecision",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppealRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
     "/v1/auth/register": {
       "post": {
         "tags": [
@@ -3254,6 +3341,20 @@
           }
         }
       },
+      "AppealRequest": {
+        "required": [
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "ApproveDescriptionRequest": {
         "required": [
           "text",
@@ -3840,6 +3941,86 @@
           }
         }
       },
+      "MyModerationResponse": {
+        "required": [
+          "reports",
+          "aboutMine"
+        ],
+        "type": "object",
+        "properties": {
+          "reports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MyReport"
+            }
+          },
+          "aboutMine": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportAboutMine"
+            }
+          }
+        }
+      },
+      "MyReport": {
+        "required": [
+          "id",
+          "target",
+          "targetId",
+          "reason",
+          "state",
+          "verdict",
+          "statement",
+          "reportedAt",
+          "decidedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "verdict": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "statement": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reportedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "decidedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
       "NameLegacyContactRequest": {
         "required": [
           "email"
@@ -4173,6 +4354,92 @@
           }
         }
       },
+      "ReportAboutMine": {
+        "required": [
+          "id",
+          "target",
+          "targetId",
+          "reason",
+          "category",
+          "state",
+          "hidden",
+          "verdict",
+          "statement",
+          "reportedAt",
+          "decidedAt",
+          "appealUntil",
+          "appealReversed",
+          "appealStatement"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "hidden": {
+            "type": "boolean"
+          },
+          "verdict": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "statement": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reportedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "decidedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "appealUntil": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "appealReversed": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "appealStatement": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "ReportDeathRequest": {
         "required": [
           "id",
@@ -4185,6 +4452,56 @@
             "format": "uuid"
           },
           "uploadKey": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ReportedResponse": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "ReportRequest": {
+        "required": [
+          "id",
+          "target",
+          "targetId",
+          "reason",
+          "explanation"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "targetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "explanation": {
             "type": [
               "null",
               "string"
@@ -4446,6 +4763,9 @@
     },
     {
       "name": "AI"
+    },
+    {
+      "name": "Moderation"
     },
     {
       "name": "Account"

@@ -81,7 +81,9 @@ public sealed class ArchiveModule : IModule
         services.AddScoped<MemoryEraser>();
         services.AddScoped<DeleteMemoryHandler>();
         services.AddScoped<TrashMemoryHandler>();
-        services.AddScoped<IMemoryDetailsQuery, MemoryDetailsQuery>();
+        services.AddScoped<MemoryDetailsQuery>();
+        services.AddScoped<IMemoryDetailsQuery>(provider => provider.GetRequiredService<MemoryDetailsQuery>());
+        services.AddScoped<IReportedMemories>(provider => provider.GetRequiredService<MemoryDetailsQuery>());
         services.AddScoped<ApproveDescriptionHandler>();
         services.AddScoped<AddPhotoHandler>();
         services.AddScoped<StartUploadHandler>();

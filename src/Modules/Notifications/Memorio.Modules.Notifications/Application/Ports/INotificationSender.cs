@@ -18,6 +18,15 @@ internal enum NotificationKind
     DeathReportRejected,
     DeathReported,
     HandoverOffered,
+    ReportReceived,
+    ContentReported,
+    ContentHiddenAfterReport,
+    ReportActedOn,
+    ReportNotActedOn,
+    ContentRemoved,
+    ContentKept,
+    AppealReversed,
+    AppealUpheld,
     PrivateArchiveShared,
 }
 
