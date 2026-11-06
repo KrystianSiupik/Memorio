@@ -140,6 +140,18 @@ final class AlbumPlanMaterialRoute extends AppRoute {
   String get location => '${AlbumPlanRoute(id).location}/$path';
 }
 
+/// S25, from inside the album.
+final class ReportDeathRoute extends AppRoute {
+  const ReportDeathRoute(this.id);
+
+  static const path = 'death-report';
+
+  final String id;
+
+  @override
+  String get location => '${const AlbumRoute('').location}$id/$path';
+}
+
 /// S12 from inside an album: its curator too.
 final class AlbumConsentsRoute extends AppRoute {
   const AlbumConsentsRoute(this.id);
@@ -221,4 +233,38 @@ final class PlanMaterialRoute extends AppRoute {
 
   @override
   String get location => '${const PlanRoute().location}/$path';
+}
+
+/// S23.
+final class TakeoverOfferRoute extends AppRoute {
+  const TakeoverOfferRoute(this.id);
+
+  static const path = 'offers/:id';
+
+  final String id;
+
+  @override
+  String get location => '${AlbumsRoute.path}/offers/$id';
+}
+
+/// Who may read private memories after the person's death.
+final class LegacyContactRoute extends AppRoute {
+  const LegacyContactRoute();
+
+  static const path = 'legacy-contact';
+
+  @override
+  String get location => '${AccountRoute.path}/$path';
+}
+
+/// What someone who named this person left private.
+final class LegacyArchiveRoute extends AppRoute {
+  const LegacyArchiveRoute(this.ownerAccountId);
+
+  static const path = 'legacy/:owner';
+
+  final String ownerAccountId;
+
+  @override
+  String get location => '${SharedWithMeRoute.path}/legacy/$ownerAccountId';
 }

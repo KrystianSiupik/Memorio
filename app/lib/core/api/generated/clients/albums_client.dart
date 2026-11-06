@@ -10,6 +10,7 @@ import '../models/add_memory_request.dart';
 import '../models/album_list_item_response.dart';
 import '../models/album_response.dart';
 import '../models/album_seats_response.dart';
+import '../models/album_takeover_response.dart';
 import '../models/album_trim_material_response.dart';
 import '../models/answered_invitation_response.dart';
 import '../models/arrange_request.dart';
@@ -55,6 +56,14 @@ abstract class AlbumsClient {
   /// For the owner: what a trim of the album could take, oldest first, with sizes.
   @GET('/v1/albums/{id}/trim-material')
   Future<List<AlbumTrimMaterialResponse>> getAlbumTrimMaterial({@Path('id') required String id});
+
+  /// For someone in an album without an owner: whether it can be taken over, and who holds it until when.
+  @GET('/v1/albums/{id}/takeover')
+  Future<AlbumTakeoverResponse> getAlbumTakeover({@Path('id') required String id});
+
+  /// Holds an album without an owner for 30 minutes, to pay for its plan; asking again keeps one's own.
+  @POST('/v1/albums/{id}/takeover-reservation')
+  Future<void> reserveAlbumTakeover({@Path('id') required String id});
 
   /// For the owner: seats taken, invited and free.
   @GET('/v1/albums/{id}/seats')

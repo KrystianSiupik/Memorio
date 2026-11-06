@@ -137,7 +137,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get legacyContact => 'Kontakt spadkowy';
 
   @override
-  String get legacyContactNone => 'Nie wskazano';
+  String get legacyContactNone => 'Nikogo nie wskazano.';
 
   @override
   String get legacyContactChoose => 'Wskaż kontakt spadkowy';
@@ -738,6 +738,121 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get restore => 'Przywróć';
+
+  @override
+  String get takeoverTitle => 'Przejęcie albumu';
+
+  @override
+  String takeoverDeadline(String date) {
+    return 'Na decyzję masz czas do: $date';
+  }
+
+  @override
+  String takeoverFounder(int count) {
+    return 'Wspomnienia fundatora w albumie: $count. Zostają w nim.';
+  }
+
+  @override
+  String get takeoverExplained =>
+      'Jeśli przejmiesz album, zostaniesz jego właścicielem, razem z jego pulą. Jeśli odmówisz albo nie odpowiesz w terminie, album zostanie bez właściciela, a przejąć go będzie mógł inny uczestnik.';
+
+  @override
+  String get takeoverStoreAdvice =>
+      'Rodzina zmarłej osoby powinna anulować jej subskrypcję w sklepie: aplikacja nie może tego zrobić. Album działa do końca opłaconego okresu.';
+
+  @override
+  String get takeoverAccept => 'Przejmuję album';
+
+  @override
+  String get takeoverRefuse => 'Odmawiam';
+
+  @override
+  String get takeoverNotSuccessor => 'Nie jesteś wskazanym następcą.';
+
+  @override
+  String get takeoverDecided => 'Sprawa już rozstrzygnięta.';
+
+  @override
+  String takeoverOfferTile(String album) {
+    return 'Wskazano Cię jako następcę: $album';
+  }
+
+  @override
+  String get takeoverNoOwner =>
+      'Ten album nie ma właściciela. Nic z niego nie znika, a każdy uczestnik może go przejąć, opłacając plan.';
+
+  @override
+  String get takeoverReserve => 'Przejmuję';
+
+  @override
+  String takeoverReservedByMe(String time) {
+    return 'Album czeka na Ciebie do $time. Opłać plan albumu, aby go przejąć.';
+  }
+
+  @override
+  String get takeoverReservedByOther => 'Ktoś właśnie przejmuje ten album.';
+
+  @override
+  String get albumReportDeath => 'Zgłoś zgon właściciela';
+
+  @override
+  String get deathReportTitle => 'Zgłoś zgon właściciela';
+
+  @override
+  String get deathReportExplained =>
+      'Dołącz zdjęcie aktu zgonu. Sprawdzi je obsługa GEO. Dokument widzi tylko obsługa, a po zamknięciu sprawy usuwamy go po 12 miesiącach.';
+
+  @override
+  String get deathReportPick => 'Wybierz zdjęcie aktu zgonu';
+
+  @override
+  String get deathReportSend => 'Wyślij zgłoszenie';
+
+  @override
+  String get deathReportSent =>
+      'Zgłoszenie wysłane. Obsługa sprawdzi dokument i da znać, jeśli nie będzie mogła go potwierdzić.';
+
+  @override
+  String get deathReportBack => 'Wróć do albumu';
+
+  @override
+  String get deathReportTaken => 'Zgłoszenie dotyczące tego albumu jest już sprawdzane.';
+
+  @override
+  String get legacyContactTitle => 'Kontakt spadkowy';
+
+  @override
+  String get legacyContactExplained =>
+      'Ta osoba po Twojej śmierci będzie mogła oglądać Twoje prywatne wspomnienia, tylko do odczytu. Nie dostanie reszty konta ani albumów. Bez wskazania nikt ich nie zobaczy, także spadkobiercy.';
+
+  @override
+  String legacyContactCurrent(String email) {
+    return 'Wskazano: $email';
+  }
+
+  @override
+  String get legacyContactEmail => 'Adres e-mail tej osoby';
+
+  @override
+  String get legacyContactSave => 'Zapisz';
+
+  @override
+  String get legacyContactRemove => 'Odwołaj wskazanie';
+
+  @override
+  String get legacyContactInvalid => 'Podaj poprawny adres innej osoby.';
+
+  @override
+  String get legacyArchiveTitle => 'Prywatne wspomnienia';
+
+  @override
+  String get legacyArchiveSubtitle => 'Wskazano Cię jako kontakt spadkowy';
+
+  @override
+  String get legacyArchiveUnknown => 'Konto bez adresu';
+
+  @override
+  String get legacyArchiveEmpty => 'Nie ma tu żadnych wspomnień.';
 
   @override
   String get planTitle => 'Plan i subskrypcja';

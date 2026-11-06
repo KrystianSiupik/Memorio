@@ -7,9 +7,12 @@ import '../../albums/albums.dart';
 
 /// S16 Shared with me: albums the person reads without being in them.
 class SharedWithMePage extends ConsumerWidget {
-  const SharedWithMePage({super.key, required this.onOpenAlbum});
+  const SharedWithMePage({super.key, required this.onOpenAlbum, this.header});
 
   final void Function(String albumId) onOpenAlbum;
+
+  /// What comes before the albums: the archives of people who named this person.
+  final Widget? header;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,6 +29,7 @@ class SharedWithMePage extends ConsumerWidget {
               padding: const EdgeInsets.all(12),
               child: Text(l10n.noConnection, key: const Key('s16-offline')),
             ),
+          ?header,
           Expanded(
             child: AlbumAsyncBody(
               value: shared,

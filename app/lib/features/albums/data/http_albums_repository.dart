@@ -77,6 +77,7 @@ class HttpAlbumsRepository implements AlbumsRepository {
       isOwner: album.isOwner,
       isMember: album.isMember,
       isReadOnly: album.isReadOnly,
+      isOwnerless: album.isOwnerless,
       successorAccountId: album.successorAccountId,
       members: [
         for (final member in album.members)

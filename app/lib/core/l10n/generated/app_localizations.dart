@@ -328,7 +328,7 @@ abstract class AppLocalizations {
   /// No description provided for @legacyContactNone.
   ///
   /// In pl, this message translates to:
-  /// **'Nie wskazano'**
+  /// **'Nikogo nie wskazano.'**
   String get legacyContactNone;
 
   /// No description provided for @legacyContactChoose.
@@ -1434,6 +1434,204 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Przywróć'**
   String get restore;
+
+  /// S23
+  ///
+  /// In pl, this message translates to:
+  /// **'Przejęcie albumu'**
+  String get takeoverTitle;
+
+  /// No description provided for @takeoverDeadline.
+  ///
+  /// In pl, this message translates to:
+  /// **'Na decyzję masz czas do: {date}'**
+  String takeoverDeadline(String date);
+
+  /// No description provided for @takeoverFounder.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wspomnienia fundatora w albumie: {count}. Zostają w nim.'**
+  String takeoverFounder(int count);
+
+  /// No description provided for @takeoverExplained.
+  ///
+  /// In pl, this message translates to:
+  /// **'Jeśli przejmiesz album, zostaniesz jego właścicielem, razem z jego pulą. Jeśli odmówisz albo nie odpowiesz w terminie, album zostanie bez właściciela, a przejąć go będzie mógł inny uczestnik.'**
+  String get takeoverExplained;
+
+  /// No description provided for @takeoverStoreAdvice.
+  ///
+  /// In pl, this message translates to:
+  /// **'Rodzina zmarłej osoby powinna anulować jej subskrypcję w sklepie: aplikacja nie może tego zrobić. Album działa do końca opłaconego okresu.'**
+  String get takeoverStoreAdvice;
+
+  /// No description provided for @takeoverAccept.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przejmuję album'**
+  String get takeoverAccept;
+
+  /// No description provided for @takeoverRefuse.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odmawiam'**
+  String get takeoverRefuse;
+
+  /// No description provided for @takeoverNotSuccessor.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie jesteś wskazanym następcą.'**
+  String get takeoverNotSuccessor;
+
+  /// No description provided for @takeoverDecided.
+  ///
+  /// In pl, this message translates to:
+  /// **'Sprawa już rozstrzygnięta.'**
+  String get takeoverDecided;
+
+  /// No description provided for @takeoverOfferTile.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wskazano Cię jako następcę: {album}'**
+  String takeoverOfferTile(String album);
+
+  /// No description provided for @takeoverNoOwner.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ten album nie ma właściciela. Nic z niego nie znika, a każdy uczestnik może go przejąć, opłacając plan.'**
+  String get takeoverNoOwner;
+
+  /// No description provided for @takeoverReserve.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przejmuję'**
+  String get takeoverReserve;
+
+  /// No description provided for @takeoverReservedByMe.
+  ///
+  /// In pl, this message translates to:
+  /// **'Album czeka na Ciebie do {time}. Opłać plan albumu, aby go przejąć.'**
+  String takeoverReservedByMe(String time);
+
+  /// No description provided for @takeoverReservedByOther.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ktoś właśnie przejmuje ten album.'**
+  String get takeoverReservedByOther;
+
+  /// No description provided for @albumReportDeath.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zgłoś zgon właściciela'**
+  String get albumReportDeath;
+
+  /// S25
+  ///
+  /// In pl, this message translates to:
+  /// **'Zgłoś zgon właściciela'**
+  String get deathReportTitle;
+
+  /// No description provided for @deathReportExplained.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dołącz zdjęcie aktu zgonu. Sprawdzi je obsługa GEO. Dokument widzi tylko obsługa, a po zamknięciu sprawy usuwamy go po 12 miesiącach.'**
+  String get deathReportExplained;
+
+  /// No description provided for @deathReportPick.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wybierz zdjęcie aktu zgonu'**
+  String get deathReportPick;
+
+  /// No description provided for @deathReportSend.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyślij zgłoszenie'**
+  String get deathReportSend;
+
+  /// No description provided for @deathReportSent.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zgłoszenie wysłane. Obsługa sprawdzi dokument i da znać, jeśli nie będzie mogła go potwierdzić.'**
+  String get deathReportSent;
+
+  /// No description provided for @deathReportBack.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wróć do albumu'**
+  String get deathReportBack;
+
+  /// No description provided for @deathReportTaken.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zgłoszenie dotyczące tego albumu jest już sprawdzane.'**
+  String get deathReportTaken;
+
+  /// No description provided for @legacyContactTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kontakt spadkowy'**
+  String get legacyContactTitle;
+
+  /// No description provided for @legacyContactExplained.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ta osoba po Twojej śmierci będzie mogła oglądać Twoje prywatne wspomnienia, tylko do odczytu. Nie dostanie reszty konta ani albumów. Bez wskazania nikt ich nie zobaczy, także spadkobiercy.'**
+  String get legacyContactExplained;
+
+  /// No description provided for @legacyContactCurrent.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wskazano: {email}'**
+  String legacyContactCurrent(String email);
+
+  /// No description provided for @legacyContactEmail.
+  ///
+  /// In pl, this message translates to:
+  /// **'Adres e-mail tej osoby'**
+  String get legacyContactEmail;
+
+  /// No description provided for @legacyContactSave.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisz'**
+  String get legacyContactSave;
+
+  /// No description provided for @legacyContactRemove.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odwołaj wskazanie'**
+  String get legacyContactRemove;
+
+  /// No description provided for @legacyContactInvalid.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podaj poprawny adres innej osoby.'**
+  String get legacyContactInvalid;
+
+  /// No description provided for @legacyArchiveTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Prywatne wspomnienia'**
+  String get legacyArchiveTitle;
+
+  /// No description provided for @legacyArchiveSubtitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wskazano Cię jako kontakt spadkowy'**
+  String get legacyArchiveSubtitle;
+
+  /// No description provided for @legacyArchiveUnknown.
+  ///
+  /// In pl, this message translates to:
+  /// **'Konto bez adresu'**
+  String get legacyArchiveUnknown;
+
+  /// No description provided for @legacyArchiveEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie ma tu żadnych wspomnień.'**
+  String get legacyArchiveEmpty;
 
   /// S18
   ///

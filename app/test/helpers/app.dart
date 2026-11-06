@@ -13,6 +13,7 @@ import 'package:memorio/features/albums/albums.dart';
 import 'package:memorio/features/memories/memories.dart';
 import 'package:memorio/features/map/map.dart';
 import 'package:memorio/features/plans/plans.dart';
+import 'package:memorio/features/succession/succession.dart';
 
 import 'fake_account.dart';
 import 'fake_albums.dart';
@@ -20,6 +21,7 @@ import 'fake_http.dart';
 import 'fake_memories.dart';
 import 'fake_places.dart';
 import 'fake_plans.dart';
+import 'fake_succession.dart';
 import 'fake_token_store.dart';
 
 /// Session store answering with a fixed session; null means signed out.
@@ -45,6 +47,7 @@ Future<ProviderContainer> pumpMemorioApp(
   PlacesRepository? places,
   AlbumsRepository? albums,
   PlansRepository? plans,
+  SuccessionRepository? succession,
   FakeHttpAdapter? http,
   Stream<bool>? online,
   Stream<List<PendingOperation>>? pending,
@@ -64,6 +67,7 @@ Future<ProviderContainer> pumpMemorioApp(
       placesRepositoryProvider.overrideWithValue(places ?? FakePlacesRepository()),
       albumsRepositoryProvider.overrideWithValue(albums ?? FakeAlbumsRepository()),
       plansRepositoryProvider.overrideWithValue(plans ?? FakePlansRepository()),
+      successionRepositoryProvider.overrideWithValue(succession ?? FakeSuccessionRepository()),
       photoPickerProvider.overrideWithValue(FakePhotoPicker()),
       localDatabaseProvider.overrideWithValue(database),
       isOnlineProvider.overrideWith((ref) => online ?? Stream.value(true)),

@@ -62,7 +62,7 @@
 | [MEM-E3-ALBUM-26](../MEM-E3-ALBUM-26-zdarzenie-integracyjne-uczestnik-oznaczony-we-wspo.md) | Zdarzenie integracyjne „Uczestnik oznaczony we wspomnieniu” (E175) w kontrakcie modułu album | album / kontrakt | 1–2 | zrobiony |
 | [MEM-E3-POWIADOMIENIA-10](../MEM-E3-POWIADOMIENIA-10-polityka-p45-zawsze-gdy-uczestnik-oznaczony-wtedy-.md) | Polityka P45: Zawsze gdy uczestnik oznaczony, wtedy powiadom go (może usunąć oznaczenie) | powiadomienia / aplikacja (handler zdarzenia) | 1–3 | zrobiony; prawdziwa wysyłka czeka na konto Scaleway (D-265) |
 | [MEM-E3-PLAT-01](../MEM-E3-PLAT-01-ekran-s09-albumy-lista-i-nowy-album.md) | Ekran S09 „Albumy (lista) i nowy album” | - / UI | 2–4 | zrobiony (bez testu na urządzeniu) |
-| [MEM-E3-PLAT-02](../MEM-E3-PLAT-02-ekran-s10-album.md) | Ekran S10 „Album” | - / UI | 4–6 | zrobiony częściowo: bez stanu przejęcia z E9; bez testu na urządzeniu (D-255) |
+| [MEM-E3-PLAT-02](../MEM-E3-PLAT-02-ekran-s10-album.md) | Ekran S10 „Album” | - / UI | 4–6 | zrobiony (bez testu na urządzeniu) |
 | [MEM-E3-PLAT-03](../MEM-E3-PLAT-03-ekran-s11-zarzadzanie-albumem-wlasciciel.md) | Ekran S11 „Zarządzanie albumem (właściciel)” | - / UI | 4–6 | zrobiony (bez testu na urządzeniu) |
 | [MEM-E3-PLAT-04](../MEM-E3-PLAT-04-ekran-s12-moje-zgody-i-powierzenia-w-albumie.md) | Ekran S12 „Moje zgody i powierzenia w albumie” | - / UI | 2–4 | zrobiony częściowo: bez zgody na AI z E6; bez testu na urządzeniu (D-255) |
 | [MEM-E3-PLAT-05](../MEM-E3-PLAT-05-ekran-s13-powierzone-tresci-kurator.md) | Ekran S13 „Powierzone treści (kurator)” | - / UI | 2–4 | zrobiony (bez testu na urządzeniu) |

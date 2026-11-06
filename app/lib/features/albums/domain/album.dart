@@ -69,6 +69,7 @@ class AlbumDetails {
     required this.limitBytes,
     required this.myCuratorAccountId,
     this.isReadOnly = false,
+    this.isOwnerless = false,
   });
 
   final String id;
@@ -88,6 +89,9 @@ class AlbumDetails {
 
   /// The plan ended: everyone reads, nothing new comes in (S2:B1).
   final bool isReadOnly;
+
+  /// Nobody leads it; someone in it may take it over (D-004).
+  final bool isOwnerless;
 
   bool get poolIsFull => freeBytes <= 0;
 }
