@@ -18,6 +18,7 @@ class AlbumPage extends ConsumerStatefulWidget {
     required this.onConsents,
     required this.onPlan,
     required this.onReportDeath,
+    this.onReport,
     required this.ownerlessBlock,
     required this.onLeft,
   });
@@ -28,6 +29,9 @@ class AlbumPage extends ConsumerStatefulWidget {
   final VoidCallback onConsents;
   final VoidCallback onPlan;
   final VoidCallback onReportDeath;
+
+  /// S27: someone in the album, or reading it through a link, can report it (L19).
+  final VoidCallback? onReport;
 
   /// What someone in an album without an owner can do about it.
   final Widget ownerlessBlock;
@@ -258,6 +262,12 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
                   if (handover.forMe && handover.waits) _handoverCard(handover),
                   if (album.isMember && !album.isOwner && !album.isOwnerless)
                     TextButton(onPressed: widget.onReportDeath, child: Text(l10n.albumReportDeath)),
+                  if (!album.isOwner && widget.onReport != null)
+                    TextButton(
+                      key: const Key('s10-report'),
+                      onPressed: widget.onReport,
+                      child: Text(l10n.reportContent),
+                    ),
                   ...failureBlock(context),
                   if (album.isMember) ...[
                     const SizedBox(height: 8),

@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'clients/app_client.dart';
 import 'clients/access_client.dart';
 import 'clients/ai_client.dart';
+import 'clients/moderation_client.dart';
 import 'clients/account_client.dart';
 import 'clients/albums_client.dart';
 import 'clients/succession_client.dart';
@@ -28,6 +29,7 @@ class MemorioApiClient {
   AppClient? _app;
   AccessClient? _access;
   AiClient? _ai;
+  ModerationClient? _moderation;
   AccountClient? _account;
   AlbumsClient? _albums;
   SuccessionClient? _succession;
@@ -42,6 +44,8 @@ class MemorioApiClient {
   AccessClient get access => _access ??= AccessClient(_dio, baseUrl: _baseUrl);
 
   AiClient get ai => _ai ??= AiClient(_dio, baseUrl: _baseUrl);
+
+  ModerationClient get moderation => _moderation ??= ModerationClient(_dio, baseUrl: _baseUrl);
 
   AccountClient get account => _account ??= AccountClient(_dio, baseUrl: _baseUrl);
 

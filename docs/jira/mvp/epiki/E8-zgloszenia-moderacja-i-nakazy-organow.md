@@ -33,6 +33,6 @@
 | [MEM-E8-MODERACJA-11](../MEM-E8-MODERACJA-11-zdarzenie-integracyjne-tresc-ukryta-e113-w-kontrak.md) | Zdarzenie integracyjne „Treść ukryta” (E113) w kontrakcie modułu moderacja | moderacja / kontrakt | 1–2 | zrobiony |
 | [MEM-E8-DOSTEP-03](../MEM-E8-DOSTEP-03-polityka-p32-zawsze-gdy-tresc-ukryta-decyzja-moder.md) | Polityka P32: Zawsze gdy treść ukryta decyzją moderacji, wtedy ukryj zakres w Dostępie | dostep / aplikacja (handler zdarzenia) | 1–3 | zrobiony |
 | [MEM-E8-PLAT-01](../MEM-E8-PLAT-01-ekran-s21-zglos-tresc.md) | Ekran S21 „Zgłoś treść” | - / UI | 2–4 | zrobiony jako strona /report (D-310) |
-| [MEM-E8-PLAT-02](../MEM-E8-PLAT-02-ekran-s22-moje-zgloszenia-i-decyzje.md) | Ekran S22 „Moje zgłoszenia i decyzje” | - / UI | 2–4 | gotowy |
+| [MEM-E8-PLAT-02](../MEM-E8-PLAT-02-ekran-s22-moje-zgloszenia-i-decyzje.md) | Ekran S22 „Moje zgłoszenia i decyzje” | - / UI | 2–4 | zrobiony (bez testu na urządzeniu) |
 | [MEM-E8-PLAT-03](../MEM-E8-PLAT-03-ekran-s26-panel-obslugi-zgloszenia-nakazy-sukcesja.md) | Ekran S26 „Panel obsługi: zgłoszenia, nakazy, sukcesja” | - / UI | 4–6 | zastąpiony skryptem obsługi (D-309) |
-| [MEM-E8-PLAT-04](../MEM-E8-PLAT-04-ekran-s27-zglos-tresc-z-aplikacji.md) | Ekran S27 „Zgłoś treść (z aplikacji)” | - / UI | 2–4 | gotowy |
+| [MEM-E8-PLAT-04](../MEM-E8-PLAT-04-ekran-s27-zglos-tresc-z-aplikacji.md) | Ekran S27 „Zgłoś treść (z aplikacji)” | - / UI | 2–4 | zrobiony (bez testu na urządzeniu) |

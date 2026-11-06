@@ -433,6 +433,131 @@ class AppLocalizationsPl extends AppLocalizations {
   String get albumSuccessor => 'Następca';
 
   @override
+  String get reportContent => 'Zgłoś treść';
+
+  @override
+  String get reportMemoryTitle => 'Zgłoś wspomnienie';
+
+  @override
+  String get reportAlbumTitle => 'Zgłoś album';
+
+  @override
+  String get reportExplained =>
+      'Zgłoszenie trafi do obsługi Memorio. Autor nie dowie się, kto zgłosił. Treści niezgodne z prawem ukrywamy od razu i rozpatrujemy w ciągu 24 godzin, pozostałe zostają widoczne do decyzji, którą podejmujemy w ciągu 7 dni.';
+
+  @override
+  String get reportCategory => 'Co jest nie tak?';
+
+  @override
+  String get reasonChildAbuse => 'Wykorzystywanie dzieci';
+
+  @override
+  String get reasonTerrorism => 'Treści terrorystyczne';
+
+  @override
+  String get reasonThreat => 'Groźby';
+
+  @override
+  String get reasonIncitement => 'Nawoływanie do przemocy lub nienawiści';
+
+  @override
+  String get reasonOtherIllegal => 'Inna treść niezgodna z prawem';
+
+  @override
+  String get reasonSomeonesImage => 'Mój wizerunek bez mojej zgody';
+
+  @override
+  String get reasonPersonalData => 'Moje dane osobowe';
+
+  @override
+  String get reasonDefamation => 'Zniesławienie';
+
+  @override
+  String get reasonCopyright => 'Naruszenie praw autorskich';
+
+  @override
+  String get reasonOther => 'Inny powód';
+
+  @override
+  String get reportIllegalHidden => 'Ta treść zostanie ukryta od razu po wysłaniu zgłoszenia, do decyzji obsługi.';
+
+  @override
+  String get reportExplanation => 'Uzasadnienie';
+
+  @override
+  String get reportSend => 'Zgłoś';
+
+  @override
+  String get reportSent => 'Dziękujemy. Decyzję z uzasadnieniem zobaczysz na ekranie „Moje zgłoszenia i decyzje”.';
+
+  @override
+  String get reportSentIllegal =>
+      'Dziękujemy. Treść jest już ukryta. Decyzję z uzasadnieniem zobaczysz na ekranie „Moje zgłoszenia i decyzje”.';
+
+  @override
+  String get reportBack => 'Wróć';
+
+  @override
+  String get reportNoAccess => 'Tej treści już nie widzisz.';
+
+  @override
+  String get reportOwnContent => 'Własną treść możesz zmienić albo usunąć samodzielnie.';
+
+  @override
+  String get myModerationTitle => 'Moje zgłoszenia i decyzje';
+
+  @override
+  String get myModerationEmpty => 'Nie masz zgłoszeń ani decyzji';
+
+  @override
+  String get myModerationAboutMine => 'Decyzje o moich treściach';
+
+  @override
+  String get myModerationMine => 'Moje zgłoszenia';
+
+  @override
+  String myModerationReported(Object date, Object reason) {
+    return '$reason, zgłoszone $date';
+  }
+
+  @override
+  String get myModerationHidden => 'Teraz widzisz to tylko Ty.';
+
+  @override
+  String myModerationStatement(Object statement) {
+    return 'Uzasadnienie: $statement';
+  }
+
+  @override
+  String get myModerationAppealPending => 'Odwołanie czeka na decyzję.';
+
+  @override
+  String get myModerationAppealReversed => 'Odwołanie uwzględnione: treść jest znów widoczna.';
+
+  @override
+  String get myModerationAppealUpheld => 'Odwołanie nieuwzględnione.';
+
+  @override
+  String get myModerationAppealReason => 'Dlaczego decyzja jest błędna';
+
+  @override
+  String myModerationAppealUntil(Object date) {
+    return 'Możesz się odwołać do $date.';
+  }
+
+  @override
+  String get myModerationAppeal => 'Odwołaj się';
+
+  @override
+  String get verdictRemoved => 'Decyzja: treść ukryta';
+
+  @override
+  String get verdictKept => 'Decyzja: treść zostaje';
+
+  @override
+  String get verdictPending => 'Czeka na decyzję';
+
+  @override
   String get albumHandover => 'Przekazanie albumu';
 
   @override

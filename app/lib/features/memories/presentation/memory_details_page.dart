@@ -11,9 +11,12 @@ import 'memory_texts.dart';
 
 /// S05 Details of a memory. "Remove my tag" appears with albums (MEM-E3-ALBUM-15): nobody can be tagged yet.
 class MemoryDetailsPage extends ConsumerStatefulWidget {
-  const MemoryDetailsPage({super.key, required this.memoryId, required this.onLeave});
+  const MemoryDetailsPage({super.key, required this.memoryId, required this.onLeave, this.onReport});
 
   final String memoryId;
+
+  /// S27: somebody else's memory can be reported (L19).
+  final VoidCallback? onReport;
 
   /// The memory is gone from here (deleted, or access taken away): back to the map.
   final VoidCallback onLeave;
@@ -156,6 +159,8 @@ class _MemoryDetailsPageState extends ConsumerState<MemoryDetailsPage> {
             child: Text(l10n.deleteForGood),
           ),
         ],
+        if (!memory.isMine && widget.onReport != null)
+          TextButton(key: const Key('s05-report'), onPressed: widget.onReport, child: Text(l10n.reportContent)),
       ],
     );
   }

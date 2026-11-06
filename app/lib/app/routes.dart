@@ -152,6 +152,40 @@ final class ReportDeathRoute extends AppRoute {
   String get location => '${const AlbumRoute('').location}$id/$path';
 }
 
+/// S27 for an album, from inside it.
+final class AlbumReportRoute extends AppRoute {
+  const AlbumReportRoute(this.id);
+
+  static const path = 'report';
+
+  final String id;
+
+  @override
+  String get location => '${const AlbumRoute('').location}$id/$path';
+}
+
+/// S27 for a memory, from S05.
+final class MemoryReportRoute extends AppRoute {
+  const MemoryReportRoute(this.id);
+
+  static const path = 'report';
+
+  final String id;
+
+  @override
+  String get location => '${MemoryRoute(id).location}/$path';
+}
+
+/// S22: reports and decisions, from the account.
+final class MyModerationRoute extends AppRoute {
+  const MyModerationRoute();
+
+  static const path = 'moderation';
+
+  @override
+  String get location => '${AccountRoute.path}/$path';
+}
+
 /// S12 from inside an album: its curator too.
 final class AlbumConsentsRoute extends AppRoute {
   const AlbumConsentsRoute(this.id);
