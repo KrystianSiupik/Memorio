@@ -1264,4 +1264,17 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get calendarApply => 'Zastosuj';
+
+  @override
+  String get settingsPoints => 'Punkty na mapie';
+
+  @override
+  String get settingsPhotoPoints => 'Zdjęcia zamiast kropek';
+
+  @override
+  String get settingsPhotoPointsExplained =>
+      'Wspomnienie ze zdjęciem pokaże się na mapie jako mały okrąg z pierwszym zdjęciem. Bez zdjęcia zostaje kropką.';
+
+  @override
+  String get settingsPointSize => 'Wielkość punktów';
 }

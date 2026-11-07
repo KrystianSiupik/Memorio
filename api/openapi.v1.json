@@ -267,7 +267,7 @@
         "tags": [
           "Memories"
         ],
-        "summary": "One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap.",
+        "summary": "One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap; photos=true adds the first photo of each, signed.",
         "operationId": "GetMemoryMap",
         "parameters": [
           {
@@ -282,6 +282,13 @@
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "photos",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
             }
           }
         ],
@@ -3927,7 +3934,8 @@
         "required": [
           "id",
           "latitude",
-          "longitude"
+          "longitude",
+          "photoUrl"
         ],
         "type": "object",
         "properties": {
@@ -3950,6 +3958,13 @@
               "string"
             ],
             "format": "double"
+          },
+          "photoUrl": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uri"
           }
         }
       },

@@ -25,8 +25,12 @@ class FakeMemoriesRepository implements MemoriesRepository {
   MemoryFailure? photoFailure;
   MemoryFailure? draftFailure;
 
+  /// Whether each load of the points asked for their photos.
+  final pinPhotoRequests = <bool>[];
+
   @override
-  Future<Result<List<MemoryPin>, MemoryFailure>> loadPins({String? from, String? to}) async {
+  Future<Result<List<MemoryPin>, MemoryFailure>> loadPins({String? from, String? to, bool withPhotos = false}) async {
+    pinPhotoRequests.add(withPhotos);
     pinRequests.add((from: from, to: to));
     final failure = loadFailure;
     return failure == null ? Ok(pins) : Err(failure);

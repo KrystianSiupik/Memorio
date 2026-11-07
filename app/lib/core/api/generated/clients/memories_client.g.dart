@@ -54,9 +54,14 @@ class _MemoriesClient implements MemoriesClient {
   Future<List<MemoryPointResponse>> getMemoryMap({
     String? from,
     String? to,
+    bool? photos,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'from': from, r'to': to};
+    final queryParameters = <String, dynamic>{
+      r'from': from,
+      r'to': to,
+      r'photos': photos,
+    };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;

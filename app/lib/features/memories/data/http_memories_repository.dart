@@ -25,17 +25,19 @@ class HttpMemoriesRepository implements MemoriesRepository {
   final Dio uploads;
 
   @override
-  Future<Result<List<MemoryPin>, MemoryFailure>> loadPins({String? from, String? to}) => _attempt(() async {
-    final points = await memories.getMemoryMap(from: from, to: to);
-    return [
-      for (final point in points)
-        MemoryPin(
-          id: point.id,
-          latitude: (point.latitude as num).toDouble(),
-          longitude: (point.longitude as num).toDouble(),
-        ),
-    ];
-  });
+  Future<Result<List<MemoryPin>, MemoryFailure>> loadPins({String? from, String? to, bool withPhotos = false}) =>
+      _attempt(() async {
+        final points = await memories.getMemoryMap(from: from, to: to, photos: withPhotos ? true : null);
+        return [
+          for (final point in points)
+            MemoryPin(
+              id: point.id,
+              latitude: (point.latitude as num).toDouble(),
+              longitude: (point.longitude as num).toDouble(),
+              photoUrl: point.photoUrl,
+            ),
+        ];
+      });
 
   @override
   Future<Result<void, MemoryFailure>> create(NewMemory memory) => _attempt(

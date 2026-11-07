@@ -33,7 +33,7 @@ internal static class MemoriesEndpoints
             .WithSummary("Records a memory; the id comes from the client, so a retry changes nothing.");
         memories.MapGet("/map", GetMapAsync)
             .WithName("GetMemoryMap")
-            .WithSummary("One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap.");
+            .WithSummary("One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap; photos=true adds the first photo of each, signed.");
         memories.MapGet("/period", GetPeriodAsync)
             .WithName("GetPeriod")
             .WithSummary("Everything the person may see in a period (yyyy-MM-dd, both days in), in order, with the first photos.");
@@ -243,6 +243,7 @@ internal static class MemoriesEndpoints
     private static async Task<Results<Ok<IReadOnlyList<MemoryPointResponse>>, ProblemHttpResult>> GetMapAsync(
         string? from,
         string? to,
+        bool? photos,
         ClaimsPrincipal principal,
         IMemoryMapQuery query,
         CancellationToken cancellationToken)
@@ -252,9 +253,9 @@ internal static class MemoriesEndpoints
             return Problems.From(MemoryErrors.InvalidDate);
         }
 
-        var points = await query.GetAsync(CurrentAccount.IdOf(principal), first, last, cancellationToken);
+        var points = await query.GetAsync(CurrentAccount.IdOf(principal), first, last, cancellationToken, photos == true);
         return TypedResults.Ok<IReadOnlyList<MemoryPointResponse>>(
-            [.. points.Select(point => new MemoryPointResponse(point.Id, point.Latitude, point.Longitude))]);
+            [.. points.Select(point => new MemoryPointResponse(point.Id, point.Latitude, point.Longitude, point.PhotoUrl))]);
     }
 
     private static async Task<Results<Ok<IReadOnlyList<PeriodMemoryResponse>>, ProblemHttpResult>> GetPeriodAsync(
@@ -350,7 +351,8 @@ internal sealed record MyMemoryResponse(Guid Id, string PlaceName, string DateFr
 
 internal sealed record PeriodMemoryResponse(Guid Id, string PlaceName, double Latitude, double Longitude, string DatePrecision, string DateFrom, string DateTo, string? Time, string? Description, bool IsMine, int Photos, IReadOnlyList<Uri> PhotoUrls);
 
-internal sealed record MemoryPointResponse(Guid Id, double Latitude, double Longitude);
+/// <param name="PhotoUrl">The first photo, signed for 5 minutes; only with photos=true, and null without photos.</param>
+internal sealed record MemoryPointResponse(Guid Id, double Latitude, double Longitude, Uri? PhotoUrl);
 
 internal sealed record StartUploadRequest(string? ContentType);
 

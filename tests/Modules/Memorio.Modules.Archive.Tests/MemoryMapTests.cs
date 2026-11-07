@@ -52,6 +52,23 @@ public sealed class MemoryMapTests(ArchiveDatabase database)
         Assert.Equal(2, (await GetAsync(account)).Count);
     }
 
+    [Fact]
+    public async Task Photo_points_carry_the_first_photo_only_when_asked_for()
+    {
+        var account = Guid.CreateVersion7();
+        var withPhotos = await database.AddMemoryAsync(account, photos: 2);
+        var withoutPhotos = await database.AddMemoryAsync(account);
+        await using var scope = database.CreateScope();
+        var query = scope.ServiceProvider.GetRequiredService<IMemoryMapQuery>();
+
+        Assert.All(await query.GetAsync(account, null, null, Cancellation), point => Assert.Null(point.PhotoUrl));
+
+        var points = await query.GetAsync(account, null, null, Cancellation, withPhotos: true);
+        var first = withPhotos.Photos.OrderBy(photo => photo.Id).First().StorageKey;
+        Assert.Contains(first, points.Single(point => point.Id == withPhotos.Id.Value).PhotoUrl!.ToString(), StringComparison.Ordinal);
+        Assert.Null(points.Single(point => point.Id == withoutPhotos.Id.Value).PhotoUrl);
+    }
+
     private async Task<IReadOnlyList<MemoryPoint>> GetAsync(Guid account, DateOnly? from = null, DateOnly? to = null)
     {
         await using var scope = database.CreateScope();

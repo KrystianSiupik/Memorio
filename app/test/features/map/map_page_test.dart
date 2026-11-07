@@ -18,9 +18,9 @@ class _Holding extends FakeMemoriesRepository {
   final answer = Completer<void>();
 
   @override
-  Future<Result<List<MemoryPin>, MemoryFailure>> loadPins({String? from, String? to}) async {
+  Future<Result<List<MemoryPin>, MemoryFailure>> loadPins({String? from, String? to, bool withPhotos = false}) async {
     await answer.future;
-    return super.loadPins(from: from, to: to);
+    return super.loadPins(from: from, to: to, withPhotos: withPhotos);
   }
 }
 

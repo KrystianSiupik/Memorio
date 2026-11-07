@@ -2341,6 +2341,30 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Zastosuj'**
   String get calendarApply;
+
+  /// No description provided for @settingsPoints.
+  ///
+  /// In pl, this message translates to:
+  /// **'Punkty na mapie'**
+  String get settingsPoints;
+
+  /// No description provided for @settingsPhotoPoints.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zdjęcia zamiast kropek'**
+  String get settingsPhotoPoints;
+
+  /// No description provided for @settingsPhotoPointsExplained.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wspomnienie ze zdjęciem pokaże się na mapie jako mały okrąg z pierwszym zdjęciem. Bez zdjęcia zostaje kropką.'**
+  String get settingsPhotoPointsExplained;
+
+  /// No description provided for @settingsPointSize.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wielkość punktów'**
+  String get settingsPointSize;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

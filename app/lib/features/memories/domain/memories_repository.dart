@@ -30,7 +30,7 @@ abstract interface class MemoriesRepository {
   Future<Result<void, MemoryFailure>> restore(String id);
 
   /// The points of the map; the dates (yyyy-MM-dd) filter by overlap.
-  Future<Result<List<MemoryPin>, MemoryFailure>> loadPins({String? from, String? to});
+  Future<Result<List<MemoryPin>, MemoryFailure>> loadPins({String? from, String? to, bool withPhotos = false});
 
   Future<Result<void, MemoryFailure>> create(NewMemory memory);
 

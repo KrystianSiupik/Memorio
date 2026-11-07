@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/settings/settings.dart';
+import 'point_style_section.dart';
 
 /// E13: what the person sets for this device. Every change applies at once, and is remembered.
 class SettingsPage extends ConsumerWidget {
@@ -46,6 +47,7 @@ class SettingsPage extends ConsumerWidget {
               ),
             ),
           ),
+          _Section(title: l10n.settingsPoints, child: const PointStyleSection()),
           _Section(
             title: l10n.settingsLanguage,
             child: RadioGroup<AppLanguage>(
