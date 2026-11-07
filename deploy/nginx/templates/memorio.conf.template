@@ -61,6 +61,12 @@ server {
         proxy_pass $api;
     }
 
+    # The base map (MEM-E12-PLAT-03): read in pieces by the app, so ranges are answered; the same file for a week.
+    location /map/ {
+        alias /srv/map/;
+        add_header Cache-Control "public, max-age=604800";
+    }
+
     # The worker serves no public endpoint; its readiness is for the monitoring server only.
     location = /internal/worker/ready {
         allow ${MONITORING_IP};
