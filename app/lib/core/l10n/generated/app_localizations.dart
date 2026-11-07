@@ -1397,13 +1397,13 @@ abstract class AppLocalizations {
   /// No description provided for @newMemoryStepPlace.
   ///
   /// In pl, this message translates to:
-  /// **'Miejsce i data'**
+  /// **'Miejsce'**
   String get newMemoryStepPlace;
 
   /// No description provided for @newMemoryStepContent.
   ///
   /// In pl, this message translates to:
-  /// **'Treść'**
+  /// **'Historia'**
   String get newMemoryStepContent;
 
   /// No description provided for @next.
@@ -2419,6 +2419,66 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Usuń zdjęcie'**
   String get photoRemove;
+
+  /// No description provided for @newMemoryStepDate.
+  ///
+  /// In pl, this message translates to:
+  /// **'Data'**
+  String get newMemoryStepDate;
+
+  /// No description provided for @newMemoryStepPhotos.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zdjęcia'**
+  String get newMemoryStepPhotos;
+
+  /// No description provided for @placeQuestion.
+  ///
+  /// In pl, this message translates to:
+  /// **'Gdzie to było?'**
+  String get placeQuestion;
+
+  /// No description provided for @placeQuestionHint.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyszukaj miejsce albo nazwij własne.'**
+  String get placeQuestionHint;
+
+  /// No description provided for @dateQuestion.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kiedy to było?'**
+  String get dateQuestion;
+
+  /// No description provided for @dateQuestionHint.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie pamiętasz dnia? Wystarczy miesiąc, rok albo okres.'**
+  String get dateQuestionHint;
+
+  /// No description provided for @photosQuestion.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pokaż, jak tam było'**
+  String get photosQuestion;
+
+  /// No description provided for @photosQuestionHint.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pierwsze zdjęcie pokaże się na mapie. Ten krok możesz pominąć.'**
+  String get photosQuestionHint;
+
+  /// No description provided for @storyQuestion.
+  ///
+  /// In pl, this message translates to:
+  /// **'Opowiedz, co się wydarzyło'**
+  String get storyQuestion;
+
+  /// No description provided for @storyQuestionHint.
+  ///
+  /// In pl, this message translates to:
+  /// **'Napisz kilka zdań albo poproś AI o szkic.'**
+  String get storyQuestionHint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

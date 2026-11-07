@@ -216,8 +216,8 @@
   "mapRejected": "Nie udało się wysłać: {count}",
   "mapRejectedDismiss": "Rozumiem",
   "newMemoryTitle": "Nowe wspomnienie",
-  "newMemoryStepPlace": "Miejsce i data",
-  "newMemoryStepContent": "Treść",
+  "newMemoryStepPlace": "Miejsce",
+  "newMemoryStepContent": "Historia",
   "next": "Dalej",
   "back": "Wstecz",
   "place": "Miejsce",
@@ -412,5 +412,15 @@
   "photosEmpty": "Dodaj zdjęcia. Pierwsze pokaże się na mapie.",
   "photoPrevious": "Poprzednie zdjęcie",
   "photoNext": "Następne zdjęcie",
-  "photoRemove": "Usuń zdjęcie"
+  "photoRemove": "Usuń zdjęcie",
+  "newMemoryStepDate": "Data",
+  "newMemoryStepPhotos": "Zdjęcia",
+  "placeQuestion": "Gdzie to było?",
+  "placeQuestionHint": "Wyszukaj miejsce albo nazwij własne.",
+  "dateQuestion": "Kiedy to było?",
+  "dateQuestionHint": "Nie pamiętasz dnia? Wystarczy miesiąc, rok albo okres.",
+  "photosQuestion": "Pokaż, jak tam było",
+  "photosQuestionHint": "Pierwsze zdjęcie pokaże się na mapie. Ten krok możesz pominąć.",
+  "storyQuestion": "Opowiedz, co się wydarzyło",
+  "storyQuestionHint": "Napisz kilka zdań albo poproś AI o szkic."
 }

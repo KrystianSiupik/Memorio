@@ -107,3 +107,15 @@ class TappedPointNotifier extends Notifier<String?> {
     }
   }
 }
+
+/// MEM-E13-PLAT-09: how many windows are open over the map; while any is, the map does not move under the mouse.
+final mapHoldProvider = NotifierProvider<MapHold, int>(MapHold.new);
+
+class MapHold extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void hold() => state++;
+
+  void release() => state = state > 0 ? state - 1 : 0;
+}

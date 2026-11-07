@@ -397,7 +397,15 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-            child: _StepBar(step: _step, labels: [l10n.newMemoryStepPlace, l10n.newMemoryStepContent]),
+            child: _StepBar(
+              step: _step,
+              labels: [
+                l10n.newMemoryStepPlace,
+                l10n.newMemoryStepDate,
+                l10n.newMemoryStepPhotos,
+                l10n.newMemoryStepContent,
+              ],
+            ),
           ),
           const Divider(height: 1),
           if (offline)
@@ -408,9 +416,14 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
           if (_busy) const LinearProgressIndicator(key: Key('s04-busy')),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
               children: [
-                if (_step == 0) ..._placeAndDate(offline) else ..._content(offline, blockedOffline),
+                ...switch (_step) {
+                  0 => _placeStep(offline),
+                  1 => _dateStep(),
+                  2 => _photosStep(),
+                  _ => _storyStep(offline),
+                },
                 ..._failureBlock(),
               ],
             ),
@@ -429,18 +442,22 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
       children: [
         TextButton(key: const Key('s04-cancel'), onPressed: widget.onClose, child: Text(l10n.cancel)),
         const Spacer(),
-        if (_step == 0)
-          FilledButton(
-            onPressed: (_place != null || _ownPlaceFilled) && _dateIsComplete && !_dateIsInFuture
-                ? () => _next(offline: offline)
-                : null,
-            child: Text(l10n.next),
-          )
-        else ...[
-          TextButton(onPressed: _busy ? null : () => setState(() => _step = 0), child: Text(l10n.back)),
+        if (_step > 0) ...[
+          OutlinedButton(onPressed: _busy ? null : () => setState(() => _step -= 1), child: Text(l10n.back)),
           const SizedBox(width: 8),
-          FilledButton(onPressed: _canSave && !blockedOffline ? _save : null, child: Text(l10n.saveMemory)),
         ],
+        switch (_step) {
+          0 => FilledButton(
+            onPressed: _place != null || _ownPlaceFilled ? () => _next(offline: offline) : null,
+            child: Text(l10n.next),
+          ),
+          1 => FilledButton(
+            onPressed: _dateIsComplete && !_dateIsInFuture ? () => setState(() => _step = 2) : null,
+            child: Text(l10n.next),
+          ),
+          2 => FilledButton(onPressed: () => setState(() => _step = 3), child: Text(l10n.next)),
+          _ => FilledButton(onPressed: _canSave && !blockedOffline ? _save : null, child: Text(l10n.saveMemory)),
+        },
       ],
     );
   }
@@ -460,12 +477,12 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
       ),
       if (failure is MemoryTermsNotAccepted)
         TextButton(onPressed: _busy ? null : _acceptTerms, child: Text(l10n.acceptTerms))
-      else if (_step == 1 && failure is! AiLimitReached && failure is! AiProviderDown)
+      else if (_step == 3 && failure is! AiLimitReached && failure is! AiProviderDown)
         TextButton(onPressed: _canSave ? _save : null, child: Text(l10n.retry)),
     ];
   }
 
-  List<Widget> _placeAndDate(bool offline) {
+  List<Widget> _placeStep(bool offline) {
     final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     final place = _place;
@@ -474,7 +491,8 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
     return [
       _Section(
         icon: Icons.place_outlined,
-        title: l10n.place,
+        title: l10n.placeQuestion,
+        subtitle: l10n.placeQuestionHint,
         children: [
           if (place != null)
             Container(
@@ -586,9 +604,18 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
           ],
         ],
       ),
+      if (place == null && !_ownPlaceFilled) _Hint(l10n.placeNeeded, key: const Key('s04-place-needed')),
+    ];
+  }
+
+  List<Widget> _dateStep() {
+    final l10n = context.l10n;
+    final colors = Theme.of(context).colorScheme;
+    return [
       _Section(
         icon: Icons.event_outlined,
-        title: l10n.datePrecision,
+        title: l10n.dateQuestion,
+        subtitle: l10n.dateQuestionHint,
         children: [
           SegmentedButton<MemoryDatePrecision>(
             showSelectedIcon: false,
@@ -646,20 +673,18 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
             ),
         ],
       ),
-      if (place == null && !_ownPlaceFilled) _Hint(l10n.placeNeeded, key: const Key('s04-place-needed')),
       if (!_dateIsComplete) _Hint(l10n.dateNeeded, key: const Key('s04-date-needed')),
     ];
   }
 
-  List<Widget> _content(bool offline, bool blockedOffline) {
+  List<Widget> _photosStep() {
     final l10n = context.l10n;
-    final colors = Theme.of(context).colorScheme;
-    final draft = _aiDraft;
     final canAdd = _poolFull || _busy ? null : _pickPhotos;
     return [
       _Section(
         icon: Icons.photo_library_outlined,
-        title: l10n.photos,
+        title: l10n.photosQuestion,
+        subtitle: l10n.photosQuestionHint,
         trailing: OutlinedButton.icon(
           onPressed: canAdd,
           icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
@@ -682,9 +707,18 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
             ),
         ],
       ),
+    ];
+  }
+
+  List<Widget> _storyStep(bool offline) {
+    final l10n = context.l10n;
+    final colors = Theme.of(context).colorScheme;
+    final draft = _aiDraft;
+    return [
       _Section(
         icon: Icons.notes_outlined,
-        title: l10n.descriptionSection,
+        title: l10n.storyQuestion,
+        subtitle: l10n.storyQuestionHint,
         children: [
           TextField(
             controller: _description,
@@ -764,46 +798,55 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
   }
 }
 
-/// MEM-E13-PLAT-08: one part of the form in a frame, with an icon and a title.
+/// MEM-E13-PLAT-08, MEM-E13-PLAT-09: one step of the form: a big question with an icon, a line of explanation, and
+/// room between the fields.
 class _Section extends StatelessWidget {
-  const _Section({required this.icon, required this.title, required this.children, this.trailing});
+  const _Section({required this.icon, required this.title, required this.children, this.subtitle, this.trailing});
 
   final IconData icon;
   final String title;
+  final String? subtitle;
   final List<Widget> children;
   final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.outlineVariant),
-      ),
+    final text = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: 16,
         children: [
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            runSpacing: 6,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, size: 20, color: colors.primary),
-                  const SizedBox(width: 8),
-                  Text(title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-                ],
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(color: colors.primary.withValues(alpha: 0.12), shape: BoxShape.circle),
+                child: Icon(icon, color: colors.primary),
               ),
-              ?trailing,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w600)),
+                    if (subtitle case final line?)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(line, style: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant)),
+                      ),
+                  ],
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 4),
           ...children,
+          ?trailing,
         ],
       ),
     );

@@ -216,8 +216,8 @@
   "mapRejected": "Could not be sent: {count}",
   "mapRejectedDismiss": "Got it",
   "newMemoryTitle": "New memory",
-  "newMemoryStepPlace": "Place and date",
-  "newMemoryStepContent": "Content",
+  "newMemoryStepPlace": "Place",
+  "newMemoryStepContent": "Story",
   "next": "Next",
   "back": "Back",
   "place": "Place",
@@ -387,5 +387,15 @@
   "photosEmpty": "Add photos. The first one shows on the map.",
   "photoPrevious": "Previous photo",
   "photoNext": "Next photo",
-  "photoRemove": "Remove photo"
+  "photoRemove": "Remove photo",
+  "newMemoryStepDate": "Date",
+  "newMemoryStepPhotos": "Photos",
+  "placeQuestion": "Where was it?",
+  "placeQuestionHint": "Search for a place, or name your own.",
+  "dateQuestion": "When was it?",
+  "dateQuestionHint": "Do not remember the day? A month, a year or a period is enough.",
+  "photosQuestion": "Show what it was like",
+  "photosQuestionHint": "The first photo shows on the map. You can skip this step.",
+  "storyQuestion": "Tell what happened",
+  "storyQuestionHint": "Write a few lines, or ask AI for a draft."
 }
