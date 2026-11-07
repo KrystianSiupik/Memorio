@@ -1277,4 +1277,10 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get settingsPointSize => 'Wielkość punktów';
+
+  @override
+  String get placeNeeded => 'Wybierz miejsce z listy albo wpisz nazwę i współrzędne miejsca własnego.';
+
+  @override
+  String get dateNeeded => 'Wybierz datę.';
 }

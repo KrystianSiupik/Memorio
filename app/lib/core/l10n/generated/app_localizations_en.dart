@@ -1278,4 +1278,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPointSize => 'Size of the points';
+
+  @override
+  String get placeNeeded => 'Choose a place from the list, or type the name and coordinates of your own place.';
+
+  @override
+  String get dateNeeded => 'Choose a date.';
 }
