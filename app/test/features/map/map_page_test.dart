@@ -243,13 +243,75 @@ void main() {
       expect(find.text('Daty'), findsOneWidget);
     });
 
-    testWidgets('opens the date range picker', (tester) async {
+    Future<void> openCalendar(WidgetTester tester, Size size) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
       await open(tester);
+      await tester.tap(find.byKey(const Key('s03-filter-dates')));
+      await tester.pumpAndSettle();
+    }
+
+    String day(DateTime date) => 's03-calendar-day-${date.year}-${date.month}-${date.day}';
+
+    testWidgets('on a wide screen a small calendar opens at the left, not the full-screen picker', (tester) async {
+      await openCalendar(tester, const Size(1400, 900));
+
+      expect(find.byType(DateRangePickerDialog), findsNothing);
+      final calendar = tester.getRect(find.byKey(const Key('s03-calendar')));
+      expect(calendar.width, lessThan(320));
+      expect(calendar.left, lessThan(40));
+    });
+
+    testWidgets('on a narrow screen it opens in the middle', (tester) async {
+      await openCalendar(tester, const Size(400, 800));
+
+      final calendar = tester.getRect(find.byKey(const Key('s03-calendar')));
+      expect(calendar.center.dx, closeTo(200, 2));
+    });
+
+    testWidgets('two taps and Apply filter by the range, in either order', (tester) async {
+      await openCalendar(tester, const Size(1400, 900));
+      final now = DateTime.now();
+      final first = DateTime(now.year, now.month);
+      final second = DateTime(now.year, now.month, now.day > 1 ? now.day : 1);
+
+      await tester.tap(find.byKey(Key(day(second))));
+      await tester.tap(find.byKey(Key(day(first))));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('s03-calendar-apply')));
+      await tester.pumpAndSettle();
+
+      String text(DateTime date) =>
+          '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      expect(memories.pinRequests.last, (from: text(first), to: text(second)));
+      expect(find.byKey(const Key('s03-calendar')), findsNothing);
+    });
+
+    testWidgets('a tap outside closes it and keeps the filter; Clear removes it', (tester) async {
+      final container = await open(tester);
+      container.read(memoryDateFilterProvider.notifier).set((from: DateTime(2020, 1, 2), to: DateTime(2020, 3, 4)));
+      await tester.pumpAndSettle();
 
       await tester.tap(find.byKey(const Key('s03-filter-dates')));
       await tester.pumpAndSettle();
+      expect(find.byKey(const Key('s03-calendar-month')), findsOneWidget);
+      await tester.tapAt(const Offset(780, 580));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('s03-calendar')), findsNothing);
+      expect(container.read(memoryDateFilterProvider), (from: DateTime(2020, 1, 2), to: DateTime(2020, 3, 4)));
 
-      expect(find.byType(DateRangePickerDialog), findsOneWidget);
+      await tester.tap(find.byKey(const Key('s03-filter-dates')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('s03-calendar-clear')));
+      await tester.pumpAndSettle();
+      expect(container.read(memoryDateFilterProvider), isNull);
+    });
+
+    testWidgets('days after today cannot be chosen', (tester) async {
+      await openCalendar(tester, const Size(1400, 900));
+
+      expect(tester.widget<IconButton>(find.byKey(const Key('s03-calendar-next'))).onPressed, isNull);
     });
   });
 

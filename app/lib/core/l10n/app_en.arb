@@ -372,5 +372,7 @@
   "settingsTheme": "Appearance",
   "settingsThemeSystem": "As on the device",
   "settingsThemeLight": "Light",
-  "settingsThemeDark": "Dark"
+  "settingsThemeDark": "Dark",
+  "calendarClear": "Clear",
+  "calendarApply": "Apply"
 }

@@ -1258,4 +1258,10 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get settingsThemeDark => 'Ciemny';
+
+  @override
+  String get calendarClear => 'Wyczyść';
+
+  @override
+  String get calendarApply => 'Zastosuj';
 }

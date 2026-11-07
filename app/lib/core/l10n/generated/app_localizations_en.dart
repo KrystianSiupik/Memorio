@@ -1259,4 +1259,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsThemeDark => 'Dark';
+
+  @override
+  String get calendarClear => 'Clear';
+
+  @override
+  String get calendarApply => 'Apply';
 }
