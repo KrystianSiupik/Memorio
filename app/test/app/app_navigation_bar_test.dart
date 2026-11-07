@@ -31,10 +31,15 @@ void main() {
       )
       .scale;
 
-  testWidgets('the chosen tab has the accent, the others not, and a tap chooses', (tester) async {
+  Color badgeColor(WidgetTester tester, String label) =>
+      (tester.widget<AnimatedContainer>(find.byKey(Key('app-navigation-badge-$label'))).decoration! as BoxDecoration)
+          .color!;
+
+  testWidgets('the chosen tab has its badge in the accent, the others not, and a tap chooses', (tester) async {
     final chosen = await pump(tester, AppThemes.light);
 
-    expect(iconColor(tester, Icons.public), AppThemes.lightAccent);
+    expect(badgeColor(tester, 'Mapa'), AppThemes.lightAccent);
+    expect(badgeColor(tester, 'Albumy'), isNot(AppThemes.lightAccent));
     expect(iconColor(tester, Icons.photo_album_outlined), isNot(AppThemes.lightAccent));
 
     await tester.tap(find.text('Albumy'));
@@ -69,6 +74,19 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(iconColor(tester, Icons.photo_album_outlined), AppThemes.darkAccent);
+  });
+
+  testWidgets('the pad is low: the bigger icons stand out above it, the labels lie on it', (tester) async {
+    await pump(tester, AppThemes.light);
+
+    final pad = tester.getRect(find.byKey(const Key('app-navigation-pad')));
+    final badge = tester.getRect(find.byKey(const Key('app-navigation-badge-Albumy')));
+    final label = tester.getRect(find.byKey(const Key('app-navigation-label-Albumy')));
+    expect(pad.height, AppNavigationBar.padHeight);
+    expect(badge.top, lessThan(pad.top - 10));
+    expect(badge.bottom, greaterThan(pad.top));
+    expect(pad.contains(label.center), isTrue);
+    expect(tester.getSize(find.byIcon(Icons.photo_album_outlined)).width, AppNavigationBar.iconSize);
   });
 
   testWidgets('the bar stays small in the middle of a wide screen', (tester) async {

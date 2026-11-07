@@ -7,7 +7,7 @@
 | Priorytet | P1 |
 | Moduły | - |
 | Zależy od epików | E0, E12 |
-| Estymacja | 14–24 h |
+| Estymacja | 20–33 h |
 | Źródło | prośba PO z 2026-11-07 po pokazie aplikacji |
 
 ## Kryteria ukończenia epiku
@@ -23,3 +23,5 @@
 | [MEM-E13-PLAT-03](../MEM-E13-PLAT-03-nowoczesny-pasek-nawigacji.md) | Nowoczesny dolny pasek nawigacji | - / UI | 2–4 h | zrobiony |
 | [MEM-E13-PLAT-04](../MEM-E13-PLAT-04-maly-kalendarz-filtra-dat.md) | Mały kalendarz filtra dat | - / UI | 2–4 h | zrobiony |
 | [MEM-E13-PLAT-05](../MEM-E13-PLAT-05-wyglad-punktow-na-mapie.md) | Wygląd punktów na mapie: okręgi ze zdjęciem i wielkość | - / UI | 4–6 h | zrobiony |
+| [MEM-E13-PLAT-06](../MEM-E13-PLAT-06-pasek-jako-podkladka.md) | Pasek nawigacji jako podkładka z wystającymi ikonami | - / UI | 2–3 h | zrobiony |
+| [MEM-E13-PLAT-07](../MEM-E13-PLAT-07-dodawanie-wspomnienia-w-oknie.md) | Dodawanie wspomnienia w oknie z etapami | - / UI | 4–6 h | gotowy |
