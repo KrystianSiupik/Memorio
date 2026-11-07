@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memorio/app/router.dart';
@@ -357,6 +358,87 @@ void main() {
       expect(queued.last.payload['memoryId'], queued.first.payload['id']);
       expect(memories.created, isEmpty);
       expect(find.text('Zapisano. Wyślemy, gdy wróci sieć.'), findsOneWidget);
+    });
+  });
+
+  group('MEM-E13-PLAT-07 window', () {
+    Color stepColor(WidgetTester tester, int index) =>
+        (tester
+                    .widget<AnimatedContainer>(
+                      find.descendant(of: find.byKey(Key('s04-step-$index')), matching: find.byType(AnimatedContainer)),
+                    )
+                    .decoration!
+                as BoxDecoration)
+            .color!;
+
+    testWidgets('opens over the map in the middle, with both steps shown and the first one current', (tester) async {
+      await open(tester);
+
+      final window = tester.getRect(find.byKey(const Key('s04-window')));
+      expect(window.width, 640);
+      expect(window.center.dx, closeTo(500, 1));
+      expect(find.byKey(const Key('s04-steps')), findsOneWidget);
+      final accent = Theme.of(tester.element(find.byKey(const Key('s04-window')))).colorScheme.primary;
+      expect(stepColor(tester, 0), accent);
+      expect(stepColor(tester, 1), isNot(accent));
+    });
+
+    testWidgets('neither a click on the background nor Escape closes it', (tester) async {
+      final container = await open(tester);
+
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('s04-window')), findsOneWidget);
+      expect(container.read(routerProvider).state.uri.path, const NewMemoryRoute().location);
+    });
+
+    testWidgets('the X closes it and goes back to the map', (tester) async {
+      final container = await open(tester);
+
+      await tester.tap(find.byKey(const Key('s04-close')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('s04-window')), findsNothing);
+      expect(container.read(routerProvider).state.uri.path, const MapRoute().location);
+    });
+
+    testWidgets('Cancel closes it from the second step too, and nothing is saved', (tester) async {
+      final container = await open(tester);
+      await toContent(tester);
+
+      await tester.tap(find.byKey(const Key('s04-cancel')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('s04-window')), findsNothing);
+      expect(container.read(routerProvider).state.uri.path, const MapRoute().location);
+      expect(memories.created, isEmpty);
+    });
+
+    testWidgets('the step bar follows Next and Back', (tester) async {
+      await open(tester);
+      final accent = Theme.of(tester.element(find.byKey(const Key('s04-window')))).colorScheme.primary;
+
+      await toContent(tester);
+      expect(stepColor(tester, 1), accent);
+      expect(
+        find.descendant(of: find.byKey(const Key('s04-step-0')), matching: find.byIcon(Icons.check)),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Wstecz'));
+      await tester.pumpAndSettle();
+      expect(stepColor(tester, 1), isNot(accent));
+    });
+
+    testWidgets('on a phone the window takes the whole screen', (tester) async {
+      await open(tester);
+      tester.view.physicalSize = const Size(400, 800);
+      await tester.pumpAndSettle();
+
+      expect(tester.getSize(find.byKey(const Key('s04-window'))), const Size(400, 800));
     });
   });
 }

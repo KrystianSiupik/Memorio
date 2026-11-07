@@ -220,7 +220,7 @@ void main() {
       await tester.tap(find.text('Dodaj pierwsze wspomnienie'));
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(AppBar, 'Nowe wspomnienie'), findsOneWidget);
+      expect(find.byKey(const Key('s04-window')), findsOneWidget);
     });
 
     testWidgets('with a filter says nothing matches instead', (tester) async {
@@ -372,7 +372,7 @@ void main() {
       await tester.tap(find.byType(FloatingActionButton));
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(AppBar, 'Nowe wspomnienie'), findsOneWidget);
+      expect(find.byKey(const Key('s04-window')), findsOneWidget);
     });
 
     testWidgets('S03 → S06: the trash', (tester) async {
