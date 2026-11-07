@@ -9,6 +9,7 @@ import 'package:memorio/app/routes.dart';
 import 'package:memorio/core/settings/settings.dart';
 
 import '../../helpers/app.dart';
+import '../../helpers/fake_memories.dart';
 
 void main() {
   Future<void> open(WidgetTester tester, InMemorySettingsStore store, String location) async {
@@ -70,6 +71,43 @@ void main() {
     await open(tester, InMemorySettingsStore(jsonEncode({'theme': 'light'})), const SettingsRoute().location);
 
     expect(Theme.of(tester.element(find.text('Wygląd'))).colorScheme.primary, AppThemes.lightAccent);
+  });
+
+  testWidgets('points: dots by default; the switch and the size show in the picture and are remembered', (
+    tester,
+  ) async {
+    final store = InMemorySettingsStore();
+    await open(tester, store, const SettingsRoute().location);
+
+    expect(find.text('Zdjęcia zamiast kropek'), findsOneWidget);
+    expect(tester.widget<SwitchListTile>(find.byKey(const Key('settings-photo-points'))).value, isFalse);
+    final dotBefore = tester.getSize(find.byKey(const Key('settings-preview-dot')));
+
+    await tester.tap(find.byKey(const Key('settings-photo-points')));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byKey(const Key('settings-point-size')), const Offset(400, 0));
+    await tester.pumpAndSettle();
+
+    final saved = jsonDecode(store.value!) as Map<String, Object?>;
+    expect(saved['photoPoints'], isTrue);
+    expect(saved['pointScale'], AppSettings.maxPointScale);
+    expect(tester.getSize(find.byKey(const Key('settings-preview-dot'))).width, greaterThan(dotBefore.width));
+    expect(tester.getSize(find.byKey(const Key('settings-preview-photo'))).width, 29 * AppSettings.maxPointScale);
+  });
+
+  testWidgets('with photo points on, the map asks for the photos', (tester) async {
+    final memories = FakeMemoriesRepository();
+    tester.view.physicalSize = const Size(1000, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await pumpMemorioApp(
+      tester,
+      session: signedIn,
+      memories: memories,
+      settings: InMemorySettingsStore(jsonEncode({'photoPoints': true})),
+    );
+
+    expect(memories.pinPhotoRequests.last, isTrue);
   });
 
   test('settings that cannot be read fall back value by value, and the point size stays in range', () {

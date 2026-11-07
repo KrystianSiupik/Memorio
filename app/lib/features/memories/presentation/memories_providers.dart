@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/result.dart';
+import '../../../core/settings/settings.dart';
 import '../../account/account.dart';
 import '../domain/memories_repository.dart';
 import '../domain/memory.dart';
@@ -66,7 +67,11 @@ final memoryPinsProvider = FutureProvider<List<MemoryPin>>((ref) async {
       '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   final loaded = await ref
       .watch(memoriesRepositoryProvider)
-      .loadPins(from: range == null ? null : day(range.from), to: range == null ? null : day(range.to));
+      .loadPins(
+        from: range == null ? null : day(range.from),
+        to: range == null ? null : day(range.to),
+        withPhotos: ref.watch(settingsProvider.select((settings) => settings.photoPoints)),
+      );
   return switch (loaded) {
     Ok(:final value) => value,
     Err(:final failure) => throw failure,

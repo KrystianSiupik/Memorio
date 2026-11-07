@@ -8,13 +8,19 @@ part 'memory_point_response.g.dart';
 
 @JsonSerializable()
 class MemoryPointResponse {
-  const MemoryPointResponse({required this.id, required this.latitude, required this.longitude});
+  const MemoryPointResponse({
+    required this.id,
+    required this.latitude,
+    required this.longitude,
+    required this.photoUrl,
+  });
 
   factory MemoryPointResponse.fromJson(Map<String, Object?> json) => _$MemoryPointResponseFromJson(json);
 
   final String id;
   final dynamic latitude;
   final dynamic longitude;
+  final String? photoUrl;
 
   Map<String, Object?> toJson() => _$MemoryPointResponseToJson(this);
 }

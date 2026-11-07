@@ -399,5 +399,9 @@
   "settingsThemeLight": "Jasny",
   "settingsThemeDark": "Ciemny",
   "calendarClear": "Wyczyść",
-  "calendarApply": "Zastosuj"
+  "calendarApply": "Zastosuj",
+  "settingsPoints": "Punkty na mapie",
+  "settingsPhotoPoints": "Zdjęcia zamiast kropek",
+  "settingsPhotoPointsExplained": "Wspomnienie ze zdjęciem pokaże się na mapie jako mały okrąg z pierwszym zdjęciem. Bez zdjęcia zostaje kropką.",
+  "settingsPointSize": "Wielkość punktów"
 }

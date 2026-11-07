@@ -6,7 +6,9 @@ namespace Memorio.Modules.Archive.Application.Queries.MemoryMap;
 /// </summary>
 internal interface IMemoryMapQuery
 {
-    Task<IReadOnlyList<MemoryPoint>> GetAsync(Guid accountId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken);
+    /// <param name="withPhotos">MEM-E13-PLAT-05: also the first photo of each memory, signed, for photo points on the map.</param>
+    Task<IReadOnlyList<MemoryPoint>> GetAsync(Guid accountId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken, bool withPhotos = false);
 }
 
-internal sealed record MemoryPoint(Guid Id, double Latitude, double Longitude);
+/// <param name="PhotoUrl">The first photo added, signed for 5 minutes; only when asked for, and null without photos.</param>
+internal sealed record MemoryPoint(Guid Id, double Latitude, double Longitude, Uri? PhotoUrl = null);

@@ -12,6 +12,21 @@ void main() {
     expect((feature['geometry']! as Map<String, Object?>)['coordinates'], [21.0, 52.2]);
   });
 
+  test('a point is drawn with its round photo only once the photo is on the map, and only while it has one', () {
+    const points = [
+      MapPoint(id: 'a', latitude: 52.2, longitude: 21.0, photoUrl: 'https://storage.example.invalid/a'),
+      MapPoint(id: 'b', latitude: 52.3, longitude: 21.1, photoUrl: 'https://storage.example.invalid/b'),
+      MapPoint(id: 'c', latitude: 52.4, longitude: 21.2),
+    ];
+
+    final features = (pointsToGeoJson(points, photos: {'a', 'c'})['features']! as List<Object?>)
+        .cast<Map<String, Object?>>();
+
+    expect(features[0]['properties'], {'id': 'a', 'photo': photoImageOf('a')});
+    expect(features[1]['properties'], {'id': 'b'});
+    expect(features[2]['properties'], {'id': 'c'});
+  });
+
   test('no points is an empty collection, not an error', () {
     expect(pointsToGeoJson(const [])['features'], isEmpty);
   });

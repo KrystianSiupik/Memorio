@@ -374,5 +374,9 @@
   "settingsThemeLight": "Light",
   "settingsThemeDark": "Dark",
   "calendarClear": "Clear",
-  "calendarApply": "Apply"
+  "calendarApply": "Apply",
+  "settingsPoints": "Points on the map",
+  "settingsPhotoPoints": "Photos instead of dots",
+  "settingsPhotoPointsExplained": "A memory with a photo shows on the map as a small circle with its first photo. Without a photo it stays a dot.",
+  "settingsPointSize": "Size of the points"
 }

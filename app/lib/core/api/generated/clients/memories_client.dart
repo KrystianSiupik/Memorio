@@ -30,9 +30,13 @@ abstract class MemoriesClient {
   @POST('/v1/memories')
   Future<CreatedMemoryResponse> createMemory({@Body() required CreateMemoryRequest body});
 
-  /// One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap.
+  /// One point per memory the person may see; from and to (yyyy-MM-dd) filter by overlap; photos=true adds the first photo of each, signed.
   @GET('/v1/memories/map')
-  Future<List<MemoryPointResponse>> getMemoryMap({@Query('from') String? from, @Query('to') String? to});
+  Future<List<MemoryPointResponse>> getMemoryMap({
+    @Query('from') String? from,
+    @Query('to') String? to,
+    @Query('photos') bool? photos,
+  });
 
   /// Everything the person may see in a period (yyyy-MM-dd, both days in), in order, with the first photos.
   @GET('/v1/memories/period')

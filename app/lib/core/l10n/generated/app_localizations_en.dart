@@ -1265,4 +1265,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calendarApply => 'Apply';
+
+  @override
+  String get settingsPoints => 'Points on the map';
+
+  @override
+  String get settingsPhotoPoints => 'Photos instead of dots';
+
+  @override
+  String get settingsPhotoPointsExplained =>
+      'A memory with a photo shows on the map as a small circle with its first photo. Without a photo it stays a dot.';
+
+  @override
+  String get settingsPointSize => 'Size of the points';
 }

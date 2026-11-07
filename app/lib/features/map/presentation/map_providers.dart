@@ -17,7 +17,7 @@ final mapPointsProvider = Provider<List<MapPoint>>((ref) {
   final pins = ref.watch(memoryPinsProvider.select((loaded) => loaded.value));
   return [
     for (final pin in pins ?? const <MemoryPin>[])
-      MapPoint(id: pin.id, latitude: pin.latitude, longitude: pin.longitude),
+      MapPoint(id: pin.id, latitude: pin.latitude, longitude: pin.longitude, photoUrl: pin.photoUrl),
   ];
 });
 

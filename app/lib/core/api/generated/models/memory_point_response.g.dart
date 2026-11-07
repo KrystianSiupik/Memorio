@@ -6,11 +6,16 @@ part of 'memory_point_response.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-MemoryPointResponse _$MemoryPointResponseFromJson(Map<String, dynamic> json) =>
-    MemoryPointResponse(id: json['id'] as String, latitude: json['latitude'], longitude: json['longitude']);
+MemoryPointResponse _$MemoryPointResponseFromJson(Map<String, dynamic> json) => MemoryPointResponse(
+  id: json['id'] as String,
+  latitude: json['latitude'],
+  longitude: json['longitude'],
+  photoUrl: json['photoUrl'] as String?,
+);
 
 Map<String, dynamic> _$MemoryPointResponseToJson(MemoryPointResponse instance) => <String, dynamic>{
   'id': instance.id,
   'latitude': instance.latitude,
   'longitude': instance.longitude,
+  'photoUrl': instance.photoUrl,
 };

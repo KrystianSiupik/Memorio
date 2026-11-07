@@ -1,10 +1,13 @@
 /// One memory on the map.
 class MemoryPin {
-  const MemoryPin({required this.id, required this.latitude, required this.longitude});
+  const MemoryPin({required this.id, required this.latitude, required this.longitude, this.photoUrl});
 
   final String id;
   final double latitude;
   final double longitude;
+
+  /// MEM-E13-PLAT-05: the first photo, signed; only when photo points are on.
+  final String? photoUrl;
 }
 
 /// How exactly a person remembers the date; [apiName] is what the backend takes.
