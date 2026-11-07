@@ -2305,6 +2305,30 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Jak w urządzeniu'**
   String get settingsLanguageSystem;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wygląd'**
+  String get settingsTheme;
+
+  /// No description provided for @settingsThemeSystem.
+  ///
+  /// In pl, this message translates to:
+  /// **'Jak w urządzeniu'**
+  String get settingsThemeSystem;
+
+  /// No description provided for @settingsThemeLight.
+  ///
+  /// In pl, this message translates to:
+  /// **'Jasny'**
+  String get settingsThemeLight;
+
+  /// No description provided for @settingsThemeDark.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ciemny'**
+  String get settingsThemeDark;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

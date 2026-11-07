@@ -19,6 +19,34 @@ class SettingsPage extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           _Section(
+            title: l10n.settingsTheme,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: SegmentedButton<AppTheme>(
+                key: const Key('settings-theme'),
+                segments: [
+                  ButtonSegment(
+                    value: AppTheme.system,
+                    icon: const Icon(Icons.brightness_auto),
+                    label: Text(l10n.settingsThemeSystem),
+                  ),
+                  ButtonSegment(
+                    value: AppTheme.light,
+                    icon: const Icon(Icons.light_mode_outlined),
+                    label: Text(l10n.settingsThemeLight),
+                  ),
+                  ButtonSegment(
+                    value: AppTheme.dark,
+                    icon: const Icon(Icons.dark_mode_outlined),
+                    label: Text(l10n.settingsThemeDark),
+                  ),
+                ],
+                selected: {settings.theme},
+                onSelectionChanged: (chosen) => notifier.update((current) => current.copyWith(theme: chosen.single)),
+              ),
+            ),
+          ),
+          _Section(
             title: l10n.settingsLanguage,
             child: RadioGroup<AppLanguage>(
               groupValue: settings.language,

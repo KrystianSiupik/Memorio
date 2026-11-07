@@ -368,5 +368,9 @@
   "albumReadOnlyRefused": "The plan of this album ended: nothing new can be added until it is paid again.",
   "settingsTitle": "Settings",
   "settingsLanguage": "Language",
-  "settingsLanguageSystem": "As on the device"
+  "settingsLanguageSystem": "As on the device",
+  "settingsTheme": "Appearance",
+  "settingsThemeSystem": "As on the device",
+  "settingsThemeLight": "Light",
+  "settingsThemeDark": "Dark"
 }
