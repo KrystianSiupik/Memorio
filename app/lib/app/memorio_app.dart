@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/api/api.dart';
 import '../core/l10n/l10n.dart';
 import '../core/settings/settings.dart';
+import 'app_theme.dart';
 import 'router.dart';
 import 'update_required_screen.dart';
 
@@ -20,7 +21,9 @@ class MemorioApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'Memorio',
-      theme: ThemeData(colorSchemeSeed: Colors.teal, useMaterial3: true),
+      theme: AppThemes.light,
+      darkTheme: AppThemes.dark,
+      themeMode: settings.theme.mode,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       // Null: the device's language, or Polish when the app does not speak it.

@@ -1246,4 +1246,16 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get settingsLanguageSystem => 'Jak w urządzeniu';
+
+  @override
+  String get settingsTheme => 'Wygląd';
+
+  @override
+  String get settingsThemeSystem => 'Jak w urządzeniu';
+
+  @override
+  String get settingsThemeLight => 'Jasny';
+
+  @override
+  String get settingsThemeDark => 'Ciemny';
 }

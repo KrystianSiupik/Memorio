@@ -393,5 +393,9 @@
   "albumReadOnlyRefused": "Plan tego albumu wygasł: nic nowego nie można dodać, dopóki nie zostanie opłacony.",
   "settingsTitle": "Ustawienia",
   "settingsLanguage": "Język",
-  "settingsLanguageSystem": "Jak w urządzeniu"
+  "settingsLanguageSystem": "Jak w urządzeniu",
+  "settingsTheme": "Wygląd",
+  "settingsThemeSystem": "Jak w urządzeniu",
+  "settingsThemeLight": "Jasny",
+  "settingsThemeDark": "Ciemny"
 }
