@@ -21,12 +21,16 @@ class NewMemoryPage extends ConsumerStatefulWidget {
   const NewMemoryPage({
     super.key,
     required this.onSaved,
+    required this.onClose,
     this.isWeb = kIsWeb,
     this.initialLatitude,
     this.initialLongitude,
   });
 
   final VoidCallback onSaved;
+
+  /// MEM-E13-PLAT-07: the X and Cancel; nothing else closes the window.
+  final VoidCallback onClose;
 
   /// MEM-E12-PLAT-02: the point chosen on the map, filled in as an own place; the person names it.
   final double? initialLatitude;
@@ -373,10 +377,28 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
     final offline = ref.watch(isOnlineProvider).value == false;
     final blockedOffline = offline && widget.isWeb;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.newMemoryTitle)),
-      body: Column(
+    return _ModalFrame(
+      child: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 8, 0),
+            child: Row(
+              children: [
+                Expanded(child: Text(l10n.newMemoryTitle, style: Theme.of(context).textTheme.titleLarge)),
+                IconButton(
+                  key: const Key('s04-close'),
+                  tooltip: l10n.cancel,
+                  icon: const Icon(Icons.close),
+                  onPressed: widget.onClose,
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+            child: _StepBar(step: _step, labels: [l10n.newMemoryStepPlace, l10n.newMemoryStepContent]),
+          ),
+          const Divider(height: 1),
           if (offline)
             Padding(
               padding: const EdgeInsets.all(12),
@@ -385,15 +407,40 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
           if (_busy) const LinearProgressIndicator(key: Key('s04-busy')),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               children: [
                 if (_step == 0) ..._placeAndDate(offline) else ..._content(offline, blockedOffline),
                 ..._failureBlock(),
               ],
             ),
           ),
+          const Divider(height: 1),
+          Padding(padding: const EdgeInsets.fromLTRB(12, 10, 20, 12), child: _footer(offline, blockedOffline)),
         ],
       ),
+    );
+  }
+
+  /// Cancel on the left; Back, Next or Save on the right, always in view.
+  Widget _footer(bool offline, bool blockedOffline) {
+    final l10n = context.l10n;
+    return Row(
+      children: [
+        TextButton(key: const Key('s04-cancel'), onPressed: widget.onClose, child: Text(l10n.cancel)),
+        const Spacer(),
+        if (_step == 0)
+          FilledButton(
+            onPressed: (_place != null || _ownPlaceFilled) && _dateIsComplete && !_dateIsInFuture
+                ? () => _next(offline: offline)
+                : null,
+            child: Text(l10n.next),
+          )
+        else ...[
+          TextButton(onPressed: _busy ? null : () => setState(() => _step = 0), child: Text(l10n.back)),
+          const SizedBox(width: 8),
+          FilledButton(onPressed: _canSave && !blockedOffline ? _save : null, child: Text(l10n.saveMemory)),
+        ],
+      ],
     );
   }
 
@@ -423,8 +470,6 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
     final recent = ref.watch(recentPlacesProvider);
     final options = offline ? recent : _suggestions;
     return [
-      Text(l10n.newMemoryStepPlace, style: Theme.of(context).textTheme.titleMedium),
-      const SizedBox(height: 12),
       if (place != null) ...[
         Text(l10n.placeChosen(place.name), key: const Key('s04-place')),
         TextButton(onPressed: () => setState(() => _place = null), child: Text(l10n.placeChange)),
@@ -489,10 +534,15 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
       if (_precision == MemoryDatePrecision.day)
         Row(
           children: [
-            TextButton(
-              key: const Key('s04-time'),
-              onPressed: _pickTime,
-              child: Text(_time == null ? l10n.timeChoose : l10n.timeChosen(_hourText(_time!))),
+            Flexible(
+              child: TextButton(
+                key: const Key('s04-time'),
+                onPressed: _pickTime,
+                child: Text(
+                  _time == null ? l10n.timeChoose : l10n.timeChosen(_hourText(_time!)),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ),
             if (_time != null)
               IconButton(
@@ -519,13 +569,6 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
         Text(l10n.placeNeeded, key: const Key('s04-place-needed'), style: Theme.of(context).textTheme.bodySmall),
       if (!_dateIsComplete)
         Text(l10n.dateNeeded, key: const Key('s04-date-needed'), style: Theme.of(context).textTheme.bodySmall),
-      const SizedBox(height: 4),
-      FilledButton(
-        onPressed: (place != null || _ownPlaceFilled) && _dateIsComplete && !_dateIsInFuture
-            ? () => _next(offline: offline)
-            : null,
-        child: Text(l10n.next),
-      ),
     ];
   }
 
@@ -533,7 +576,6 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
     final l10n = context.l10n;
     final draft = _aiDraft;
     return [
-      Text(l10n.newMemoryStepContent, style: Theme.of(context).textTheme.titleMedium),
       const SizedBox(height: 12),
       Text(l10n.photos, style: Theme.of(context).textTheme.titleSmall),
       OutlinedButton(onPressed: _poolFull || _busy ? null : _pickPhotos, child: Text(l10n.photosAdd)),
@@ -580,14 +622,122 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
         onPressed: _description.text.trim().isEmpty || _approved ? null : () => setState(() => _approved = true),
         child: Text(_approved ? l10n.descriptionApproved : l10n.approveDescription),
       ),
-      const SizedBox(height: 16),
-      Row(
+    ];
+  }
+}
+
+/// MEM-E13-PLAT-07: on a wide screen a window in the middle; on a phone the whole screen.
+class _ModalFrame extends StatelessWidget {
+  const _ModalFrame({required this.child});
+
+  static const maxWidth = 640.0;
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final wide = size.width >= 720;
+    final surface = Material(
+      key: const Key('s04-window'),
+      color: Theme.of(context).colorScheme.surface,
+      elevation: 12,
+      borderRadius: wide ? BorderRadius.circular(20) : BorderRadius.zero,
+      clipBehavior: Clip.antiAlias,
+      child: SafeArea(child: child),
+    );
+    if (!wide) {
+      return surface;
+    }
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth, maxHeight: size.height * 0.9),
+          child: surface,
+        ),
+      ),
+    );
+  }
+}
+
+/// The steps as numbered circles joined by a line: done ones ticked, the current one in the accent.
+class _StepBar extends StatelessWidget {
+  const _StepBar({required this.step, required this.labels});
+
+  final int step;
+  final List<String> labels;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Row(
+      key: const Key('s04-steps'),
+      children: [
+        for (final (index, label) in labels.indexed) ...[
+          if (index > 0)
+            Expanded(
+              child: Container(
+                height: 2,
+                margin: const EdgeInsets.symmetric(horizontal: 10),
+                color: index <= step ? colors.primary : colors.outlineVariant,
+              ),
+            ),
+          _StepDot(index: index, label: label, done: index < step, current: index == step),
+        ],
+      ],
+    );
+  }
+}
+
+class _StepDot extends StatelessWidget {
+  const _StepDot({required this.index, required this.label, required this.done, required this.current});
+
+  final int index;
+  final String label;
+  final bool done;
+  final bool current;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final lit = done || current;
+    return Semantics(
+      selected: current,
+      child: Row(
+        key: Key('s04-step-$index'),
+        mainAxisSize: MainAxisSize.min,
         children: [
-          TextButton(onPressed: _busy ? null : () => setState(() => _step = 0), child: Text(l10n.back)),
-          const Spacer(),
-          FilledButton(onPressed: _canSave && !blockedOffline ? _save : null, child: Text(l10n.saveMemory)),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: lit ? colors.primary : Colors.transparent,
+              border: Border.all(color: lit ? colors.primary : colors.outline, width: 1.5),
+            ),
+            child: done
+                ? Icon(Icons.check, size: 16, color: colors.onPrimary)
+                : Text(
+                    '${index + 1}',
+                    style: TextStyle(
+                      color: lit ? colors.onPrimary : colors.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: current ? colors.onSurface : colors.onSurfaceVariant,
+              fontWeight: current ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
         ],
       ),
-    ];
+    );
   }
 }

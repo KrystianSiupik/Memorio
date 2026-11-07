@@ -24,4 +24,4 @@
 | [MEM-E13-PLAT-04](../MEM-E13-PLAT-04-maly-kalendarz-filtra-dat.md) | Mały kalendarz filtra dat | - / UI | 2–4 h | zrobiony |
 | [MEM-E13-PLAT-05](../MEM-E13-PLAT-05-wyglad-punktow-na-mapie.md) | Wygląd punktów na mapie: okręgi ze zdjęciem i wielkość | - / UI | 4–6 h | zrobiony |
 | [MEM-E13-PLAT-06](../MEM-E13-PLAT-06-pasek-jako-podkladka.md) | Pasek nawigacji jako podkładka z wystającymi ikonami | - / UI | 2–3 h | zrobiony |
-| [MEM-E13-PLAT-07](../MEM-E13-PLAT-07-dodawanie-wspomnienia-w-oknie.md) | Dodawanie wspomnienia w oknie z etapami | - / UI | 4–6 h | gotowy |
+| [MEM-E13-PLAT-07](../MEM-E13-PLAT-07-dodawanie-wspomnienia-w-oknie.md) | Dodawanie wspomnienia w oknie z etapami | - / UI | 4–6 h | zrobiony |

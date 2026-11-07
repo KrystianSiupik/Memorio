@@ -13,10 +13,14 @@ import '../features/moderation/moderation.dart';
 import '../features/settings/settings.dart';
 import '../features/succession/succession.dart';
 import 'home_shell.dart';
+import 'modal_page.dart';
 import 'routes.dart';
 
 /// Path of the screen shown while the session is restored; `?from=` keeps the requested location.
 const startPath = '/';
+
+/// The navigator above the tabs: windows on it cover the bar too (MEM-E13-PLAT-07).
+final _rootNavigator = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 final routerProvider = Provider<GoRouter>((ref) {
   // Re-runs the redirect whenever the session changes (restored, signed in, signed out).
@@ -24,6 +28,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.listen(sessionProvider, (_, _) => sessionChanged.value++);
 
   final router = GoRouter(
+    navigatorKey: _rootNavigator,
     initialLocation: startPath,
     refreshListenable: sessionChanged,
     redirect: (context, state) => redirectFor(session: ref.read(sessionProvider), uri: state.uri),
@@ -56,12 +61,18 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(path: TrashRoute.path, builder: (context, state) => const TrashPage()),
               GoRoute(
                 path: NewMemoryRoute.path,
-                builder: (context, state) {
+                parentNavigatorKey: _rootNavigator,
+                // MEM-E13-PLAT-07: a window over the map, closed only by its X or Cancel.
+                pageBuilder: (context, state) {
                   final point = NewMemoryRoute.pointOf(state.uri.queryParameters);
-                  return NewMemoryPage(
-                    onSaved: () => const MapRoute().go(context),
-                    initialLatitude: point?.latitude,
-                    initialLongitude: point?.longitude,
+                  return ModalPage(
+                    key: state.pageKey,
+                    child: NewMemoryPage(
+                      onSaved: () => const MapRoute().go(context),
+                      onClose: () => const MapRoute().go(context),
+                      initialLatitude: point?.latitude,
+                      initialLongitude: point?.longitude,
+                    ),
                   );
                 },
               ),
