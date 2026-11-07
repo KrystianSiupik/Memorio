@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memorio/app/router.dart';
 import 'package:memorio/app/routes.dart';
 import 'package:memorio/core/offline/offline.dart';
+import 'package:memorio/features/map/map.dart' show mapHoldProvider;
 import 'package:memorio/features/memories/memories.dart';
 
 import '../../helpers/app.dart';
@@ -58,11 +59,26 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<void> toContent(WidgetTester tester) async {
-    await choosePlace(tester);
-    await chooseToday(tester);
+  Future<void> next(WidgetTester tester) async {
     await tester.tap(find.widgetWithText(FilledButton, 'Dalej'));
     await tester.pumpAndSettle();
+  }
+
+  // MEM-E13-PLAT-09: four steps: place, date, photos, story.
+  Future<void> toDate(WidgetTester tester) async {
+    await choosePlace(tester);
+    await next(tester);
+  }
+
+  Future<void> toPhotos(WidgetTester tester) async {
+    await toDate(tester);
+    await chooseToday(tester);
+    await next(tester);
+  }
+
+  Future<void> toStory(WidgetTester tester) async {
+    await toPhotos(tester);
+    await next(tester);
   }
 
   bool isEnabled(WidgetTester tester, String label) => switch (tester.widget(
@@ -79,19 +95,34 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('shows the fields of both steps', (tester) async {
+  testWidgets('one thing per step: place, date, photos, story', (tester) async {
     await open(tester);
 
-    for (final label in ['Miejsce', 'Nazwa własna miejsca', 'Data', 'Wybierz datę', 'Dodaj miejsce własne']) {
+    expect(find.text('Gdzie to było?'), findsOneWidget);
+    for (final label in ['Nazwa własna miejsca', 'Dodaj miejsce własne']) {
       expect(find.text(label), findsWidgets, reason: label);
     }
+    expect(find.text('Wybierz datę'), findsNothing);
     expect(isEnabled(tester, 'Dalej'), isFalse);
 
-    await toContent(tester);
+    await toDate(tester);
+    expect(find.text('Kiedy to było?'), findsOneWidget);
+    expect(find.text('Wybierz datę'), findsOneWidget);
+    expect(isEnabled(tester, 'Dalej'), isFalse);
 
-    for (final label in ['Zdjęcia', 'Opis', 'Poproś AI o szkic', 'Zatwierdź opis', 'Zapisz wspomnienie']) {
+    await chooseToday(tester);
+    await next(tester);
+    expect(find.text('Pokaż, jak tam było'), findsOneWidget);
+    expect(find.text('Dodaj zdjęcia'), findsOneWidget);
+    // Photos may be skipped.
+    expect(isEnabled(tester, 'Dalej'), isTrue);
+
+    await next(tester);
+    expect(find.text('Opowiedz, co się wydarzyło'), findsOneWidget);
+    for (final label in ['Poproś AI o szkic', 'Zatwierdź opis', 'Zapisz wspomnienie']) {
       expect(find.text(label), findsOneWidget, reason: label);
     }
+    expect(find.widgetWithText(TextField, 'Opis'), findsOneWidget);
   });
 
   testWidgets('suggestions come as the person types', (tester) async {
@@ -125,9 +156,10 @@ void main() {
 
   testWidgets('S04 → S03: saving sends the memory, its photos and the approved description', (tester) async {
     await open(tester);
-    await toContent(tester);
+    await toPhotos(tester);
     await tester.tap(find.text('Dodaj zdjęcia'));
     await tester.pumpAndSettle();
+    await next(tester);
     await tester.enterText(find.widgetWithText(TextField, 'Opis'), 'W górach.');
     await tester.pump();
     await tester.tap(find.text('Zatwierdź opis'));
@@ -145,7 +177,7 @@ void main() {
 
   testWidgets('a day may get an hour, which can be taken back; other precisions have none', (tester) async {
     await open(tester);
-    await choosePlace(tester);
+    await toDate(tester);
     await chooseToday(tester);
     await tester.tap(find.byKey(const Key('s04-time')));
     await tester.pumpAndSettle();
@@ -163,14 +195,14 @@ void main() {
 
   testWidgets('the hour goes with the memory', (tester) async {
     await open(tester);
-    await choosePlace(tester);
+    await toDate(tester);
     await chooseToday(tester);
     await tester.tap(find.byKey(const Key('s04-time')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Dalej'));
-    await tester.pumpAndSettle();
+    await next(tester);
+    await next(tester);
 
     await save(tester);
 
@@ -179,7 +211,7 @@ void main() {
 
   testWidgets('a description not approved is not sent', (tester) async {
     await open(tester);
-    await toContent(tester);
+    await toStory(tester);
     await tester.enterText(find.widgetWithText(TextField, 'Opis'), 'W górach.');
     await tester.pump();
 
@@ -190,7 +222,7 @@ void main() {
 
   testWidgets('editing after approving asks for it again', (tester) async {
     await open(tester);
-    await toContent(tester);
+    await toStory(tester);
     await tester.enterText(find.widgetWithText(TextField, 'Opis'), 'W górach.');
     await tester.pump();
     await tester.tap(find.text('Zatwierdź opis'));
@@ -206,7 +238,7 @@ void main() {
   group('the AI draft', () {
     testWidgets('waits for consent and shows with its marker; used and approved it keeps its id', (tester) async {
       await open(tester);
-      await toContent(tester);
+      await toStory(tester);
       await tester.enterText(find.widgetWithText(TextField, 'Opis'), 'Góry');
       await tester.pump();
       expect(isEnabled(tester, 'Poproś AI o szkic'), isFalse);
@@ -232,7 +264,7 @@ void main() {
     testWidgets('a used up limit says so and turns the action off', (tester) async {
       memories.draftFailure = const AiLimitReached();
       await open(tester);
-      await toContent(tester);
+      await toStory(tester);
       await tester.enterText(find.widgetWithText(TextField, 'Opis'), 'Góry');
       await tester.tap(find.byType(CheckboxListTile));
       await tester.pump();
@@ -247,7 +279,7 @@ void main() {
     testWidgets('after a provider failure the retry is the same draft', (tester) async {
       memories.draftFailure = const AiProviderDown();
       await open(tester);
-      await toContent(tester);
+      await toStory(tester);
       await tester.enterText(find.widgetWithText(TextField, 'Opis'), 'Góry');
       await tester.tap(find.byType(CheckboxListTile));
       await tester.pump();
@@ -276,7 +308,7 @@ void main() {
       testWidgets(message, (tester) async {
         memories.createFailure = failure;
         await open(tester);
-        await toContent(tester);
+        await toStory(tester);
         await tester.enterText(find.widgetWithText(TextField, 'Opis'), 'W górach.');
         await save(tester);
 
@@ -296,20 +328,23 @@ void main() {
   testWidgets('a full pool says so and turns adding photos off', (tester) async {
     memories.photoFailure = const MemorySpaceFull();
     await open(tester);
-    await toContent(tester);
+    await toPhotos(tester);
     await tester.tap(find.text('Dodaj zdjęcia'));
     await tester.pumpAndSettle();
+    await next(tester);
 
     await save(tester);
 
     expect(find.text('Pula miejsca jest pełna. To zdjęcie się nie zmieści.'), findsOneWidget);
+    await tester.tap(find.text('Wstecz'));
+    await tester.pumpAndSettle();
     expect(isEnabled(tester, 'Dodaj zdjęcia'), isFalse);
   });
 
   testWidgets('terms not accepted: accept them here and the save goes on', (tester) async {
     memories.createFailure = const MemoryTermsNotAccepted();
     await open(tester);
-    await toContent(tester);
+    await toStory(tester);
     await save(tester);
 
     expect(find.text('Przed pierwszym wspomnieniem zaakceptuj regulamin.'), findsOneWidget);
@@ -334,15 +369,15 @@ void main() {
 
       await tester.tap(find.text('Giewont'));
       await tester.pumpAndSettle();
+      await next(tester);
       await chooseToday(tester);
-      await tester.tap(find.widgetWithText(FilledButton, 'Dalej'));
+      await next(tester);
+      await tester.tap(find.text('Dodaj zdjęcia'));
       await tester.pumpAndSettle();
+      await next(tester);
 
       expect(find.byKey(const Key('s04-ai-offline')), findsOneWidget);
       expect(find.text('Poproś AI o szkic'), findsNothing);
-
-      await tester.tap(find.text('Dodaj zdjęcia'));
-      await tester.pumpAndSettle();
       // The queue is a real database: its work needs real time, which a widget test only has in runAsync.
       // A stream read outside it leaves a timer that never fires, and closing the database then waits forever.
       final saveButton = tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Zapisz wspomnienie'));
@@ -405,9 +440,9 @@ void main() {
       expect(container.read(routerProvider).state.uri.path, const MapRoute().location);
     });
 
-    testWidgets('Cancel closes it from the second step too, and nothing is saved', (tester) async {
+    testWidgets('Cancel closes it from the last step too, and nothing is saved', (tester) async {
       final container = await open(tester);
-      await toContent(tester);
+      await toStory(tester);
 
       await tester.tap(find.byKey(const Key('s04-cancel')));
       await tester.pumpAndSettle();
@@ -421,7 +456,7 @@ void main() {
       await open(tester);
       final accent = Theme.of(tester.element(find.byKey(const Key('s04-window')))).colorScheme.primary;
 
-      await toContent(tester);
+      await toDate(tester);
       expect(stepColor(tester, 1), accent);
       expect(
         find.descendant(of: find.byKey(const Key('s04-step-0')), matching: find.byIcon(Icons.check)),
@@ -467,7 +502,7 @@ void main() {
 
     testWidgets('no photos yet: a field asks for them, and a tap on it picks', (tester) async {
       await open(tester);
-      await toContent(tester);
+      await toPhotos(tester);
 
       expect(find.byKey(const Key('s04-photos-empty')), findsOneWidget);
       await tester.tap(find.byKey(const Key('s04-photos-empty')));
@@ -479,7 +514,7 @@ void main() {
 
     testWidgets('the carousel moves with the arrows and the small pictures', (tester) async {
       await open(tester);
-      await toContent(tester);
+      await toPhotos(tester);
       await addPhotos(tester, 3);
 
       // New photos show the first of them.
@@ -498,7 +533,7 @@ void main() {
 
     testWidgets('a removed photo leaves the carousel and is not sent', (tester) async {
       await open(tester);
-      await toContent(tester);
+      await toPhotos(tester);
       await addPhotos(tester, 2);
 
       await tester.tap(find.byKey(const Key('s04-photo-remove')));
@@ -510,9 +545,22 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('s04-photos-empty')), findsOneWidget);
 
+      await next(tester);
       await save(tester);
       expect(memories.created, hasLength(1));
       expect(memories.photos, isEmpty);
+    });
+  });
+
+  group('MEM-E13-PLAT-09 the map under the window', () {
+    testWidgets('holds still while the window is open and moves again once it closes', (tester) async {
+      final container = await open(tester);
+      await tester.pump();
+      expect(container.read(mapHoldProvider), 1);
+
+      await tester.tap(find.byKey(const Key('s04-close')));
+      await tester.pumpAndSettle();
+      expect(container.read(mapHoldProvider), 0);
     });
   });
 }

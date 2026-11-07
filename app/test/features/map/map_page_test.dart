@@ -120,14 +120,11 @@ void main() {
 
     // A name is enough: Next adds the own place itself, without "Add own place" first.
     await tester.enterText(find.widgetWithText(TextField, 'Nazwa własna miejsca'), 'Warszawa');
-    await tester.tap(find.text('Wybierz datę'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('OK'));
-    await tester.pumpAndSettle();
+    await tester.pump();
     await tester.tap(find.widgetWithText(FilledButton, 'Dalej'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Dodaj zdjęcia'), findsOneWidget);
+    expect(find.text('Kiedy to było?'), findsOneWidget);
   });
 
   testWidgets('a point that is not on the Earth opens S04 empty', (tester) async {

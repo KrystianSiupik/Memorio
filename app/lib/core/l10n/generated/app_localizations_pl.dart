@@ -719,10 +719,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get newMemoryTitle => 'Nowe wspomnienie';
 
   @override
-  String get newMemoryStepPlace => 'Miejsce i data';
+  String get newMemoryStepPlace => 'Miejsce';
 
   @override
-  String get newMemoryStepContent => 'Treść';
+  String get newMemoryStepContent => 'Historia';
 
   @override
   String get next => 'Dalej';
@@ -1304,4 +1304,34 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get photoRemove => 'Usuń zdjęcie';
+
+  @override
+  String get newMemoryStepDate => 'Data';
+
+  @override
+  String get newMemoryStepPhotos => 'Zdjęcia';
+
+  @override
+  String get placeQuestion => 'Gdzie to było?';
+
+  @override
+  String get placeQuestionHint => 'Wyszukaj miejsce albo nazwij własne.';
+
+  @override
+  String get dateQuestion => 'Kiedy to było?';
+
+  @override
+  String get dateQuestionHint => 'Nie pamiętasz dnia? Wystarczy miesiąc, rok albo okres.';
+
+  @override
+  String get photosQuestion => 'Pokaż, jak tam było';
+
+  @override
+  String get photosQuestionHint => 'Pierwsze zdjęcie pokaże się na mapie. Ten krok możesz pominąć.';
+
+  @override
+  String get storyQuestion => 'Opowiedz, co się wydarzyło';
+
+  @override
+  String get storyQuestionHint => 'Napisz kilka zdań albo poproś AI o szkic.';
 }

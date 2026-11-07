@@ -169,14 +169,22 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
     _layersReady = true;
     controller.onFeatureTapped.add(_featureTapped);
     controller.onFeatureHover.add(_featureHovered);
-    _stopContextMenu ??= listenToMapContextMenu(
-      (latitude, longitude, x, y) => ref.read(mapMenuProvider.notifier).open(latitude, longitude, Offset(x, y)),
-    );
+    _stopContextMenu ??= listenToMapContextMenu((latitude, longitude, x, y) {
+      if (!_held) {
+        ref.read(mapMenuProvider.notifier).open(latitude, longitude, Offset(x, y));
+      }
+    });
     await _showPoints(ref.read(mapPointsProvider));
     widget.onPointsAdded?.call(controller);
   }
 
+  /// MEM-E13-PLAT-09: a window is open over the map; the map neither moves nor answers the mouse.
+  bool get _held => ref.read(mapHoldProvider) > 0;
+
   void _featureTapped(Point<double> point, LatLng coordinates, String id, String layerId, Annotation? annotation) {
+    if (_held) {
+      return;
+    }
     if (layerId == _singlePointLayer || layerId == _photoPointLayer) {
       ref.read(tappedPointProvider.notifier).tap(id);
     } else if (layerId == _clusterLayer || layerId == _clusterCountLayer) {
@@ -193,7 +201,7 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
     Annotation? annotation,
     HoverEventType eventType,
   ) {
-    if (!id.contains('-')) {
+    if (!id.contains('-') || (_held && eventType != HoverEventType.leave)) {
       return;
     }
     final hovered = ref.read(hoveredPointProvider.notifier);
@@ -276,11 +284,18 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
         if (json == null) {
           return const SizedBox.expand();
         }
+        final moves = ref.watch(mapHoldProvider) == 0;
         return MapLibreMap(
+          // All five together: the web plugin applies gestures only when it gets every one of them.
+          rotateGesturesEnabled: moves,
+          scrollGesturesEnabled: moves,
+          tiltGesturesEnabled: moves,
+          zoomGesturesEnabled: moves,
+          doubleClickZoomEnabled: moves,
           styleString: json,
           trackCameraPosition: true,
           // On a device the long press opens the menu; in a browser it comes with a double click, which zooms.
-          onMapLongClick: kIsWeb
+          onMapLongClick: kIsWeb || !moves
               ? null
               : (point, coordinates) => ref
                     .read(mapMenuProvider.notifier)

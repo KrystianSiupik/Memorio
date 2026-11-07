@@ -722,10 +722,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newMemoryTitle => 'New memory';
 
   @override
-  String get newMemoryStepPlace => 'Place and date';
+  String get newMemoryStepPlace => 'Place';
 
   @override
-  String get newMemoryStepContent => 'Content';
+  String get newMemoryStepContent => 'Story';
 
   @override
   String get next => 'Next';
@@ -1305,4 +1305,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get photoRemove => 'Remove photo';
+
+  @override
+  String get newMemoryStepDate => 'Date';
+
+  @override
+  String get newMemoryStepPhotos => 'Photos';
+
+  @override
+  String get placeQuestion => 'Where was it?';
+
+  @override
+  String get placeQuestionHint => 'Search for a place, or name your own.';
+
+  @override
+  String get dateQuestion => 'When was it?';
+
+  @override
+  String get dateQuestionHint => 'Do not remember the day? A month, a year or a period is enough.';
+
+  @override
+  String get photosQuestion => 'Show what it was like';
+
+  @override
+  String get photosQuestionHint => 'The first photo shows on the map. You can skip this step.';
+
+  @override
+  String get storyQuestion => 'Tell what happened';
+
+  @override
+  String get storyQuestionHint => 'Write a few lines, or ask AI for a draft.';
 }

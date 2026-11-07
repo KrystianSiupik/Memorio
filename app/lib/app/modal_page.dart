@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../features/map/map.dart';
+
 /// MEM-E13-PLAT-07: a route shown as a window over the screen below it, with its own address. A click on the
-/// darkened background or Escape does not close it; the window closes itself (its X or Cancel).
+/// darkened background or Escape does not close it; the window closes itself (its X or Cancel). The map below holds
+/// still meanwhile (MEM-E13-PLAT-09).
 class ModalPage<T> extends Page<T> {
   const ModalPage({required this.child, super.key, super.name});
 
@@ -31,7 +34,7 @@ class _ModalPageRoute<T> extends PopupRoute<T> {
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) =>
-      PopScope(canPop: false, child: _page.child);
+      MapHeld(child: PopScope(canPop: false, child: _page.child));
 
   @override
   Widget buildTransitions(
