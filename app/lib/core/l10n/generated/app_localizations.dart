@@ -2329,6 +2329,18 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Ciemny'**
   String get settingsThemeDark;
+
+  /// No description provided for @calendarClear.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyczyść'**
+  String get calendarClear;
+
+  /// No description provided for @calendarApply.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zastosuj'**
+  String get calendarApply;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

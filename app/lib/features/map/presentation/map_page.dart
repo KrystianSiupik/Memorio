@@ -6,6 +6,7 @@ import '../../../core/offline/offline.dart';
 import '../../memories/memories.dart';
 import 'map_providers.dart';
 import 'memory_preview_card.dart';
+import 'mini_range_calendar.dart';
 
 /// S03 Map and globe. Points stay on the map through a reload and a lost connection: the provider
 /// keeps the last answer, so only the message around them changes.
@@ -33,14 +34,14 @@ class MapPage extends ConsumerWidget {
   Future<void> _pickDates(BuildContext context, WidgetRef ref) async {
     final now = DateTime.now();
     final range = ref.read(memoryDateFilterProvider);
-    final picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(1900),
-      lastDate: DateTime(now.year, now.month, now.day),
-      initialDateRange: range == null ? null : DateTimeRange(start: range.from, end: range.to),
+    // MEM-E13-PLAT-04: a small calendar instead of the full-screen picker.
+    final picked = await showMiniRangeCalendar(
+      context,
+      initial: range,
+      lastDay: DateTime(now.year, now.month, now.day),
     );
     if (picked != null) {
-      ref.read(memoryDateFilterProvider.notifier).set((from: picked.start, to: picked.end));
+      ref.read(memoryDateFilterProvider.notifier).set(picked.range);
     }
   }
 

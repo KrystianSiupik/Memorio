@@ -397,5 +397,7 @@
   "settingsTheme": "Wygląd",
   "settingsThemeSystem": "Jak w urządzeniu",
   "settingsThemeLight": "Jasny",
-  "settingsThemeDark": "Ciemny"
+  "settingsThemeDark": "Ciemny",
+  "calendarClear": "Wyczyść",
+  "calendarApply": "Zastosuj"
 }
