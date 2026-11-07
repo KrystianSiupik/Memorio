@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/l10n/l10n.dart';
 import '../core/offline/offline.dart';
+import 'app_navigation_bar.dart';
 
 /// S02: the signed-in shell with the tabs Map · Albums · Shared with me · Account.
 /// Each tab keeps its own navigation stack (StatefulShellRoute). Shows the offline banner on every
@@ -25,32 +26,19 @@ class HomeShell extends ConsumerWidget {
           Expanded(child: navigationShell),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: AppNavigationBar(
         selectedIndex: navigationShell.currentIndex,
         // Tapping the current tab again returns to its first screen.
-        onDestinationSelected: (index) =>
-            navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),
-        destinations: [
-          NavigationDestination(
-            icon: Icon(Icons.public_outlined),
-            selectedIcon: Icon(Icons.public),
-            label: context.l10n.tabMap,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.photo_album_outlined),
-            selectedIcon: Icon(Icons.photo_album),
+        onSelected: (index) => navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),
+        items: [
+          AppNavigationItem(icon: Icons.public_outlined, selectedIcon: Icons.public, label: context.l10n.tabMap),
+          AppNavigationItem(
+            icon: Icons.photo_album_outlined,
+            selectedIcon: Icons.photo_album,
             label: context.l10n.tabAlbums,
           ),
-          NavigationDestination(
-            icon: Icon(Icons.people_outline),
-            selectedIcon: Icon(Icons.people),
-            label: context.l10n.tabShared,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: context.l10n.tabAccount,
-          ),
+          AppNavigationItem(icon: Icons.people_outline, selectedIcon: Icons.people, label: context.l10n.tabShared),
+          AppNavigationItem(icon: Icons.person_outline, selectedIcon: Icons.person, label: context.l10n.tabAccount),
         ],
       ),
     );

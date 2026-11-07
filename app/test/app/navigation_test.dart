@@ -12,7 +12,7 @@ void main() {
     testWidgets('a signed-in user starts on the map with the four tabs', (tester) async {
       await pumpMemorioApp(tester, session: signedIn);
 
-      final bar = find.byType(NavigationBar);
+      final bar = find.byKey(const Key('app-navigation'));
       for (final label in ['Mapa', 'Albumy', 'Udostępnione', 'Konto']) {
         expect(find.descendant(of: bar, matching: find.text(label)), findsOneWidget);
       }
@@ -29,7 +29,7 @@ void main() {
         'Mapa': 'Mapa',
       };
       for (final MapEntry(key: label, value: title) in titles.entries) {
-        await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(label)));
+        await tester.tap(find.descendant(of: find.byKey(const Key('app-navigation')), matching: find.text(label)));
         await tester.pumpAndSettle();
         expect(find.widgetWithText(AppBar, title), findsOneWidget, reason: label);
       }
@@ -50,7 +50,7 @@ void main() {
       await pumpMemorioApp(tester);
 
       expect(find.widgetWithText(AppBar, 'Rejestracja'), findsOneWidget);
-      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byKey(const Key('app-navigation')), findsNothing);
     });
 
     testWidgets('cannot open a tab directly', (tester) async {
