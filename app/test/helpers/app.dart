@@ -14,6 +14,7 @@ import 'package:memorio/features/memories/memories.dart';
 import 'package:memorio/features/map/map.dart';
 import 'package:memorio/features/plans/plans.dart';
 import 'package:memorio/features/replay/replay.dart';
+import 'package:memorio/core/settings/settings.dart';
 import 'package:memorio/features/moderation/moderation.dart';
 import 'package:memorio/features/succession/succession.dart';
 
@@ -54,12 +55,16 @@ Future<ProviderContainer> pumpMemorioApp(
   ReplayRepository? replay,
   SuccessionRepository? succession,
   ModerationRepository? moderation,
+  SettingsStore? settings,
   FakeHttpAdapter? http,
   Stream<bool>? online,
   Stream<List<PendingOperation>>? pending,
   bool settle = true,
   List<Override> overrides = const [],
 }) async {
+  // The device speaks Polish, as the screens the tests read are written; the English ones are tested on purpose.
+  tester.platformDispatcher.localesTestValue = const [Locale('pl', 'PL')];
+  addTearDown(tester.platformDispatcher.clearLocalesTestValue);
   final database = LocalDatabase(NativeDatabase.memory());
   addTearDown(database.close);
   final container = ProviderContainer(
@@ -67,6 +72,7 @@ Future<ProviderContainer> pumpMemorioApp(
       appVersionProvider.overrideWithValue('1.0.0'),
       apiBaseUrlProvider.overrideWithValue('https://api.example.invalid'),
       tokenStoreProvider.overrideWithValue(InMemoryTokenStore()),
+      settingsStoreProvider.overrideWithValue(settings ?? InMemorySettingsStore()),
       sessionRepositoryProvider.overrideWithValue(sessions ?? FakeSessionRepository(session)),
       accountRepositoryProvider.overrideWithValue(account ?? FakeAccountRepository()),
       memoriesRepositoryProvider.overrideWithValue(memories ?? FakeMemoriesRepository()),

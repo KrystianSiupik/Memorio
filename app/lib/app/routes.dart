@@ -191,6 +191,16 @@ final class MemoryReportRoute extends AppRoute {
   String get location => '${MemoryRoute(id).location}/$path';
 }
 
+/// E13: settings of this device, from the account.
+final class SettingsRoute extends AppRoute {
+  const SettingsRoute();
+
+  static const path = 'settings';
+
+  @override
+  String get location => '${AccountRoute.path}/$path';
+}
+
 /// S22: reports and decisions, from the account.
 final class MyModerationRoute extends AppRoute {
   const MyModerationRoute();

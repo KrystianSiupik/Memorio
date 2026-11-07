@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/misc.dart';
 import '../core/api/api.dart';
 import '../core/auth/token_store.dart';
 import '../core/offline/offline.dart';
+import '../core/settings/settings.dart';
 import '../features/account/account.dart';
 import '../features/albums/albums.dart';
 import '../features/map/map.dart';
@@ -18,6 +19,7 @@ List<Override> appOverrides({required String appVersion}) => [
   appVersionProvider.overrideWithValue(appVersion),
   mapViewProvider.overrideWithValue(const MapLibreMapView()),
   tokenStoreProvider.overrideWithValue(SecureTokenStore()),
+  settingsStoreProvider.overrideWithValue(const SecureSettingsStore()),
   sessionRepositoryProvider.overrideWith((ref) => TokenSessionRepository(ref.watch(tokenStoreProvider))),
   authRepositoryProvider.overrideWith((ref) {
     final api = ref.watch(apiClientProvider);

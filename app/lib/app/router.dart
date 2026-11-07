@@ -10,6 +10,7 @@ import '../features/plans/plans.dart';
 import '../features/replay/replay.dart';
 import '../features/shared_with_me/shared_with_me.dart';
 import '../features/moderation/moderation.dart';
+import '../features/settings/settings.dart';
 import '../features/succession/succession.dart';
 import 'home_shell.dart';
 import 'routes.dart';
@@ -211,11 +212,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                 onOpenPlan: () => const PlanRoute().go(context),
                 onOpenLegacyContact: () => const LegacyContactRoute().go(context),
                 onOpenModeration: () => const MyModerationRoute().go(context),
+                onOpenSettings: () => const SettingsRoute().go(context),
               ),
             ),
             routes: [
               GoRoute(path: LegacyContactRoute.path, builder: (context, state) => const LegacyContactPage()),
               GoRoute(path: MyModerationRoute.path, builder: (context, state) => const MyModerationPage()),
+              GoRoute(path: SettingsRoute.path, builder: (context, state) => const SettingsPage()),
               GoRoute(
                 path: PlanRoute.path,
                 builder: (context, state) => PlanPage(onChooseMaterial: () => const PlanMaterialRoute().go(context)),

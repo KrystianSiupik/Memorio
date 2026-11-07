@@ -1237,4 +1237,13 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get albumReadOnlyRefused =>
       'Plan tego albumu wygasł: nic nowego nie można dodać, dopóki nie zostanie opłacony.';
+
+  @override
+  String get settingsTitle => 'Ustawienia';
+
+  @override
+  String get settingsLanguage => 'Język';
+
+  @override
+  String get settingsLanguageSystem => 'Jak w urządzeniu';
 }

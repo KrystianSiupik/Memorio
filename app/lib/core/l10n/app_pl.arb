@@ -390,5 +390,8 @@
   "planMaterialKeep": "Zachowaj wybrane",
   "planMaterialSaved": "Wybór zapisany.",
   "albumReadOnly": "Plan albumu wygasł: album jest tylko do odczytu. Wszyscy dalej go oglądają, ale nic nowego nie można dodać.",
-  "albumReadOnlyRefused": "Plan tego albumu wygasł: nic nowego nie można dodać, dopóki nie zostanie opłacony."
+  "albumReadOnlyRefused": "Plan tego albumu wygasł: nic nowego nie można dodać, dopóki nie zostanie opłacony.",
+  "settingsTitle": "Ustawienia",
+  "settingsLanguage": "Język",
+  "settingsLanguageSystem": "Jak w urządzeniu"
 }

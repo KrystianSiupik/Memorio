@@ -9,13 +9,22 @@ import 'session_providers.dart';
 
 /// S24 Account and privacy: what goes with the account, deleting it and changing one's mind.
 class AccountPage extends ConsumerStatefulWidget {
-  const AccountPage({super.key, required this.onOpenPlan, required this.onOpenLegacyContact, this.onOpenModeration});
+  const AccountPage({
+    super.key,
+    required this.onOpenPlan,
+    required this.onOpenLegacyContact,
+    this.onOpenModeration,
+    this.onOpenSettings,
+  });
 
   final VoidCallback onOpenPlan;
   final VoidCallback onOpenLegacyContact;
 
   /// S22.
   final VoidCallback? onOpenModeration;
+
+  /// E13.
+  final VoidCallback? onOpenSettings;
 
   @override
   ConsumerState<AccountPage> createState() => _AccountPageState();
@@ -82,6 +91,12 @@ class _AccountPageState extends ConsumerState<AccountPage> {
         title: Text(context.l10n.accountTitle),
         // In the bar: available also when the data did not load, and without a connection.
         actions: [
+          if (widget.onOpenSettings != null)
+            IconButton(
+              tooltip: context.l10n.settingsTitle,
+              icon: const Icon(Icons.settings_outlined),
+              onPressed: widget.onOpenSettings,
+            ),
           if (widget.onOpenModeration != null)
             IconButton(
               tooltip: context.l10n.myModerationTitle,

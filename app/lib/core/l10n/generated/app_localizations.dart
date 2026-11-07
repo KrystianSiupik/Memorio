@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_en.dart';
 import 'app_localizations_pl.dart';
 
 // ignore_for_file: type=lint
@@ -89,7 +90,7 @@ abstract class AppLocalizations {
   ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('pl')];
+  static const List<Locale> supportedLocales = <Locale>[Locale('en'), Locale('pl')];
 
   /// No description provided for @tabMap.
   ///
@@ -2286,6 +2287,24 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Plan tego albumu wygasł: nic nowego nie można dodać, dopóki nie zostanie opłacony.'**
   String get albumReadOnlyRefused;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ustawienia'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Język'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsLanguageSystem.
+  ///
+  /// In pl, this message translates to:
+  /// **'Jak w urządzeniu'**
+  String get settingsLanguageSystem;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
@@ -2297,7 +2316,7 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['pl'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'pl'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -2306,6 +2325,8 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
     case 'pl':
       return AppLocalizationsPl();
   }
