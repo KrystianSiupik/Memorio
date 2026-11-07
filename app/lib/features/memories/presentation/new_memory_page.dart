@@ -13,6 +13,7 @@ import '../domain/memory.dart';
 import '../domain/memory_failure.dart';
 import '../domain/memory_operations.dart';
 import 'memories_providers.dart';
+import 'photo_carousel.dart';
 import 'memory_texts.dart';
 
 /// S04 New memory, a wizard: place and date, then content. The ids are made once per screen,
@@ -466,173 +467,406 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
 
   List<Widget> _placeAndDate(bool offline) {
     final l10n = context.l10n;
+    final colors = Theme.of(context).colorScheme;
     final place = _place;
     final recent = ref.watch(recentPlacesProvider);
     final options = offline ? recent : _suggestions;
     return [
-      if (place != null) ...[
-        Text(l10n.placeChosen(place.name), key: const Key('s04-place')),
-        TextButton(onPressed: () => setState(() => _place = null), child: Text(l10n.placeChange)),
-      ] else ...[
-        if (!offline)
-          TextField(
-            controller: _placeSearch,
-            decoration: InputDecoration(labelText: l10n.place),
-            onChanged: _search,
-          )
-        else if (recent.isNotEmpty)
-          Text(l10n.placeRecent),
-        for (final option in options)
-          ListTile(
-            title: Text(option.name),
-            leading: Icon(option.isOwn ? Icons.bookmark : Icons.place),
-            onTap: () => _choose(option, offline: offline),
-          ),
-        const SizedBox(height: 12),
-        if (widget.initialLatitude != null) Text(l10n.ownPlaceFromMap, key: const Key('s04-from-map')),
-        TextField(
-          controller: _ownName,
-          decoration: InputDecoration(labelText: l10n.ownPlaceName),
-          onChanged: (_) => setState(() {}),
-        ),
-        TextField(
-          controller: _ownLatitude,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-          decoration: InputDecoration(labelText: l10n.ownPlaceLatitude),
-          onChanged: (_) => setState(() {}),
-        ),
-        TextField(
-          controller: _ownLongitude,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-          decoration: InputDecoration(labelText: l10n.ownPlaceLongitude),
-          onChanged: (_) => setState(() {}),
-        ),
-        if (_ownPlaceInvalid) Text(l10n.ownPlaceInvalid, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-        TextButton(
-          onPressed: () => _addOwnPlace(offline: offline),
-          child: Text(l10n.ownPlaceAdd),
-        ),
-      ],
-      const SizedBox(height: 24),
-      Text(l10n.datePrecision, style: Theme.of(context).textTheme.titleMedium),
-      const SizedBox(height: 8),
-      SegmentedButton<MemoryDatePrecision>(
-        segments: [
-          ButtonSegment(value: MemoryDatePrecision.day, label: Text(l10n.precisionDay)),
-          ButtonSegment(value: MemoryDatePrecision.month, label: Text(l10n.precisionMonth)),
-          ButtonSegment(value: MemoryDatePrecision.year, label: Text(l10n.precisionYear)),
-          ButtonSegment(value: MemoryDatePrecision.period, label: Text(l10n.precisionPeriod)),
-        ],
-        selected: {_precision},
-        onSelectionChanged: (selected) => setState(() => _precision = selected.single),
-      ),
-      const SizedBox(height: 8),
-      TextButton(
-        onPressed: () => _pickDate(end: false),
-        child: Text(_from == null ? l10n.dateChoose : l10n.dateChosen(dayText(_from!))),
-      ),
-      if (_precision == MemoryDatePrecision.day)
-        Row(
-          children: [
-            Flexible(
-              child: TextButton(
-                key: const Key('s04-time'),
-                onPressed: _pickTime,
-                child: Text(
-                  _time == null ? l10n.timeChoose : l10n.timeChosen(_hourText(_time!)),
-                  overflow: TextOverflow.ellipsis,
+      _Section(
+        icon: Icons.place_outlined,
+        title: l10n.place,
+        children: [
+          if (place != null)
+            Container(
+              key: const Key('s04-place-card'),
+              padding: const EdgeInsets.fromLTRB(14, 6, 6, 6),
+              decoration: BoxDecoration(
+                color: colors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: colors.primary.withValues(alpha: 0.5)),
+              ),
+              child: Row(
+                children: [
+                  Icon(place.isOwn ? Icons.bookmark : Icons.place, color: colors.primary),
+                  const SizedBox(width: 10),
+                  Expanded(child: Text(l10n.placeChosen(place.name), key: const Key('s04-place'))),
+                  OutlinedButton(onPressed: () => setState(() => _place = null), child: Text(l10n.placeChange)),
+                ],
+              ),
+            )
+          else ...[
+            if (!offline)
+              TextField(
+                controller: _placeSearch,
+                decoration: InputDecoration(
+                  labelText: l10n.place,
+                  hintText: l10n.placeSearchHint,
+                  prefixIcon: const Icon(Icons.search),
+                ),
+                onChanged: _search,
+              )
+            else if (recent.isNotEmpty)
+              Text(l10n.placeRecent),
+            if (options.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(top: 6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: colors.outlineVariant),
+                ),
+                child: Column(
+                  children: [
+                    for (final option in options)
+                      ListTile(
+                        dense: true,
+                        title: Text(option.name),
+                        leading: Icon(option.isOwn ? Icons.bookmark : Icons.place),
+                        onTap: () => _choose(option, offline: offline),
+                      ),
+                  ],
                 ),
               ),
-            ),
-            if (_time != null)
-              IconButton(
-                key: const Key('s04-time-clear'),
-                tooltip: l10n.timeClear,
-                icon: const Icon(Icons.close),
-                onPressed: () => setState(() => _time = null),
+            const SizedBox(height: 16),
+            Text(l10n.ownPlaceSection, style: Theme.of(context).textTheme.labelLarge),
+            if (widget.initialLatitude != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  l10n.ownPlaceFromMap,
+                  key: const Key('s04-from-map'),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _ownName,
+              decoration: InputDecoration(
+                labelText: l10n.ownPlaceName,
+                prefixIcon: const Icon(Icons.edit_location_alt_outlined),
+              ),
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              key: const Key('s04-coordinates'),
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _ownLatitude,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                    decoration: InputDecoration(labelText: l10n.ownPlaceLatitude),
+                    onChanged: (_) => setState(() {}),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: _ownLongitude,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                    decoration: InputDecoration(labelText: l10n.ownPlaceLongitude),
+                    onChanged: (_) => setState(() {}),
+                  ),
+                ),
+              ],
+            ),
+            if (_ownPlaceInvalid)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(l10n.ownPlaceInvalid, style: TextStyle(color: colors.error)),
+              ),
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                onPressed: () => _addOwnPlace(offline: offline),
+                icon: const Icon(Icons.add_location_alt_outlined),
+                label: Text(l10n.ownPlaceAdd),
+              ),
+            ),
           ],
-        ),
-      if (_precision == MemoryDatePrecision.period)
-        TextButton(
-          onPressed: () => _pickDate(end: true),
-          child: Text(_to == null ? l10n.dateChooseEnd : l10n.dateChosenEnd(dayText(_to!))),
-        ),
-      if (_dateIsInFuture)
-        Text(
-          l10n.dateInFuture,
-          key: const Key('s04-future'),
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
-        ),
-      const SizedBox(height: 16),
-      if (place == null && !_ownPlaceFilled)
-        Text(l10n.placeNeeded, key: const Key('s04-place-needed'), style: Theme.of(context).textTheme.bodySmall),
-      if (!_dateIsComplete)
-        Text(l10n.dateNeeded, key: const Key('s04-date-needed'), style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+      _Section(
+        icon: Icons.event_outlined,
+        title: l10n.datePrecision,
+        children: [
+          SegmentedButton<MemoryDatePrecision>(
+            showSelectedIcon: false,
+            segments: [
+              ButtonSegment(value: MemoryDatePrecision.day, label: Text(l10n.precisionDay)),
+              ButtonSegment(value: MemoryDatePrecision.month, label: Text(l10n.precisionMonth)),
+              ButtonSegment(value: MemoryDatePrecision.year, label: Text(l10n.precisionYear)),
+              ButtonSegment(value: MemoryDatePrecision.period, label: Text(l10n.precisionPeriod)),
+            ],
+            selected: {_precision},
+            onSelectionChanged: (selected) => setState(() => _precision = selected.single),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            key: const Key('s04-date-buttons'),
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              OutlinedButton.icon(
+                onPressed: () => _pickDate(end: false),
+                icon: const Icon(Icons.calendar_today_outlined, size: 18),
+                label: Text(_from == null ? l10n.dateChoose : l10n.dateChosen(dayText(_from!))),
+              ),
+              if (_precision == MemoryDatePrecision.period)
+                OutlinedButton.icon(
+                  onPressed: () => _pickDate(end: true),
+                  icon: const Icon(Icons.calendar_today_outlined, size: 18),
+                  label: Text(_to == null ? l10n.dateChooseEnd : l10n.dateChosenEnd(dayText(_to!))),
+                ),
+              if (_precision == MemoryDatePrecision.day)
+                OutlinedButton.icon(
+                  key: const Key('s04-time'),
+                  onPressed: _pickTime,
+                  icon: const Icon(Icons.schedule, size: 18),
+                  label: Text(_time == null ? l10n.timeChoose : l10n.timeChosen(_hourText(_time!))),
+                ),
+              if (_precision == MemoryDatePrecision.day && _time != null)
+                IconButton(
+                  key: const Key('s04-time-clear'),
+                  tooltip: l10n.timeClear,
+                  icon: const Icon(Icons.close),
+                  onPressed: () => setState(() => _time = null),
+                ),
+            ],
+          ),
+          if (_dateIsInFuture)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                l10n.dateInFuture,
+                key: const Key('s04-future'),
+                style: TextStyle(color: colors.error),
+              ),
+            ),
+        ],
+      ),
+      if (place == null && !_ownPlaceFilled) _Hint(l10n.placeNeeded, key: const Key('s04-place-needed')),
+      if (!_dateIsComplete) _Hint(l10n.dateNeeded, key: const Key('s04-date-needed')),
     ];
   }
 
   List<Widget> _content(bool offline, bool blockedOffline) {
     final l10n = context.l10n;
+    final colors = Theme.of(context).colorScheme;
     final draft = _aiDraft;
+    final canAdd = _poolFull || _busy ? null : _pickPhotos;
     return [
-      const SizedBox(height: 12),
-      Text(l10n.photos, style: Theme.of(context).textTheme.titleSmall),
-      OutlinedButton(onPressed: _poolFull || _busy ? null : _pickPhotos, child: Text(l10n.photosAdd)),
-      if (_photos.isNotEmpty) Text(l10n.photosPicked(_photos.length), key: const Key('s04-photos')),
-      const SizedBox(height: 16),
-      TextField(
-        controller: _description,
-        minLines: 3,
-        maxLines: 8,
-        decoration: InputDecoration(labelText: l10n.description),
-        // Always rebuilds: the approve and AI actions depend on the text.
-        onChanged: (_) => setState(() => _approved = false),
+      _Section(
+        icon: Icons.photo_library_outlined,
+        title: l10n.photos,
+        trailing: OutlinedButton.icon(
+          onPressed: canAdd,
+          icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+          label: Text(l10n.photosAdd),
+        ),
+        children: [
+          PhotoCarousel(
+            photos: [..._photos],
+            onAdd: canAdd,
+            onRemove: (id) => setState(() => _photos.removeWhere((photo) => photo.$1 == id)),
+          ),
+          if (_photos.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                l10n.photosPicked(_photos.length),
+                key: const Key('s04-photos'),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+        ],
       ),
-      const SizedBox(height: 8),
-      if (offline)
-        Text(l10n.aiUnavailableOffline, key: const Key('s04-ai-offline'))
-      else ...[
-        CheckboxListTile(
-          title: Text(l10n.aiConsent),
-          value: _consentsToAi,
-          onChanged: (value) => setState(() => _consentsToAi = value ?? false),
-        ),
-        OutlinedButton(
-          onPressed: _consentsToAi && !_aiExhausted && !_busy && _description.text.trim().isNotEmpty
-              ? _requestAiDraft
-              : null,
-          child: Text(l10n.aiRequest),
-        ),
-      ],
-      if (draft != null) ...[
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Text(l10n.aiDraft, style: Theme.of(context).textTheme.titleSmall),
-            const SizedBox(width: 8),
-            Chip(key: const Key('s04-ai-marker'), label: Text(l10n.aiMarker)),
-          ],
-        ),
-        Text(draft.text, key: const Key('s04-ai-draft')),
-        TextButton(onPressed: _useAiDraft, child: Text(l10n.aiUseDraft)),
-      ],
-      const SizedBox(height: 8),
-      OutlinedButton(
-        onPressed: _description.text.trim().isEmpty || _approved ? null : () => setState(() => _approved = true),
-        child: Text(_approved ? l10n.descriptionApproved : l10n.approveDescription),
+      _Section(
+        icon: Icons.notes_outlined,
+        title: l10n.descriptionSection,
+        children: [
+          TextField(
+            controller: _description,
+            minLines: 4,
+            maxLines: 10,
+            decoration: InputDecoration(labelText: l10n.description, alignLabelWithHint: true),
+            // Always rebuilds: the approve and AI actions depend on the text.
+            onChanged: (_) => setState(() => _approved = false),
+          ),
+          const SizedBox(height: 10),
+          if (offline)
+            Text(l10n.aiUnavailableOffline, key: const Key('s04-ai-offline'))
+          else
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: colors.outlineVariant),
+              ),
+              child: CheckboxListTile(
+                dense: true,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(l10n.aiConsent),
+                value: _consentsToAi,
+                onChanged: (value) => setState(() => _consentsToAi = value ?? false),
+              ),
+            ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (!offline)
+                OutlinedButton.icon(
+                  onPressed: _consentsToAi && !_aiExhausted && !_busy && _description.text.trim().isNotEmpty
+                      ? _requestAiDraft
+                      : null,
+                  icon: const Icon(Icons.auto_awesome_outlined, size: 18),
+                  label: Text(l10n.aiRequest),
+                ),
+              OutlinedButton.icon(
+                onPressed: _description.text.trim().isEmpty || _approved
+                    ? null
+                    : () => setState(() => _approved = true),
+                icon: Icon(_approved ? Icons.check_circle : Icons.check, size: 18),
+                label: Text(_approved ? l10n.descriptionApproved : l10n.approveDescription),
+              ),
+            ],
+          ),
+          if (draft != null)
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colors.tertiaryContainer.withValues(alpha: 0.35),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: colors.outlineVariant),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(l10n.aiDraft, style: Theme.of(context).textTheme.titleSmall),
+                      const SizedBox(width: 8),
+                      Chip(key: const Key('s04-ai-marker'), label: Text(l10n.aiMarker)),
+                    ],
+                  ),
+                  Text(draft.text, key: const Key('s04-ai-draft')),
+                  const SizedBox(height: 8),
+                  OutlinedButton(onPressed: _useAiDraft, child: Text(l10n.aiUseDraft)),
+                ],
+              ),
+            ),
+        ],
       ),
     ];
   }
+}
+
+/// MEM-E13-PLAT-08: one part of the form in a frame, with an icon and a title.
+class _Section extends StatelessWidget {
+  const _Section({required this.icon, required this.title, required this.children, this.trailing});
+
+  final IconData icon;
+  final String title;
+  final List<Widget> children;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            runSpacing: 6,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: 20, color: colors.primary),
+                  const SizedBox(width: 8),
+                  Text(title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                ],
+              ),
+              ?trailing,
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+/// What is still missing before Next.
+class _Hint extends StatelessWidget {
+  const _Hint(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 4),
+    child: Row(
+      children: [
+        Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+        const SizedBox(width: 6),
+        Expanded(child: Text(text, style: Theme.of(context).textTheme.bodySmall)),
+      ],
+    ),
+  );
 }
 
 /// MEM-E13-PLAT-07: on a wide screen a window in the middle; on a phone the whole screen.
 class _ModalFrame extends StatelessWidget {
   const _ModalFrame({required this.child});
 
-  static const maxWidth = 640.0;
+  static const maxWidth = 680.0;
 
   final Widget child;
+
+  /// MEM-E13-PLAT-08: framed fields and outlined buttons with a visible border in the accent.
+  static ThemeData _formTheme(ThemeData base) {
+    final colors = base.colorScheme;
+    final shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(10));
+    return base.copyWith(
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: colors.outline),
+        ),
+        isDense: true,
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: ButtonStyle(
+          shape: WidgetStatePropertyAll(shape),
+          padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 14, vertical: 12)),
+          side: WidgetStateProperty.resolveWith(
+            (states) => BorderSide(
+              color: states.contains(WidgetState.disabled) ? colors.outlineVariant : colors.primary,
+              width: 1.4,
+            ),
+          ),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(shape: shape, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14)),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -644,7 +878,9 @@ class _ModalFrame extends StatelessWidget {
       elevation: 12,
       borderRadius: wide ? BorderRadius.circular(20) : BorderRadius.zero,
       clipBehavior: Clip.antiAlias,
-      child: SafeArea(child: child),
+      child: SafeArea(
+        child: Theme(data: _formTheme(Theme.of(context)), child: child),
+      ),
     );
     if (!wide) {
       return surface;
@@ -683,7 +919,10 @@ class _StepBar extends StatelessWidget {
                 color: index <= step ? colors.primary : colors.outlineVariant,
               ),
             ),
-          _StepDot(index: index, label: label, done: index < step, current: index == step),
+          Flexible(
+            flex: 3,
+            child: _StepDot(index: index, label: label, done: index < step, current: index == step),
+          ),
         ],
       ],
     );
@@ -729,11 +968,15 @@ class _StepDot extends StatelessWidget {
                   ),
           ),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: current ? colors.onSurface : colors.onSurfaceVariant,
-              fontWeight: current ? FontWeight.w700 : FontWeight.w500,
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: current ? colors.onSurface : colors.onSurfaceVariant,
+                fontWeight: current ? FontWeight.w700 : FontWeight.w500,
+              ),
             ),
           ),
         ],

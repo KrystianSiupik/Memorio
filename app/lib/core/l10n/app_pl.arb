@@ -405,5 +405,12 @@
   "settingsPhotoPointsExplained": "Wspomnienie ze zdjęciem pokaże się na mapie jako mały okrąg z pierwszym zdjęciem. Bez zdjęcia zostaje kropką.",
   "settingsPointSize": "Wielkość punktów",
   "placeNeeded": "Wybierz miejsce z listy albo wpisz nazwę i współrzędne miejsca własnego.",
-  "dateNeeded": "Wybierz datę."
+  "dateNeeded": "Wybierz datę.",
+  "placeSearchHint": "Szukaj, np. Biskupia Kopa",
+  "ownPlaceSection": "Albo własne miejsce",
+  "descriptionSection": "Twoja historia",
+  "photosEmpty": "Dodaj zdjęcia. Pierwsze pokaże się na mapie.",
+  "photoPrevious": "Poprzednie zdjęcie",
+  "photoNext": "Następne zdjęcie",
+  "photoRemove": "Usuń zdjęcie"
 }

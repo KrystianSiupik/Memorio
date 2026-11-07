@@ -1283,4 +1283,25 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get dateNeeded => 'Wybierz datę.';
+
+  @override
+  String get placeSearchHint => 'Szukaj, np. Biskupia Kopa';
+
+  @override
+  String get ownPlaceSection => 'Albo własne miejsce';
+
+  @override
+  String get descriptionSection => 'Twoja historia';
+
+  @override
+  String get photosEmpty => 'Dodaj zdjęcia. Pierwsze pokaże się na mapie.';
+
+  @override
+  String get photoPrevious => 'Poprzednie zdjęcie';
+
+  @override
+  String get photoNext => 'Następne zdjęcie';
+
+  @override
+  String get photoRemove => 'Usuń zdjęcie';
 }

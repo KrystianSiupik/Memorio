@@ -2377,6 +2377,48 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Wybierz datę.'**
   String get dateNeeded;
+
+  /// No description provided for @placeSearchHint.
+  ///
+  /// In pl, this message translates to:
+  /// **'Szukaj, np. Biskupia Kopa'**
+  String get placeSearchHint;
+
+  /// No description provided for @ownPlaceSection.
+  ///
+  /// In pl, this message translates to:
+  /// **'Albo własne miejsce'**
+  String get ownPlaceSection;
+
+  /// No description provided for @descriptionSection.
+  ///
+  /// In pl, this message translates to:
+  /// **'Twoja historia'**
+  String get descriptionSection;
+
+  /// No description provided for @photosEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dodaj zdjęcia. Pierwsze pokaże się na mapie.'**
+  String get photosEmpty;
+
+  /// No description provided for @photoPrevious.
+  ///
+  /// In pl, this message translates to:
+  /// **'Poprzednie zdjęcie'**
+  String get photoPrevious;
+
+  /// No description provided for @photoNext.
+  ///
+  /// In pl, this message translates to:
+  /// **'Następne zdjęcie'**
+  String get photoNext;
+
+  /// No description provided for @photoRemove.
+  ///
+  /// In pl, this message translates to:
+  /// **'Usuń zdjęcie'**
+  String get photoRemove;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

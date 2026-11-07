@@ -380,5 +380,12 @@
   "settingsPhotoPointsExplained": "A memory with a photo shows on the map as a small circle with its first photo. Without a photo it stays a dot.",
   "settingsPointSize": "Size of the points",
   "placeNeeded": "Choose a place from the list, or type the name and coordinates of your own place.",
-  "dateNeeded": "Choose a date."
+  "dateNeeded": "Choose a date.",
+  "placeSearchHint": "Search, e.g. Biskupia Kopa",
+  "ownPlaceSection": "Or your own place",
+  "descriptionSection": "Your story",
+  "photosEmpty": "Add photos. The first one shows on the map.",
+  "photoPrevious": "Previous photo",
+  "photoNext": "Next photo",
+  "photoRemove": "Remove photo"
 }
