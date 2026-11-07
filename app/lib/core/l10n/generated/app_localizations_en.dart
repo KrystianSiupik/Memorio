@@ -1284,4 +1284,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dateNeeded => 'Choose a date.';
+
+  @override
+  String get placeSearchHint => 'Search, e.g. Biskupia Kopa';
+
+  @override
+  String get ownPlaceSection => 'Or your own place';
+
+  @override
+  String get descriptionSection => 'Your story';
+
+  @override
+  String get photosEmpty => 'Add photos. The first one shows on the map.';
+
+  @override
+  String get photoPrevious => 'Previous photo';
+
+  @override
+  String get photoNext => 'Next photo';
+
+  @override
+  String get photoRemove => 'Remove photo';
 }

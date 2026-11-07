@@ -375,7 +375,7 @@ void main() {
       await open(tester);
 
       final window = tester.getRect(find.byKey(const Key('s04-window')));
-      expect(window.width, 640);
+      expect(window.width, 680);
       expect(window.center.dx, closeTo(500, 1));
       expect(find.byKey(const Key('s04-steps')), findsOneWidget);
       final accent = Theme.of(tester.element(find.byKey(const Key('s04-window')))).colorScheme.primary;
@@ -439,6 +439,80 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.getSize(find.byKey(const Key('s04-window'))), const Size(400, 800));
+    });
+  });
+
+  group('MEM-E13-PLAT-08 layout and photos', () {
+    Future<void> addPhotos(WidgetTester tester, int times) async {
+      for (var i = 0; i < times; i++) {
+        await tester.tap(find.text('Dodaj zdjęcia'));
+        await tester.pumpAndSettle();
+      }
+    }
+
+    String counter(WidgetTester tester) => tester.widget<Text>(find.byKey(const Key('s04-photo-counter'))).data!;
+
+    testWidgets('latitude and longitude lie side by side; nothing spills over on a phone', (tester) async {
+      await open(tester);
+
+      final latitude = tester.getRect(find.widgetWithText(TextField, 'Szerokość geograficzna'));
+      final longitude = tester.getRect(find.widgetWithText(TextField, 'Długość geograficzna'));
+      expect(latitude.top, longitude.top);
+      expect(latitude.right, lessThan(longitude.left));
+
+      tester.view.physicalSize = const Size(360, 740);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('no photos yet: a field asks for them, and a tap on it picks', (tester) async {
+      await open(tester);
+      await toContent(tester);
+
+      expect(find.byKey(const Key('s04-photos-empty')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('s04-photos-empty')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('s04-carousel')), findsOneWidget);
+      expect(counter(tester), '1 / 1');
+    });
+
+    testWidgets('the carousel moves with the arrows and the small pictures', (tester) async {
+      await open(tester);
+      await toContent(tester);
+      await addPhotos(tester, 3);
+
+      // New photos show the first of them.
+      expect(counter(tester), '3 / 3');
+      expect(find.byKey(const Key('s04-photo-next')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('s04-photo-previous')));
+      await tester.pumpAndSettle();
+      expect(counter(tester), '2 / 3');
+
+      await tester.tap(find.byKey(const Key('s04-photo-thumb-0')));
+      await tester.pumpAndSettle();
+      expect(counter(tester), '1 / 3');
+      expect(find.byKey(const Key('s04-photo-previous')), findsNothing);
+    });
+
+    testWidgets('a removed photo leaves the carousel and is not sent', (tester) async {
+      await open(tester);
+      await toContent(tester);
+      await addPhotos(tester, 2);
+
+      await tester.tap(find.byKey(const Key('s04-photo-remove')));
+      await tester.pumpAndSettle();
+      expect(counter(tester), '1 / 1');
+      expect(find.text('Wybrane zdjęcia: 1'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('s04-photo-remove')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('s04-photos-empty')), findsOneWidget);
+
+      await save(tester);
+      expect(memories.created, hasLength(1));
+      expect(memories.photos, isEmpty);
     });
   });
 }
