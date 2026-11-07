@@ -143,6 +143,21 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
     });
   }
 
+  /// MEM-E12-PLAT-05: a name and coordinates typed in are enough to go on; "Next" adds the own place itself.
+  bool get _ownPlaceFilled =>
+      _ownName.text.trim().isNotEmpty &&
+      double.tryParse(_ownLatitude.text.replaceAll(',', '.')) != null &&
+      double.tryParse(_ownLongitude.text.replaceAll(',', '.')) != null;
+
+  Future<void> _next({required bool offline}) async {
+    if (_place == null) {
+      await _addOwnPlace(offline: offline);
+    }
+    if (mounted && _place != null) {
+      setState(() => _step = 1);
+    }
+  }
+
   Future<void> _addOwnPlace({required bool offline}) async {
     final name = _ownName.text.trim();
     final latitude = double.tryParse(_ownLatitude.text.replaceAll(',', '.'));
@@ -433,16 +448,19 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
         TextField(
           controller: _ownName,
           decoration: InputDecoration(labelText: l10n.ownPlaceName),
+          onChanged: (_) => setState(() {}),
         ),
         TextField(
           controller: _ownLatitude,
           keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
           decoration: InputDecoration(labelText: l10n.ownPlaceLatitude),
+          onChanged: (_) => setState(() {}),
         ),
         TextField(
           controller: _ownLongitude,
           keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
           decoration: InputDecoration(labelText: l10n.ownPlaceLongitude),
+          onChanged: (_) => setState(() {}),
         ),
         if (_ownPlaceInvalid) Text(l10n.ownPlaceInvalid, style: TextStyle(color: Theme.of(context).colorScheme.error)),
         TextButton(
@@ -497,8 +515,15 @@ class _NewMemoryPageState extends ConsumerState<NewMemoryPage> {
           style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       const SizedBox(height: 16),
+      if (place == null && !_ownPlaceFilled)
+        Text(l10n.placeNeeded, key: const Key('s04-place-needed'), style: Theme.of(context).textTheme.bodySmall),
+      if (!_dateIsComplete)
+        Text(l10n.dateNeeded, key: const Key('s04-date-needed'), style: Theme.of(context).textTheme.bodySmall),
+      const SizedBox(height: 4),
       FilledButton(
-        onPressed: place != null && _dateIsComplete && !_dateIsInFuture ? () => setState(() => _step = 1) : null,
+        onPressed: (place != null || _ownPlaceFilled) && _dateIsComplete && !_dateIsInFuture
+            ? () => _next(offline: offline)
+            : null,
         child: Text(l10n.next),
       ),
     ];

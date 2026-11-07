@@ -2365,6 +2365,18 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Wielkość punktów'**
   String get settingsPointSize;
+
+  /// No description provided for @placeNeeded.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wybierz miejsce z listy albo wpisz nazwę i współrzędne miejsca własnego.'**
+  String get placeNeeded;
+
+  /// No description provided for @dateNeeded.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wybierz datę.'**
+  String get dateNeeded;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
