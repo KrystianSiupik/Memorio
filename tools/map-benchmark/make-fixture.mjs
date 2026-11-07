@@ -3,21 +3,32 @@
 // real low-zoom tiles of a Protomaps world build (OpenStreetMap data, ODbL), read with range requests.
 // The result is committed, so CI needs neither this script nor the network.
 //
-//   node tools/map-benchmark/make-fixture.mjs <yyyymmdd> [maxZoom=3]
+//   node tools/map-benchmark/make-fixture.mjs <yyyymmdd> [maxZoom=3] [--area=minLon,minLat,maxLon,maxLat ...] [--area-zoom=14] [--out=dir]
+//
+// With --area it also takes the detailed tiles of those areas up to --area-zoom (MEM-E12-PLAT-03): a local sample
+// of the detailed map, e.g. --area=19.6,49.1,20.3,49.35 for the Tatras. Not for committing: it grows fast.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync, gzipSync } from 'node:zlib';
 
-const [date, maxZoomArgument = '3'] = process.argv.slice(2);
+const options = process.argv.slice(2).filter((argument) => argument.startsWith('--'));
+const [date, maxZoomArgument = '3'] = process.argv.slice(2).filter((argument) => !argument.startsWith('--'));
+const option = (name) => options.filter((argument) => argument.startsWith(`--${name}=`)).map((argument) => argument.slice(name.length + 3));
+const areas = option('area').map((area) => area.split(',').map(Number));
+if (areas.some((area) => area.length !== 4 || area.some(Number.isNaN))) {
+  console.error('an area is --area=minLon,minLat,maxLon,maxLat');
+  process.exit(2);
+}
+const areaZoom = Number(option('area-zoom')[0] ?? 14);
 if (!/^\d{8}$/.test(date ?? '')) {
   console.error('usage: make-fixture.mjs <yyyymmdd> [maxZoom]');
   process.exit(2);
 }
 const maxZoom = Number(maxZoomArgument);
 const source = `https://build.protomaps.com/${date}.pmtiles`;
-const output = join(dirname(fileURLToPath(import.meta.url)), '../../app/benchmark/map');
+const output = option('out')[0] ?? join(dirname(fileURLToPath(import.meta.url)), '../../app/benchmark/map');
 
 async function range(offset, length) {
   const response = await fetch(source, { headers: { Range: `bytes=${offset}-${offset + length - 1}` } });
@@ -108,20 +119,40 @@ const contents = new Map();
 const entries = [];
 const tiles = [];
 let offset = 0;
+const taken = new Set();
+async function take(z, x, y) {
+  const id = zxyToTileId(z, x, y);
+  if (taken.has(id)) return;
+  taken.add(id);
+  const entry = await findTile(root, id);
+  if (!entry) return;
+  const tile = await range(tilesOffset + entry.offset, entry.length);
+  const hash = createHash('sha256').update(tile).digest('hex');
+  if (!contents.has(hash)) {
+    contents.set(hash, offset);
+    tiles.push(tile);
+    offset += tile.length;
+  }
+  entries.push({ tileId: id, runLength: 1, length: tile.length, offset: contents.get(hash) });
+}
 for (let z = 0; z <= maxZoom; z++) {
   for (let x = 0; x < 2 ** z; x++) {
     for (let y = 0; y < 2 ** z; y++) {
-      const id = zxyToTileId(z, x, y);
-      const entry = await findTile(root, id);
-      if (!entry) continue;
-      const tile = await range(tilesOffset + entry.offset, entry.length);
-      const hash = createHash('sha256').update(tile).digest('hex');
-      if (!contents.has(hash)) {
-        contents.set(hash, offset);
-        tiles.push(tile);
-        offset += tile.length;
+      await take(z, x, y);
+    }
+  }
+}
+const tileX = (lon, z) => Math.floor(((lon + 180) / 360) * 2 ** z);
+const tileY = (lat, z) => {
+  const radians = (lat * Math.PI) / 180;
+  return Math.floor(((1 - Math.log(Math.tan(radians) + 1 / Math.cos(radians)) / Math.PI) / 2) * 2 ** z);
+};
+for (const [minLon, minLat, maxLon, maxLat] of areas) {
+  for (let z = maxZoom + 1; z <= areaZoom; z++) {
+    for (let x = tileX(minLon, z); x <= tileX(maxLon, z); x++) {
+      for (let y = tileY(maxLat, z); y <= tileY(minLat, z); y++) {
+        await take(z, x, y);
       }
-      entries.push({ tileId: id, runLength: 1, length: tile.length, offset: contents.get(hash) });
     }
   }
 }
@@ -149,7 +180,7 @@ result[97] = 2; // directories in gzip
 result[98] = header[98];
 result[99] = header[99];
 result[100] = 0;
-result[101] = maxZoom;
+result[101] = areas.length > 0 ? Math.max(maxZoom, areaZoom) : maxZoom;
 result.writeInt32LE(-180e7, 102);
 result.writeInt32LE(-85e7, 106);
 result.writeInt32LE(180e7, 110);

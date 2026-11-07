@@ -115,6 +115,8 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - letsencrypt:/etc/letsencrypt:ro
       - certbot-webroot:/var/www/certbot:ro
+      # The base map, put there by deploy/map/basemap.sh (D-320).
+      - /var/lib/memorio/map:/srv/map:ro
 
   # Certificates from Let's Encrypt (webroot challenge through nginx); renewed by memorio-certificates.timer.
   certbot:
