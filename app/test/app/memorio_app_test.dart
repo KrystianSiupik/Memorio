@@ -9,7 +9,7 @@ void main() {
   testWidgets('a supported app starts normally', (tester) async {
     await pumpMemorioApp(tester, session: signedIn);
 
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byKey(const Key('app-navigation')), findsOneWidget);
     expect(find.text('Zaktualizuj Memorio'), findsNothing);
   });
 
@@ -33,6 +33,6 @@ void main() {
       ),
     );
 
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byKey(const Key('app-navigation')), findsOneWidget);
   });
 }

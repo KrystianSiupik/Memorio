@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart' show driftRuntimeOptions;
-import 'package:flutter/material.dart' show NavigationBar;
+import 'package:flutter/material.dart' show Key;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memorio/core/offline/offline.dart';
 
@@ -21,7 +21,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(bannerText), findsOneWidget);
 
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Albumy')));
+    await tester.tap(find.descendant(of: find.byKey(const Key('app-navigation')), matching: find.text('Albumy')));
     await tester.pumpAndSettle();
     expect(find.text(bannerText), findsOneWidget);
 

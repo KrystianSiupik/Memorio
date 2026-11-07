@@ -187,7 +187,7 @@ void main() {
 
       expect(sessions.session, isNull);
       expect(find.widgetWithText(AppBar, 'Rejestracja'), findsOneWidget);
-      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byKey(const Key('app-navigation')), findsNothing);
     });
 
     testWidgets('works without a connection and when the data did not load', (tester) async {
