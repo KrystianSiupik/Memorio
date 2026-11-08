@@ -12,7 +12,7 @@ internal sealed record MemoryMovedToTrash(Guid EventId, DateTimeOffset OccurredA
 internal sealed record MemoryRestored(Guid EventId, DateTimeOffset OccurredAt, MemoryId MemoryId, Guid AuthorAccountId, int Sequence) : IDomainEvent;
 
 /// <summary>E25.</summary>
-internal sealed record ArchiveTrimmed(Guid EventId, DateTimeOffset OccurredAt, Guid ResourceId, bool IsAlbum, int MemoriesTrimmed, int Sequence) : IDomainEvent;
+internal sealed record ArchiveTrimmed(Guid EventId, DateTimeOffset OccurredAt, Guid ResourceId, bool IsAlbum, int MemoriesTrimmed, int Sequence, IReadOnlyList<Guid> TrimmedMemoryIds) : IDomainEvent;
 
 /// <summary>E12.</summary>
 internal sealed record MemoryCreated(Guid EventId, DateTimeOffset OccurredAt, MemoryId MemoryId, Guid AuthorAccountId) : IDomainEvent;

@@ -69,7 +69,7 @@ internal sealed class Memories(IDbContextOutbox<ArchiveDbContext> outbox) : IMem
         await Database.Memories.Where(memory => memory.TrimmedFor == resourceId && memory.State == MemoryState.Trashed).ToListAsync(cancellationToken);
 
     public async Task AnnounceAsync(ArchiveTrimmed trimmed) =>
-        await outbox.PublishAsync(new ArchiveTrimmedEvent(trimmed.EventId, trimmed.OccurredAt, trimmed.ResourceId, trimmed.IsAlbum, trimmed.MemoriesTrimmed, trimmed.Sequence));
+        await outbox.PublishAsync(new ArchiveTrimmedEvent(trimmed.EventId, trimmed.OccurredAt, trimmed.ResourceId, trimmed.IsAlbum, trimmed.MemoriesTrimmed, trimmed.Sequence, trimmed.TrimmedMemoryIds));
 
     public async Task<bool> SaveAsync(CancellationToken cancellationToken)
     {

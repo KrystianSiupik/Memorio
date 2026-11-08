@@ -40,3 +40,6 @@ public sealed record TakeoverReservedEvent(Guid EventId, DateTimeOffset Occurred
 
 /// <summary>E167: a participant paid and is the owner now (D-004).</summary>
 public sealed record AlbumTakenOverEvent(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, Guid OwnerAccountId, int Sequence) : IIntegrationEvent;
+
+/// <summary>P34: a memory left the album on trimming (D-290: its author keeps it); what was made from it through the album goes.</summary>
+public sealed record AlbumMemoryTrimmedEvent(Guid EventId, DateTimeOffset OccurredAt, Guid AlbumId, Guid MemoryId, Guid AuthorAccountId) : IIntegrationEvent;
