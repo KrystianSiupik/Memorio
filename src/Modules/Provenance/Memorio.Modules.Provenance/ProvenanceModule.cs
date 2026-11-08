@@ -1,5 +1,6 @@
 using Memorio.Modularity;
 using Memorio.Modules.Provenance.Application.Commands.RegisterArtifact;
+using Memorio.Modules.Provenance.Contracts;
 using Memorio.Modules.Provenance.Domain.Artifacts;
 using Memorio.Modules.Provenance.Infrastructure;
 using Memorio.Modules.Provenance.Infrastructure.Persistence;
@@ -34,6 +35,7 @@ public sealed class ProvenanceModule : IModule
         services.AddDbContextWithWolverineIntegration<ProvenanceDbContext>(database => database.UseProvenanceDatabase(connectionString));
         services.AddScoped<IArtifacts, Artifacts>();
         services.AddScoped<RegisterArtifactHandler>();
+        services.AddScoped<IArtifactRegistry, ArtifactRegistry>();
 
         services.AddHealthChecks().AddCheck<ProvenanceDatabaseHealthCheck>(ProvenanceDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))
