@@ -109,6 +109,9 @@ grant and end is written to `/var/lib/memorio/operations.log`.
 
 Releasing the version that brings E1 needs `AiNarration__ConnectionString`, `Places__ConnectionString`, `Limits__ConnectionString`, `Archive__ConnectionString` and `Album__ConnectionString` in the server's `app.env` as well.
 
+Releasing the version that brings E6 needs `Provenance__ConnectionString` in the server's `app.env` (see
+`app.env.example`; the password is `PG_PASSWORD_MEMORIO_PROVENANCE` from `postgres.env`).
+
 Releasing the version that brings the ledger needs `Plans__ConnectionString` in the server's `app.env` (see
 `app.env.example`; the password is `PG_PASSWORD_MEMORIO_PLANS` from `postgres.env`), then
 `secrets/secrets.sh encrypt <environment>` (`secrets.sh check` names a variable missing from the copy).

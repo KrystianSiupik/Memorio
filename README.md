@@ -47,6 +47,7 @@ or missing variable stops the host and the log names the variable, never its val
 | `Notifications__Smtp__Host`, `__Port`, `__Security`, `__Username`, `__Password`, `__From`, `__FromName`, `__AppUrl` | worker | optional: outgoing mail over SMTP (default port 587, `StartTls`); `From` is required with a host. Without a host messages are only logged, nothing is delivered |
 | `Places__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_places` (own places, OpenStreetMap places) |
 | `AiNarration__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_ai_narration` (AI drafts) |
+| `Provenance__ConnectionString` | API, worker | PostgreSQL connection of the role `memorio_provenance` (what AI summaries and other artifacts were made from) |
 | `Database__MigrateOnStartup` | API, worker | optional, default `true`: apply the modules' migrations at start |
 | `Scheduling__ConnectionString` | worker | PostgreSQL connection of the role `memorio_scheduler` (scheduled jobs and deadlines) |
 | `Telemetry__OtlpEndpoint` | API, worker | optional: OTLP/HTTP address of the OpenTelemetry Collector; none: no metrics or logs exported |
