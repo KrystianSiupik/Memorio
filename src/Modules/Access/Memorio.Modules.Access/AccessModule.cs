@@ -39,6 +39,7 @@ public sealed class AccessModule : IModule
         services.AddDbContextWithWolverineIntegration<AccessDbContext>(database => database.UseAccessDatabase(connectionString));
         services.AddScoped<AccessReader>();
         services.AddScoped<IAccessReader>(provider => provider.GetRequiredService<AccessReader>());
+        services.AddScoped<IReadableContent, ReadableContent>();
         services.AddScoped<IBlockList>(provider => provider.GetRequiredService<AccessReader>());
         services.AddScoped<IAudiences, Audiences>();
         services.AddScoped<IAudienceQueries, AudienceQueries>();
