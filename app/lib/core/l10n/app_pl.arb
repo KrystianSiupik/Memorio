@@ -402,7 +402,7 @@
   "calendarApply": "Zastosuj",
   "settingsPoints": "Punkty na mapie",
   "settingsPhotoPoints": "Zdjęcia zamiast kropek",
-  "settingsPhotoPointsExplained": "Wspomnienie ze zdjęciem pokaże się na mapie jako mały okrąg z pierwszym zdjęciem. Bez zdjęcia zostaje kropką.",
+  "settingsPhotoPointsExplained": "Wspomnienie ze zdjęciem pokaże się na mapie jako mała odbitka w białej ramce, jak z polaroida, z pierwszym zdjęciem. Bez zdjęcia zostaje kropką.",
   "settingsPointSize": "Wielkość punktów",
   "placeNeeded": "Wybierz miejsce z listy albo wpisz nazwę i współrzędne miejsca własnego.",
   "dateNeeded": "Wybierz datę.",

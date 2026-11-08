@@ -2357,7 +2357,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPhotoPointsExplained.
   ///
   /// In pl, this message translates to:
-  /// **'Wspomnienie ze zdjęciem pokaże się na mapie jako mały okrąg z pierwszym zdjęciem. Bez zdjęcia zostaje kropką.'**
+  /// **'Wspomnienie ze zdjęciem pokaże się na mapie jako mała odbitka w białej ramce, jak z polaroida, z pierwszym zdjęciem. Bez zdjęcia zostaje kropką.'**
   String get settingsPhotoPointsExplained;
 
   /// No description provided for @settingsPointSize.

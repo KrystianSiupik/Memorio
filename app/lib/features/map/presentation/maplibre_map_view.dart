@@ -41,7 +41,10 @@ Map<String, Object> pointsToGeoJson(List<MapPoint> points, {Set<String> photos =
         // GL JS drops string feature ids; the source promotes this property back to the id.
         'properties': <String, Object>{
           'id': point.id,
-          if (point.photoUrl != null && photos.contains(point.id)) 'photo': photoImageOf(point.id),
+          if (point.photoUrl != null && photos.contains(point.id)) ...{
+            'photo': photoImageOf(point.id),
+            'tilt': photoTiltOf(point.id),
+          },
         },
         'geometry': {
           'type': 'Point',
@@ -156,6 +159,9 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
         iconImage: ['get', 'photo'],
         iconSize: _photoSize(ref.read(settingsProvider)),
         iconAllowOverlap: true,
+        // The print stands on its point, a little askew.
+        iconAnchor: 'bottom',
+        iconRotate: ['get', 'tilt'],
       ),
       filter: [
         'all',
@@ -215,8 +221,8 @@ class _MapLibreMapViewState extends ConsumerState<MapLibreMapView> {
   /// MEM-E13-PLAT-05: a dot of 6 pixels at the smallest size, growing with the setting.
   static double _dotRadius(AppSettings settings) => 6 * settings.pointScale;
 
-  /// The photo is drawn 96 pixels wide: 0.3 makes a circle of about 29 pixels, a little bigger than a dot.
-  static double _photoSize(AppSettings settings) => 0.3 * settings.pointScale;
+  /// The print is drawn 96 pixels wide: 0.36 makes it about 35 by 41 pixels, small enough to see the map around it.
+  static double _photoSize(AppSettings settings) => 0.36 * settings.pointScale;
 
   /// Points first as they are; round photos follow as they arrive, each in its turn.
   Future<void> _showPoints(List<MapPoint> points) async {

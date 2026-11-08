@@ -1273,7 +1273,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get settingsPhotoPointsExplained =>
-      'Wspomnienie ze zdjęciem pokaże się na mapie jako mały okrąg z pierwszym zdjęciem. Bez zdjęcia zostaje kropką.';
+      'Wspomnienie ze zdjęciem pokaże się na mapie jako mała odbitka w białej ramce, jak z polaroida, z pierwszym zdjęciem. Bez zdjęcia zostaje kropką.';
 
   @override
   String get settingsPointSize => 'Wielkość punktów';

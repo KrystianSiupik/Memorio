@@ -115,30 +115,33 @@ class _PhotoPreview extends StatelessWidget {
 
   final double scale;
 
+  /// MEM-E13-PLAT-13: an instant print as on the map: white frame, wider at the bottom, a little askew.
   @override
-  Widget build(BuildContext context) => Container(
-    key: const Key('settings-preview-photo'),
-    width: 29 * scale,
-    height: 29 * scale,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      color: Colors.white,
-      boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 3, offset: Offset(0, 1))],
-    ),
-    padding: const EdgeInsets.all(2.5),
-    child: const DecoratedBox(
+  Widget build(BuildContext context) => Transform.rotate(
+    angle: -0.07,
+    child: Container(
+      key: const Key('settings-preview-photo'),
+      width: 29 * scale,
+      height: 34 * scale,
+      padding: EdgeInsets.fromLTRB(2.5 * scale, 2.5 * scale, 2.5 * scale, 8 * scale),
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF8EC5FC), Color(0xFF7CB342)],
-        ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(1.5),
+        boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 3, offset: Offset(0, 1.5))],
       ),
-      child: FittedBox(
-        child: Padding(
-          padding: EdgeInsets.all(3),
-          child: Icon(Icons.landscape, color: Colors.white),
+      child: const DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF8EC5FC), Color(0xFF7CB342)],
+          ),
+        ),
+        child: FittedBox(
+          child: Padding(
+            padding: EdgeInsets.all(3),
+            child: Icon(Icons.landscape, color: Colors.white),
+          ),
         ),
       ),
     ),
