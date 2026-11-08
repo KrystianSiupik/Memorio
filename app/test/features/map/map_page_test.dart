@@ -94,6 +94,34 @@ void main() {
     expect(find.byKey(const Key('s03-preview')), findsNothing);
   });
 
+  testWidgets('with a photo, the photo fills the card and the text is white on a grey band at its foot', (
+    tester,
+  ) async {
+    memories.previews['memory-1'] = const MemoryPreview(
+      id: 'memory-1',
+      placeName: 'Biskupia Kopa',
+      datePrecision: 'Day',
+      dateFrom: '2026-07-01',
+      dateTo: '2026-07-01',
+      excerpt: 'Wieża widokowa.',
+      photos: 1,
+      photoUrl: 'https://storage.example.invalid/a.jpg',
+    );
+    final container = await open(tester);
+
+    container.read(hoveredPointProvider.notifier).hover('memory-1', const Offset(200, 200));
+    await tester.pumpAndSettle();
+
+    final card = tester.getRect(find.byKey(const Key('s03-preview')));
+    final photo = tester.getRect(find.byKey(const Key('s03-preview-photo')));
+    final band = tester.getRect(find.byKey(const Key('s03-preview-band')));
+    expect(photo.height, greaterThanOrEqualTo(band.height + 40));
+    expect(band.bottom, closeTo(photo.bottom, 0.5));
+    expect(tester.widget<Container>(find.byKey(const Key('s03-preview-band'))).color, MemoryPreviewCard.band);
+    expect(tester.widget<Text>(find.text('Wieża widokowa.')).style!.color, Colors.white);
+    expect(card.height, greaterThanOrEqualTo(200));
+  });
+
   testWidgets('a preview that cannot be read says so without covering the map', (tester) async {
     final container = await open(tester);
 
