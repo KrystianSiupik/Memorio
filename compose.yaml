@@ -96,6 +96,7 @@ services:
       Account__ConnectionString: &account Host=postgres;Database=memorio;Username=memorio_account;Maximum Pool Size=10;Timeout=5;Password=memorio_local
       Plans__ConnectionString: &plans Host=postgres;Database=memorio;Username=memorio_plans;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       AiNarration__ConnectionString: &ainarration Host=postgres;Database=memorio;Username=memorio_ai_narration;Maximum Pool Size=5;Timeout=5;Password=memorio_local
+      Provenance__ConnectionString: &provenance Host=postgres;Database=memorio;Username=memorio_provenance;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Places__ConnectionString: &places Host=postgres;Database=memorio;Username=memorio_places;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Limits__ConnectionString: &limits Host=postgres;Database=memorio;Username=memorio_limits;Maximum Pool Size=5;Timeout=5;Password=memorio_local
       Access__ConnectionString: &access Host=postgres;Database=memorio;Username=memorio_access;Maximum Pool Size=5;Timeout=5;Password=memorio_local
@@ -127,6 +128,7 @@ services:
       Account__ConnectionString: *account
       Plans__ConnectionString: *plans
       AiNarration__ConnectionString: *ainarration
+      Provenance__ConnectionString: *provenance
       Places__ConnectionString: *places
       Limits__ConnectionString: *limits
       Access__ConnectionString: *access

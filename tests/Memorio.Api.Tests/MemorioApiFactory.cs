@@ -35,6 +35,7 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
         // Not contacted either (tests/Modules/Memorio.Modules.Plans.Tests covers the ledger on a real database).
         ["Plans:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_plans",
         ["AiNarration:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_ai_narration",
+        ["Provenance:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_provenance",
         ["Places:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_places",
         ["Limits:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_limits",
         ["Access:ConnectionString"] = "Host=localhost;Database=memorio;Username=memorio_access",
@@ -89,7 +90,7 @@ internal sealed class MemorioApiFactory : WebApplicationFactory<Program>
             services.Configure<HealthCheckServiceOptions>(options =>
             {
                 foreach (var check in options.Registrations
-                    .Where(check => check.Name is MemorioMessaging.HealthCheckName or ObjectStorage.HealthCheckName or "account-database" or "plans-database" or "archive-database" or "album-database" or "ai-narration-database" or "places-database" or "limits-database" or "access-database" or "succession-database" or "moderation-database" or "notifications-database")
+                    .Where(check => check.Name is MemorioMessaging.HealthCheckName or ObjectStorage.HealthCheckName or "account-database" or "plans-database" or "archive-database" or "album-database" or "ai-narration-database" or "places-database" or "limits-database" or "access-database" or "succession-database" or "moderation-database" or "notifications-database" or "provenance-database")
                     .ToList())
                 {
                     options.Registrations.Remove(check);

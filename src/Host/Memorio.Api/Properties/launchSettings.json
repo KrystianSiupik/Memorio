@@ -12,6 +12,7 @@
         "Account__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_account;Password=memorio_local",
         "Plans__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_plans;Password=memorio_local",
         "AiNarration__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_ai_narration;Password=memorio_local",
+        "Provenance__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_provenance;Password=memorio_local",
         "Places__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_places;Password=memorio_local",
         "Limits__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_limits;Password=memorio_local",
         "Access__ConnectionString": "Host=localhost;Port=5432;Database=memorio;Username=memorio_access;Password=memorio_local",
