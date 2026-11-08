@@ -39,4 +39,21 @@ internal sealed class InvalidateWhenSourceGone(InvalidateArtifactsHandler invali
         invalidate.HandleAsync(
             UnavailableSource.AuthorInAlbum(revoked.EventId, revoked.AlbumId, revoked.AccountId, InvalidationReason.AiConsentRevoked, revoked.OccurredAt),
             cancellationToken);
+
+    /// <summary>P34: an account was trimmed (E25); its trimmed memories are in the trash and what cites them goes.</summary>
+    public async Task HandleAsync(ArchiveTrimmedEvent trimmed, CancellationToken cancellationToken)
+    {
+        foreach (var memoryId in trimmed.TrimmedMemoryIds ?? [])
+        {
+            await invalidate.HandleAsync(
+                UnavailableSource.Memory(FactIds.Of(trimmed.EventId, memoryId), memoryId, InvalidationReason.ArchiveTrimmed, trimmed.OccurredAt),
+                cancellationToken);
+        }
+    }
+
+    /// <summary>P34 for an album: the memory left that album only (D-290).</summary>
+    public Task HandleAsync(AlbumMemoryTrimmedEvent trimmed, CancellationToken cancellationToken) =>
+        invalidate.HandleAsync(
+            UnavailableSource.MemoryInAlbum(trimmed.EventId, trimmed.MemoryId, trimmed.AlbumId, InvalidationReason.ArchiveTrimmed, trimmed.OccurredAt),
+            cancellationToken);
 }

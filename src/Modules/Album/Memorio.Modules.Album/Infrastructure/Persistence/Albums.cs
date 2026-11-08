@@ -121,6 +121,11 @@ internal sealed class Albums(IDbContextOutbox<AlbumDbContext> outbox) : IAlbums
             }
         }
 
+        foreach (var trimmed in Database.ChangeTracker.Entries<TrimmedAlbumMemory>().Where(entry => entry.State == EntityState.Added).Select(entry => entry.Entity).ToList())
+        {
+            await outbox.PublishAsync(new AlbumMemoryTrimmedEvent(Guid.CreateVersion7(), trimmed.TrimmedAt, trimmed.AlbumId.Value, trimmed.MemoryId, trimmed.AuthorAccountId));
+        }
+
         try
         {
             // Every save flushes (D-278): by default what a second save in a scope publishes is dropped.

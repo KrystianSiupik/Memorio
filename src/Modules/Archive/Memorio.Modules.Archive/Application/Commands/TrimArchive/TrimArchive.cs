@@ -31,7 +31,7 @@ internal sealed class TrimArchiveHandler(IMemories memories, ITrimMaterialQuery 
         }
 
         memories.RecordApplied(applied, command.ResourceId, command.Sequence);
-        await memories.AnnounceAsync(new ArchiveTrimmed(Guid.CreateVersion7(), now, command.ResourceId, false, toTrim.Count, command.Sequence));
+        await memories.AnnounceAsync(new ArchiveTrimmed(Guid.CreateVersion7(), now, command.ResourceId, false, toTrim.Count, command.Sequence, [.. toTrim]));
         if (!await memories.SaveAsync(cancellationToken))
         {
             throw new InvalidOperationException("Another decision about these memories got there first; the retry reads them again.");

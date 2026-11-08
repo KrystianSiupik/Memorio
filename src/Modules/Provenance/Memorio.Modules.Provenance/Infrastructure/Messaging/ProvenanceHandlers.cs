@@ -41,3 +41,17 @@ public static class AiConsentRevokedHandler
     public static Task Handle(AiConsentRevokedEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
         services.GetRequiredService<InvalidateWhenSourceGone>().HandleAsync(integrationEvent, cancellationToken);
 }
+
+/// <summary>P34 for an account, in the worker.</summary>
+public static class ArchiveTrimmedHandler
+{
+    public static Task Handle(ArchiveTrimmedEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
+        services.GetRequiredService<InvalidateWhenSourceGone>().HandleAsync(integrationEvent, cancellationToken);
+}
+
+/// <summary>P34 for an album, in the worker.</summary>
+public static class AlbumMemoryTrimmedHandler
+{
+    public static Task Handle(AlbumMemoryTrimmedEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
+        services.GetRequiredService<InvalidateWhenSourceGone>().HandleAsync(integrationEvent, cancellationToken);
+}
