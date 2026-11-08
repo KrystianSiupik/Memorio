@@ -1,3 +1,4 @@
+using Memorio.Modules.Access.Contracts;
 using Memorio.Modules.Album.Contracts;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Provenance.Application.Policies;
@@ -16,5 +17,19 @@ public static class ContentDeletedHandler
 public static class ContributionsWithdrawnHandler
 {
     public static Task Handle(ContributionsWithdrawnEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
+        services.GetRequiredService<InvalidateWhenSourceGone>().HandleAsync(integrationEvent, cancellationToken);
+}
+
+/// <summary>P10 in the worker.</summary>
+public static class AccessRevokedHandler
+{
+    public static Task Handle(AccessRevokedEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
+        services.GetRequiredService<InvalidateWhenSourceGone>().HandleAsync(integrationEvent, cancellationToken);
+}
+
+/// <summary>P10 for a blocked person, in the worker.</summary>
+public static class UserBlockedHandler
+{
+    public static Task Handle(UserBlockedEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
         services.GetRequiredService<InvalidateWhenSourceGone>().HandleAsync(integrationEvent, cancellationToken);
 }

@@ -1,3 +1,4 @@
+using Memorio.Modules.Access.Contracts;
 using Memorio.Modules.Album.Contracts;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Provenance.Application.Commands.InvalidateArtifacts;
@@ -18,5 +19,17 @@ internal sealed class InvalidateWhenSourceGone(InvalidateArtifactsHandler invali
     public Task HandleAsync(ContributionsWithdrawnEvent withdrawn, CancellationToken cancellationToken) =>
         invalidate.HandleAsync(
             UnavailableSource.AuthorInAlbum(withdrawn.EventId, withdrawn.AlbumId, withdrawn.AccountId, InvalidationReason.ContributionsWithdrawn, withdrawn.OccurredAt),
+            cancellationToken);
+
+    /// <summary>P10: a person lost the album (E66); everything made for them from it goes, and does not come back.</summary>
+    public Task HandleAsync(AccessRevokedEvent revoked, CancellationToken cancellationToken) =>
+        invalidate.HandleAsync(
+            UnavailableSource.ReaderOfAlbum(revoked.EventId, revoked.AlbumId, revoked.AccountId, InvalidationReason.AccessRevoked, revoked.OccurredAt),
+            cancellationToken);
+
+    /// <summary>P10 too: blocking takes the album away (C64) the same way.</summary>
+    public Task HandleAsync(UserBlockedEvent blocked, CancellationToken cancellationToken) =>
+        invalidate.HandleAsync(
+            UnavailableSource.ReaderOfAlbum(blocked.EventId, blocked.AlbumId, blocked.AccountId, InvalidationReason.AccessRevoked, blocked.OccurredAt),
             cancellationToken);
 }
