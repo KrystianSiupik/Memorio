@@ -2,6 +2,7 @@ using Memorio.Modularity;
 using Memorio.Modules.AiNarration.Api;
 using Memorio.Modules.AiNarration.Application.AiTexts;
 using Memorio.Modules.AiNarration.Application.Commands.Consents;
+using Memorio.Modules.AiNarration.Application.Policies;
 using Memorio.Modules.AiNarration.Application.Commands.RequestDraft;
 using Memorio.Modules.AiNarration.Application.Ports;
 using Memorio.Modules.AiNarration.Contracts;
@@ -66,6 +67,8 @@ public sealed class AiNarrationModule : IModule
         services.AddScoped<IAiDraftReader, AiDraftReader>();
         services.AddScoped<IAiConsents, AiConsents>();
         services.AddScoped<GiveAiConsentHandler>();
+        services.AddScoped<RevokeAiConsentHandler>();
+        services.AddScoped<ConsentEndsWithParticipation>();
         services.AddScoped<AiConsentQuery>();
 
         services.AddHealthChecks().AddCheck<AiNarrationDatabaseHealthCheck>(AiNarrationDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);

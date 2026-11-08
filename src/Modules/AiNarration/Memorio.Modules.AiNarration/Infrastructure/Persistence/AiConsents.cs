@@ -55,6 +55,18 @@ internal sealed class AiConsents(IDbContextOutbox<AiNarrationDbContext> outbox) 
     private ValueTask PublishAsync(IDomainEvent domainEvent) => domainEvent switch
     {
         AiConsentGiven given => outbox.PublishAsync(new AiConsentGivenEvent(given.EventId, given.OccurredAt, given.AccountId, given.AlbumId, given.Sequence)),
+        AiConsentRevoked revoked => outbox.PublishAsync(new AiConsentRevokedEvent(
+            revoked.EventId,
+            revoked.OccurredAt,
+            revoked.AccountId,
+            revoked.AlbumId,
+            revoked.Reason switch
+            {
+                AiConsentEnd.LeftAlbum => AiConsentRevocationReasons.LeftAlbum,
+                AiConsentEnd.RemovedFromAlbum => AiConsentRevocationReasons.RemovedFromAlbum,
+                _ => AiConsentRevocationReasons.ByPerson,
+            },
+            revoked.Sequence)),
         _ => ValueTask.CompletedTask,
     };
 }
