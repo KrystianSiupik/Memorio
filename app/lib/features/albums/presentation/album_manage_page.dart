@@ -7,6 +7,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/result.dart';
 import '../../memories/memories.dart' show dayText;
 import '../domain/album.dart';
+import 'album_link_qr.dart';
 import 'albums_providers.dart';
 
 /// S11 Managing an album, for its owner: seats, invitations, who is in it and the successor. What is typed
@@ -242,7 +243,19 @@ class _AlbumManagePageState extends ConsumerState<AlbumManagePage> with AlbumAct
                     OutlinedButton(onPressed: offline || busy ? null : _share, child: Text(l10n.albumShareByLink)),
                   ] else ...[
                     SelectableText(albumLinkAddress(link), key: const Key('s11-link')),
-                    TextButton(onPressed: () => _copy(albumLinkAddress(link)), child: Text(l10n.albumCopyLink)),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        TextButton(onPressed: () => _copy(albumLinkAddress(link)), child: Text(l10n.albumCopyLink)),
+                        TextButton.icon(
+                          key: const Key('s11-qr'),
+                          onPressed: () =>
+                              showAlbumLinkQr(context, albumName: album?.name ?? '', address: albumLinkAddress(link)),
+                          icon: const Icon(Icons.qr_code_2),
+                          label: Text(l10n.albumShowQr),
+                        ),
+                      ],
+                    ),
                     OutlinedButton(onPressed: offline || busy ? null : _revokeLink, child: Text(l10n.albumRevokeLink)),
                   ],
                   const SizedBox(height: 16),

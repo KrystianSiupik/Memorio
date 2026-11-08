@@ -1341,4 +1341,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get memoryDeleting => 'Deleting';
+
+  @override
+  String get albumShowQr => 'Show QR code';
+
+  @override
+  String get albumQrLabel => 'QR code with the album link';
+
+  @override
+  String get albumQrHint => 'Scan it with a phone camera to open the album. Revoking the link turns this code off too.';
+
+  @override
+  String get close => 'Close';
 }

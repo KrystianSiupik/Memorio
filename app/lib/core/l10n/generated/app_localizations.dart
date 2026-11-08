@@ -2491,6 +2491,30 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Usuwanie'**
   String get memoryDeleting;
+
+  /// No description provided for @albumShowQr.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pokaż kod QR'**
+  String get albumShowQr;
+
+  /// No description provided for @albumQrLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kod QR z linkiem do albumu'**
+  String get albumQrLabel;
+
+  /// No description provided for @albumQrHint.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zeskanuj aparatem telefonu, żeby otworzyć album. Unieważnienie linku wyłącza też ten kod.'**
+  String get albumQrHint;
+
+  /// No description provided for @close.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zamknij'**
+  String get close;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

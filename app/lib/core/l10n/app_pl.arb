@@ -424,5 +424,9 @@
   "storyQuestion": "Opowiedz, co się wydarzyło",
   "storyQuestionHint": "Napisz kilka zdań albo poproś AI o szkic.",
   "memoryStory": "Historia",
-  "memoryDeleting": "Usuwanie"
+  "memoryDeleting": "Usuwanie",
+  "albumShowQr": "Pokaż kod QR",
+  "albumQrLabel": "Kod QR z linkiem do albumu",
+  "albumQrHint": "Zeskanuj aparatem telefonu, żeby otworzyć album. Unieważnienie linku wyłącza też ten kod.",
+  "close": "Zamknij"
 }
