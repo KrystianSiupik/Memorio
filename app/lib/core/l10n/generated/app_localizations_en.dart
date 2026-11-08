@@ -1274,7 +1274,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPhotoPointsExplained =>
-      'A memory with a photo shows on the map as a small circle with its first photo. Without a photo it stays a dot.';
+      'A memory with a photo shows on the map as a small instant print in a white frame, with its first photo. Without a photo it stays a dot.';
 
   @override
   String get settingsPointSize => 'Size of the points';

@@ -22,12 +22,20 @@ void main() {
     final features = (pointsToGeoJson(points, photos: {'a', 'c'})['features']! as List<Object?>)
         .cast<Map<String, Object?>>();
 
-    expect(features[0]['properties'], {'id': 'a', 'photo': photoImageOf('a')});
+    expect(features[0]['properties'], {'id': 'a', 'photo': photoImageOf('a'), 'tilt': photoTiltOf('a')});
     expect(features[1]['properties'], {'id': 'b'});
     expect(features[2]['properties'], {'id': 'c'});
   });
 
   test('no points is an empty collection, not an error', () {
     expect(pointsToGeoJson(const [])['features'], isEmpty);
+  });
+
+  test('each print leans a little, always the same way for the same memory', () {
+    final tilts = {for (var i = 0; i < 200; i++) photoTiltOf('memory-$i')};
+
+    expect(tilts.every((tilt) => tilt >= -6 && tilt <= 6), isTrue);
+    expect(tilts.length, greaterThan(5));
+    expect(photoTiltOf('memory-7'), photoTiltOf('memory-7'));
   });
 }
