@@ -75,6 +75,48 @@ namespace Memorio.Modules.Provenance.Infrastructure.Persistence.Migrations
                     b.ToTable("artifacts", "provenance");
                 });
 
+            modelBuilder.Entity("Memorio.Modules.Provenance.Domain.Artifacts.UnavailableSource", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<Guid?>("AlbumId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("album_id");
+
+                    b.Property<DateTimeOffset>("At")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("at");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("kind");
+
+                    b.Property<Guid?>("MemoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("memory_id");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("reason");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("At")
+                        .HasDatabaseName("ix_unavailable_sources_at");
+
+                    b.ToTable("unavailable_sources", "provenance");
+                });
+
             modelBuilder.Entity("Memorio.Modules.Provenance.Domain.Artifacts.Artifact", b =>
                 {
                     b.OwnsMany("Memorio.Modules.Provenance.Domain.Artifacts.ArtifactSource", "Sources", b1 =>

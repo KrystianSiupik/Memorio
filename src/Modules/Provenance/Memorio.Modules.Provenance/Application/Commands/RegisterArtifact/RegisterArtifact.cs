@@ -31,6 +31,7 @@ internal sealed class RegisterArtifactHandler(IArtifacts artifacts, TimeProvider
         artifacts.Add(artifact.Value);
         if (await artifacts.SaveAsync(cancellationToken))
         {
+            await CheckAfterSaveAsync(artifact.Value, command.MaterialsReadAt, cancellationToken);
             return Result.Success();
         }
 
@@ -38,5 +39,23 @@ internal sealed class RegisterArtifactHandler(IArtifacts artifacts, TimeProvider
         return await artifacts.FindAsync(command.Id, cancellationToken) is { } raced && raced.OwnerAccountId == command.OwnerAccountId
             ? Result.Success()
             : ArtifactErrors.IdTaken;
+    }
+
+    /// <summary>
+    /// AG9, D-023: saved first, then checked. What was withdrawn since the materials were read invalidates the new artifact
+    /// at once; what is withdrawn after this check finds the artifact through the policy.
+    /// </summary>
+    private async Task CheckAfterSaveAsync(Artifact artifact, DateTimeOffset? materialsReadAt, CancellationToken cancellationToken)
+    {
+        if (materialsReadAt is not { } since)
+        {
+            return;
+        }
+
+        var fact = (await artifacts.FindFactsSinceAsync(since, cancellationToken)).FirstOrDefault(found => found.Hits(artifact));
+        if (fact is not null && artifact.Invalidate(fact.Reason, clock.GetUtcNow()))
+        {
+            await artifacts.SaveAsync(cancellationToken);
+        }
     }
 }

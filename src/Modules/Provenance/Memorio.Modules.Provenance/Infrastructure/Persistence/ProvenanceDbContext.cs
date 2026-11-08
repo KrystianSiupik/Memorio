@@ -10,6 +10,8 @@ internal sealed class ProvenanceDbContext(DbContextOptions<ProvenanceDbContext> 
 
     public DbSet<Artifact> Artifacts => Set<Artifact>();
 
+    public DbSet<UnavailableSource> UnavailableSources => Set<UnavailableSource>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.HasDefaultSchema(Schema);
@@ -43,6 +45,20 @@ internal sealed class ProvenanceDbContext(DbContextOptions<ProvenanceDbContext> 
                 source.HasIndex(item => new { item.AlbumId, item.AuthorAccountId }).HasDatabaseName("ix_artifact_sources_album_author");
             });
             artifact.Navigation(item => item.Sources).HasField("_sources").UsePropertyAccessMode(PropertyAccessMode.Field);
+        });
+
+        builder.Entity<UnavailableSource>(fact =>
+        {
+            fact.ToTable("unavailable_sources");
+            fact.HasKey(item => item.Id);
+            fact.Property(item => item.Id).HasColumnName("id").ValueGeneratedNever();
+            fact.Property(item => item.Kind).HasColumnName("kind").HasConversion<string>().HasMaxLength(20);
+            fact.Property(item => item.MemoryId).HasColumnName("memory_id");
+            fact.Property(item => item.AlbumId).HasColumnName("album_id");
+            fact.Property(item => item.AccountId).HasColumnName("account_id");
+            fact.Property(item => item.Reason).HasColumnName("reason").HasConversion<string>().HasMaxLength(40);
+            fact.Property(item => item.At).HasColumnName("at");
+            fact.HasIndex(item => item.At).HasDatabaseName("ix_unavailable_sources_at");
         });
     }
 }
