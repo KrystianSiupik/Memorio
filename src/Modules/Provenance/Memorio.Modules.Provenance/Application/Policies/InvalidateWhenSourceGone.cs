@@ -1,4 +1,5 @@
 using Memorio.Modules.Access.Contracts;
+using Memorio.Modules.AiNarration.Contracts;
 using Memorio.Modules.Album.Contracts;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Provenance.Application.Commands.InvalidateArtifacts;
@@ -31,5 +32,11 @@ internal sealed class InvalidateWhenSourceGone(InvalidateArtifactsHandler invali
     public Task HandleAsync(UserBlockedEvent blocked, CancellationToken cancellationToken) =>
         invalidate.HandleAsync(
             UnavailableSource.ReaderOfAlbum(blocked.EventId, blocked.AlbumId, blocked.AccountId, InvalidationReason.AccessRevoked, blocked.OccurredAt),
+            cancellationToken);
+
+    /// <summary>P12: the author took back the AI consent for the album (E81), or it lapsed (D-335); what was made from their content there goes.</summary>
+    public Task HandleAsync(AiConsentRevokedEvent revoked, CancellationToken cancellationToken) =>
+        invalidate.HandleAsync(
+            UnavailableSource.AuthorInAlbum(revoked.EventId, revoked.AlbumId, revoked.AccountId, InvalidationReason.AiConsentRevoked, revoked.OccurredAt),
             cancellationToken);
 }
