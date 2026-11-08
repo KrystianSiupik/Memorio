@@ -105,6 +105,61 @@
         }
       }
     },
+    "/v1/albums/{albumId}/ai-consent": {
+      "get": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "Whether the signed-in person lets the AI use their content in this album (S2:C5).",
+        "operationId": "GetAiConsent",
+        "parameters": [
+          {
+            "name": "albumId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiConsentResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "C80: the participant lets the AI use their content in this album; again changes nothing.",
+        "operationId": "GiveAiConsent",
+        "parameters": [
+          {
+            "name": "albumId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
     "/v1/moderation/mine": {
       "get": {
         "tags": [
@@ -2932,6 +2987,17 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "AiConsentResponse": {
+        "required": [
+          "given"
+        ],
+        "type": "object",
+        "properties": {
+          "given": {
+            "type": "boolean"
           }
         }
       },

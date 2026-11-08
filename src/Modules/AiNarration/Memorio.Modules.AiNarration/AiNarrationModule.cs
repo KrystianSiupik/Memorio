@@ -1,9 +1,11 @@
 using Memorio.Modularity;
 using Memorio.Modules.AiNarration.Api;
 using Memorio.Modules.AiNarration.Application.AiTexts;
+using Memorio.Modules.AiNarration.Application.Commands.Consents;
 using Memorio.Modules.AiNarration.Application.Commands.RequestDraft;
 using Memorio.Modules.AiNarration.Application.Ports;
 using Memorio.Modules.AiNarration.Contracts;
+using Memorio.Modules.AiNarration.Domain.Consents;
 using Memorio.Modules.AiNarration.Domain.Drafts;
 using Memorio.Modules.AiNarration.Infrastructure;
 using Memorio.Modules.AiNarration.Infrastructure.Mistral;
@@ -14,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Wolverine.EntityFrameworkCore;
 
 namespace Memorio.Modules.AiNarration;
 
@@ -56,11 +59,14 @@ public sealed class AiNarrationModule : IModule
             connectionString = "Host=unconfigured";
         }
 
-        services.AddDbContext<AiNarrationDbContext>(database => database.UseAiNarrationDatabase(connectionString));
+        services.AddDbContextWithWolverineIntegration<AiNarrationDbContext>(database => database.UseAiNarrationDatabase(connectionString));
         services.AddScoped<IMemoryDrafts, MemoryDrafts>();
         services.AddScoped<IPromptCatalog, PromptCatalog>();
         services.AddScoped<RequestDraftHandler>();
         services.AddScoped<IAiDraftReader, AiDraftReader>();
+        services.AddScoped<IAiConsents, AiConsents>();
+        services.AddScoped<GiveAiConsentHandler>();
+        services.AddScoped<AiConsentQuery>();
 
         services.AddHealthChecks().AddCheck<AiNarrationDatabaseHealthCheck>(AiNarrationDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))
@@ -69,5 +75,9 @@ public sealed class AiNarrationModule : IModule
         }
     }
 
-    public void MapEndpoints(IEndpointRouteBuilder endpoints) => endpoints.MapDraftsEndpoints();
+    public void MapEndpoints(IEndpointRouteBuilder endpoints)
+    {
+        endpoints.MapDraftsEndpoints();
+        endpoints.MapConsentEndpoints();
+    }
 }
