@@ -158,6 +158,29 @@
             "description": "No Content"
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "C81: the person takes the consent back; what was made from their content in this album is invalidated.",
+        "operationId": "RevokeAiConsent",
+        "parameters": [
+          {
+            "name": "albumId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
       }
     },
     "/v1/moderation/mine": {

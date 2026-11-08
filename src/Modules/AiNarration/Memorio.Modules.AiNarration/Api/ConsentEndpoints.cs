@@ -20,6 +20,20 @@ internal static class ConsentEndpoints
             .WithTags("AI")
             .WithName("GiveAiConsent")
             .WithSummary("C80: the participant lets the AI use their content in this album; again changes nothing.");
+        v1.MapDelete("/albums/{albumId:guid}/ai-consent", RevokeAsync)
+            .WithTags("AI")
+            .WithName("RevokeAiConsent")
+            .WithSummary("C81: the person takes the consent back; what was made from their content in this album is invalidated.");
+    }
+
+    private static async Task<Results<NoContent, ProblemHttpResult>> RevokeAsync(
+        Guid albumId,
+        ClaimsPrincipal principal,
+        RevokeAiConsentHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var revoked = await handler.HandleAsync(new RevokeAiConsent(CurrentAccount.IdOf(principal), albumId), cancellationToken);
+        return revoked.IsFailure ? Problems.From(revoked.Error) : TypedResults.NoContent();
     }
 
     private static async Task<Ok<AiConsentResponse>> GetAsync(Guid albumId, ClaimsPrincipal principal, AiConsentQuery query, CancellationToken cancellationToken) =>

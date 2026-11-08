@@ -49,7 +49,33 @@ internal sealed class AiConsent : AggregateRoot<Guid>
         Raise(new AiConsentGiven(Guid.CreateVersion7(), now, AccountId, AlbumId, Sequence));
         return true;
     }
+
+    /// <summary>C81, or the participation ended (D-335): false when it was not given.</summary>
+    public bool Revoke(AiConsentEnd reason, DateTimeOffset now)
+    {
+        if (!IsGiven)
+        {
+            return false;
+        }
+
+        IsGiven = false;
+        ChangedAt = now;
+        Sequence++;
+        Raise(new AiConsentRevoked(Guid.CreateVersion7(), now, AccountId, AlbumId, reason, Sequence));
+        return true;
+    }
 }
+
+/// <summary>Why the consent ended.</summary>
+internal enum AiConsentEnd
+{
+    ByPerson,
+    LeftAlbum,
+    RemovedFromAlbum,
+}
+
+/// <summary>E81.</summary>
+internal sealed record AiConsentRevoked(Guid EventId, DateTimeOffset OccurredAt, Guid AccountId, Guid AlbumId, AiConsentEnd Reason, int Sequence) : IDomainEvent;
 
 /// <summary>E80.</summary>
 internal sealed record AiConsentGiven(Guid EventId, DateTimeOffset OccurredAt, Guid AccountId, Guid AlbumId, int Sequence) : IDomainEvent;
