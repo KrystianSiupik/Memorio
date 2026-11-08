@@ -1,3 +1,4 @@
+using Memorio.Modules.Album.Contracts;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Provenance.Application.Policies;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,5 +9,12 @@ namespace Memorio.Modules.Provenance.Infrastructure.Messaging;
 public static class ContentDeletedHandler
 {
     public static Task Handle(ContentDeleted integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
+        services.GetRequiredService<InvalidateWhenSourceGone>().HandleAsync(integrationEvent, cancellationToken);
+}
+
+/// <summary>P9 in the worker.</summary>
+public static class ContributionsWithdrawnHandler
+{
+    public static Task Handle(ContributionsWithdrawnEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
         services.GetRequiredService<InvalidateWhenSourceGone>().HandleAsync(integrationEvent, cancellationToken);
 }
