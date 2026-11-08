@@ -1,3 +1,4 @@
+using Memorio.Modules.Album.Contracts;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Provenance.Application.Commands.InvalidateArtifacts;
 using Memorio.Modules.Provenance.Domain.Artifacts;
@@ -11,5 +12,11 @@ internal sealed class InvalidateWhenSourceGone(InvalidateArtifactsHandler invali
     public Task HandleAsync(ContentDeleted deleted, CancellationToken cancellationToken) =>
         invalidate.HandleAsync(
             UnavailableSource.Memory(deleted.EventId, deleted.MemoryId, InvalidationReason.ContentDeleted, deleted.OccurredAt),
+            cancellationToken);
+
+    /// <summary>P9: an author took their contributions out of an album (E57); what was made from them through it goes.</summary>
+    public Task HandleAsync(ContributionsWithdrawnEvent withdrawn, CancellationToken cancellationToken) =>
+        invalidate.HandleAsync(
+            UnavailableSource.AuthorInAlbum(withdrawn.EventId, withdrawn.AlbumId, withdrawn.AccountId, InvalidationReason.ContributionsWithdrawn, withdrawn.OccurredAt),
             cancellationToken);
 }
