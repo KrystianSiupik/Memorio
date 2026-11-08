@@ -397,5 +397,7 @@
   "photosQuestion": "Show what it was like",
   "photosQuestionHint": "The first photo shows on the map. You can skip this step.",
   "storyQuestion": "Tell what happened",
-  "storyQuestionHint": "Write a few lines, or ask AI for a draft."
+  "storyQuestionHint": "Write a few lines, or ask AI for a draft.",
+  "memoryStory": "Story",
+  "memoryDeleting": "Deleting"
 }

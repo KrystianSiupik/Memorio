@@ -1335,4 +1335,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storyQuestionHint => 'Write a few lines, or ask AI for a draft.';
+
+  @override
+  String get memoryStory => 'Story';
+
+  @override
+  String get memoryDeleting => 'Deleting';
 }
