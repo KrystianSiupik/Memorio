@@ -55,6 +55,7 @@ public sealed class ArchiveModule : IModule
         services.AddDbContextWithWolverineIntegration<ArchiveDbContext>(database => database.UseArchiveDatabase(connectionString));
         services.AddScoped<IAccountContentReader, AccountContentReader>();
         services.AddScoped<IAlbumContent, AlbumContent>();
+        services.AddScoped<IMemoryFacts, MemoryFactsQuery>();
         services.AddScoped<IMemories, Memories>();
         services.AddScoped<DeleteAccountContentHandler>();
         services.AddScoped<CreateMemoryHandler>();

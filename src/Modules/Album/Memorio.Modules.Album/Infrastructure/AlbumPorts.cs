@@ -131,3 +131,16 @@ internal sealed class AlbumSuccession(IAlbums albums, AlbumDbContext database, T
         return await albums.SaveAsync(cancellationToken) ? SuccessorOutcome.Named : SuccessorOutcome.AlreadyDecided;
     }
 }
+
+/// <summary>R8 for AiNarration, with Dapper on the module's own schema (D-126).</summary>
+internal sealed class AlbumMemoriesReader(AlbumDbContext database) : IAlbumMemories
+{
+    public async Task<IReadOnlyList<AlbumMemoryRef>> MemoriesOfAsync(Guid albumId, CancellationToken cancellationToken) =>
+        [.. await database.Database.GetDbConnection().QueryAsync<AlbumMemoryRef>(new CommandDefinition(
+            """
+            SELECT memory_id AS "MemoryId", author_account_id AS "AuthorAccountId"
+            FROM album.album_memories WHERE album_id = @albumId ORDER BY position, memory_id
+            """,
+            new { albumId },
+            cancellationToken: cancellationToken))];
+}
