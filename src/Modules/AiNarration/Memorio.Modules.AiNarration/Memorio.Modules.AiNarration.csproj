@@ -6,11 +6,13 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="WolverineFx.EntityFrameworkCore" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../../BuildingBlocks/Memorio.SharedKernel/Memorio.SharedKernel.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Memorio.Modularity/Memorio.Modularity.csproj" />
     <ProjectReference Include="../Memorio.Modules.AiNarration.Contracts/Memorio.Modules.AiNarration.Contracts.csproj" />
     <ProjectReference Include="../../Limits/Memorio.Modules.Limits.Contracts/Memorio.Modules.Limits.Contracts.csproj" />
+    <ProjectReference Include="../../Album/Memorio.Modules.Album.Contracts/Memorio.Modules.Album.Contracts.csproj" />
   </ItemGroup>
 </Project>

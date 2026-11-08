@@ -23,6 +23,45 @@ namespace Memorio.Modules.AiNarration.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Memorio.Modules.AiNarration.Domain.Consents.AiConsent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("album_id");
+
+                    b.Property<DateTimeOffset>("ChangedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("changed_at");
+
+                    b.Property<bool>("IsGiven")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_given");
+
+                    b.Property<int>("Sequence")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId", "AlbumId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_ai_consents_account_album");
+
+                    b.HasIndex("AlbumId", "IsGiven")
+                        .HasDatabaseName("ix_ai_consents_album");
+
+                    b.ToTable("ai_consents", "ai_narration");
+                });
+
             modelBuilder.Entity("Memorio.Modules.AiNarration.Domain.Drafts.MemoryDraft", b =>
                 {
                     b.Property<Guid>("Id")
