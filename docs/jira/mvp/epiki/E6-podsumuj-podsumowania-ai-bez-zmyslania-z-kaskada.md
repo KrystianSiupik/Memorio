@@ -32,7 +32,7 @@
 | [MEM-E6-POCHODZENIE-05](../MEM-E6-POCHODZENIE-05-polityka-p9-zawsze-gdy-wklady-wycofane-z-albumu-wt.md) | Polityka P9: Zawsze gdy wkłady wycofane z albumu, wtedy unieważnij artefakty pochodne, które je cytują | pochodzenie / aplikacja (handler zdarzenia) | 1–3 | zrobiony |
 | [MEM-E6-POCHODZENIE-06](../MEM-E6-POCHODZENIE-06-polityka-p10-zawsze-gdy-dostep-odebrany-wtedy-unie.md) | Polityka P10: Zawsze gdy dostęp odebrany, wtedy unieważnij artefakty pochodne powstałe z tego albumu u tej osoby | pochodzenie / aplikacja (handler zdarzenia) | 1–3 | zrobiony |
 | [MEM-E6-NARRACJA-AI-07](../MEM-E6-NARRACJA-AI-07-zdarzenie-integracyjne-zgoda-na-ai-odwolana-e81-w-.md) | Zdarzenie integracyjne „Zgoda na AI odwołana” (E81) w kontrakcie modułu narracja-ai | narracja-ai / kontrakt | 1–2 | zrobiony |
-| [MEM-E6-POCHODZENIE-07](../MEM-E6-POCHODZENIE-07-polityka-p12-zawsze-gdy-zgoda-na-ai-odwolana-wtedy.md) | Polityka P12: Zawsze gdy zgoda na AI odwołana, wtedy unieważnij artefakty powstałe z treści tej osoby | pochodzenie / aplikacja (handler zdarzenia) | 1–3 | gotowy |
+| [MEM-E6-POCHODZENIE-07](../MEM-E6-POCHODZENIE-07-polityka-p12-zawsze-gdy-zgoda-na-ai-odwolana-wtedy.md) | Polityka P12: Zawsze gdy zgoda na AI odwołana, wtedy unieważnij artefakty powstałe z treści tej osoby | pochodzenie / aplikacja (handler zdarzenia) | 1–3 | zrobiony |
 | [MEM-E6-POCHODZENIE-08](../MEM-E6-POCHODZENIE-08-polityka-p34-zawsze-gdy-archiwum-przyciete-wtedy-u.md) | Polityka P34: Zawsze gdy archiwum przycięte, wtedy unieważnij artefakty cytujące usunięty materiał | pochodzenie / aplikacja (handler zdarzenia) | 1–3 | gotowy |
 | [MEM-E6-PLAT-01](../MEM-E6-PLAT-01-ekran-s17-podsumowanie-okresu-ai.md) | Ekran S17 „Podsumowanie okresu (AI)” | - / UI | 2–4 | gotowy |
 

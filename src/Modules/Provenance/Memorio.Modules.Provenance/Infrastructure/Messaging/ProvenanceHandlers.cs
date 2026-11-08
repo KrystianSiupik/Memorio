@@ -1,4 +1,5 @@
 using Memorio.Modules.Access.Contracts;
+using Memorio.Modules.AiNarration.Contracts;
 using Memorio.Modules.Album.Contracts;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Provenance.Application.Policies;
@@ -31,5 +32,12 @@ public static class AccessRevokedHandler
 public static class UserBlockedHandler
 {
     public static Task Handle(UserBlockedEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
+        services.GetRequiredService<InvalidateWhenSourceGone>().HandleAsync(integrationEvent, cancellationToken);
+}
+
+/// <summary>P12 in the worker.</summary>
+public static class AiConsentRevokedHandler
+{
+    public static Task Handle(AiConsentRevokedEvent integrationEvent, IServiceProvider services, CancellationToken cancellationToken) =>
         services.GetRequiredService<InvalidateWhenSourceGone>().HandleAsync(integrationEvent, cancellationToken);
 }
