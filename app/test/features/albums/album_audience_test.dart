@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:memorio/app/router.dart';
 import 'package:memorio/app/routes.dart';
 import 'package:memorio/features/albums/albums.dart';
@@ -45,6 +46,19 @@ void main() {
 
       expect(albums.actions, ['share']);
       expect(tester.widget<SelectableText>(find.byKey(const Key('s11-link'))).data, endsWith('/albums/link/token-1'));
+
+      // MEM-E13-PLAT-12: the same link as a QR code.
+      await tester.tap(find.byKey(const Key('s11-qr')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('s11-qr-dialog')), findsOneWidget);
+      expect(find.byType(QrImageView), findsOneWidget);
+      expect(
+        tester.widget<SelectableText>(find.byKey(const Key('s11-qr-address'))).data,
+        endsWith('/albums/link/token-1'),
+      );
+      await tester.tap(find.text('Zamknij'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('s11-qr-dialog')), findsNothing);
 
       await tester.tap(find.text('Unieważnij link (nikt nowy nie wejdzie)'));
       await tester.pumpAndSettle();

@@ -1340,4 +1340,16 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get memoryDeleting => 'Usuwanie';
+
+  @override
+  String get albumShowQr => 'Pokaż kod QR';
+
+  @override
+  String get albumQrLabel => 'Kod QR z linkiem do albumu';
+
+  @override
+  String get albumQrHint => 'Zeskanuj aparatem telefonu, żeby otworzyć album. Unieważnienie linku wyłącza też ten kod.';
+
+  @override
+  String get close => 'Zamknij';
 }

@@ -399,5 +399,9 @@
   "storyQuestion": "Tell what happened",
   "storyQuestionHint": "Write a few lines, or ask AI for a draft.",
   "memoryStory": "Story",
-  "memoryDeleting": "Deleting"
+  "memoryDeleting": "Deleting",
+  "albumShowQr": "Show QR code",
+  "albumQrLabel": "QR code with the album link",
+  "albumQrHint": "Scan it with a phone camera to open the album. Revoking the link turns this code off too.",
+  "close": "Close"
 }

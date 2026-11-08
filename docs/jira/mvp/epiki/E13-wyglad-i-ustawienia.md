@@ -29,3 +29,4 @@
 | [MEM-E13-PLAT-09](../MEM-E13-PLAT-09-cztery-kroki-i-mapa-pod-oknem.md) | Dodawanie wspomnienia w czterech krokach, mapa nieruchoma pod oknem | - / UI | 3–5 h | zrobiony |
 | [MEM-E13-PLAT-10](../MEM-E13-PLAT-10-podglad-zdjecie-w-tle.md) | Podgląd po najechaniu: zdjęcie w tle, biały tekst na szarym pasku | - / UI | 1–2 h | zrobiony |
 | [MEM-E13-PLAT-11](../MEM-E13-PLAT-11-wyglad-szczegolow-wspomnienia.md) | Nowy wygląd szczegółów wspomnienia (S05) | - / UI | 3–4 h | zrobiony |
+| [MEM-E13-PLAT-12](../MEM-E13-PLAT-12-kod-qr-linku-albumu.md) | Kod QR z linkiem do albumu | - / UI | 1–2 h | zrobiony |
