@@ -47,6 +47,7 @@ public sealed class AlbumModule : IModule
         services.AddScoped<IAlbumQueries, AlbumQueries>();
         services.AddScoped<IAlbumMembership, AlbumMembership>();
         services.AddScoped<IAlbumNames, AlbumNames>();
+        services.AddScoped<IAlbumMemories, AlbumMemoriesReader>();
         services.AddScoped<IAlbumMessaging, AlbumMessaging>();
         services.AddScoped<IAlbumSuccession, AlbumSuccession>();
         services.AddScoped<CreateAlbumHandler>();

@@ -25,7 +25,7 @@
 | [MEM-E6-NARRACJA-AI-05](../MEM-E6-NARRACJA-AI-05-dodaj-podsumowanie-do-albumu-c84.md) | Dodaj podsumowanie do albumu (C84) | narracja-ai / aplikacja | 1–3 | gotowy |
 | [MEM-E6-POCHODZENIE-01](../MEM-E6-POCHODZENIE-01-uniewaznij-artefakty-pochodne-c31.md) | Unieważnij artefakty pochodne (C31) | pochodzenie / domena + aplikacja | 3–4 | zrobiony |
 | [MEM-E6-POCHODZENIE-02](../MEM-E6-POCHODZENIE-02-zarejestruj-artefakt-c154.md) | Zarejestruj artefakt (C154) | pochodzenie / domena + aplikacja | 3–4 | zrobiony |
-| [MEM-E6-NARRACJA-AI-06](../MEM-E6-NARRACJA-AI-06-zapytanie-materialy-dozwolone-do-podsumowania-zgod.md) | Zapytanie: Materiały dozwolone do podsumowania (zgody, uprawnienia) (R8) | narracja-ai / infrastruktura (query handler) | 1–3 | gotowy |
+| [MEM-E6-NARRACJA-AI-06](../MEM-E6-NARRACJA-AI-06-zapytanie-materialy-dozwolone-do-podsumowania-zgod.md) | Zapytanie: Materiały dozwolone do podsumowania (zgody, uprawnienia) (R8) | narracja-ai / infrastruktura (query handler) | 1–3 | zrobiony |
 | [MEM-E6-DOSTEP-01](../MEM-E6-DOSTEP-01-read-port-dostep-dla-narracja-ai-ktore-tresci-osob.md) | Read port dostep → dla narracja-ai: które treści osoba może czytać teraz | dostep / kontrakt | 1–2 | zrobiony |
 | [MEM-E6-POCHODZENIE-03](../MEM-E6-POCHODZENIE-03-write-port-pochodzenie-dla-narracja-ai-zarejestruj.md) | Write port pochodzenie → dla narracja-ai: zarejestruj artefakt z listą źródeł (C154) | pochodzenie / kontrakt | 1–2 | zrobiony |
 | [MEM-E6-POCHODZENIE-04](../MEM-E6-POCHODZENIE-04-polityka-p4-zawsze-gdy-tresc-usunieta-definitywnie.md) | Polityka P4: Zawsze gdy treść usunięta definitywnie, wtedy unieważnij artefakty pochodne, które ją cytują | pochodzenie / aplikacja (handler zdarzenia) | 1–3 | zrobiony |

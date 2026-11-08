@@ -3,6 +3,7 @@ using Memorio.Modules.AiNarration.Api;
 using Memorio.Modules.AiNarration.Application.AiTexts;
 using Memorio.Modules.AiNarration.Application.Commands.Consents;
 using Memorio.Modules.AiNarration.Application.Policies;
+using Memorio.Modules.AiNarration.Application.Queries.SummaryMaterials;
 using Memorio.Modules.AiNarration.Application.Commands.RequestDraft;
 using Memorio.Modules.AiNarration.Application.Ports;
 using Memorio.Modules.AiNarration.Contracts;
@@ -12,6 +13,7 @@ using Memorio.Modules.AiNarration.Infrastructure;
 using Memorio.Modules.AiNarration.Infrastructure.Mistral;
 using Memorio.Modules.AiNarration.Infrastructure.Persistence;
 using Memorio.Modules.AiNarration.Infrastructure.Prompts;
+using Memorio.Modules.AiNarration.Infrastructure.Queries;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -70,6 +72,7 @@ public sealed class AiNarrationModule : IModule
         services.AddScoped<RevokeAiConsentHandler>();
         services.AddScoped<ConsentEndsWithParticipation>();
         services.AddScoped<AiConsentQuery>();
+        services.AddScoped<ISummaryMaterialsQuery, SummaryMaterialsQuery>();
 
         services.AddHealthChecks().AddCheck<AiNarrationDatabaseHealthCheck>(AiNarrationDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))

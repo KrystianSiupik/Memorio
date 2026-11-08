@@ -1,7 +1,9 @@
 using Memorio.Hosting.Messaging;
+using Memorio.Modules.Access.Contracts;
 using Memorio.Modules.AiNarration.Application.Ports;
 using Memorio.Modules.AiNarration.Infrastructure.Persistence;
 using Memorio.Modules.Album.Contracts;
+using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Limits.Contracts;
 using Memorio.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -59,6 +61,9 @@ public sealed class AiNarrationDatabase : PostgresDatabase
         builder.Services.RemoveAll<ITextGenerator>();
         builder.Services.AddSingleton<ITextGenerator>(Provider);
         builder.Services.AddSingleton<IAlbumMembership>(Albums);
+        builder.Services.AddSingleton<IAlbumMemories>(Albums);
+        builder.Services.AddSingleton<IReadableContent>(Albums);
+        builder.Services.AddSingleton<IMemoryFacts>(Albums);
         _host = builder.Build();
 
         await using (var scope = CreateScope())
@@ -79,10 +84,34 @@ public sealed class AiNarrationDatabase : PostgresDatabase
     }
 }
 
-/// <summary>Who takes part in which album, in memory.</summary>
-internal sealed class FakeAlbums : IAlbumMembership
+/// <summary>Who takes part in which album, what each album holds, who may read it and the facts of its memories, in memory.</summary>
+internal sealed class FakeAlbums : IAlbumMembership, IAlbumMemories, IReadableContent, IMemoryFacts
 {
     private readonly System.Collections.Concurrent.ConcurrentDictionary<(Guid Account, Guid Album), bool> _members = new();
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<Guid, (Guid Album, MemoryFact Fact)> _memories = new();
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<Guid, bool> _hidden = new();
+
+    /// <summary>A memory of the album by this author; its author takes part.</summary>
+    public MemoryFact Bring(Guid albumId, Guid authorAccountId, DateOnly date, string place = "Giewont", string? description = "W górach.")
+    {
+        Join(authorAccountId, albumId);
+        var fact = new MemoryFact(Guid.CreateVersion7(), authorAccountId, place, "Day", date, date, null, description);
+        _memories[fact.MemoryId] = (albumId, fact);
+        return fact;
+    }
+
+    public void Hide(Guid memoryId) => _hidden[memoryId] = true;
+
+    public void Delete(Guid memoryId) => _memories.TryRemove(memoryId, out _);
+
+    public Task<IReadOnlyList<AlbumMemoryRef>> MemoriesOfAsync(Guid albumId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<AlbumMemoryRef>>([.. _memories.Values.Where(item => item.Album == albumId).Select(item => new AlbumMemoryRef(item.Fact.MemoryId, item.Fact.AuthorAccountId))]);
+
+    public Task<IReadOnlyCollection<Guid>> ReadableAsync(Guid personId, Guid albumId, IReadOnlyCollection<Guid> memoryIds, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyCollection<Guid>>(_members.ContainsKey((personId, albumId)) ? [.. memoryIds.Where(id => !_hidden.ContainsKey(id))] : []);
+
+    public Task<IReadOnlyList<MemoryFact>> FactsAsync(IReadOnlyCollection<Guid> memoryIds, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<MemoryFact>>([.. memoryIds.Where(_memories.ContainsKey).Select(id => _memories[id].Fact).OrderBy(fact => fact.DateFrom)]);
 
     public void Join(Guid accountId, Guid albumId) => _members[(accountId, albumId)] = true;
 
