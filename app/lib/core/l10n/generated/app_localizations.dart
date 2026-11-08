@@ -2479,6 +2479,18 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Napisz kilka zdań albo poproś AI o szkic.'**
   String get storyQuestionHint;
+
+  /// No description provided for @memoryStory.
+  ///
+  /// In pl, this message translates to:
+  /// **'Historia'**
+  String get memoryStory;
+
+  /// No description provided for @memoryDeleting.
+  ///
+  /// In pl, this message translates to:
+  /// **'Usuwanie'**
+  String get memoryDeleting;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

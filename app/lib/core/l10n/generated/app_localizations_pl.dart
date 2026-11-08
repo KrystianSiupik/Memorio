@@ -1334,4 +1334,10 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get storyQuestionHint => 'Napisz kilka zdań albo poproś AI o szkic.';
+
+  @override
+  String get memoryStory => 'Historia';
+
+  @override
+  String get memoryDeleting => 'Usuwanie';
 }

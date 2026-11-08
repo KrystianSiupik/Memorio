@@ -422,5 +422,7 @@
   "photosQuestion": "Pokaż, jak tam było",
   "photosQuestionHint": "Pierwsze zdjęcie pokaże się na mapie. Ten krok możesz pominąć.",
   "storyQuestion": "Opowiedz, co się wydarzyło",
-  "storyQuestionHint": "Napisz kilka zdań albo poproś AI o szkic."
+  "storyQuestionHint": "Napisz kilka zdań albo poproś AI o szkic.",
+  "memoryStory": "Historia",
+  "memoryDeleting": "Usuwanie"
 }

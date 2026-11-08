@@ -38,19 +38,21 @@ void main() {
   }
 
   bool isEnabled(WidgetTester tester, Finder finder) => switch (tester.widget(finder)) {
-    final FilledButton button => button.onPressed != null,
-    final OutlinedButton button => button.onPressed != null,
+    final ButtonStyleButton button => button.onPressed != null,
     _ => throw StateError('Not a button'),
   };
 
-  Finder trash() => find.widgetWithText(OutlinedButton, 'Usuń moją treść');
-  Finder forGood() => find.widgetWithText(FilledButton, 'Usuń trwale (formalne żądanie)');
+  // The buttons carry icons (MEM-E13-PLAT-11): found by their words.
+  Finder button(String label) =>
+      find.ancestor(of: find.text(label), matching: find.byWidgetPredicate((widget) => widget is ButtonStyleButton));
+  Finder trash() => button('Usuń moją treść');
+  Finder forGood() => button('Usuń trwale (formalne żądanie)');
 
   testWidgets('shows the place, the date, the content with its author, the people and the AI marker', (tester) async {
     await open(tester);
 
-    expect(find.text('Miejsce: Giewont'), findsOneWidget);
-    expect(find.text('Data: 01.07.2026 – 20.07.2026'), findsOneWidget);
+    expect(find.text('Giewont'), findsOneWidget);
+    expect(find.text('01.07.2026 – 20.07.2026'), findsOneWidget);
     expect(find.text('Autor: Ty'), findsOneWidget);
     expect(find.text('W górach.'), findsOneWidget);
     expect(find.text('Nikt nie jest oznaczony'), findsOneWidget);
@@ -71,7 +73,7 @@ void main() {
     );
     await open(tester);
 
-    expect(find.text('Data: 01.07.2026, 18:30'), findsOneWidget);
+    expect(find.text('01.07.2026, 18:30'), findsOneWidget);
   });
 
   testWidgets('S05 → S03: moving to the trash leaves the screen', (tester) async {
@@ -157,7 +159,7 @@ void main() {
         await tester.tap(find.text('Ponów'));
         await tester.pumpAndSettle();
 
-        expect(find.text('Miejsce: Giewont'), findsOneWidget);
+        expect(find.text('Giewont'), findsOneWidget);
       });
     });
   });
@@ -170,16 +172,61 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('To już rozstrzygnięte. Odśwież i sprawdź aktualny stan.'), findsOneWidget);
-    expect(find.text('Miejsce: Giewont'), findsOneWidget);
+    expect(find.text('Giewont'), findsOneWidget);
   });
 
   testWidgets('offline: the banner, the data read only, the actions off', (tester) async {
     await open(tester, online: Stream.value(false));
 
     expect(find.byKey(const Key('s05-offline')), findsOneWidget);
-    expect(find.text('Miejsce: Giewont'), findsOneWidget);
+    expect(find.text('Giewont'), findsOneWidget);
     expect(isEnabled(tester, trash()), isFalse);
     expect(tester.widget<CheckboxListTile>(find.byType(CheckboxListTile)).onChanged, isNull);
+  });
+
+  group('MEM-E13-PLAT-11 look', () {
+    testWidgets('the place and the date are written on the photos, which move with the arrows and open full screen', (
+      tester,
+    ) async {
+      memories.details = const MemoryDetails(
+        id: 'memory-1',
+        placeName: 'Biskupia Kopa',
+        dateFrom: '2026-07-01',
+        dateTo: '2026-07-01',
+        isMine: true,
+        description: 'Wieża.',
+        descriptionIsAi: false,
+        photoUrls: ['https://storage.example.invalid/1.jpg', 'https://storage.example.invalid/2.jpg'],
+      );
+      await open(tester);
+
+      final header = tester.getRect(find.byKey(const Key('s05-header')));
+      expect(header.contains(tester.getCenter(find.byKey(const Key('s05-place')))), isTrue);
+      expect(tester.widget<Text>(find.byKey(const Key('s05-place'))).style!.color, Colors.white);
+      expect(tester.widget<Text>(find.byKey(const Key('s05-photo-counter'))).data, '1 / 2');
+
+      await tester.tap(find.byKey(const Key('s05-photo-next')));
+      await tester.pumpAndSettle();
+      expect(tester.widget<Text>(find.byKey(const Key('s05-photo-counter'))).data, '2 / 2');
+      expect(find.byKey(const Key('s05-photo-next')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('s05-photos')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('s05-photo-full')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('s05-photo-full-close')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('s05-photo-full')), findsNothing);
+    });
+
+    testWidgets('without photos a coloured band carries the place; deleting sits apart at the foot', (tester) async {
+      await open(tester);
+
+      expect(find.byKey(const Key('s05-photos')), findsNothing);
+      expect(tester.getSize(find.byKey(const Key('s05-header'))).height, 160);
+      final zone = tester.getRect(find.byKey(const Key('s05-delete-zone')));
+      expect(zone.contains(tester.getCenter(trash())), isTrue);
+      expect(zone.top, greaterThan(tester.getRect(find.text('W górach.')).bottom));
+    });
   });
 }
 
