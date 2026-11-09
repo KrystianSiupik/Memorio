@@ -21,6 +21,10 @@ internal static class SummaryEndpoints
             .WithTags("AI")
             .WithName("GetAiSummary")
             .WithSummary("One summary of the person who asked for it.");
+        v1.MapPost("/ai/summaries/{id:guid}/save", SaveAsync)
+            .WithTags("AI")
+            .WithName("SaveAiSummary")
+            .WithSummary("C83: the person approves the summary as it is and keeps it; the memories it tells of are checked again.");
     }
 
     private static async Task<Results<Ok<AiSummaryResponse>, ProblemHttpResult>> RequestAsync(
@@ -35,6 +39,16 @@ internal static class SummaryEndpoints
         }
 
         var summary = await handler.HandleAsync(new RequestSummary(request.Id, CurrentAccount.IdOf(principal), request.AlbumId, from, to), cancellationToken);
+        return summary.IsFailure ? Problems.From(summary.Error) : TypedResults.Ok(AiSummaryResponse.Of(summary.Value));
+    }
+
+    private static async Task<Results<Ok<AiSummaryResponse>, ProblemHttpResult>> SaveAsync(
+        Guid id,
+        ClaimsPrincipal principal,
+        ApproveSummaryHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var summary = await handler.HandleAsync(new ApproveSummary(id, CurrentAccount.IdOf(principal)), cancellationToken);
         return summary.IsFailure ? Problems.From(summary.Error) : TypedResults.Ok(AiSummaryResponse.Of(summary.Value));
     }
 

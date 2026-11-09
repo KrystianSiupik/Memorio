@@ -156,8 +156,11 @@ internal sealed class FakeProviderForDrafts : ITextGenerator
     public ConcurrentDictionary<string, bool> DownFor { get; } = new();
 
     /// <summary>What the AI tells of a period: one sentence with its fact, one with none, one with a fact it was not given.</summary>
-    public string SummaryAnswer { get; set; } =
+    public string SummaryAnswer { get; } =
         "W lipcu byliście w [PLACE_1]. [F1] Wszyscy byli bardzo szczęśliwi. Potem przyszło coś jeszcze. [F9]";
+
+    /// <summary>Another answer for the material holding this text, so tests running at once do not change each other's.</summary>
+    public ConcurrentDictionary<string, string> SummaryAnswerWhen { get; } = new();
 
     public Task<Result<ProviderText>> GenerateAsync(TextGenerationRequest request, CancellationToken cancellationToken)
     {
@@ -168,7 +171,8 @@ internal sealed class FakeProviderForDrafts : ITextGenerator
 
         _materials.Add(request.Material);
         return Task.FromResult<Result<ProviderText>>(new ProviderText(
-            request.Prompt.Id == "period-summary" ? SummaryAnswer : "Wspomnienie.",
+            request.Prompt.Id != "period-summary" ? "Wspomnienie."
+                : SummaryAnswerWhen.FirstOrDefault(answer => request.Material.Contains(answer.Key, StringComparison.Ordinal)).Value ?? SummaryAnswer,
             "test-model"));
     }
 }
