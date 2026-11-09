@@ -183,6 +183,69 @@
         }
       }
     },
+    "/v1/ai/summaries": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "C82: the AI\u0027s story of a period of an album, from the materials the person may use; the id comes from the client.",
+        "operationId": "RequestAiSummary",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestAiSummaryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ai/summaries/{id}": {
+      "get": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "One summary of the person who asked for it.",
+        "operationId": "GetAiSummary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/moderation/mine": {
       "get": {
         "tags": [
@@ -3044,6 +3107,120 @@
           }
         }
       },
+      "AiSummaryResponse": {
+        "required": [
+          "id",
+          "albumId",
+          "from",
+          "to",
+          "state",
+          "text",
+          "sentences",
+          "isAiGenerated",
+          "model",
+          "promptVersion",
+          "generatedAt",
+          "leftOutMemories",
+          "leftOutPeople",
+          "droppedSentences",
+          "addedToAlbum",
+          "invalidReason"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "albumId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "sentences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiSummarySentence"
+            }
+          },
+          "isAiGenerated": {
+            "type": "boolean"
+          },
+          "model": {
+            "type": "string"
+          },
+          "promptVersion": {
+            "type": "string"
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "leftOutMemories": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "leftOutPeople": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "droppedSentences": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "addedToAlbum": {
+            "type": "boolean"
+          },
+          "invalidReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "AiSummarySentence": {
+        "required": [
+          "text",
+          "memoryIds"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "memoryIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
       "AlbumHandoverResponse": {
         "required": [
           "toAccountId",
@@ -4777,6 +4954,37 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "RequestAiSummaryRequest": {
+        "required": [
+          "id",
+          "albumId",
+          "from",
+          "to"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "albumId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "from": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "to": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

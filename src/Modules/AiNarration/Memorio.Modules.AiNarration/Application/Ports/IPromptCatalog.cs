@@ -4,4 +4,6 @@ namespace Memorio.Modules.AiNarration.Application.Ports;
 internal interface IPromptCatalog
 {
     Prompt MemoryDescriptionDraft { get; }
+
+    Prompt PeriodSummary { get; }
 }
