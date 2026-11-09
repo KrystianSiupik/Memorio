@@ -211,6 +211,18 @@ final class MyModerationRoute extends AppRoute {
   String get location => '${AccountRoute.path}/$path';
 }
 
+/// S17 of an album, for its participants.
+final class AlbumSummaryRoute extends AppRoute {
+  const AlbumSummaryRoute(this.id);
+
+  static const path = 'summary';
+
+  final String id;
+
+  @override
+  String get location => '${const AlbumRoute('').location}$id/$path';
+}
+
 /// S12 from inside an album: its curator too.
 final class AlbumConsentsRoute extends AppRoute {
   const AlbumConsentsRoute(this.id);

@@ -6,6 +6,7 @@ import '../core/auth/token_store.dart';
 import '../core/offline/offline.dart';
 import '../core/settings/settings.dart';
 import '../features/account/account.dart';
+import '../features/ai_summaries/ai_summaries.dart';
 import '../features/albums/albums.dart';
 import '../features/map/map.dart';
 import '../features/memories/memories.dart';
@@ -60,6 +61,12 @@ List<Override> appOverrides({required String appVersion}) => [
   plansRepositoryProvider.overrideWith((ref) {
     final api = ref.watch(apiClientProvider);
     return HttpPlansRepository(plans: api.plans, memories: api.memories, albums: api.albums);
+  }),
+  summariesRepositoryProvider.overrideWith((ref) => HttpSummariesRepository(ai: ref.watch(apiClientProvider).ai)),
+  // The AI pool of a summary is the person's own (D-336).
+  aiOperationsLeftProvider.overrideWith((ref) async {
+    final plan = await ref.watch(planProvider(null).future);
+    return plan.aiLimit - plan.aiUsed;
   }),
   photoPickerProvider.overrideWithValue(const ImagePhotoPicker()),
   operationSendersProvider.overrideWith(

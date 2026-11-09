@@ -3220,6 +3220,7 @@
           "model",
           "promptVersion",
           "generatedAt",
+          "usedMemories",
           "leftOutMemories",
           "leftOutPeople",
           "droppedSentences",
@@ -3270,6 +3271,14 @@
           "generatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "usedMemories": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           },
           "leftOutMemories": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",

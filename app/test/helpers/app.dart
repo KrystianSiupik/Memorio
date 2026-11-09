@@ -9,6 +9,7 @@ import 'package:memorio/core/auth/token_store.dart';
 import 'package:memorio/core/offline/local_database.dart';
 import 'package:memorio/core/offline/offline.dart';
 import 'package:memorio/features/account/account.dart';
+import 'package:memorio/features/ai_summaries/ai_summaries.dart';
 import 'package:memorio/features/albums/albums.dart';
 import 'package:memorio/features/memories/memories.dart';
 import 'package:memorio/features/map/map.dart';
@@ -27,6 +28,7 @@ import 'fake_plans.dart';
 import 'fake_replay.dart';
 import 'fake_moderation.dart';
 import 'fake_succession.dart';
+import 'fake_summaries.dart';
 import 'fake_token_store.dart';
 
 /// Session store answering with a fixed session; null means signed out.
@@ -55,6 +57,7 @@ Future<ProviderContainer> pumpMemorioApp(
   ReplayRepository? replay,
   SuccessionRepository? succession,
   ModerationRepository? moderation,
+  SummariesRepository? summaries,
   SettingsStore? settings,
   FakeHttpAdapter? http,
   Stream<bool>? online,
@@ -82,6 +85,7 @@ Future<ProviderContainer> pumpMemorioApp(
       replayRepositoryProvider.overrideWithValue(replay ?? FakeReplayRepository()),
       successionRepositoryProvider.overrideWithValue(succession ?? FakeSuccessionRepository()),
       moderationRepositoryProvider.overrideWithValue(moderation ?? FakeModerationRepository()),
+      summariesRepositoryProvider.overrideWithValue(summaries ?? FakeSummariesRepository()),
       photoPickerProvider.overrideWithValue(FakePhotoPicker()),
       localDatabaseProvider.overrideWithValue(database),
       isOnlineProvider.overrideWith((ref) => online ?? Stream.value(true)),

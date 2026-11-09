@@ -1353,4 +1353,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get close => 'Close';
+
+  @override
+  String get summaryTitle => 'Period summary (AI)';
+
+  @override
+  String get summaryOpen => 'AI summary';
+
+  @override
+  String get summaryConsent => 'My memories in this album may be used in AI summaries';
+
+  @override
+  String get summaryConsentHint =>
+      'This consent is for this album only. When you take it back, summaries made from your memories disappear.';
+
+  @override
+  String summaryFrom(String date) {
+    return 'From: $date';
+  }
+
+  @override
+  String summaryTo(String date) {
+    return 'To: $date';
+  }
+
+  @override
+  String get summaryRequest => 'Request a summary';
+
+  @override
+  String get summaryConsentNeeded => 'First give the AI consent for this album.';
+
+  @override
+  String get summaryLimitUsed => 'This month\'s AI allowance is used up.';
+
+  @override
+  String get summaryPreparing => 'We are preparing the summary — we will let you know with a notification';
+
+  @override
+  String get summaryEmpty => 'There is nothing that may be used';
+
+  @override
+  String get summaryAiBadge => 'Text written by AI';
+
+  @override
+  String summaryMaterials(int count) {
+    return 'Materials allowed (memories): $count';
+  }
+
+  @override
+  String summaryLeftOut(int count) {
+    return 'Participants left out (no consent): $count';
+  }
+
+  @override
+  String summaryDropped(int count) {
+    return 'AI sentences left out for having no source: $count';
+  }
+
+  @override
+  String get summarySave => 'Approve and save';
+
+  @override
+  String get summaryAddToAlbum => 'Add to the album (participants see it)';
+
+  @override
+  String get summarySaved => 'Saved as a keepsake';
+
+  @override
+  String get summaryAdded => 'Added to the album';
+
+  @override
+  String get summaryInvalidated =>
+      'This summary is no longer valid: some memories may no longer be used. Request a new one.';
+
+  @override
+  String get summaryInAlbum => 'Summaries in the album';
+
+  @override
+  String get summaryInAlbumEmpty => 'The album has no summaries yet.';
+
+  @override
+  String get summaryNoAccess => 'You have no access to this summary or album.';
+
+  @override
+  String get summaryMaterialsChanged => 'Some memories may no longer be used. Request a new summary.';
+
+  @override
+  String get summaryNothingTold => 'The AI wrote nothing the memories support. Try again.';
+
+  @override
+  String get summaryInvalidPeriod => 'Choose a period whose start is not after its end, at most 10 years.';
 }

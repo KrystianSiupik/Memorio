@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/account/account.dart';
+import '../features/ai_summaries/ai_summaries.dart';
 import '../features/albums/albums.dart';
 import '../features/map/map.dart';
 import '../features/memories/memories.dart';
@@ -147,6 +148,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                     onOpenMemory: (memoryId) => MemoryRoute(memoryId).go(context),
                     onManage: () => AlbumManageRoute(id).go(context),
                     onConsents: () => AlbumConsentsRoute(id).go(context),
+                    onSummaries: () => AlbumSummaryRoute(id).go(context),
                     onPlan: () => AlbumPlanRoute(id).go(context),
                     onReportDeath: () => ReportDeathRoute(id).go(context),
                     onReport: () => AlbumReportRoute(id).go(context),
@@ -189,6 +191,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                         builder: (context, state) => PlanMaterialPage(albumId: state.pathParameters['id']),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: AlbumSummaryRoute.path,
+                    builder: (context, state) => AlbumSummaryPage(albumId: state.pathParameters['id']!),
                   ),
                   GoRoute(
                     path: AlbumConsentsRoute.path,

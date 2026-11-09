@@ -16,6 +16,7 @@ class AlbumPage extends ConsumerStatefulWidget {
     required this.onOpenMemory,
     required this.onManage,
     required this.onConsents,
+    this.onSummaries,
     required this.onPlan,
     required this.onReportDeath,
     this.onReport,
@@ -27,6 +28,9 @@ class AlbumPage extends ConsumerStatefulWidget {
   final void Function(String memoryId) onOpenMemory;
   final VoidCallback onManage;
   final VoidCallback onConsents;
+
+  /// S17; without it the album has no summaries entry.
+  final VoidCallback? onSummaries;
   final VoidCallback onPlan;
   final VoidCallback onReportDeath;
 
@@ -229,6 +233,13 @@ class _AlbumPageState extends ConsumerState<AlbumPage> with AlbumActions {
               tooltip: l10n.planAlbumTitle,
               icon: const Icon(Icons.workspace_premium_outlined),
               onPressed: widget.onPlan,
+            ),
+          if ((details.value?.isMember ?? false) && widget.onSummaries != null)
+            IconButton(
+              key: const Key('album-summaries'),
+              tooltip: l10n.summaryOpen,
+              icon: const Icon(Icons.auto_awesome_outlined),
+              onPressed: widget.onSummaries,
             ),
           if (details.value?.isMember ?? false)
             IconButton(
