@@ -22,7 +22,7 @@
 | [MEM-E6-NARRACJA-AI-02](../MEM-E6-NARRACJA-AI-02-odwolaj-zgode-na-ai-c81.md) | Odwołaj zgodę na AI (C81) | narracja-ai / aplikacja | 1–3 | zrobiony |
 | [MEM-E6-NARRACJA-AI-03](../MEM-E6-NARRACJA-AI-03-zamow-podsumowanie-okresu-c82.md) | Zamów podsumowanie okresu (C82) | narracja-ai / aplikacja | 2–4 | zrobiony |
 | [MEM-E6-NARRACJA-AI-04](../MEM-E6-NARRACJA-AI-04-zatwierdz-i-zapisz-podsumowanie-c83.md) | Zatwierdź i zapisz podsumowanie (C83) | narracja-ai / aplikacja | 1–3 | zrobiony |
-| [MEM-E6-NARRACJA-AI-05](../MEM-E6-NARRACJA-AI-05-dodaj-podsumowanie-do-albumu-c84.md) | Dodaj podsumowanie do albumu (C84) | narracja-ai / aplikacja | 1–3 | gotowy |
+| [MEM-E6-NARRACJA-AI-05](../MEM-E6-NARRACJA-AI-05-dodaj-podsumowanie-do-albumu-c84.md) | Dodaj podsumowanie do albumu (C84) | narracja-ai / aplikacja | 1–3 | zrobiony |
 | [MEM-E6-POCHODZENIE-01](../MEM-E6-POCHODZENIE-01-uniewaznij-artefakty-pochodne-c31.md) | Unieważnij artefakty pochodne (C31) | pochodzenie / domena + aplikacja | 3–4 | zrobiony |
 | [MEM-E6-POCHODZENIE-02](../MEM-E6-POCHODZENIE-02-zarejestruj-artefakt-c154.md) | Zarejestruj artefakt (C154) | pochodzenie / domena + aplikacja | 3–4 | zrobiony |
 | [MEM-E6-NARRACJA-AI-06](../MEM-E6-NARRACJA-AI-06-zapytanie-materialy-dozwolone-do-podsumowania-zgod.md) | Zapytanie: Materiały dozwolone do podsumowania (zgody, uprawnienia) (R8) | narracja-ai / infrastruktura (query handler) | 1–3 | zrobiony |

@@ -13,6 +13,12 @@ internal sealed class PeriodSummaries(IDbContextOutbox<AiNarrationDbContext> out
     public Task<PeriodSummary?> FindAsync(Guid id, CancellationToken cancellationToken) =>
         Database.PeriodSummaries.FirstOrDefaultAsync(summary => summary.Id == id, cancellationToken);
 
+    public async Task<IReadOnlyList<PeriodSummary>> InAlbumAsync(Guid albumId, CancellationToken cancellationToken) =>
+        await Database.PeriodSummaries.AsNoTracking()
+            .Where(summary => summary.AlbumId == albumId && summary.AddedToAlbumAt != null && summary.State == SummaryState.Saved)
+            .OrderByDescending(summary => summary.AddedToAlbumAt)
+            .ToListAsync(cancellationToken);
+
     public async Task<PeriodSummary> AddOrFindAsync(PeriodSummary summary, CancellationToken cancellationToken)
     {
         Database.PeriodSummaries.Add(summary);

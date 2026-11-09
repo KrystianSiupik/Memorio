@@ -5,6 +5,9 @@ internal interface IPeriodSummaries
 {
     Task<PeriodSummary?> FindAsync(Guid id, CancellationToken cancellationToken);
 
+    /// <summary>The valid summaries added to the album, the newest first.</summary>
+    Task<IReadOnlyList<PeriodSummary>> InAlbumAsync(Guid albumId, CancellationToken cancellationToken);
+
     /// <summary>The new summary, or the one the same request saved first.</summary>
     Task<PeriodSummary> AddOrFindAsync(PeriodSummary summary, CancellationToken cancellationToken);
 

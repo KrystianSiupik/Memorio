@@ -4,6 +4,7 @@ using Memorio.Modules.AiNarration.Application.AiTexts;
 using Memorio.Modules.AiNarration.Application.Commands.Consents;
 using Memorio.Modules.AiNarration.Application.Commands.Summaries;
 using Memorio.Modules.AiNarration.Application.Policies;
+using Memorio.Modules.AiNarration.Application.Queries.AlbumSummaries;
 using Memorio.Modules.AiNarration.Application.Queries.SummaryMaterials;
 using Memorio.Modules.AiNarration.Application.Commands.RequestDraft;
 using Memorio.Modules.AiNarration.Application.Ports;
@@ -78,6 +79,8 @@ public sealed class AiNarrationModule : IModule
         services.AddScoped<IPeriodSummaries, PeriodSummaries>();
         services.AddScoped<RequestSummaryHandler>();
         services.AddScoped<ApproveSummaryHandler>();
+        services.AddScoped<AddSummaryToAlbumHandler>();
+        services.AddScoped<AlbumSummariesQuery>();
         services.AddScoped<SummaryEndsWithArtifact>();
 
         services.AddHealthChecks().AddCheck<AiNarrationDatabaseHealthCheck>(AiNarrationDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);

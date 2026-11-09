@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Memorio.Modularity;
 using Memorio.Modules.AiNarration.Application.Commands.Summaries;
+using Memorio.Modules.AiNarration.Application.Queries.AlbumSummaries;
 using Memorio.Modules.AiNarration.Domain.Summaries;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -25,6 +26,14 @@ internal static class SummaryEndpoints
             .WithTags("AI")
             .WithName("SaveAiSummary")
             .WithSummary("C83: the person approves the summary as it is and keeps it; the memories it tells of are checked again.");
+        v1.MapPost("/ai/summaries/{id:guid}/album", AddToAlbumAsync)
+            .WithTags("AI")
+            .WithName("AddAiSummaryToAlbum")
+            .WithSummary("C84: a saved summary shown to the participants of its album.");
+        v1.MapGet("/albums/{albumId:guid}/ai-summaries", InAlbumAsync)
+            .WithTags("AI")
+            .WithName("ListAlbumAiSummaries")
+            .WithSummary("The summaries added to the album that this participant may read every memory of, the newest first.");
     }
 
     private static async Task<Results<Ok<AiSummaryResponse>, ProblemHttpResult>> RequestAsync(
@@ -52,6 +61,28 @@ internal static class SummaryEndpoints
         return summary.IsFailure ? Problems.From(summary.Error) : TypedResults.Ok(AiSummaryResponse.Of(summary.Value));
     }
 
+    private static async Task<Results<Ok<AiSummaryResponse>, ProblemHttpResult>> AddToAlbumAsync(
+        Guid id,
+        ClaimsPrincipal principal,
+        AddSummaryToAlbumHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var summary = await handler.HandleAsync(new AddSummaryToAlbum(id, CurrentAccount.IdOf(principal)), cancellationToken);
+        return summary.IsFailure ? Problems.From(summary.Error) : TypedResults.Ok(AiSummaryResponse.Of(summary.Value));
+    }
+
+    private static async Task<Results<Ok<IReadOnlyList<AiSummaryResponse>>, ProblemHttpResult>> InAlbumAsync(
+        Guid albumId,
+        ClaimsPrincipal principal,
+        AlbumSummariesQuery query,
+        CancellationToken cancellationToken)
+    {
+        var summaries = await query.ForAsync(CurrentAccount.IdOf(principal), albumId, cancellationToken);
+        return summaries.IsFailure
+            ? Problems.From(summaries.Error)
+            : TypedResults.Ok<IReadOnlyList<AiSummaryResponse>>([.. summaries.Value.Select(AiSummaryResponse.Of)]);
+    }
+
     private static async Task<Results<Ok<AiSummaryResponse>, ProblemHttpResult>> GetAsync(
         Guid id,
         ClaimsPrincipal principal,
@@ -67,6 +98,7 @@ internal static class SummaryEndpoints
 /// <param name="To">yyyy-MM-dd.</param>
 internal sealed record RequestAiSummaryRequest(Guid Id, Guid AlbumId, string? From, string? To);
 
+/// <param name="AccountId">Who asked for it.</param>
 /// <param name="State">Draft, Saved or Invalidated; an invalidated summary has no text any more.</param>
 /// <param name="IsAiGenerated">Always true: the marker shown with this text.</param>
 /// <param name="LeftOutMemories">Memories of the period not used, because their authors gave no AI consent.</param>
@@ -74,6 +106,7 @@ internal sealed record RequestAiSummaryRequest(Guid Id, Guid AlbumId, string? Fr
 /// <param name="DroppedSentences">Sentences of the AI dropped for pointing to no memory.</param>
 internal sealed record AiSummaryResponse(
     Guid Id,
+    Guid AccountId,
     Guid AlbumId,
     string From,
     string To,
@@ -92,6 +125,7 @@ internal sealed record AiSummaryResponse(
 {
     public static AiSummaryResponse Of(PeriodSummary summary) => new(
         summary.Id,
+        summary.AccountId,
         summary.AlbumId,
         summary.From.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
         summary.To.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
