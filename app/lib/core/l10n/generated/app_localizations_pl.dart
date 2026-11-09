@@ -1352,4 +1352,93 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get close => 'Zamknij';
+
+  @override
+  String get summaryTitle => 'Podsumowanie okresu (AI)';
+
+  @override
+  String get summaryOpen => 'Podsumowanie AI';
+
+  @override
+  String get summaryConsent => 'Moje wspomnienia z tego albumu mogą trafić do podsumowań AI';
+
+  @override
+  String get summaryConsentHint =>
+      'Zgoda dotyczy tylko tego albumu. Gdy ją odwołasz, podsumowania z Twoich wspomnień znikną.';
+
+  @override
+  String summaryFrom(String date) {
+    return 'Od: $date';
+  }
+
+  @override
+  String summaryTo(String date) {
+    return 'Do: $date';
+  }
+
+  @override
+  String get summaryRequest => 'Zamów podsumowanie';
+
+  @override
+  String get summaryConsentNeeded => 'Najpierw wyraź zgodę na AI dla tego albumu.';
+
+  @override
+  String get summaryLimitUsed => 'Limit AI w tym miesiącu jest wykorzystany.';
+
+  @override
+  String get summaryPreparing => 'Przygotowujemy podsumowanie — damy znać powiadomieniem';
+
+  @override
+  String get summaryEmpty => 'Brak materiałów, które wolno użyć';
+
+  @override
+  String get summaryAiBadge => 'Tekst napisany przez AI';
+
+  @override
+  String summaryMaterials(int count) {
+    return 'Materiały dozwolone (wspomnienia): $count';
+  }
+
+  @override
+  String summaryLeftOut(int count) {
+    return 'Pominięto uczestników (brak zgody): $count';
+  }
+
+  @override
+  String summaryDropped(int count) {
+    return 'Pominięte zdania AI bez źródła: $count';
+  }
+
+  @override
+  String get summarySave => 'Zatwierdź i zapisz';
+
+  @override
+  String get summaryAddToAlbum => 'Dodaj do albumu (widzą uczestnicy)';
+
+  @override
+  String get summarySaved => 'Zapisane jako pamiątka';
+
+  @override
+  String get summaryAdded => 'Dodane do albumu';
+
+  @override
+  String get summaryInvalidated => 'To podsumowanie jest nieaktualne: części wspomnień nie wolno już użyć. Zamów nowe.';
+
+  @override
+  String get summaryInAlbum => 'Podsumowania w albumie';
+
+  @override
+  String get summaryInAlbumEmpty => 'W albumie nie ma jeszcze podsumowań.';
+
+  @override
+  String get summaryNoAccess => 'Nie masz dostępu do tego podsumowania ani albumu.';
+
+  @override
+  String get summaryMaterialsChanged => 'Części wspomnień nie wolno już użyć. Zamów nowe podsumowanie.';
+
+  @override
+  String get summaryNothingTold => 'AI nie napisało nic, co potwierdzają wspomnienia. Spróbuj ponownie.';
+
+  @override
+  String get summaryInvalidPeriod => 'Wybierz okres, którego początek nie jest po końcu, najwyżej 10 lat.';
 }

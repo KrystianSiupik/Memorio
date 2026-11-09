@@ -101,6 +101,7 @@ internal sealed record RequestAiSummaryRequest(Guid Id, Guid AlbumId, string? Fr
 /// <param name="AccountId">Who asked for it.</param>
 /// <param name="State">Draft, Saved or Invalidated; an invalidated summary has no text any more.</param>
 /// <param name="IsAiGenerated">Always true: the marker shown with this text.</param>
+/// <param name="UsedMemories">The memories it was made from: the materials the person may use (R8).</param>
 /// <param name="LeftOutMemories">Memories of the period not used, because their authors gave no AI consent.</param>
 /// <param name="LeftOutPeople">How many people those memories belong to.</param>
 /// <param name="DroppedSentences">Sentences of the AI dropped for pointing to no memory.</param>
@@ -117,6 +118,7 @@ internal sealed record AiSummaryResponse(
     string Model,
     string PromptVersion,
     DateTimeOffset GeneratedAt,
+    int UsedMemories,
     int LeftOutMemories,
     int LeftOutPeople,
     int DroppedSentences,
@@ -136,6 +138,7 @@ internal sealed record AiSummaryResponse(
         summary.Model,
         summary.PromptVersion,
         summary.GeneratedAt,
+        summary.Sources.Count,
         summary.LeftOutMemories,
         summary.LeftOutPeople,
         summary.DroppedSentences,

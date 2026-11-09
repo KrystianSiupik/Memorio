@@ -3,11 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../account/account.dart';
+import '../../ai_summaries/ai_summaries.dart' show AiConsentTile;
 import '../../memories/memories.dart' show memoryPinsProvider;
 import 'albums_providers.dart';
 
 /// S12 The person's consents: what stayed in albums they left and, from inside an album, its curator.
-/// The AI consent comes with E6 (D-255).
+/// From inside an album, the person's AI consent for it too (C80, C81).
 class AlbumConsentsPage extends ConsumerStatefulWidget {
   const AlbumConsentsPage({super.key, this.albumId});
 
@@ -61,6 +62,10 @@ class _AlbumConsentsPageState extends ConsumerState<AlbumConsentsPage> with Albu
                 padding: const EdgeInsets.all(16),
                 children: [
                   ...failureBlock(context),
+                  if (albumId != null && (album?.isMember ?? false)) ...[
+                    AiConsentTile(albumId: albumId),
+                    const SizedBox(height: 16),
+                  ],
                   if (album != null) ...[
                     Text(l10n.albumCurator, style: Theme.of(context).textTheme.titleMedium),
                     if (album.myCuratorAccountId == null) Text(l10n.albumNoCurator, key: const Key('s12-no-curator')),

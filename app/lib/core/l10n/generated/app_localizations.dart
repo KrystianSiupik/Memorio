@@ -2515,6 +2515,162 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Zamknij'**
   String get close;
+
+  /// No description provided for @summaryTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podsumowanie okresu (AI)'**
+  String get summaryTitle;
+
+  /// No description provided for @summaryOpen.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podsumowanie AI'**
+  String get summaryOpen;
+
+  /// No description provided for @summaryConsent.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moje wspomnienia z tego albumu mogą trafić do podsumowań AI'**
+  String get summaryConsent;
+
+  /// No description provided for @summaryConsentHint.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zgoda dotyczy tylko tego albumu. Gdy ją odwołasz, podsumowania z Twoich wspomnień znikną.'**
+  String get summaryConsentHint;
+
+  /// No description provided for @summaryFrom.
+  ///
+  /// In pl, this message translates to:
+  /// **'Od: {date}'**
+  String summaryFrom(String date);
+
+  /// No description provided for @summaryTo.
+  ///
+  /// In pl, this message translates to:
+  /// **'Do: {date}'**
+  String summaryTo(String date);
+
+  /// No description provided for @summaryRequest.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zamów podsumowanie'**
+  String get summaryRequest;
+
+  /// No description provided for @summaryConsentNeeded.
+  ///
+  /// In pl, this message translates to:
+  /// **'Najpierw wyraź zgodę na AI dla tego albumu.'**
+  String get summaryConsentNeeded;
+
+  /// No description provided for @summaryLimitUsed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Limit AI w tym miesiącu jest wykorzystany.'**
+  String get summaryLimitUsed;
+
+  /// No description provided for @summaryPreparing.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przygotowujemy podsumowanie — damy znać powiadomieniem'**
+  String get summaryPreparing;
+
+  /// No description provided for @summaryEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak materiałów, które wolno użyć'**
+  String get summaryEmpty;
+
+  /// No description provided for @summaryAiBadge.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tekst napisany przez AI'**
+  String get summaryAiBadge;
+
+  /// No description provided for @summaryMaterials.
+  ///
+  /// In pl, this message translates to:
+  /// **'Materiały dozwolone (wspomnienia): {count}'**
+  String summaryMaterials(int count);
+
+  /// No description provided for @summaryLeftOut.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pominięto uczestników (brak zgody): {count}'**
+  String summaryLeftOut(int count);
+
+  /// No description provided for @summaryDropped.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pominięte zdania AI bez źródła: {count}'**
+  String summaryDropped(int count);
+
+  /// No description provided for @summarySave.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zatwierdź i zapisz'**
+  String get summarySave;
+
+  /// No description provided for @summaryAddToAlbum.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dodaj do albumu (widzą uczestnicy)'**
+  String get summaryAddToAlbum;
+
+  /// No description provided for @summarySaved.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisane jako pamiątka'**
+  String get summarySaved;
+
+  /// No description provided for @summaryAdded.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dodane do albumu'**
+  String get summaryAdded;
+
+  /// No description provided for @summaryInvalidated.
+  ///
+  /// In pl, this message translates to:
+  /// **'To podsumowanie jest nieaktualne: części wspomnień nie wolno już użyć. Zamów nowe.'**
+  String get summaryInvalidated;
+
+  /// No description provided for @summaryInAlbum.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podsumowania w albumie'**
+  String get summaryInAlbum;
+
+  /// No description provided for @summaryInAlbumEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'W albumie nie ma jeszcze podsumowań.'**
+  String get summaryInAlbumEmpty;
+
+  /// No description provided for @summaryNoAccess.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie masz dostępu do tego podsumowania ani albumu.'**
+  String get summaryNoAccess;
+
+  /// No description provided for @summaryMaterialsChanged.
+  ///
+  /// In pl, this message translates to:
+  /// **'Części wspomnień nie wolno już użyć. Zamów nowe podsumowanie.'**
+  String get summaryMaterialsChanged;
+
+  /// No description provided for @summaryNothingTold.
+  ///
+  /// In pl, this message translates to:
+  /// **'AI nie napisało nic, co potwierdzają wspomnienia. Spróbuj ponownie.'**
+  String get summaryNothingTold;
+
+  /// No description provided for @summaryInvalidPeriod.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wybierz okres, którego początek nie jest po końcu, najwyżej 10 lat.'**
+  String get summaryInvalidPeriod;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
