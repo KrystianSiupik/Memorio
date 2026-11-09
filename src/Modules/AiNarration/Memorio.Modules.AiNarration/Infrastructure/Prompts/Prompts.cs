@@ -9,6 +9,8 @@ namespace Memorio.Modules.AiNarration.Infrastructure.Prompts;
 internal sealed class PromptCatalog : IPromptCatalog
 {
     public Prompt MemoryDescriptionDraft => Prompts.MemoryDescriptionDraft;
+
+    public Prompt PeriodSummary => Prompts.PeriodSummary;
 }
 
 /// <summary>The prompts themselves.</summary>
@@ -28,9 +30,16 @@ internal static class Prompts
         1,
         "You help a person describe one memory in a few warm, factual sentences.\n" + Rules);
 
-    /// <summary>C82: summary of a period built from many memories.</summary>
+    /// <summary>C82: summary of a period built from many memories; every sentence names its facts (S2:A2).</summary>
     public static readonly Prompt PeriodSummary = new(
         "period-summary",
-        1,
-        "You write a short story of a period from the memories below, in chronological order.\n" + Rules);
+        2,
+        """
+        You write a short, warm story of a period from the numbered facts below (F1, F2, ...), in chronological order,
+        in 3 to 8 sentences. End every sentence with the facts it is based on in square brackets, for example
+        "In July you went to the mountains. [F1, F3]". Write no sentence without its facts.
+        Tell only what the facts say: never add feelings, intentions, relations between people, events, places or dates.
+        Refer to the people only as the facts do ("person A"); never guess who they are.
+
+        """ + Rules);
 }

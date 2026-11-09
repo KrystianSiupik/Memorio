@@ -97,6 +97,109 @@ namespace Memorio.Modules.AiNarration.Infrastructure.Persistence.Migrations
 
                     b.ToTable("memory_drafts", "ai_narration");
                 });
+
+            modelBuilder.Entity("Memorio.Modules.AiNarration.Domain.Summaries.PeriodSummary", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<DateTimeOffset?>("AddedToAlbumAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("added_to_album_at");
+
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("album_id");
+
+                    b.Property<int>("DroppedSentences")
+                        .HasColumnType("integer")
+                        .HasColumnName("dropped_sentences");
+
+                    b.Property<DateOnly>("From")
+                        .HasColumnType("date")
+                        .HasColumnName("period_from");
+
+                    b.Property<DateTimeOffset>("GeneratedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("generated_at");
+
+                    b.Property<string>("InvalidReason")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("invalid_reason");
+
+                    b.Property<DateTimeOffset?>("InvalidatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("invalidated_at");
+
+                    b.Property<int>("LeftOutMemories")
+                        .HasColumnType("integer")
+                        .HasColumnName("left_out_memories");
+
+                    b.Property<int>("LeftOutPeople")
+                        .HasColumnType("integer")
+                        .HasColumnName("left_out_people");
+
+                    b.Property<DateTimeOffset>("MaterialsReadAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("materials_read_at");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("model");
+
+                    b.Property<string>("PromptVersion")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("prompt_version");
+
+                    b.Property<DateTimeOffset?>("SavedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("saved_at");
+
+                    b.Property<int>("Sequence")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("state");
+
+                    b.Property<DateOnly>("To")
+                        .HasColumnType("date")
+                        .HasColumnName("period_to");
+
+                    b.Property<string>("_sentences")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("sentences");
+
+                    b.Property<string>("_sources")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("sources");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId")
+                        .HasDatabaseName("ix_period_summaries_account");
+
+                    b.HasIndex("AlbumId", "AddedToAlbumAt")
+                        .HasDatabaseName("ix_period_summaries_album");
+
+                    b.ToTable("period_summaries", "ai_narration");
+                });
 #pragma warning restore 612, 618
         }
     }

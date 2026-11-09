@@ -2,6 +2,7 @@ using Memorio.Modularity;
 using Memorio.Modules.AiNarration.Api;
 using Memorio.Modules.AiNarration.Application.AiTexts;
 using Memorio.Modules.AiNarration.Application.Commands.Consents;
+using Memorio.Modules.AiNarration.Application.Commands.Summaries;
 using Memorio.Modules.AiNarration.Application.Policies;
 using Memorio.Modules.AiNarration.Application.Queries.SummaryMaterials;
 using Memorio.Modules.AiNarration.Application.Commands.RequestDraft;
@@ -9,6 +10,7 @@ using Memorio.Modules.AiNarration.Application.Ports;
 using Memorio.Modules.AiNarration.Contracts;
 using Memorio.Modules.AiNarration.Domain.Consents;
 using Memorio.Modules.AiNarration.Domain.Drafts;
+using Memorio.Modules.AiNarration.Domain.Summaries;
 using Memorio.Modules.AiNarration.Infrastructure;
 using Memorio.Modules.AiNarration.Infrastructure.Mistral;
 using Memorio.Modules.AiNarration.Infrastructure.Persistence;
@@ -73,6 +75,8 @@ public sealed class AiNarrationModule : IModule
         services.AddScoped<ConsentEndsWithParticipation>();
         services.AddScoped<AiConsentQuery>();
         services.AddScoped<ISummaryMaterialsQuery, SummaryMaterialsQuery>();
+        services.AddScoped<IPeriodSummaries, PeriodSummaries>();
+        services.AddScoped<RequestSummaryHandler>();
 
         services.AddHealthChecks().AddCheck<AiNarrationDatabaseHealthCheck>(AiNarrationDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))
@@ -85,5 +89,6 @@ public sealed class AiNarrationModule : IModule
     {
         endpoints.MapDraftsEndpoints();
         endpoints.MapConsentEndpoints();
+        endpoints.MapSummaryEndpoints();
     }
 }
