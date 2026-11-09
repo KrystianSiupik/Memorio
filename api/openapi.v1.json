@@ -278,6 +278,73 @@
         }
       }
     },
+    "/v1/ai/summaries/{id}/album": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "C84: a saved summary shown to the participants of its album.",
+        "operationId": "AddAiSummaryToAlbum",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/albums/{albumId}/ai-summaries": {
+      "get": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "The summaries added to the album that this participant may read every memory of, the newest first.",
+        "operationId": "ListAlbumAiSummaries",
+        "parameters": [
+          {
+            "name": "albumId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AiSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/moderation/mine": {
       "get": {
         "tags": [
@@ -3142,6 +3209,7 @@
       "AiSummaryResponse": {
         "required": [
           "id",
+          "accountId",
           "albumId",
           "from",
           "to",
@@ -3161,6 +3229,10 @@
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
             "type": "string",
             "format": "uuid"
           },
