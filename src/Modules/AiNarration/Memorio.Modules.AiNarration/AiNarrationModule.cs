@@ -77,6 +77,8 @@ public sealed class AiNarrationModule : IModule
         services.AddScoped<ISummaryMaterialsQuery, SummaryMaterialsQuery>();
         services.AddScoped<IPeriodSummaries, PeriodSummaries>();
         services.AddScoped<RequestSummaryHandler>();
+        services.AddScoped<ApproveSummaryHandler>();
+        services.AddScoped<SummaryEndsWithArtifact>();
 
         services.AddHealthChecks().AddCheck<AiNarrationDatabaseHealthCheck>(AiNarrationDatabaseHealthCheck.Name, tags: [HealthTags.Ready]);
         if (configuration.GetValue("Database:MigrateOnStartup", defaultValue: true))

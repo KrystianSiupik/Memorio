@@ -246,6 +246,38 @@
         }
       }
     },
+    "/v1/ai/summaries/{id}/save": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "C83: the person approves the summary as it is and keeps it; the memories it tells of are checked again.",
+        "operationId": "SaveAiSummary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/moderation/mine": {
       "get": {
         "tags": [

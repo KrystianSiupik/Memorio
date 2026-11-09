@@ -20,13 +20,13 @@ public sealed class RequestSummaryTests(AiNarrationDatabase database)
     }
 
     /// <summary>An album whose owner and Ola consented and whose Jan did not, each with a July memory.</summary>
-    internal static async Task<(Guid Album, Guid Owner, Guid OwnersMemory, Guid OlasMemory, Guid Jan)> AlbumAsync(AiNarrationDatabase database)
+    internal static async Task<(Guid Album, Guid Owner, Guid OwnersMemory, Guid OlasMemory, Guid Jan)> AlbumAsync(AiNarrationDatabase database, string ownersDescription = "W górach.")
     {
         var album = Guid.CreateVersion7();
         var owner = Guid.CreateVersion7();
         var ola = Guid.CreateVersion7();
         var jan = Guid.CreateVersion7();
-        var owners = database.Albums.Bring(album, owner, July, place: "Giewont");
+        var owners = database.Albums.Bring(album, owner, July, place: "Giewont", description: ownersDescription);
         var olas = database.Albums.Bring(album, ola, July.AddDays(2), place: "Morskie Oko");
         database.Albums.Bring(album, jan, July.AddDays(4));
         await RevokeAiConsentTests.GiveAsync(database, owner, album);
@@ -99,18 +99,14 @@ public sealed class RequestSummaryTests(AiNarrationDatabase database)
     [Fact]
     public async Task When_the_AI_supports_nothing_there_is_no_summary_and_the_retry_costs_nothing_more()
     {
-        var (album, owner, _, _, _) = await AlbumAsync(database);
+        var marker = "Dolina" + Guid.CreateVersion7().ToString("N")[..8];
+        var (album, owner, _, _, _) = await AlbumAsync(database, ownersDescription: marker);
         var id = Guid.CreateVersion7();
-        var answer = database.Provider.SummaryAnswer;
-        database.Provider.SummaryAnswer = "Było pięknie. Wszyscy się cieszyli.";
-        try
-        {
-            Assert.Equal(SummaryErrors.NothingTold, (await RequestAsync(database, id, owner, album)).Error);
-        }
-        finally
-        {
-            database.Provider.SummaryAnswer = answer;
-        }
+        database.Provider.SummaryAnswerWhen[marker] = "Było pięknie. Wszyscy się cieszyli.";
+
+        Assert.Equal(SummaryErrors.NothingTold, (await RequestAsync(database, id, owner, album)).Error);
+
+        database.Provider.SummaryAnswerWhen.TryRemove(marker, out _);
 
         Assert.True((await RequestAsync(database, id, owner, album)).IsSuccess);
         Assert.Equal(1, database.Allowance.Consumed[id]);

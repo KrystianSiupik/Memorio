@@ -5,6 +5,8 @@ using Memorio.Modules.AiNarration.Infrastructure.Persistence;
 using Memorio.Modules.Album.Contracts;
 using Memorio.Modules.Archive.Contracts;
 using Memorio.Modules.Limits.Contracts;
+using Memorio.Modules.Provenance.Contracts;
+using Memorio.SharedKernel.Results;
 using Memorio.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +35,8 @@ public sealed class AiNarrationDatabase : PostgresDatabase
     internal FakeProviderForDrafts Provider { get; } = new();
 
     internal FakeAlbums Albums { get; } = new();
+
+    internal FakeArtifactRegistry Artifacts { get; } = new();
 
     /// <summary>How many events about this id wait in the worker's queue: nothing consumes it here.</summary>
     public async Task<long> QueuedEventsAsync(string eventName, Guid id)
@@ -64,6 +68,7 @@ public sealed class AiNarrationDatabase : PostgresDatabase
         builder.Services.AddSingleton<IAlbumMemories>(Albums);
         builder.Services.AddSingleton<IReadableContent>(Albums);
         builder.Services.AddSingleton<IMemoryFacts>(Albums);
+        builder.Services.AddSingleton<IArtifactRegistry>(Artifacts);
         _host = builder.Build();
 
         await using (var scope = CreateScope())
@@ -124,4 +129,26 @@ internal sealed class FakeAlbums : IAlbumMembership, IAlbumMemories, IReadableCo
 
     public Task<IReadOnlyCollection<Guid>> AlbumsOfAsync(Guid accountId, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyCollection<Guid>>([.. _members.Keys.Where(key => key.Account == accountId).Select(key => key.Album)]);
+}
+
+/// <summary>What Provenance was told was made from what, in memory; a refusal can be set for one artifact.</summary>
+internal sealed class FakeArtifactRegistry : IArtifactRegistry
+{
+    public System.Collections.Concurrent.ConcurrentDictionary<Guid, NewArtifact> Registered { get; } = new();
+
+    public System.Collections.Concurrent.ConcurrentDictionary<Guid, int> Calls { get; } = new();
+
+    public System.Collections.Concurrent.ConcurrentDictionary<Guid, bool> Refuse { get; } = new();
+
+    public Task<Result> RegisterAsync(NewArtifact artifact, CancellationToken cancellationToken)
+    {
+        Calls.AddOrUpdate(artifact.Id, 1, (_, calls) => calls + 1);
+        if (Refuse.ContainsKey(artifact.Id))
+        {
+            return Task.FromResult(Result.Failure(Error.Conflict("Provenance.IdTaken", "Another artifact has this id.")));
+        }
+
+        Registered[artifact.Id] = artifact;
+        return Task.FromResult(Result.Success());
+    }
 }
