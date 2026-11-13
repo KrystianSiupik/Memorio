@@ -28,7 +28,7 @@ const runs = Number(options.runs ?? 20);
 const budgets = {
   firstImageP95Ms: options.gpu ? 2000 : 15000, // map screen opened → base map and points on screen, assets cached
   movingFps: 50, // only with --gpu
-  initialGzipMb: 3.5, // SD3: what the first visit downloads before the map opens
+  initialGzipMb: 4.0, // SD3: what the first visit downloads before the map opens (D-374; back down with MEM-E0-PLAT-22)
   mapGzipMb: 0.35, // SD3: MapLibre GL JS and pmtiles, loaded when the map opens
 };
 const pointsMinimum = 1;

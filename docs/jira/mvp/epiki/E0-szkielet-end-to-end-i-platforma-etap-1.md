@@ -51,3 +51,4 @@
 | [MEM-E0-PLAT-19](../MEM-E0-PLAT-19-nawigacja-aplikacji-zakladki-mapa-albumy-udostepni.md) | Nawigacja aplikacji: zakładki Mapa · Albumy · Udostępnione mi · Konto, typy tras, przekierowanie niezalogowanych (S02) | - / UI | 2–3 | zrobiony |
 | [MEM-E0-PLAT-20](../MEM-E0-PLAT-20-dead-letters-runbook-skrypt-ponowienia-test-replayu.md) | Dead letters: runbook, skrypt przeglądu i ponowienia, test replayu | - / infrastruktura | 2–3 | zrobiony |
 | [MEM-E0-PLAT-21](../MEM-E0-PLAT-21-pule-polaczen-max-connections-alert-test-obciazenia.md) | Pule połączeń: rozmiary pul, max_connections, alert na zużycie, test obciążenia | - / infrastruktura | 2–4 | zrobiony |
+| [MEM-E0-PLAT-22](../MEM-E0-PLAT-22-odchudzenie-pierwszej-wizyty-web-leniwe-ladowanie.md) | Odchudzenie pierwszej wizyty w przeglądarce: leniwe ładowanie ekranów | - / UI | 4–8 | do zrobienia |
