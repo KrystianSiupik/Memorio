@@ -3,6 +3,10 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Migrations one at a time across hosts (D-373). -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="../Memorio.SharedKernel/Memorio.SharedKernel.csproj" />
   </ItemGroup>
 </Project>
