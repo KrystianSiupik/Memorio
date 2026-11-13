@@ -22,6 +22,7 @@ recovery_target_time = '$target'
 recovery_target_action = 'promote'
 archive_mode = off
 listen_addresses = ''
+max_connections = ${POSTGRES_MAX_CONNECTIONS:-250}
 EOF
 
 # RTO ≤ 8 h (QS2): the replay may take that long before the test gives up.

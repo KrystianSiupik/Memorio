@@ -1,8 +1,8 @@
 using Memorio.Modules.Provenance.Application.Commands.RegisterArtifact;
 using Memorio.Modules.Provenance.Domain.Artifacts;
 using Memorio.Modules.Provenance.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Memorio.SharedKernel.Results;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Memorio.Modules.Provenance.Tests;

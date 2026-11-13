@@ -1,5 +1,5 @@
-using Memorio.Modules.Album.Contracts;
 using Memorio.Modules.Album.Application.Policies;
+using Memorio.Modules.Album.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Memorio.Modules.Album.Infrastructure.Messaging;
