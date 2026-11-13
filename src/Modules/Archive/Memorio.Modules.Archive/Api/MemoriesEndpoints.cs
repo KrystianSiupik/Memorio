@@ -1,12 +1,12 @@
 using System.Security.Claims;
-using Memorio.Modules.Access.Contracts;
 using Memorio.Modularity;
+using Memorio.Modules.Access.Contracts;
 using Memorio.Modules.Archive.Application.Commands.AddPhoto;
-using Memorio.Modules.Archive.Application.Commands.RestoreMemory;
-using Memorio.Modules.Archive.Application.Commands.DeleteMemory;
-using Memorio.Modules.Archive.Application.Commands.TrashMemory;
 using Memorio.Modules.Archive.Application.Commands.ApproveDescription;
 using Memorio.Modules.Archive.Application.Commands.CreateMemory;
+using Memorio.Modules.Archive.Application.Commands.DeleteMemory;
+using Memorio.Modules.Archive.Application.Commands.RestoreMemory;
+using Memorio.Modules.Archive.Application.Commands.TrashMemory;
 using Memorio.Modules.Archive.Application.Queries.MemoryDetails;
 using Memorio.Modules.Archive.Application.Queries.MemoryMap;
 using Memorio.Modules.Archive.Application.Queries.MyMemories;

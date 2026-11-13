@@ -1,9 +1,9 @@
-using Memorio.Modules.AiNarration.Domain.Consents;
 using System.Text.Json;
+using Memorio.Modules.AiNarration.Domain.Consents;
 using Memorio.Modules.AiNarration.Domain.Drafts;
 using Memorio.Modules.AiNarration.Domain.Summaries;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Memorio.Modules.AiNarration.Infrastructure.Persistence;
 
